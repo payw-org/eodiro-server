@@ -1,4 +1,6 @@
+require('dotenv').config()
 require('module-alias/register')
+require('@/db')
 
 const Koa = require('koa')
 const Router = require('@koa/router')
