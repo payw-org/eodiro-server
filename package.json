@@ -1,0 +1,8 @@
+{
+  "name": "eodiro-api-mysql",
+  "version": "1.0.0-alpha.1",
+  "main": "index.js",
+  "repository": "https://github.com/paywteam/eodiro-api-mysql.git",
+  "author": "PAYW",
+  "license": "MIT"
+}
