@@ -4,5 +4,21 @@
   "main": "index.js",
   "repository": "https://github.com/paywteam/eodiro-api-mysql.git",
   "author": "PAYW",
-  "license": "MIT"
+  "license": "MIT",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon --watch src/ src/index.js"
+  },
+  "_moduleAliases": {
+    "@": "src"
+  },
+  "dependencies": {
+    "@koa/router": "^8.0.2",
+    "koa": "^2.8.2",
+    "koa-router": "^7.4.0",
+    "module-alias": "^2.2.2"
+  },
+  "devDependencies": {
+    "nodemon": "^1.19.3"
+  }
 }
