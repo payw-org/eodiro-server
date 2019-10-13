@@ -8,8 +8,6 @@ class Auth {
       .update(password)
       .digest('base64')
 
-    console.log(portalId, pwHash)
-
     const conn = require('@/db/db-connector').getConnection()
     const query = 'SELECT * FROM users WHERE portal_id = ? AND password = ?'
     const values = [portalId, pwHash]
