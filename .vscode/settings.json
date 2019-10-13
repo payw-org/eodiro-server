@@ -1,0 +1,6 @@
+{
+  "editor.formatOnSave": true,
+  "eslint.autoFixOnSave": true,
+  "files.insertFinalNewline": true,
+  "editor.formatOnPaste": true
+}
