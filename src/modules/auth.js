@@ -74,12 +74,13 @@ class Auth {
     if (results.length === 0) {
       // Available
       const query2 =
-        'INSERT INTO users (portal_id, password, registered_at, nickname) VALUES (?, ?, ?, ?)'
+        'INSERT INTO users_pending (portal_id, password, registered_at, nickname, random_nickname, token) VALUES (?, ?, ?, ?, "random nickname", ?)'
       const values2 = [
         portalId,
         this.hashPw(password),
         dayjs().format('YYYY-MM-DD HH:mm:ss'),
-        nickname
+        nickname,
+        crypto.randomBytes(20).toString('hex')
       ]
       const { err } = await new Promise(resolve => {
         conn.query(query2, values2, (err, results) => {
