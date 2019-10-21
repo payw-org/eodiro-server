@@ -1,18 +1,21 @@
-const Router = require('@koa/router')
-const authRouter = new Router()
+const express = require('express')
+const router = express.Router()
 const Auth = require('@/modules/auth')
 
-authRouter.get('/sign-in', async (ctx, next) => {
-  ctx.body = await Auth.signIn(ctx.session, ctx.request.body)
+router.get('/sign-in', async (req, res) => {
+  const body = await Auth.signIn(null, req.body)
+  res.send(body)
 })
 
-authRouter.post('/sign-up', async (ctx, next) => {
-  const requestData = ctx.request.body
-  ctx.body = await Auth.signUp(requestData)
+router.post('/sign-up', async (req, res) => {
+  const requestData = req.body
+  const body = await Auth.signUp(requestData)
+  res.send(body)
 })
 
-authRouter.get('/sign-out', (ctx, next) => {
-  ctx.body = Auth.signOut(ctx.session)
+router.get('/sign-out', (req, res) => {
+  const body = Auth.signOut(null)
+  res.send(body)
 })
 
-module.exports = authRouter
+module.exports = router

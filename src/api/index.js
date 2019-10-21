@@ -1,9 +1,9 @@
-const Router = require('@koa/router')
-const api = new Router()
+const express = require('express')
+const router = express.Router()
 const peperoSquareRouter = require('@/api/pepero-square')
 const authRouter = require('@/api/auth')
 
-api.use('/pepero-square', peperoSquareRouter.routes())
-api.use('/auth', authRouter.routes())
+router.use('/pepero-square', peperoSquareRouter)
+router.use('/auth', authRouter)
 
-module.exports = api
+module.exports = router
