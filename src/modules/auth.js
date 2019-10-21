@@ -92,6 +92,10 @@ class Auth {
         return {
           err: false
         }
+      } else {
+        return {
+          err: 8
+        }
       }
     } else if (results.length === 1) {
       // There already exists a user with this portal ID
@@ -99,7 +103,7 @@ class Auth {
         err: 5
       }
     } else {
-      // Fatal error
+      // Fatal error: multiple fields for the same portal ID
       // Must be reviewed by the maintainers
       return {
         err: 7
