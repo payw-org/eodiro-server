@@ -1,17 +1,15 @@
-const Router = require('@koa/router')
-const peperoSquare = new Router()
+const express = require('express')
+const router = express.Router()
 const conn = require('@/db/db-connector').getConnection()
 
-peperoSquare.get('/', (ctx, next) => {
+router.get('/', (req, res) => {
   // ctx.body = 'pepero square API'
-  let n = ctx.session.views || 0
-  ctx.session.views = ++n
-  ctx.body = n + ' views'
+  res.send('hello pepero-square')
 })
 
 // Get posts data
-peperoSquare.get('/posts', async (ctx, next) => {
-  ctx.body = await new Promise((resolve, reject) => {
+router.get('/posts', async (req, res) => {
+  const body = await new Promise((resolve, reject) => {
     const sql = 'SELECT * FROM posts ORDER BY id DESC'
 
     conn.query(sql, (err, results) => {
@@ -27,12 +25,16 @@ peperoSquare.get('/posts', async (ctx, next) => {
       })
     })
   })
+
+  res.send(body)
 })
 
 // Upload a new post
-peperoSquare.post('/posts', async (ctx, next) => {
-  ctx.body = await new Promise((resolve, reject) => {
-    const requestBody = ctx.request.body
+router.post('/posts', async (req, res) => {
+  console.log('upload a new post')
+  const body = await new Promise((resolve, reject) => {
+    const requestBody = req.body
+    console.log(requestBody)
     const { title, body, authorId, uploadedAt } = requestBody
 
     if (!title) {
@@ -67,12 +69,14 @@ peperoSquare.post('/posts', async (ctx, next) => {
       })
     })
   })
+
+  res.send(body)
 })
 
 // Update post data
-peperoSquare.patch('/posts', async (ctx, next) => {
-  ctx.body = await new Promise((resolve, reject) => {
-    const requestBody = ctx.request.body
+router.patch('/posts', async (req, res) => {
+  const body = await new Promise((resolve, reject) => {
+    const requestBody = req.body
     const { postId, title, body } = requestBody
 
     const query = 'UPDATE posts SET title = ?, body = ? WHERE id = ?'
@@ -90,6 +94,8 @@ peperoSquare.patch('/posts', async (ctx, next) => {
       })
     })
   })
+
+  res.send(body)
 })
 
-module.exports = peperoSquare
+module.exports = router
