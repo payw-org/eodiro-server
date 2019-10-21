@@ -12,7 +12,7 @@ peperoSquare.get('/', (ctx, next) => {
 // Get posts data
 peperoSquare.get('/posts', async (ctx, next) => {
   ctx.body = await new Promise((resolve, reject) => {
-    const sql = 'SELECT * FROM posts ORDER BY _id DESC'
+    const sql = 'SELECT * FROM posts ORDER BY id DESC'
 
     conn.query(sql, (err, results) => {
       if (err) {
@@ -75,7 +75,7 @@ peperoSquare.patch('/posts', async (ctx, next) => {
     const requestBody = ctx.request.body
     const { postId, title, body } = requestBody
 
-    const query = 'UPDATE posts SET title = ?, body = ? WHERE _id = ?'
+    const query = 'UPDATE posts SET title = ?, body = ? WHERE id = ?'
     const values = [title, body, postId]
 
     conn.query(query, values, (err, results) => {
