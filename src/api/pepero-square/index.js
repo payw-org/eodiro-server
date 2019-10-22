@@ -1,95 +1,69 @@
-const Router = require('@koa/router')
-const peperoSquare = new Router()
-const conn = require('@/db/db-connector').getConnection()
+const express = require('express')
+const router = express.Router()
+const conn = require('@/modules/db-connector').getConnection()
 
-peperoSquare.get('/', (ctx, next) => {
+router.get('/', (req, res) => {
   // ctx.body = 'pepero square API'
-  let n = ctx.session.views || 0
-  ctx.session.views = ++n
-  ctx.body = n + ' views'
+  if (!req.session.count) {
+    req.session.count = 0
+  }
+  req.session.count++
+  res.json(req.session.count)
 })
 
 // Get posts data
-peperoSquare.get('/posts', async (ctx, next) => {
-  ctx.body = await new Promise((resolve, reject) => {
-    const sql = 'SELECT * FROM posts ORDER BY id DESC'
+router.get('/posts', async (req, res) => {
+  const sql = `
+    SELECT *
+    FROM post
+    ORDER BY id DESC
+  `
+  const [results] = await conn.execute(sql)
 
-    conn.query(sql, (err, results) => {
-      if (err) {
-        resolve({
-          err: err.stack
-        })
-      }
-
-      resolve({
-        err: false,
-        rows: results
-      })
-    })
-  })
+  res.json(results)
 })
 
 // Upload a new post
-peperoSquare.post('/posts', async (ctx, next) => {
-  ctx.body = await new Promise((resolve, reject) => {
-    const requestBody = ctx.request.body
-    const { title, body, authorId, uploadedAt } = requestBody
+router.post('/posts', async (req, res) => {
+  const { title, body, authorId, uploadedAt } = req.body
 
-    if (!title) {
-      resolve({
-        err: 'no title'
-      })
-      return
-    }
-
-    if (!body) {
-      resolve({
-        err: 'no body'
-      })
-      return
-    }
-
-    const query =
-      'INSERT INTO posts (title, body, author_id, uploaded_at) VALUES (?, ?, ?, ?)'
-    const values = [title, body, authorId, uploadedAt]
-
-    conn.query(query, values, (err, results) => {
-      if (err) {
-        resolve({
-          err: err.stack
-        })
-        return
-      }
-
-      resolve({
-        err: false,
-        insertedId: results.insertId
-      })
+  if (!title) {
+    res.json({
+      err: 'no title'
     })
-  })
+    return
+  }
+
+  if (!body) {
+    res.json({
+      err: 'no body'
+    })
+    return
+  }
+
+  const query = `
+    INSERT INTO post
+    (title, body, author_id, uploaded_at)
+    VALUES (?, ?, ?, ?)
+  `
+  const values = [title, body, authorId, uploadedAt]
+  const [results] = await conn.query(query, values)
+
+  res.json(results)
 })
 
 // Update post data
-peperoSquare.patch('/posts', async (ctx, next) => {
-  ctx.body = await new Promise((resolve, reject) => {
-    const requestBody = ctx.request.body
-    const { postId, title, body } = requestBody
+router.patch('/posts', async (req, res) => {
+  const { postId, title, body } = req.body
 
-    const query = 'UPDATE posts SET title = ?, body = ? WHERE id = ?'
-    const values = [title, body, postId]
+  const query = `
+    UPDATE post
+    SET title = ?, body = ? WHERE id = ?
+  `
+  const values = [title, body, postId]
+  const [results] = await conn.query(query, values)
 
-    conn.query(query, values, (err, results) => {
-      if (err) {
-        resolve({
-          err: err.stack
-        })
-      }
-
-      resolve({
-        err: false
-      })
-    })
-  })
+  res.json(results)
 })
 
-module.exports = peperoSquare
+module.exports = router

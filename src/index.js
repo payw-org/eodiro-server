@@ -1,25 +1,24 @@
 require('dotenv').config()
 require('module-alias/register')
 
-const Koa = require('koa')
-const Router = require('@koa/router')
+const express = require('express')
+const bodyParser = require('body-parser')
+const session = require('express-session')
+const crypto = require('crypto')
 
-const app = new Koa()
-const bodyParser = require('koa-bodyparser')
-const router = new Router()
-const session = require('koa-session')
+const app = express()
 const api = require('@/api')
 
-app.keys = ['secret']
-const sessionConfig = {
-  key: 'eodiro_api2_session',
-  renew: true
-}
-app.use(session(sessionConfig, app))
-app.use(bodyParser())
-router.use('', api.routes())
-app.use(router.routes())
-app.use(router.allowedMethods())
+app.use(bodyParser.urlencoded({ extended: true }))
+app.use(bodyParser.json())
+app.use(
+  session({
+    secret: crypto.randomBytes(64).toString(),
+    resave: false,
+    saveUninitialized: true
+  })
+)
+app.use(api)
 
 const port = 4000
 app.listen(port, () => {
