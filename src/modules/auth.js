@@ -1,4 +1,4 @@
-const conn = require('@/db/db-connector').getConnection()
+const conn = require('@/modules/db-connector').getConnection()
 const crypto = require('crypto')
 const dayjs = require('dayjs')
 
@@ -10,8 +10,11 @@ class Auth {
       .digest('base64')
   }
 
-  static async signIn(session, options) {
-    const { portalId, password } = options
+  /**
+   * @param {Express.Session} session
+   */
+  static async signIn(session, info) {
+    const { portalId, password } = info
 
     if (!portalId) {
       return {
@@ -25,31 +28,21 @@ class Auth {
       }
     }
 
-    const pwHash = this.hashPw(password)
+    const hashedPw = this.hashPw(password)
 
-    const query = 'SELECT * FROM users WHERE portal_id = ? AND password = ?'
-    const values = [portalId, pwHash]
-    const { err, results } = await new Promise(resolve => {
-      conn.query(query, values, (err, results) => {
-        resolve({ err, results })
-      })
-    })
+    const sql = `
+      SELECT *
+      FROM users
+      WHERE portal_id = ? AND password = ?
+    `
+    const values = [portalId, hashedPw]
+    const [results] = conn.execute(sql, values)
 
-    if (!err && results.length === 1) {
-      session.auth = results[0]
-
-      return {
-        err: false
-      }
-    } else {
-      return {
-        err: 6
-      }
-    }
+    return results
   }
 
-  static async signUp(options) {
-    const { portalId, password, nickname } = options
+  static async signUp(info) {
+    const { portalId, password, nickname } = info
 
     if (!portalId) {
       return {
@@ -63,40 +56,32 @@ class Auth {
       }
     }
 
-    const query = 'SELECT * FROM users WHERE portal_id = ?'
+    const sql = `
+      SELECT *
+      FROM users
+      WHERE portal_id = ?
+    `
     const values = [portalId]
-    const { results } = await new Promise(resolve => {
-      conn.query(query, values, (err, results) => {
-        resolve({ err, results })
-      })
-    })
+    const [results] = conn.execute(sql, values)
 
     if (results.length === 0) {
       // Available
-      const query2 =
-        'INSERT INTO users_pending (portal_id, password, registered_at, nickname, random_nickname, token) VALUES (?, ?, ?, ?, "random nickname", ?)'
-      const values2 = [
+      const sql = `
+        INSERT INTO users_pending
+        (portal_id, password, registered_at, nickname, random_nickname, token)
+        VALUES (?, ?, ?, ?, "random nickname", ?)
+      `
+      const values = [
         portalId,
         this.hashPw(password),
         dayjs().format('YYYY-MM-DD HH:mm:ss'),
         nickname,
         crypto.randomBytes(20).toString('hex')
       ]
-      const { err } = await new Promise(resolve => {
-        conn.query(query2, values2, (err, results) => {
-          resolve({ err, results })
-        })
-      })
 
-      if (!err) {
-        return {
-          err: false
-        }
-      } else {
-        return {
-          err: 8
-        }
-      }
+      const [results] = conn.execute(sql, values)
+
+      return results
     } else if (results.length === 1) {
       // There already exists a user with this portal ID
       return {
@@ -111,8 +96,11 @@ class Auth {
     }
   }
 
+  /**
+   * @param {Express.Session} session
+   */
   static signOut(session) {
-    session = null
+    session.destroy()
   }
 }
 
