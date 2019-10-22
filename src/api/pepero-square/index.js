@@ -1,101 +1,69 @@
 const express = require('express')
 const router = express.Router()
-const conn = require('@/db/db-connector').getConnection()
+const conn = require('@/modules/db-connector').getConnection()
 
 router.get('/', (req, res) => {
   // ctx.body = 'pepero square API'
-  res.send('hello pepero-square')
+  if (!req.session.count) {
+    req.session.count = 0
+  }
+  req.session.count++
+  res.json(req.session.count)
 })
 
 // Get posts data
 router.get('/posts', async (req, res) => {
-  const body = await new Promise((resolve, reject) => {
-    const sql = 'SELECT * FROM posts ORDER BY id DESC'
+  const sql = `
+    SELECT *
+    FROM post
+    ORDER BY id DESC
+  `
+  const [results] = await conn.execute(sql)
 
-    conn.query(sql, (err, results) => {
-      if (err) {
-        resolve({
-          err: err.stack
-        })
-      }
-
-      resolve({
-        err: false,
-        rows: results
-      })
-    })
-  })
-
-  res.send(body)
+  res.json(results)
 })
 
 // Upload a new post
 router.post('/posts', async (req, res) => {
-  console.log('upload a new post')
-  const body = await new Promise((resolve, reject) => {
-    const requestBody = req.body
-    console.log(requestBody)
-    const { title, body, authorId, uploadedAt } = requestBody
+  const { title, body, authorId, uploadedAt } = req.body
 
-    if (!title) {
-      resolve({
-        err: 'no title'
-      })
-      return
-    }
-
-    if (!body) {
-      resolve({
-        err: 'no body'
-      })
-      return
-    }
-
-    const query =
-      'INSERT INTO posts (title, body, author_id, uploaded_at) VALUES (?, ?, ?, ?)'
-    const values = [title, body, authorId, uploadedAt]
-
-    conn.query(query, values, (err, results) => {
-      if (err) {
-        resolve({
-          err: err.stack
-        })
-        return
-      }
-
-      resolve({
-        err: false,
-        insertedId: results.insertId
-      })
+  if (!title) {
+    res.json({
+      err: 'no title'
     })
-  })
+    return
+  }
 
-  res.send(body)
+  if (!body) {
+    res.json({
+      err: 'no body'
+    })
+    return
+  }
+
+  const query = `
+    INSERT INTO post
+    (title, body, author_id, uploaded_at)
+    VALUES (?, ?, ?, ?)
+  `
+  const values = [title, body, authorId, uploadedAt]
+  const [results] = await conn.query(query, values)
+
+  res.json(results)
 })
 
 // Update post data
 router.patch('/posts', async (req, res) => {
-  const body = await new Promise((resolve, reject) => {
-    const requestBody = req.body
-    const { postId, title, body } = requestBody
+  const { postId, title, body } = req.body
 
-    const query = 'UPDATE posts SET title = ?, body = ? WHERE id = ?'
-    const values = [title, body, postId]
+  const query = `
+    UPDATE post
+    SET title = ?, body = ? WHERE id = ?
+  `
+  const values = [title, body, postId]
+  const [results] = await conn.query(query, values)
 
-    conn.query(query, values, (err, results) => {
-      if (err) {
-        resolve({
-          err: err.stack
-        })
-      }
-
-      resolve({
-        err: false
-      })
-    })
-  })
-
-  res.send(body)
+  res.json(results)
 })
 
 module.exports = router
