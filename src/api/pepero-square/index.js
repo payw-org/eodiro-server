@@ -41,13 +41,13 @@ router.post('/posts', async (req, res) => {
     return
   }
 
-  const query = `
+  const sql = `
     INSERT INTO post
     (title, body, author_id, uploaded_at)
     VALUES (?, ?, ?, ?)
   `
   const values = [title, body, authorId, uploadedAt]
-  const [results] = await conn.query(query, values)
+  const [results] = await conn.query(sql, values)
 
   res.json(results)
 })
@@ -56,12 +56,12 @@ router.post('/posts', async (req, res) => {
 router.patch('/posts', async (req, res) => {
   const { postId, title, body } = req.body
 
-  const query = `
+  const sql = `
     UPDATE post
     SET title = ?, body = ? WHERE id = ?
   `
   const values = [title, body, postId]
-  const [results] = await conn.query(query, values)
+  const [results] = await conn.query(sql, values)
 
   res.json(results)
 })
