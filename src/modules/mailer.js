@@ -3,12 +3,14 @@ const nodeMailer = require('nodemailer')
 class Mailer {
   /**
    * @param {Object} options
+   * @param {string} options.subject
    * @param {string} options.to
    * @param {string} options.html
    */
   static sendMail(options) {
     this.transporter.sendMail({
       from: '"어디로" <contact@payw.org>',
+      subject: options.subject,
       to: options.to,
       html: options.html
     })
