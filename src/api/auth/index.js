@@ -3,7 +3,7 @@ const router = express.Router()
 const Auth = require('@/modules/auth')
 
 router.get('/sign-in', async (req, res) => {
-  const result = await Auth.signIn(null, req.body)
+  const result = await Auth.signIn(req.session, req.body)
   res.send(result)
 })
 
@@ -14,7 +14,7 @@ router.post('/sign-up', async (req, res) => {
 })
 
 router.get('/sign-out', (req, res) => {
-  const result = Auth.signOut(null)
+  const result = Auth.signOut(req.session)
   res.send(result)
 })
 
