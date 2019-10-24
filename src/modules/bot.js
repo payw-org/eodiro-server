@@ -29,9 +29,10 @@ class Bot {
         if (timeDiffMin > 30) {
           const sql = `
             delete from pending_user
-            where id = '${row.id}'
+            where id = ?
           `
-          await conn.execute(sql)
+          const values = [row.id]
+          await conn.execute(sql, values)
         }
       })
     }, time)
