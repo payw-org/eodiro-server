@@ -13,9 +13,7 @@ class Bot {
         select *
         from pending_user
       `
-      /**
-       * @type {[[]]}
-       */
+      /** @type {[Array<>} */
       const [results] = await conn.execute(sql)
 
       results.forEach(async row => {
@@ -29,9 +27,10 @@ class Bot {
         if (timeDiffMin > 30) {
           const sql = `
             delete from pending_user
-            where id = '${row.id}'
+            where id = ?
           `
-          await conn.execute(sql)
+          const values = [row.id]
+          await conn.execute(sql, values)
         }
       })
     }, time)
