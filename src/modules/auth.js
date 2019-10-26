@@ -15,6 +15,69 @@ class Auth {
   }
 
   /**
+   * @param {string} token
+   */
+  static async verifyPendingUser(token) {
+    if (!token) {
+      return {
+        err: true,
+        msg: 'no token given'
+      }
+    }
+    const sql = `
+      select *
+      from pending_user
+      where token = ?
+    `
+    const values = [token]
+
+    /** @type {[Array<>]} */
+    const queryResult = await conn.execute(sql, values).catch(err => {
+      console.log(err)
+    })
+    if (!queryResult) {
+      return {
+        err: true,
+        msg: 'query failed'
+      }
+    }
+
+    const [results] = queryResult
+    if (results.length !== 1) {
+      return {
+        err: true,
+        msg: 'no token found from pending users'
+      }
+    }
+
+    // Successfully verified
+    // Auto login and redirect to main page or the previous page
+    const pendingUserId = results[0].id
+    const sql2 = `
+      insert into user (portal_id, password, registered_at, nickname, random_nickname)
+      select portal_id, password, registered_at, nickname, random_nickname
+      from pending_user
+      where id = ?;
+      delete from pending_user
+      where id = ?;
+    `
+    const values2 = [pendingUserId, pendingUserId]
+    const queryResult2 = await conn.query(sql2, values2).catch(err => {
+      console.log(err.message)
+    })
+    if (!queryResult2) {
+      return {
+        err: true,
+        msg: 'query failed'
+      }
+    }
+
+    return {
+      err: false
+    }
+  }
+
+  /**
    * @param {string} portalId
    */
   static validatePortalId(portalId) {
