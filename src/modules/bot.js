@@ -13,9 +13,7 @@ class Bot {
         select *
         from pending_user
       `
-      /**
-       * @type {[[]]}
-       */
+      /** @type {[Array<>} */
       const [results] = await conn.execute(sql)
 
       results.forEach(async row => {
