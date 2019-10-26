@@ -6,18 +6,28 @@ const Bot = require('@/modules/bot')
 const bot = new Bot()
 bot.clearPendingUsers()
 
-router.get('/sign-in', async (req, res) => {
-  const result = await Auth.signIn(req.session, req.body)
-  res.send(result)
-})
-
-router.post('/sign-up', async (req, res) => {
+// Sign up
+router.post('/signup', async (req, res) => {
   const requestData = req.body
   const result = await Auth.signUp(requestData)
   res.send(result)
 })
 
-router.get('/sign-out', (req, res) => {
+// Verify pending user
+router.get('/verify', async (req, res) => {
+  const requestData = req.body
+  const result = await Auth.verifyPendingUser(requestData.token)
+  res.json(result)
+})
+
+// Sign in
+router.get('/signin', async (req, res) => {
+  const result = await Auth.signIn(req.session, req.body)
+  res.send(result)
+})
+
+// Sign out
+router.get('/signout', (req, res) => {
   const result = Auth.signOut(req.session)
   res.send(result)
 })
