@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "moduleResolution": "node",
+    "target": "es5",
+    "module": "commonjs",
+    "outDir": "build",
+    "declaration": false,
+    "esModuleInterop": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"],
+      "@@/*": ["./*"]
+    }
+  },
+  "exclude": ["node_modules", "build"]
+}
