@@ -1,70 +1,72 @@
 import express from 'express'
+import Post from '@/db/post'
+import { PostModel, PostNew, PostUpdate } from '@/db/post'
+import Auth from '@/modules/auth'
 
 const router = express.Router()
-const conn = require('@/modules/db-connector').getConnection()
 
 router.get('/', (req, res) => {
-  // ctx.body = 'pepero square API'
-  if (!req.session.count) {
-    req.session.count = 0
-  }
-  req.session.count++
-  res.json(req.session.count)
+  res.json(req.session.userId)
 })
 
 // Get posts data
 router.get('/posts', async (req, res) => {
-  const sql = `
-    SELECT *
-    FROM post
-    ORDER BY id DESC
-  `
-  const [results] = await conn.execute(sql)
+  const posts = await Post.getPosts(0, 1000)
 
-  res.json(results)
+  if (posts) {
+    res.status(200).json(posts)
+  } else {
+    res.sendStatus(500)
+  }
 })
 
 // Upload a new post
 router.post('/posts', async (req, res) => {
-  const { title, body, authorId, uploadedAt } = req.body
+  const postData: PostNew = req.body
 
-  if (!title) {
-    res.json({
-      err: 'no title'
-    })
+  // Unauthorized user or not signed in
+  if (!Auth.isSignedUser(req.session, postData.userId)) {
+    res.sendStatus(401)
     return
   }
 
-  if (!body) {
-    res.json({
-      err: 'no body'
-    })
-    return
+  // Validate post content
+
+  const isUploaded = await Post.upload(postData)
+
+  if (isUploaded) {
+    res.sendStatus(201)
+  } else {
+    res.sendStatus(400)
   }
-
-  const sql = `
-    INSERT INTO post
-    (title, body, author_id, uploaded_at)
-    VALUES (?, ?, ?, ?)
-  `
-  const values = [title, body, authorId, uploadedAt]
-  const [results] = await conn.query(sql, values)
-
-  res.json(results)
 })
 
 // Update post data
 router.patch('/posts', async (req, res) => {
-  const { postId, title, body } = req.body
+  // Not signed in
+  if (!Auth.isSignedIn(req.session)) {
+    res.sendStatus(401)
+    return
+  }
 
-  const sql = `
-    UPDATE post
-    SET title = ?, body = ? WHERE id = ?
-  `
-  const values = [title, body, postId]
-  const [results] = await conn.query(sql, values)
+  const refinedData: PostUpdate = req.body
+  const isOwnedByUser = await Post.isOwnedBy(
+    refinedData.postId,
+    Auth.getSignedInUserId(req.session)
+  )
 
-  res.json(results)
+  if (!isOwnedByUser) {
+    res.sendStatus(401)
+    return
+  }
+
+  const isUpdated = await Post.update(refinedData)
+
+  if (isUpdated) {
+    res.sendStatus(200)
+  } else {
+    res.sendStatus(500)
+  }
 })
 
 export default router
