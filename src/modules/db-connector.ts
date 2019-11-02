@@ -21,18 +21,14 @@ export default class DbConnector {
         multipleStatements: true
       })
 
-      console.info(
-        `📦 Connecing to DB (host: ${Config.DB_HOST}, user: ${Config.DB_USER})`
-      )
-
       this.connection.connect(err => {
         if (err) {
           this.connection = undefined
           console.error(err.message)
-          console.error('❌ Could not connect to Database')
+          console.error('❌ Failed to connect to Database')
           resolve(false)
         } else {
-          console.error('⭕️ Successfully connected to DB')
+          console.info('⭕️ Connected to DB')
           resolve(true)
         }
       })
