@@ -3,6 +3,9 @@
  */
 
 export default {
+  NODE_ENV: 'development',
+  PORT: 4000,
+
   // DB
   DB_HOST: '',
   DB_USER: '',
