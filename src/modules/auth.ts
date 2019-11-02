@@ -84,7 +84,22 @@ export default class Auth {
     return user ? false : true
   }
 
-  static async signIn(session, info: SignInInfo): Promise<boolean> {
+  static isSignedIn(session: Express.Session): boolean {
+    return session.userId ? true : false
+  }
+
+  static isSignedUser(session: Express.Session, userId: number): boolean {
+    return this.isSignedIn(session) && session.userId === userId
+  }
+
+  static getSignedInUserId(session: Express.Session): number {
+    return session.userId
+  }
+
+  static async signIn(
+    session: Express.Session,
+    info: SignInInfo
+  ): Promise<boolean> {
     let { portalId, password } = info
 
     portalId = portalId.trim()
@@ -95,6 +110,10 @@ export default class Auth {
     }
 
     const user = await User.findWithPortalIdAndPw(portalId, password)
+
+    if (user) {
+      session.userId = user.id
+    }
 
     return user ? true : false
   }
@@ -138,9 +157,16 @@ export default class Auth {
     return true
   }
 
-  static signOut(session: Express.Session): void {
-    session.destroy(err => {
-      console.error(err)
+  static async signOut(session: Express.Session): Promise<boolean> {
+    return new Promise(resolve => {
+      session.destroy(err => {
+        if (err) {
+          console.error(err)
+          resolve(false)
+        } else {
+          resolve(true)
+        }
+      })
     })
   }
 }
