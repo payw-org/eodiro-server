@@ -1,4 +1,5 @@
-const express = require('express')
+import express from 'express'
+
 const router = express.Router()
 const conn = require('@/modules/db-connector').getConnection()
 
@@ -66,4 +67,4 @@ router.patch('/posts', async (req, res) => {
   res.json(results)
 })
 
-module.exports = router
+export default router
