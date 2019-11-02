@@ -1,5 +1,4 @@
 import Db from '@/db'
-import { Dayjs } from 'dayjs'
 import { SignUpInfo } from '@/modules/auth'
 import Auth from '@/modules/auth'
 import Time from '@/modules/time'
@@ -7,7 +6,7 @@ import Time from '@/modules/time'
 export interface UserModel {
   id: number
   portal_id: string
-  registered_at: Dayjs
+  registered_at: string
   nickname: string
   random_nickname: string
 }
@@ -16,13 +15,14 @@ export default class User {
   static async findWithPortalIdAndPw(
     portalId: string,
     password: string
-  ): Promise<UserModel | undefined | false> {
+  ): Promise<UserModel | false> {
     const query = `
       select *
       from user
       where portal_id = ? and password = ?
     `
-    const [err, results] = await Db.query(query, [portalId, password])
+    const encryptedPassword = Auth.encryptPw(password)
+    const [err, results] = await Db.query(query, [portalId, encryptedPassword])
 
     if (err) {
       console.error(err.message)
@@ -36,7 +36,7 @@ export default class User {
     return results[0]
   }
 
-  static async findAtId(id: number): Promise<UserModel | undefined | false> {
+  static async findAtId(id: number): Promise<UserModel | false> {
     const query = `
       select *
       from user
@@ -59,7 +59,7 @@ export default class User {
   static async findWithAttrFromAll(
     attrName: 'portal_id' | 'nickname',
     value: string
-  ): Promise<UserModel | undefined | false> {
+  ): Promise<UserModel | false> {
     if (attrName !== 'portal_id' && attrName !== 'nickname') {
       return undefined
     }
@@ -90,9 +90,7 @@ export default class User {
     return results[0]
   }
 
-  static async findWithToken(
-    token: string
-  ): Promise<UserModel | undefined | false> {
+  static async findWithToken(token: string): Promise<UserModel | false> {
     const query = `
       select *
       from pending_user
