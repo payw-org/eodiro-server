@@ -27,7 +27,7 @@ export default class EodiroMailer {
           console.error(err.message)
           resolve(false)
         } else {
-          console.info('⭕️ Successfully connected to Zoho mail server')
+          console.info('⭕️ Connected to Zoho mail server')
           resolve(true)
         }
       })

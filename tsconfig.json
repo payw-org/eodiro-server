@@ -3,12 +3,12 @@
     "moduleResolution": "node",
     "target": "es5",
     "module": "commonjs",
-    "outDir": "build",
+    "outDir": "./build",
     "declaration": false,
     "esModuleInterop": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"],
+      "@/*": ["./src/*"],
       "@@/*": ["./*"]
     }
   },
