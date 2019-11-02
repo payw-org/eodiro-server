@@ -8,6 +8,9 @@
   "scripts": {
     "build": "tsc",
     "start": "node build/src/index.js",
+    "compile": "tsc --incremental --sourceMap && node build/src/index.js",
+    "dev:ts-node": "yarn clear && nodemon --exec ts-node -- src/index.ts",
+    "dev": "yarn clear && nodemon -e ts --exec \"yarn run compile\"",
     "clear": "rimraf build/*"
   },
   "_moduleAliases": {
