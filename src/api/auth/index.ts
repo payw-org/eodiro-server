@@ -5,7 +5,7 @@ import { SignUpInfo } from '@/modules/auth'
 const router = express.Router()
 
 // Sign up
-router.post('/signup', async (req, res) => {
+router.post('/sign-up', async (req, res) => {
   const signUpInfo: SignUpInfo = req.body
   const { portalId, nickname, password } = signUpInfo
   const validations = {
@@ -37,7 +37,7 @@ router.get('/verify', async (req, res) => {
 })
 
 // Sign in
-router.get('/signin', async (req, res) => {
+router.get('/sign-in', async (req, res) => {
   const isSucceeded = await Auth.signIn(req.session, req.body)
   if (isSucceeded) {
     res.sendStatus(200)
@@ -47,8 +47,7 @@ router.get('/signin', async (req, res) => {
 })
 
 // Sign out
-router.get('/signout', (req, res) => {
-  Auth.signOut(req.session)
+router.get('/sign-out', async (req, res) => {
 })
 
 export default router
