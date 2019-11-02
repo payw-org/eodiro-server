@@ -4,3 +4,4 @@ dist
 .env
 .vscode/*
 !.vscode/settings.json
+config/index.ts
