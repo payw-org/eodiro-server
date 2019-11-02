@@ -32,13 +32,19 @@ router.post('/sign-up', async (req, res) => {
 // Verify pending user
 router.get('/verify', async (req, res) => {
   const requestData = req.body
-  const result = await Auth.verifyPendingUser(requestData.token)
-  res.json(result)
+  const isVerified = await Auth.verifyPendingUser(requestData.token)
+
+  if (isVerified) {
+    res.sendStatus(201)
+  } else {
+    res.sendStatus(404)
+  }
 })
 
 // Sign in
 router.get('/sign-in', async (req, res) => {
   const isSucceeded = await Auth.signIn(req.session, req.body)
+
   if (isSucceeded) {
     res.sendStatus(200)
   } else {
@@ -48,6 +54,11 @@ router.get('/sign-in', async (req, res) => {
 
 // Sign out
 router.get('/sign-out', async (req, res) => {
+  if (await Auth.signOut(req.session)) {
+    res.sendStatus(200)
+  } else {
+    res.sendStatus(500)
+  }
 })
 
 export default router
