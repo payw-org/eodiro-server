@@ -69,4 +69,6 @@ router.patch('/posts', async (req, res) => {
   }
 })
 
+router.get('/posts/comments', async (req, res) => {})
+
 export default router
