@@ -70,8 +70,32 @@ export default class Post {
     return results[0]
   }
 
-  static async getCommentsOf(postId: number): Promise<CommentModel[]> {
-    return undefined
+  /**
+   * Returns the given number of comments data associated to the given post id
+   */
+  static async getCommentsOf(
+    postId: number,
+    fromId: number,
+    count: number
+  ): Promise<CommentModel[] | false> {
+    const query = `
+      select *
+      from comment
+      where post_id = ?
+      and id >= ?
+      order by desc
+      limit ?
+    `
+    const values = [postId, fromId, count]
+
+    const [err, results] = await Db.query(query, values)
+
+    if (err) {
+      console.error(err.message)
+      return false
+    }
+
+    return results
   }
 
   static isValidTitle(title: string): boolean {
