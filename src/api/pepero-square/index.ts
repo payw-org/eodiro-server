@@ -32,7 +32,7 @@ router.post('/posts', async (req, res) => {
 
   // Validate post content
 
-  const isUploaded = await Post.upload(postData)
+  const isUploaded = await Post.upload(req.session, postData)
 
   if (isUploaded) {
     res.sendStatus(201)
