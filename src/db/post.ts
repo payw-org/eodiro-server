@@ -130,7 +130,7 @@ export default class Post {
     const values = [
       postData.title,
       postData.body,
-      postData.userId,
+      Auth.getSignedInUserId(session),
       Time.getCurrTime()
     ]
     const [err] = await Db.query(query, values)
