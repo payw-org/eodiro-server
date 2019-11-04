@@ -25,7 +25,7 @@ router.post('/posts', async (req, res) => {
   const postData: PostNew = req.body
 
   // Unauthorized user or not signed in
-  if (!Auth.isSignedUser(req.session, postData.userId)) {
+  if (!Auth.isSignedIn(req.session)) {
     res.sendStatus(401)
     return
   }
@@ -69,6 +69,36 @@ router.patch('/posts', async (req, res) => {
   }
 })
 
+// Delete the post
+router.delete('/posts', async (req, res) => {
+  const requestedBody = req.body
+  const postId: number = requestedBody.postId
+
+  if (!postId) {
+    res.sendStatus(404)
+    return
+  }
+
+  // Could not delete post without sign in
+  // If signed in, check the post ownership
+  if (
+    !Auth.isSignedIn(req.session) ||
+    !(await Post.isOwnedBy(postId, Auth.getSignedInUserId(req.session)))
+  ) {
+    res.sendStatus(401)
+    return
+  }
+
+  const isDeleted = await Post.delete(requestedBody.postId)
+
+  if (isDeleted) {
+    res.sendStatus(200)
+  } else {
+    res.sendStatus(500)
+  }
+})
+
+// Get comments of the post
 router.get('/posts/comments', async (req, res) => {})
 
 export default router

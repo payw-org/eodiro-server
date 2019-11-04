@@ -112,7 +112,7 @@ export default class Auth {
     const user = await User.findWithPortalIdAndPw(portalId, password)
 
     if (user) {
-      session.userId = user.id
+      this.setSignedInUserId(session, user.id)
     }
 
     return user ? true : false

@@ -1,6 +1,7 @@
 import Db from '@/db'
 import { CommentModel } from './comment'
 import Time from '@/modules/time'
+import Auth from '@/modules/auth'
 
 export interface PostModel {
   id: number
@@ -13,7 +14,6 @@ export interface PostModel {
 export interface PostNew {
   title: string
   body: string
-  userId: number
 }
 
 export interface PostUpdate {
@@ -155,6 +155,22 @@ export default class Post {
 
     if (err) {
       console.error(err)
+      return false
+    }
+
+    return true
+  }
+
+  static async delete(postId: number): Promise<boolean> {
+    const query = `
+      delete from post
+      where id = ?
+    `
+
+    const [err] = await Db.query(query, postId)
+
+    if (err) {
+      console.error(err.message)
       return false
     }
 
