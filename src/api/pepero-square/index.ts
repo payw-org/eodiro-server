@@ -1,6 +1,6 @@
 import express from 'express'
 import Post from '@/db/post'
-import { PostModel, PostNew, PostUpdate } from '@/db/post'
+import { PostNew, PostUpdate } from '@/db/post'
 import Auth from '@/modules/auth'
 
 const router = express.Router()

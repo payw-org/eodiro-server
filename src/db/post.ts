@@ -109,7 +109,10 @@ export default class Post {
   /**
    * Upload a new post
    */
-  static async upload(postData: PostNew): Promise<boolean> {
+  static async upload(
+    session: Express.Session,
+    postData: PostNew
+  ): Promise<boolean> {
     // Verify and purify data
 
     const title = postData.title.trim()
