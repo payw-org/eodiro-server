@@ -25,7 +25,7 @@ router.post('/posts', async (req, res) => {
   const postData: PostNew = req.body
 
   // Unauthorized user or not signed in
-  if (!Auth.isSignedUser(req.session, postData.userId)) {
+  if (!(await Auth.isSignedUser(req.headers.accesstoken as string))) {
     res.sendStatus(401)
     return
   }
