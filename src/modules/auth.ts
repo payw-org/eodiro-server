@@ -2,6 +2,8 @@ import User from '@/db/user'
 import crypto from 'crypto'
 import EodiroMailer from '@/modules/eodiro-mailer'
 import { SignUpTemplate } from '@/modules/eodiro-mailer/templates'
+import AccessToken from './accessToken'
+import JwtError from './jwtError'
 
 export interface SignInInfo {
   portalId: string
@@ -91,11 +93,28 @@ export default class Auth {
     return session.userId ? true : false
   }
 
-  /**
-   * Check if the given user id is the same as the signed in user's one
-   */
-  static isSignedUser(session: Express.Session, userId: number): boolean {
-    return this.isSignedIn(session) && session.userId === userId
+  static async isSignedUser(accesstoken: string): Promise<boolean> {
+    if (!accesstoken) {
+      return false
+    }
+    try {
+      const accessToken = new AccessToken(accesstoken)
+      await accessToken.verify()
+      return true
+    } catch (err) {
+      switch (err.code) {
+        case JwtError.ERROR.INVALID_JWT:
+          // TODO: deal with inavlid jwt case 
+          break
+        case JwtError.ERROR.EXPIRED_JWT:
+          // TODO : deal with expired jwt case 
+          break
+        default:
+          // TODO : deal with unexpected case 
+          break
+      }
+      return false
+    }
   }
 
   static setSignedInUserId(session: Express.Session, userId: number): void {
@@ -109,23 +128,23 @@ export default class Auth {
   static async signIn(
     session: Express.Session,
     info: SignInInfo
-  ): Promise<boolean> {
+  ): Promise<[number, boolean]> {
     let { portalId, password } = info
 
     portalId = portalId.trim()
     password = password.trim()
 
     if (!portalId || !password) {
-      return false
+      return [undefined, false]
     }
 
     const user = await User.findWithPortalIdAndPw(portalId, password)
 
     if (user) {
-      this.setSignedInUserId(session, user.id)
+      session.userId = user.id
+      return [user.id, true]
     }
-
-    return user ? true : false
+    return [undefined, false]
   }
 
   static async signUp(info: SignUpInfo): Promise<boolean> {
