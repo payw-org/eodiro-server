@@ -86,6 +86,9 @@ export default class Auth {
     return user ? false : true
   }
 
+  /**
+   * Check if the session is signed in
+   */
   static isSignedIn(session: Express.Session): boolean {
     return session.userId ? true : false
   }
@@ -112,6 +115,10 @@ export default class Auth {
       }
       return false
     }
+  }
+
+  static setSignedInUserId(session: Express.Session, userId: number): void {
+    session.userId = userId
   }
 
   static getSignedInUserId(session: Express.Session): number {

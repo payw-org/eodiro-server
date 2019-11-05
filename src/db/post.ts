@@ -1,6 +1,7 @@
 import Db from '@/db'
 import { CommentModel } from './comment'
 import Time from '@/modules/time'
+import Auth from '@/modules/auth'
 
 export interface PostModel {
   id: number
@@ -13,7 +14,6 @@ export interface PostModel {
 export interface PostNew {
   title: string
   body: string
-  userId: number
 }
 
 export interface PostUpdate {
@@ -70,8 +70,32 @@ export default class Post {
     return results[0]
   }
 
-  static async getCommentsOf(postId: number): Promise<CommentModel[]> {
-    return undefined
+  /**
+   * Returns the given number of comments data associated to the given post id
+   */
+  static async getCommentsOf(
+    postId: number,
+    fromId: number,
+    count: number
+  ): Promise<CommentModel[] | false> {
+    const query = `
+      select *
+      from comment
+      where post_id = ?
+      and id >= ?
+      order by desc
+      limit ?
+    `
+    const values = [postId, fromId, count]
+
+    const [err, results] = await Db.query(query, values)
+
+    if (err) {
+      console.error(err.message)
+      return false
+    }
+
+    return results
   }
 
   static isValidTitle(title: string): boolean {
@@ -85,7 +109,10 @@ export default class Post {
   /**
    * Upload a new post
    */
-  static async upload(postData: PostNew): Promise<boolean> {
+  static async upload(
+    session: Express.Session,
+    postData: PostNew
+  ): Promise<boolean> {
     // Verify and purify data
 
     const title = postData.title.trim()
@@ -103,7 +130,7 @@ export default class Post {
     const values = [
       postData.title,
       postData.body,
-      postData.userId,
+      Auth.getSignedInUserId(session),
       Time.getCurrTime()
     ]
     const [err] = await Db.query(query, values)
@@ -128,6 +155,22 @@ export default class Post {
 
     if (err) {
       console.error(err)
+      return false
+    }
+
+    return true
+  }
+
+  static async delete(postId: number): Promise<boolean> {
+    const query = `
+      delete from post
+      where id = ?
+    `
+
+    const [err] = await Db.query(query, postId)
+
+    if (err) {
+      console.error(err.message)
       return false
     }
 
