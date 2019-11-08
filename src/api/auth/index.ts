@@ -1,6 +1,7 @@
 import express from 'express'
 import Auth from '@/modules/auth'
 import { SignUpInfo } from '@/modules/auth'
+import JwtManager from '@/modules/jwtManager'
 
 const router = express.Router()
 
@@ -43,10 +44,10 @@ router.get('/verify', async (req, res) => {
 
 // Sign in
 router.get('/sign-in', async (req, res) => {
-  const isSucceeded = await Auth.signIn(req.session, req.body)
-
+  const [userId, isSucceeded] = await Auth.signIn(req.session, req.body)
   if (isSucceeded) {
-    res.sendStatus(200)
+    const tokens = await JwtManager.getToken(userId)
+    res.send(tokens)
   } else {
     res.sendStatus(401)
   }
@@ -60,5 +61,13 @@ router.get('/sign-out', async (req, res) => {
     res.sendStatus(500)
   }
 })
-
+// Sign out
+router.get('/refreshToken', async (req, res) => {
+  try {
+    const tokens = await JwtManager.refresh(req.headers.refreshtoken as string)
+    res.send(tokens)
+  } catch (err) {
+    res.sendStatus(401)
+  }
+})
 export default router
