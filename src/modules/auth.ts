@@ -67,6 +67,9 @@ export default class Auth {
    * Minimum password length is 12
    */
   static isValidPassword(password: string): boolean {
+    if (!password || typeof password !== 'string') {
+      return false
+    }
     return password.length >= 12
   }
 
@@ -74,6 +77,9 @@ export default class Auth {
    * Check duplication of portal id
    */
   static async isValidPortalId(portalId: string): Promise<boolean> {
+    if (!portalId || typeof portalId !== 'string') {
+      return false
+    }
     const user = await User.findWithAttrFromAll('portal_id', portalId)
     return user ? false : true
   }
@@ -82,6 +88,9 @@ export default class Auth {
    * Check duplication of nickname
    */
   static async isValidNickname(nickname: string): Promise<boolean> {
+    if (!nickname || typeof nickname !== 'string') {
+      return false
+    }
     const user = await User.findWithAttrFromAll('nickname', nickname)
     return user ? false : true
   }
