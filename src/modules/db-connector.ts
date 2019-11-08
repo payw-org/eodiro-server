@@ -11,7 +11,9 @@ export default class DbConnector {
       }
 
       const database =
-        Config.NODE_ENV === 'development' ? Config.DB_NAME_DEV : Config.DB_NAME
+        process.env.NODE_ENV === 'development'
+          ? Config.DB_NAME_DEV
+          : Config.DB_NAME
 
       this.connection = mysql.createConnection({
         host: Config.DB_HOST,
@@ -28,7 +30,7 @@ export default class DbConnector {
           console.error('❌ Failed to connect to Database')
           resolve(false)
         } else {
-          console.info('⭕️ Connected to DB')
+          console.info(`⭕️ Connected to DB (${database})`)
           resolve(true)
         }
       })
