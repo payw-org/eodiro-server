@@ -8,10 +8,9 @@
   "scripts": {
     "build": "tsc",
     "start": "node build/src/index.js",
-    "compile": "tsc --incremental --sourceMap && node build/src/index.js",
-    "dev": "yarn start && tsc -w --incremental",
+    "compile": "tsc --incremental --sourceMap && cross-env NODE_ENV=development node build/src/index.js",
     "dev:ts": "yarn clear && nodemon --exec ts-node -- src/index.ts",
-    "dev:legacy": "yarn clear && nodemon -e ts --exec \"yarn run compile\"",
+    "dev": "yarn clear && nodemon -e ts --exec \"yarn run compile\"",
     "clear": "rimraf build/*"
   },
   "_moduleAliases": {
@@ -37,6 +36,8 @@
     "@types/nodemailer": "^6.2.2",
     "@typescript-eslint/eslint-plugin": "^2.6.0",
     "@typescript-eslint/parser": "^2.6.0",
+    "cross-env": "^6.0.3",
+    "dotenv": "^8.2.0",
     "eslint": "^6.5.1",
     "nodemon": "^1.19.3",
     "rimraf": "^3.0.0",
