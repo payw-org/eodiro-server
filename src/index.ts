@@ -9,6 +9,7 @@ import EodiroBot from '@/modules/eodiro-bot'
 import DbConnector from '@/modules/db-connector'
 import EodiroMailer from '@/modules/eodiro-mailer'
 import Config from '@@/config'
+import cors from 'cors'
 
 async function main(): Promise<void> {
   // Run eodiro bot
@@ -18,6 +19,7 @@ async function main(): Promise<void> {
   // Create Express app
   const app = express()
 
+  app.use(cors())
   app.use(bodyParser.urlencoded({ extended: true }))
   app.use(bodyParser.json())
   app.use(
