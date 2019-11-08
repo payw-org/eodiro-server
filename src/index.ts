@@ -1,4 +1,5 @@
 import 'module-alias/register'
+import dotenv from 'dotenv'
 import crypto from 'crypto'
 import express from 'express'
 import bodyParser from 'body-parser'
@@ -6,8 +7,8 @@ import session from 'express-session'
 import api from '@/api'
 import EodiroBot from '@/modules/eodiro-bot'
 import DbConnector from '@/modules/db-connector'
-import Config from '@@/config'
 import EodiroMailer from '@/modules/eodiro-mailer'
+import Config from '@@/config'
 
 async function main(): Promise<void> {
   // Run eodiro bot
@@ -50,4 +51,5 @@ async function main(): Promise<void> {
 }
 
 // Run the app
+dotenv.config()
 main()
