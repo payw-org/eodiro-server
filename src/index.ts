@@ -45,7 +45,7 @@ async function main(): Promise<void> {
   }
 
   app.listen(Config.PORT, () => {
-    console.info(`🌐 Listening on port ${Config.PORT}`)
+    console.info(`👂 Listening on port ${Config.PORT}`)
   })
 }
 
