@@ -1,8 +1,8 @@
+import 'module-alias/register'
 import crypto from 'crypto'
 import express from 'express'
 import bodyParser from 'body-parser'
 import session from 'express-session'
-import 'module-alias/register'
 import api from '@/api'
 import EodiroBot from '@/modules/eodiro-bot'
 import DbConnector from '@/modules/db-connector'
@@ -32,6 +32,7 @@ async function main(): Promise<void> {
   const isDbConnected = await DbConnector.connect()
 
   if (!isDbConnected) {
+    console.info('🛑 Stop the application due to DB connection failed')
     return
   }
 
@@ -39,6 +40,7 @@ async function main(): Promise<void> {
   const isMailServerConnected = await EodiroMailer.verify()
 
   if (!isMailServerConnected) {
+    console.log('🛑 Stop the application due to Email server connection failed')
     return
   }
 
