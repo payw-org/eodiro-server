@@ -104,13 +104,13 @@ export default class Auth {
     } catch (err) {
       switch (err.code) {
         case JwtError.ERROR.INVALID_JWT:
-          // TODO: deal with inavlid jwt case 
+          // TODO: deal with inavlid jwt case
           break
         case JwtError.ERROR.EXPIRED_JWT:
-          // TODO : deal with expired jwt case 
+          // TODO : deal with expired jwt case
           break
         default:
-          // TODO : deal with unexpected case 
+          // TODO : deal with unexpected case
           break
       }
       return false
@@ -131,8 +131,8 @@ export default class Auth {
   ): Promise<[number, boolean]> {
     let { portalId, password } = info
 
-    portalId = portalId.trim()
-    password = password.trim()
+    portalId = portalId ? portalId.trim() : portalId
+    password = password ? password.trim() : password
 
     if (!portalId || !password) {
       return [undefined, false]
