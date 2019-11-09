@@ -2,6 +2,7 @@ import express from 'express'
 import Post from '@/db/post'
 import { PostNew, PostUpdate } from '@/db/post'
 import Auth from '@/modules/auth'
+import Comment from '@/db/comment'
 
 const router = express.Router()
 
@@ -21,8 +22,40 @@ router.get('/posts', async (req, res) => {
   }
 })
 
+// Get recent posts
+router.get('/posts/recent', async (req, res) => {
+  const { from } = req.query
+  const posts = await Post.getRecentPosts(Number(from))
+
+  if (posts) {
+    res.status(200).json(posts)
+  } else {
+    res.sendStatus(500)
+  }
+})
+
+// Get a post data
+router.get('/post', async (req, res) => {
+  // Unauthorized user or not signed in
+  const userId = Auth.isSignedUser(req.headers.accesstoken as string)
+
+  if (!userId) {
+    res.sendStatus(401)
+    return
+  }
+
+  const { postId } = req.query
+  const post = await Post.getFromId(Number(postId))
+
+  if (post) {
+    res.status(200).json(post)
+  } else {
+    res.sendStatus(500)
+  }
+})
+
 // Upload a new post
-router.post('/posts', async (req, res) => {
+router.post('/post', async (req, res) => {
   // Unauthorized user or not signed in
   const userId = Auth.isSignedUser(req.headers.accesstoken as string)
 
@@ -101,6 +134,44 @@ router.delete('/posts', async (req, res) => {
 })
 
 // Get comments of the post
-router.get('/posts/comments', async (req, res) => {})
+router.get('/posts/comments', async (req, res) => {
+  // Unauthorized user or not signed in
+  const userId = Auth.isSignedUser(req.headers.accesstoken as string)
+
+  if (!userId) {
+    res.sendStatus(401)
+    return
+  }
+
+  const { postId, fromId } = req.query
+  const comments = await Post.getCommentsOf(Number(postId), Number(fromId))
+
+  if (!comments) {
+    res.sendStatus(500)
+    return
+  }
+
+  res.status(200).json(comments)
+})
+
+// Upload a comment
+router.post('/posts/comment', async (req, res) => {
+  // Unauthorized user or not signed in
+  const userId = Auth.isSignedUser(req.headers.accesstoken as string)
+
+  if (!userId) {
+    res.sendStatus(401)
+    return
+  }
+
+  const commentData = req.body
+  const isUploaded = await Comment.add(userId, commentData)
+
+  if (!isUploaded) {
+    res.sendStatus(500)
+  } else {
+    res.sendStatus(200)
+  }
+})
 
 export default router

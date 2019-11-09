@@ -1,4 +1,6 @@
 import Db from '@/db'
+import User from '@/db/user'
+import Time from '@/modules/time'
 
 export interface CommentModel {
   id: number
@@ -7,11 +9,11 @@ export interface CommentModel {
   uploaded_at: string
   user_id: number
   likes: number
+  random_nickname: string
 }
 
 export interface CommentNew {
   postId: number
-  userId: number
   body: string
 }
 
@@ -20,21 +22,33 @@ export default class Comment {
     return body.length > 0
   }
 
-  static async add(commentData: CommentNew): Promise<boolean> {
+  static async add(userId: number, commentData: CommentNew): Promise<boolean> {
     if (!this.isValidBody(commentData.body)) {
+      return false
+    }
+
+    const userInfo = await User.findAtId(userId)
+
+    if (!userInfo) {
       return false
     }
 
     const query = `
       insert into comment
-      (post_id, user_id, body)
-      values (?, ?, ?)
+      (user_id, random_nickname, post_id, body, uploaded_at)
+      values (?, ?, ?, ?, ?)
     `
-    const values = [commentData.postId, commentData.userId, commentData.body]
+    const values = [
+      userInfo.id,
+      userInfo.random_nickname,
+      commentData.postId,
+      commentData.body,
+      Time.getCurrTime()
+    ]
     const [err] = await Db.query(query, values)
 
     if (err) {
-      console.error(err.message)
+      console.error(err.stack)
       return false
     }
 
