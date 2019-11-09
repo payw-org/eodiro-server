@@ -7,10 +7,12 @@
   "license": "MIT",
   "scripts": {
     "build": "tsc",
-    "start": "node build/src/index.js",
-    "compile": "tsc --incremental --sourceMap && node build/src/index.js",
-    "dev:ts-node": "yarn clear && nodemon --exec ts-node -- src/index.ts",
-    "dev": "yarn clear && nodemon -e ts --exec \"yarn run compile\"",
+    "start": "yarn package:start && node build/src/index.js",
+    "dev": "yarn clear && yarn package:dev && nodemon --exec cross-env NODE_ENV=development ts-node -- src/index.ts",
+    "package:start": "ts-node src/dev/modify-package.ts",
+    "package:dev": "cross-env NODE_ENV=development ts-node src/dev/modify-package.ts",
+    "compile": "tsc --incremental --sourceMap && cross-env NODE_ENV=development node build/src/index.js",
+    "dev:legacy": "yarn clear && nodemon -e ts --exec \"yarn run compile\"",
     "clear": "rimraf build/*"
   },
   "_moduleAliases": {
@@ -19,6 +21,7 @@
   },
   "dependencies": {
     "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
     "dayjs": "^1.8.16",
     "express": "^4.17.1",
     "express-session": "^1.17.0",
@@ -36,6 +39,8 @@
     "@types/nodemailer": "^6.2.2",
     "@typescript-eslint/eslint-plugin": "^2.6.0",
     "@typescript-eslint/parser": "^2.6.0",
+    "cross-env": "^6.0.3",
+    "dotenv": "^8.2.0",
     "eslint": "^6.5.1",
     "nodemon": "^1.19.3",
     "rimraf": "^3.0.0",
