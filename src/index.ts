@@ -43,7 +43,9 @@ async function main(): Promise<void> {
   const isMailServerConnected = await EodiroMailer.verify()
 
   if (!isMailServerConnected) {
-    console.log('🛑 Stop the application due to Email server connection failed')
+    console.info(
+      '🛑 Stop the application due to Email server connection failed'
+    )
     return
   }
 
