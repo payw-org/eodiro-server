@@ -51,7 +51,7 @@ export default class JwtToken {
       if (err.name === 'TokenExpiredError') {
         throw JwtToken.errorWrapper(JwtError.ERROR.EXPIRED_JWT)
       } else {
-        console.log(err)
+        console.error(err)
         throw JwtToken.errorWrapper(JwtError.ERROR.INVALID_JWT)
       }
     }
