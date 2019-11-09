@@ -65,6 +65,45 @@ router.get('/sign-in', async (req, res) => {
   }
 })
 
+// Validate portal email id
+router.post('/validate/portal-id', async (req, res) => {
+  const portalId = req.body.portalId
+  if (
+    (await Auth.isValidPortalId(portalId)) &&
+    Auth.isValidPortalIdFormat(portalId)
+  ) {
+    res.sendStatus(200)
+    return
+  } else {
+    res.sendStatus(403)
+  }
+})
+
+// Validate nickname
+router.post('/validate/nickname', async (req, res) => {
+  const nickname = req.body.nickname
+  if (
+    (await Auth.isValidNickname(nickname)) &&
+    Auth.isValidNicknameFormat(nickname)
+  ) {
+    res.sendStatus(200)
+    return
+  } else {
+    res.sendStatus(403)
+  }
+})
+
+// Validate password
+router.post('/validate/password', async (req, res) => {
+  const password = req.body.password
+  if (Auth.isValidPassword(password)) {
+    res.sendStatus(200)
+    return
+  } else {
+    res.sendStatus(403)
+  }
+})
+
 // Sign out
 router.get('/sign-out', async (req, res) => {
   if (await Auth.signOut(req.session)) {
