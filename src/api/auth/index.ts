@@ -43,7 +43,7 @@ router.post('/sign-up', async (req, res) => {
 })
 
 // Verify pending user
-router.get('/verify', async (req, res) => {
+router.post('/verify', async (req, res) => {
   const requestData = req.body
   const isVerified = await Auth.verifyPendingUser(requestData.token)
 
@@ -55,8 +55,8 @@ router.get('/verify', async (req, res) => {
 })
 
 // Sign in
-router.get('/sign-in', async (req, res) => {
-  const [userId, isSucceeded] = await Auth.signIn(req.session, req.body)
+router.post('/sign-in', async (req, res) => {
+  const [userId, isSucceeded] = await Auth.signIn(req.body)
   if (isSucceeded) {
     const tokens = await JwtManager.getToken(userId)
     res.send(tokens)
@@ -105,15 +105,16 @@ router.post('/validate/password', async (req, res) => {
 })
 
 // Sign out
-router.get('/sign-out', async (req, res) => {
+router.post('/sign-out', async (req, res) => {
   if (await Auth.signOut(req.session)) {
     res.sendStatus(200)
   } else {
     res.sendStatus(500)
   }
 })
-// Sign out
-router.get('/refreshToken', async (req, res) => {
+
+// Refresh access and refresh token
+router.post('/refresh-token', async (req, res) => {
   try {
     const tokens = await JwtManager.refresh(req.headers.refreshtoken as string)
     res.send(tokens)
@@ -121,4 +122,5 @@ router.get('/refreshToken', async (req, res) => {
     res.sendStatus(401)
   }
 })
+
 export default router
