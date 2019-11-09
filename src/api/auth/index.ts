@@ -5,6 +5,18 @@ import JwtManager from '@/modules/jwtManager'
 
 const router = express.Router()
 
+// Is signed in
+router.post('/is-signed-in', (req, res) => {
+  // headers key names are case insensitive
+  const accessToken = req.headers.accesstoken as string
+  const isSignedUser = Auth.isSignedUser(accessToken)
+  if (isSignedUser) {
+    res.sendStatus(200)
+  } else {
+    res.sendStatus(401)
+  }
+})
+
 // Sign up
 router.post('/sign-up', async (req, res) => {
   const signUpInfo: SignUpInfo = req.body
