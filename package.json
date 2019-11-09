@@ -7,10 +7,12 @@
   "license": "MIT",
   "scripts": {
     "build": "tsc",
-    "start": "node build/src/index.js",
+    "start": "yarn package:start && node build/src/index.js",
+    "dev": "yarn clear && yarn package:dev && nodemon --exec cross-env NODE_ENV=development ts-node -- src/index.ts",
+    "package:start": "ts-node src/dev/modify-package.ts",
+    "package:dev": "cross-env NODE_ENV=development ts-node src/dev/modify-package.ts",
     "compile": "tsc --incremental --sourceMap && cross-env NODE_ENV=development node build/src/index.js",
-    "dev:ts": "yarn clear && nodemon --exec cross-env NODE_ENV=development ts-node -- src/index.ts",
-    "dev": "yarn clear && nodemon -e ts --exec \"yarn run compile\"",
+    "dev:legacy": "yarn clear && nodemon -e ts --exec \"yarn run compile\"",
     "clear": "rimraf build/*"
   },
   "_moduleAliases": {
