@@ -29,8 +29,8 @@ export default class Auth {
   }
 
   static async verifyPendingUser(token: string): Promise<boolean> {
-    if (!token) {
-      console.error('No token given')
+    if (!token || typeof token !== 'string') {
+      console.error('The given token has invalid type')
       return false
     }
 
@@ -64,17 +64,20 @@ export default class Auth {
   }
 
   /**
-   * Minimum password length is 12
+   * Minimum password length is 8
    */
   static isValidPassword(password: string): boolean {
     if (!password || typeof password !== 'string') {
       return false
     }
-    return password.length >= 12
+    const passwordMinLength = 8
+    return password.length >= passwordMinLength
   }
 
   /**
    * Check duplication of portal id
+   *
+   * It doesn't check the email format. Use Auth.isValidPortalIdFormat() if you need to check that.
    */
   static async isValidPortalId(portalId: string): Promise<boolean> {
     if (!portalId || typeof portalId !== 'string') {
@@ -82,6 +85,34 @@ export default class Auth {
     }
     const user = await User.findWithAttrFromAll('portal_id', portalId)
     return user ? false : true
+  }
+
+  /**
+   * Check nickname format
+   */
+  static isValidNicknameFormat(nickname: string): boolean {
+    if (!nickname || typeof nickname !== 'string') {
+      return false
+    }
+
+    const minNicknameLength = 2
+    const maxNicknameLength = 20
+    /**
+     * 1. No starts with numbers or _
+     * 2. No ends with _
+     * 3. No space
+     * 4. No multiple _
+     * 5. Only accepts Hangul, Alphabets(lowercase), numbers, and _
+     */
+    const regExp = /^(?![0-9_])(?!.*[_]$)(?!.*?([_])\1{1})[a-z0-9_가-힣]+$/g
+    const regExpResult = regExp.exec(nickname)
+
+    return (
+      nickname.length >= minNicknameLength &&
+      nickname.length <= maxNicknameLength &&
+      regExpResult &&
+      regExpResult.length > 0
+    )
   }
 
   /**
@@ -96,24 +127,20 @@ export default class Auth {
   }
 
   /**
-   * Check if the session is signed in
+   * Verify the given access token and return user ID if it is valid. Otherwise return false.
    */
-  static isSignedIn(session: Express.Session): boolean {
-    return session.userId ? true : false
-  }
-
-  static async isSignedUser(accesstoken: string): Promise<boolean> {
-    if (!accesstoken) {
+  static isSignedUser(accessToken: string): number | false {
+    if (!accessToken) {
       return false
     }
     try {
-      const accessToken = new AccessToken(accesstoken)
-      await accessToken.verify()
-      return true
+      const at = new AccessToken(accessToken)
+      at.verify()
+      return at.decoded.payload.userId
     } catch (err) {
       switch (err.code) {
         case JwtError.ERROR.INVALID_JWT:
-          // TODO: deal with inavlid jwt case
+          // TODO: deal with invalid jwt case
           break
         case JwtError.ERROR.EXPIRED_JWT:
           // TODO : deal with expired jwt case
@@ -126,18 +153,7 @@ export default class Auth {
     }
   }
 
-  static setSignedInUserId(session: Express.Session, userId: number): void {
-    session.userId = userId
-  }
-
-  static getSignedInUserId(session: Express.Session): number {
-    return session.userId
-  }
-
-  static async signIn(
-    session: Express.Session,
-    info: SignInInfo
-  ): Promise<[number, boolean]> {
+  static async signIn(info: SignInInfo): Promise<[number, boolean]> {
     let { portalId, password } = info
 
     portalId = portalId ? portalId.trim() : portalId
@@ -150,7 +166,6 @@ export default class Auth {
     const user = await User.findWithPortalIdAndPw(portalId, password)
 
     if (user) {
-      session.userId = user.id
       return [user.id, true]
     }
     return [undefined, false]
@@ -158,6 +173,11 @@ export default class Auth {
 
   static async signUp(info: SignUpInfo): Promise<boolean> {
     let { portalId, password, nickname } = info
+
+    if (!portalId || !password || !nickname) {
+      return false
+    }
+
     // Trim information
     portalId = portalId.trim()
     password = password.trim()
@@ -169,6 +189,7 @@ export default class Auth {
     if (
       !this.isValidPortalIdFormat(portalId) ||
       !this.isValidPortalId(portalId) ||
+      !this.isValidNicknameFormat(nickname) ||
       !this.isValidNickname(nickname) ||
       !this.isValidPassword(password)
     ) {
@@ -190,9 +211,11 @@ export default class Auth {
         subject: '어디로 인증 이메일입니다',
         html: SignUpTemplate(verificationCode)
       })
-    }
 
-    return true
+      return true
+    } else {
+      return false
+    }
   }
 
   static async signOut(session: Express.Session): Promise<boolean> {
