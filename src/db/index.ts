@@ -1,7 +1,8 @@
 import DbConnector from '@/modules/db-connector'
 import { MysqlError, FieldInfo } from 'mysql'
 
-type MysqlQueryReturn = [MysqlError, any[], FieldInfo[]]
+type MysqlResult = any[] | Record<string, any>
+type MysqlQueryReturn = [MysqlError, any[] | MysqlResult, FieldInfo[]]
 type QueryValues = (string | number)[] | string | number
 
 export default class Db {
