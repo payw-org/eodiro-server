@@ -1,7 +1,7 @@
 import Db from '@/db'
 import { CommentModel } from './comment'
 import Time from '@/modules/time'
-import Auth from '@/modules/auth'
+import User from '@/db/user'
 
 export interface PostModel {
   id: number
@@ -30,6 +30,11 @@ export default class Post {
     fromId: number,
     count: number
   ): Promise<PostModel[] | false> {
+    if (typeof fromId !== 'number' || typeof count !== 'number') {
+      console.error('Wrong parameter format', fromId, count)
+      return false
+    }
+
     const query = `
       select *
       from post
@@ -45,7 +50,7 @@ export default class Post {
       return false
     }
 
-    return results
+    return results as PostModel[]
   }
 
   /**
@@ -95,7 +100,7 @@ export default class Post {
       return false
     }
 
-    return results
+    return results as CommentModel[]
   }
 
   static isValidTitle(title: string): boolean {
@@ -107,12 +112,12 @@ export default class Post {
   }
 
   /**
-   * Upload a new post
+   * Upload a new post and return its id.
    */
   static async upload(
-    session: Express.Session,
+    userId: number,
     postData: PostNew
-  ): Promise<boolean> {
+  ): Promise<false | number> {
     // Verify and purify data
 
     const title = postData.title.trim()
@@ -124,23 +129,30 @@ export default class Post {
 
     const query = `
       insert into post
-      (title, body, user_id, uploaded_at)
-      values (?, ?, ?, ?)
+      (title, body, user_id, uploaded_at, random_nickname)
+      values (?, ?, ?, ?, ?)
     `
+    const userInfo = await User.findAtId(userId)
+
+    if (!userInfo) {
+      return false
+    }
+
     const values = [
       postData.title,
       postData.body,
-      Auth.getSignedInUserId(session),
-      Time.getCurrTime()
+      userId,
+      Time.getCurrTime(),
+      userInfo.random_nickname
     ]
-    const [err] = await Db.query(query, values)
+    const [err, results] = await Db.query(query, values)
 
     if (err) {
       console.error(err.message)
       return false
     }
 
-    return true
+    return (results as Record<string, any>).insertId
   }
 
   static async update(refinedData: PostUpdate): Promise<boolean> {

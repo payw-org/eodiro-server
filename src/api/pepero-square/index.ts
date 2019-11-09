@@ -11,7 +11,8 @@ router.get('/', (req, res) => {
 
 // Get posts data
 router.get('/posts', async (req, res) => {
-  const posts = await Post.getPosts(0, 1000)
+  const { from, quantity } = req.query
+  const posts = await Post.getPosts(Number(from), Number(quantity))
 
   if (posts) {
     res.status(200).json(posts)
@@ -22,20 +23,22 @@ router.get('/posts', async (req, res) => {
 
 // Upload a new post
 router.post('/posts', async (req, res) => {
-  const postData: PostNew = req.body
-
   // Unauthorized user or not signed in
-  if (!(await Auth.isSignedUser(req.headers.accesstoken as string))) {
+  const userId = Auth.isSignedUser(req.headers.accesstoken as string)
+
+  if (!userId) {
     res.sendStatus(401)
     return
   }
 
   // Validate post content
+  const postData: PostNew = req.body
+  const postId = await Post.upload(userId, postData)
 
-  const isUploaded = await Post.upload(req.session, postData)
-
-  if (isUploaded) {
-    res.sendStatus(201)
+  if (postId) {
+    res.status(201).json({
+      postId
+    })
   } else {
     res.sendStatus(400)
   }
@@ -44,16 +47,14 @@ router.post('/posts', async (req, res) => {
 // Update post data
 router.patch('/posts', async (req, res) => {
   // Not signed in
-  if (!Auth.isSignedIn(req.session)) {
+  if (!Auth.isSignedUser(req.headers.accesstoken as string)) {
     res.sendStatus(401)
     return
   }
 
   const refinedData: PostUpdate = req.body
-  const isOwnedByUser = await Post.isOwnedBy(
-    refinedData.postId,
-    Auth.getSignedInUserId(req.session)
-  )
+  const userId = undefined
+  const isOwnedByUser = await Post.isOwnedBy(refinedData.postId, userId)
 
   if (!isOwnedByUser) {
     res.sendStatus(401)
@@ -81,9 +82,10 @@ router.delete('/posts', async (req, res) => {
 
   // Could not delete post without sign in
   // If signed in, check the post ownership
+  const userId = undefined
   if (
-    !Auth.isSignedIn(req.session) ||
-    !(await Post.isOwnedBy(postId, Auth.getSignedInUserId(req.session)))
+    !Auth.isSignedUser(req.headers.accesstoken as string) ||
+    !(await Post.isOwnedBy(postId, userId))
   ) {
     res.sendStatus(401)
     return
