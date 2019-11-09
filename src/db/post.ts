@@ -9,6 +9,7 @@ export interface PostModel {
   body: string
   user_id: number
   likes: number
+  random_nickname: string
 }
 
 export interface PostNew {
@@ -24,29 +25,53 @@ export interface PostUpdate {
 
 export default class Post {
   /**
-   * Returns all posts
+   * Return posts equal or smaller than the given post id with the number of given amount
    */
   static async getPosts(
-    fromId: number,
-    count: number
+    fromId?: number,
+    quantity = 20
   ): Promise<PostModel[] | false> {
-    if (typeof fromId !== 'number' || typeof count !== 'number') {
-      console.error('Wrong parameter format', fromId, count)
+    let query = `
+      select *
+      from post
+      order by id desc
+      limit ?
+    `
+    let values = [quantity]
+
+    if (fromId) {
+      query = `
+        select *
+        from post
+        where id <= ?
+        order by id desc
+        limit ?
+      `
+      values = [fromId, quantity]
+    }
+
+    const [err, results] = await Db.query(query, values)
+
+    if (err) {
+      console.error(err.stack)
       return false
     }
 
+    return results as PostModel[]
+  }
+
+  static async getRecentPosts(fromId: number): Promise<PostModel[] | false> {
     const query = `
       select *
       from post
       where id >= ?
       order by id desc
-      limit ?
     `
-
-    const [err, results] = await Db.query(query, [fromId, count])
+    const values = [fromId]
+    const [err, results] = await Db.query(query, values)
 
     if (err) {
-      console.error(err.message)
+      console.error(err.stack)
       return false
     }
 
@@ -80,23 +105,28 @@ export default class Post {
    */
   static async getCommentsOf(
     postId: number,
-    fromId: number,
-    count: number
+    fromId = 0,
+    quantity = 20
   ): Promise<CommentModel[] | false> {
+    if (typeof postId !== 'number') {
+      console.error('Wrong postId data')
+      return false
+    }
+
     const query = `
       select *
       from comment
       where post_id = ?
       and id >= ?
-      order by desc
+      order by id asc
       limit ?
     `
-    const values = [postId, fromId, count]
+    const values = [postId, fromId, quantity]
 
     const [err, results] = await Db.query(query, values)
 
     if (err) {
-      console.error(err.message)
+      console.error(err.stack)
       return false
     }
 
