@@ -5,6 +5,18 @@ import JwtManager from '@/modules/jwtManager'
 
 const router = express.Router()
 
+// Is signed in
+router.post('/is-signed-in', (req, res) => {
+  // headers key names are case insensitive
+  const accessToken = req.headers.accesstoken as string
+  const isSignedUser = Auth.isSignedUser(accessToken)
+  if (isSignedUser) {
+    res.sendStatus(200)
+  } else {
+    res.sendStatus(401)
+  }
+})
+
 // Sign up
 router.post('/sign-up', async (req, res) => {
   const signUpInfo: SignUpInfo = req.body
@@ -31,7 +43,7 @@ router.post('/sign-up', async (req, res) => {
 })
 
 // Verify pending user
-router.get('/verify', async (req, res) => {
+router.post('/verify', async (req, res) => {
   const requestData = req.body
   const isVerified = await Auth.verifyPendingUser(requestData.token)
 
@@ -43,8 +55,8 @@ router.get('/verify', async (req, res) => {
 })
 
 // Sign in
-router.get('/sign-in', async (req, res) => {
-  const [userId, isSucceeded] = await Auth.signIn(req.session, req.body)
+router.post('/sign-in', async (req, res) => {
+  const [userId, isSucceeded] = await Auth.signIn(req.body)
   if (isSucceeded) {
     const tokens = await JwtManager.getToken(userId)
     res.send(tokens)
@@ -53,16 +65,56 @@ router.get('/sign-in', async (req, res) => {
   }
 })
 
+// Validate portal email id
+router.post('/validate/portal-id', async (req, res) => {
+  const portalId = req.body.portalId
+  if (
+    (await Auth.isValidPortalId(portalId)) &&
+    Auth.isValidPortalIdFormat(portalId)
+  ) {
+    res.sendStatus(200)
+    return
+  } else {
+    res.sendStatus(403)
+  }
+})
+
+// Validate nickname
+router.post('/validate/nickname', async (req, res) => {
+  const nickname = req.body.nickname
+  if (
+    (await Auth.isValidNickname(nickname)) &&
+    Auth.isValidNicknameFormat(nickname)
+  ) {
+    res.sendStatus(200)
+    return
+  } else {
+    res.sendStatus(403)
+  }
+})
+
+// Validate password
+router.post('/validate/password', async (req, res) => {
+  const password = req.body.password
+  if (Auth.isValidPassword(password)) {
+    res.sendStatus(200)
+    return
+  } else {
+    res.sendStatus(403)
+  }
+})
+
 // Sign out
-router.get('/sign-out', async (req, res) => {
+router.post('/sign-out', async (req, res) => {
   if (await Auth.signOut(req.session)) {
     res.sendStatus(200)
   } else {
     res.sendStatus(500)
   }
 })
-// Sign out
-router.get('/refreshToken', async (req, res) => {
+
+// Refresh access and refresh token
+router.post('/refresh-token', async (req, res) => {
   try {
     const tokens = await JwtManager.refresh(req.headers.refreshtoken as string)
     res.send(tokens)
@@ -70,4 +122,5 @@ router.get('/refreshToken', async (req, res) => {
     res.sendStatus(401)
   }
 })
+
 export default router

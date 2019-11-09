@@ -2,6 +2,7 @@ import Db from '@/db'
 import { SignUpInfo } from '@/modules/auth'
 import Auth from '@/modules/auth'
 import Time from '@/modules/time'
+import rng from '@/modules/random-name-generator'
 
 export interface UserModel {
   id: number
@@ -25,7 +26,7 @@ export default class User {
     const [err, results] = await Db.query(query, [portalId, encryptedPassword])
 
     if (err) {
-      console.error(err.message)
+      console.error(err.stack)
       return false
     }
 
@@ -45,7 +46,7 @@ export default class User {
     const [err, results] = await Db.query(query, id)
 
     if (err) {
-      console.error(err.message)
+      console.error(err.stack)
       return false
     }
 
@@ -79,7 +80,7 @@ export default class User {
     const [err, results] = await Db.query(query, value)
 
     if (err) {
-      console.log(err)
+      console.error(err.stack)
       return undefined
     }
 
@@ -99,7 +100,7 @@ export default class User {
     const [err, results] = await Db.query(query, token)
 
     if (err) {
-      console.error(err.message)
+      console.error(err.stack)
       return false
     }
 
@@ -115,13 +116,13 @@ export default class User {
    *
    * **_NOTE_**: Pass raw password instead of encrypted one.
    *
-   * @returns Returns generated token
+   * @returns Returns generated token(verification code)
    */
   static async addPendingUser(info: SignUpInfo): Promise<string | false> {
     const query = `
       insert into pending_user
       (portal_id, password, registered_at, nickname, random_nickname, token)
-      values (?, ?, ?, ?, "random nickname", ?)
+      values (?, ?, ?, ?, ?, ?)
     `
     const encryptedPassword = Auth.encryptPw(info.password)
     const pendingToken = Auth.generatePendingToken()
@@ -130,18 +131,22 @@ export default class User {
       encryptedPassword,
       Time.getCurrTime(),
       info.nickname,
+      rng(),
       pendingToken
     ]
     const [err] = await Db.query(query, values)
 
     if (err) {
-      console.error(err.message)
+      console.error(err.stack)
       return false
     }
 
     return pendingToken
   }
 
+  /**
+   * Transfer pending user to active user.
+   */
   static async transferPendingUser(pendingUserId: number): Promise<boolean> {
     const query = `
       insert into user (portal_id, password, registered_at, nickname, random_nickname)
@@ -151,11 +156,10 @@ export default class User {
       delete from pending_user
       where id = ?;
     `
-
     const [err] = await Db.query(query, [pendingUserId, pendingUserId])
 
     if (err) {
-      console.error(err.message)
+      console.error(err.stack)
       return false
     }
 

@@ -1,13 +1,15 @@
+import 'module-alias/register'
+import dotenv from 'dotenv'
 import crypto from 'crypto'
 import express from 'express'
 import bodyParser from 'body-parser'
 import session from 'express-session'
-import 'module-alias/register'
 import api from '@/api'
 import EodiroBot from '@/modules/eodiro-bot'
 import DbConnector from '@/modules/db-connector'
-import Config from '@@/config'
 import EodiroMailer from '@/modules/eodiro-mailer'
+import Config from '@@/config'
+import cors from 'cors'
 
 async function main(): Promise<void> {
   // Run eodiro bot
@@ -17,6 +19,7 @@ async function main(): Promise<void> {
   // Create Express app
   const app = express()
 
+  app.use(cors())
   app.use(bodyParser.urlencoded({ extended: true }))
   app.use(bodyParser.json())
   app.use(
@@ -32,6 +35,7 @@ async function main(): Promise<void> {
   const isDbConnected = await DbConnector.connect()
 
   if (!isDbConnected) {
+    console.info('🛑 Stop the application due to DB connection failed')
     return
   }
 
@@ -39,6 +43,9 @@ async function main(): Promise<void> {
   const isMailServerConnected = await EodiroMailer.verify()
 
   if (!isMailServerConnected) {
+    console.info(
+      '🛑 Stop the application due to Email server connection failed'
+    )
     return
   }
 
@@ -48,4 +55,5 @@ async function main(): Promise<void> {
 }
 
 // Run the app
+dotenv.config()
 main()

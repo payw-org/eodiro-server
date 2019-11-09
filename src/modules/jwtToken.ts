@@ -33,28 +33,23 @@ export default class JwtToken {
     return err
   }
 
-  async create(payload: Payload, secret: string, expire: string) {
+  create(payload: Payload, secret: string, expire: string): void {
     if (!payload) {
       throw new JwtError('no payload')
     }
-    this.token = await Jwt.sign(
-      { payload },
-      secret,
-      { expiresIn: expire }
-    )
+    this.token = Jwt.sign({ payload }, secret, { expiresIn: expire })
   }
 
-  async verify(secret: string) {
+  verify(secret: string): void {
     try {
-      this.decoded = await Jwt.verify(this.token, secret) as Decoded
+      this.decoded = Jwt.verify(this.token, secret) as Decoded
     } catch (err) {
       if (err.name === 'TokenExpiredError') {
         throw JwtToken.errorWrapper(JwtError.ERROR.EXPIRED_JWT)
       } else {
-        console.log(err)
+        console.error(err)
         throw JwtToken.errorWrapper(JwtError.ERROR.INVALID_JWT)
       }
     }
   }
 }
-
