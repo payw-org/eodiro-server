@@ -4,6 +4,7 @@ import EodiroMailer from '@/modules/eodiro-mailer'
 import { SignUpTemplate } from '@/modules/eodiro-mailer/templates'
 import AccessToken from './accessToken'
 import JwtError from './jwtError'
+import JwtManager from './jwtManager'
 
 export interface SignInInfo {
   portalId: string
@@ -129,28 +130,12 @@ export default class Auth {
   /**
    * Verify the given access token and return user ID if it is valid. Otherwise return false.
    */
-  static isSignedUser(accessToken: string): number | false {
+  static async isSignedUser(accessToken: string): Promise<number | false> {
     if (!accessToken) {
       return false
     }
-    try {
-      const at = new AccessToken(accessToken)
-      at.verify()
-      return at.decoded.payload.userId
-    } catch (err) {
-      switch (err.code) {
-        case JwtError.ERROR.INVALID_JWT:
-          // TODO: deal with invalid jwt case
-          break
-        case JwtError.ERROR.EXPIRED_JWT:
-          // TODO : deal with expired jwt case
-          break
-        default:
-          // TODO : deal with unexpected case
-          break
-      }
-      return false
-    }
+    const result = await JwtManager.verify(accessToken)
+    return result
   }
 
   static async signIn(info: SignInInfo): Promise<[number, boolean]> {
