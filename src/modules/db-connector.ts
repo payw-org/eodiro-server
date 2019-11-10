@@ -20,6 +20,7 @@ export default class DbConnector {
         user: Config.DB_USER,
         password: Config.DB_PASSWORD,
         database,
+        charset: 'utf8mb4',
         multipleStatements: true
       })
 
