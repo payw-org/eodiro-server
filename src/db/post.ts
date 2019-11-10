@@ -168,9 +168,10 @@ export default class Post {
       return false
     }
 
+    // Pass trimmed title and body
     const values = [
-      postData.title,
-      postData.body,
+      title,
+      body,
       userId,
       Time.getCurrTime(),
       userInfo.random_nickname
