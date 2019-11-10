@@ -37,7 +37,7 @@ router.get('/posts/recent', async (req, res) => {
 // Get a post data
 router.get('/post', async (req, res) => {
   // Unauthorized user or not signed in
-  const userId = Auth.isSignedUser(req.headers.accesstoken as string)
+  const userId = await Auth.isSignedUser(req.headers.accesstoken as string)
 
   if (!userId) {
     res.sendStatus(401)
@@ -57,7 +57,7 @@ router.get('/post', async (req, res) => {
 // Upload a new post
 router.post('/post', async (req, res) => {
   // Unauthorized user or not signed in
-  const userId = Auth.isSignedUser(req.headers.accesstoken as string)
+  const userId = await Auth.isSignedUser(req.headers.accesstoken as string)
 
   if (!userId) {
     res.sendStatus(401)
@@ -80,7 +80,7 @@ router.post('/post', async (req, res) => {
 // Update post data
 router.patch('/posts', async (req, res) => {
   // Not signed in
-  if (!Auth.isSignedUser(req.headers.accesstoken as string)) {
+  if (!await Auth.isSignedUser(req.headers.accesstoken as string)) {
     res.sendStatus(401)
     return
   }
@@ -117,7 +117,7 @@ router.delete('/posts', async (req, res) => {
   // If signed in, check the post ownership
   const userId = undefined
   if (
-    !Auth.isSignedUser(req.headers.accesstoken as string) ||
+    !await Auth.isSignedUser(req.headers.accesstoken as string) ||
     !(await Post.isOwnedBy(postId, userId))
   ) {
     res.sendStatus(401)
@@ -136,7 +136,7 @@ router.delete('/posts', async (req, res) => {
 // Get comments of the post
 router.get('/posts/comments', async (req, res) => {
   // Unauthorized user or not signed in
-  const userId = Auth.isSignedUser(req.headers.accesstoken as string)
+  const userId = await Auth.isSignedUser(req.headers.accesstoken as string)
 
   if (!userId) {
     res.sendStatus(401)
@@ -157,7 +157,7 @@ router.get('/posts/comments', async (req, res) => {
 // Upload a comment
 router.post('/posts/comment', async (req, res) => {
   // Unauthorized user or not signed in
-  const userId = Auth.isSignedUser(req.headers.accesstoken as string)
+  const userId = await Auth.isSignedUser(req.headers.accesstoken as string)
 
   if (!userId) {
     res.sendStatus(401)
