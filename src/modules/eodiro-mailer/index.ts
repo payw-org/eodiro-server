@@ -4,7 +4,7 @@ import Config from '@@/config'
 interface MailOption {
   subject: string
   to: string
-  html: string
+  html?: string
 }
 
 export default class EodiroMailer {
@@ -20,8 +20,8 @@ export default class EodiroMailer {
   })
 
   static async verify(): Promise<boolean> {
-    return new Promise(resolve => {
-      this.transporter.verify(err => {
+    return new Promise((resolve) => {
+      this.transporter.verify((err) => {
         if (err) {
           console.error('❌ Failed to connect to Zoho mail server')
           console.error(err.message)
