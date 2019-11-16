@@ -58,8 +58,8 @@ export default class EodiroBot {
   }
 
   private updateRandomNickname(): void {
-    const cronTime = '0 0 * * *'
-    // const cronTime = '35 * * * *'
+    // const cronTime = '0 0 * * *'
+    const cronTime = '35 * * * *'
     const timeZone = 'Asia/Seoul'
     new CronJob(cronTime, User.updateRandomNickname, null, true, timeZone)
   }
