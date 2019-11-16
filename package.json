@@ -6,7 +6,7 @@
   "author": "PAYW",
   "license": "MIT",
   "scripts": {
-    "build": "tsc",
+    "build": "yarn package:start && tsc",
     "start": "yarn package:start && node build/src/index.js",
     "start:pm2": "yarn package:start && pm2 start build/src/index.js --name \"eodiro-api2\"",
     "stop": "pm2 stop eodiro-api2",
