@@ -11,6 +11,7 @@ export interface UserModel {
   registered_at: string
   nickname: string
   random_nickname: string
+  password: string
 }
 
 export default class User {
@@ -35,7 +36,12 @@ export default class User {
       return undefined
     }
 
-    return results[0]
+    const user: UserModel = results[0]
+
+    // Delete password
+    delete user.password
+
+    return user
   }
 
   static async findAtId(id: number): Promise<UserModel | false> {
@@ -55,7 +61,12 @@ export default class User {
       return undefined
     }
 
-    return results[0]
+    const user: UserModel = results[0]
+
+    // Delete password
+    delete user.password
+
+    return user
   }
 
   static async findWithAttrFromAll(
