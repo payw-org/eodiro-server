@@ -32,7 +32,12 @@ export default class Post {
     quantity = 20
   ): Promise<PostModel[] | false> {
     let query = `
-      select *
+      select *,
+      (
+        select count(*)
+        from comment
+        where comment.post_id = post.id
+      ) as comment_count
       from post
       order by id desc
       limit ?
@@ -41,7 +46,12 @@ export default class Post {
 
     if (fromId) {
       query = `
-        select *
+        select *,
+        (
+          select count(*)
+          from comment
+          where comment.post_id = post.id
+        ) as comment_count
         from post
         where id <= ?
         order by id desc
