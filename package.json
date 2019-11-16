@@ -9,6 +9,7 @@
     "build": "yarn package:start && tsc",
     "start": "yarn package:start && node build/src/index.js",
     "start:pm2": "yarn package:start && pm2 start build/src/index.js --name \"eodiro-api2\"",
+    "restart": "pm2 restart eodiro-api2",
     "stop": "pm2 stop eodiro-api2",
     "delete": "pm2 delete eodiro-api2",
     "dev": "yarn clear && yarn package:dev && nodemon --exec cross-env NODE_ENV=development ts-node -- src/index.ts",
