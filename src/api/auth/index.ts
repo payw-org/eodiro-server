@@ -2,8 +2,20 @@ import express from 'express'
 import Auth from '@/modules/auth'
 import { SignUpInfo } from '@/modules/auth'
 import JwtManager from '@/modules/jwtManager'
+import User from '@/db/user'
 
 const router = express.Router()
+
+router.get('/information', async (req, res) => {
+  const accessToken = req.headers.accesstoken as string
+  const userId = await Auth.isSignedUser(accessToken)
+  if (userId) {
+    const user = await User.findAtId(userId)
+    res.status(200).json(user)
+  } else {
+    res.sendStatus(401)
+  }
+})
 
 // Is signed in
 router.post('/is-signed-in', async (req, res) => {
