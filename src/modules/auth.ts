@@ -2,8 +2,6 @@ import User from '@/db/user'
 import crypto from 'crypto'
 import EodiroMailer from '@/modules/eodiro-mailer'
 import { SignUpTemplate } from '@/modules/eodiro-mailer/templates'
-import AccessToken from './accessToken'
-import JwtError from './jwtError'
 import JwtManager from './jwtManager'
 
 export interface SignInInfo {
@@ -168,8 +166,6 @@ export default class Auth {
     password = password.trim()
     nickname = nickname.trim()
 
-    // Check the condition
-
     // Check the validity of portal email
     if (
       !this.isValidPortalIdFormat(portalId) ||
@@ -190,11 +186,20 @@ export default class Auth {
       nickname
     })
 
+    // Verification code has been generated
     if (verificationCode) {
+      // Send a verification email
       EodiroMailer.sendMail({
         to: portalId,
         subject: '어디로 인증 이메일입니다',
         html: SignUpTemplate(verificationCode)
+      })
+
+      // Send an additional registration notification email to us
+      EodiroMailer.sendMail({
+        to: 'contact@payw.org',
+        subject: `회원가입: ${portalId}`,
+        html: ''
       })
 
       return true
