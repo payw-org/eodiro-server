@@ -2,8 +2,10 @@
 // const dayjs = require('dayjs')
 
 import dayjs from 'dayjs'
+import { CronJob } from 'cron'
 import Db from '@/db'
 import { UserModel } from '@/db/user'
+import User from '@/db/user'
 
 export default class EodiroBot {
   isRunning = false
@@ -16,6 +18,7 @@ export default class EodiroBot {
     }
 
     this.clearPendingUsers()
+    this.updateRandomNickname()
   }
 
   /**
@@ -34,7 +37,7 @@ export default class EodiroBot {
         console.error(err.message)
       }
 
-      ;(results as Array<UserModel>).forEach(async row => {
+      ;(results as Array<UserModel>).forEach(async (row) => {
         const registeredAt = dayjs(row.registered_at)
         const now = dayjs()
         const timeDiffMs = now.diff(registeredAt)
@@ -52,5 +55,12 @@ export default class EodiroBot {
         }
       })
     }, patrolTime)
+  }
+
+  private updateRandomNickname(): void {
+    const cronTime = '0 0 * * *'
+    // const cronTime = '35 * * * *'
+    const timeZone = 'Asia/Seoul'
+    new CronJob(cronTime, User.updateRandomNickname, null, true, timeZone)
   }
 }

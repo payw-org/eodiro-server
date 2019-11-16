@@ -3,6 +3,7 @@ import { SignUpInfo } from '@/modules/auth'
 import Auth from '@/modules/auth'
 import Time from '@/modules/time'
 import rng from '@/modules/random-name-generator'
+import EodiroMailer from '@/modules/eodiro-mailer'
 
 export interface UserModel {
   id: number
@@ -164,5 +165,33 @@ export default class User {
     }
 
     return true
+  }
+
+  /**
+   * Update all users' random nickname.
+   */
+  static async updateRandomNickname(): Promise<void> {
+    const query = `select * from user`
+    const [err, results] = await Db.query(query)
+
+    if (err) {
+      console.error(err)
+      return
+    }
+
+    results.forEach((user: UserModel) => {
+      const query = `
+        update user
+        set random_nickname = ?
+        where id = ${user.id}
+      `
+      const values = [rng()]
+      Db.query(query, values)
+    })
+
+    EodiroMailer.sendMail({
+      to: 'contact@payw.org',
+      subject: 'Updating user random nickname'
+    })
   }
 }
