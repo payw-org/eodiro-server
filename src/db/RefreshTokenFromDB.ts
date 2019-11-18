@@ -1,4 +1,4 @@
-import Db from '@/db'
+import Db, { MysqlResult } from '@/db'
 import RefreshToken from '@/modules/refreshToken'
 
 export interface RefreshTokenModel {
@@ -8,11 +8,13 @@ export interface RefreshTokenModel {
 }
 
 export default class RefreshTokenFromDB {
-  static async findWithUserId(userId: number): Promise<RefreshTokenModel | false> {
-    const query = ` 
-      SELECT * 
-      FROM refresh_token 
-      WHERE user_id = ${userId} 
+  static async findWithUserId(
+    userId: number
+  ): Promise<RefreshTokenModel | false> {
+    const query = `
+      SELECT *
+      FROM refresh_token
+      WHERE user_id = ${userId}
     `
     const [err, results] = await Db.query(query)
     if (err) {
@@ -26,11 +28,13 @@ export default class RefreshTokenFromDB {
     return results[0]
   }
 
-  static async addRefreshToken(refreshToken: RefreshToken) {
-    const query = ` 
-      insert into refresh_token 
-      (user_id, token, manually_changed_at) 
-      values (${refreshToken.decoded.payload.userId},'${refreshToken.token}',${refreshToken.decoded.iat}) 
+  static async addRefreshToken(
+    refreshToken: RefreshToken
+  ): Promise<MysqlResult | false> {
+    const query = `
+      insert into refresh_token
+      (user_id, token, manually_changed_at)
+      values (${refreshToken.decoded.payload.userId},'${refreshToken.token}',${refreshToken.decoded.iat})
     `
     const [err, results] = await Db.query(query)
     if (err) {
@@ -44,11 +48,13 @@ export default class RefreshTokenFromDB {
     return results
   }
 
-  static async updateRefreshToken(refreshToken: RefreshToken) {
-    const query = ` 
-      UPDATE refresh_token 
+  static async updateRefreshToken(
+    refreshToken: RefreshToken
+  ): Promise<MysqlResult | false> {
+    const query = `
+      UPDATE refresh_token
       SET token = '${refreshToken.token}'
-      WHERE user_id = ${refreshToken.decoded.payload.userId} 
+      WHERE user_id = ${refreshToken.decoded.payload.userId}
     `
     const [err, results] = await Db.query(query)
     if (err) {
@@ -62,10 +68,12 @@ export default class RefreshTokenFromDB {
     return results
   }
 
-  static async deleteRefreshToken(userId: number) {
-    const query = ` 
-      DELETE FROM refresh_token 
-      WHERE user_id = ${userId} 
+  static async deleteRefreshToken(
+    userId: number
+  ): Promise<MysqlResult | false> {
+    const query = `
+      DELETE FROM refresh_token
+      WHERE user_id = ${userId}
     `
     const [err, results] = await Db.query(query)
     if (err) {
