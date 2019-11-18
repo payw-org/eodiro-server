@@ -16,6 +16,9 @@ export interface SignUpInfo {
 }
 
 export default class Auth {
+  /**
+   * Returns an encrypted password
+   */
   static encryptPw(password: string): string {
     return crypto
       .createHash('sha256')
@@ -23,10 +26,18 @@ export default class Auth {
       .digest('base64')
   }
 
+  /**
+   * Generates a random token which will be
+   * stored in DB and will be used later
+   * for email verification
+   */
   static generatePendingToken(): string {
     return crypto.randomBytes(20).toString('hex')
   }
 
+  /**
+   * Verifies the email verification with the given token
+   */
   static async verifyPendingUser(token: string): Promise<boolean> {
     if (!token || typeof token !== 'string') {
       console.error('The given token has invalid type')
@@ -63,7 +74,7 @@ export default class Auth {
   }
 
   /**
-   * Minimum password length is 8
+   * Validates a password
    */
   static isValidPassword(password: string): boolean {
     if (!password || typeof password !== 'string') {
@@ -74,9 +85,10 @@ export default class Auth {
   }
 
   /**
-   * Check duplication of portal id
+   * Checks duplication of portal id
    *
-   * It doesn't check the email format. Use Auth.isValidPortalIdFormat() if you need to check that.
+   * **_NOTE:_** It doesn't check the email format.
+   * Use Auth.isValidPortalIdFormat() if you need to check that.
    */
   static async isValidPortalId(portalId: string): Promise<boolean> {
     if (!portalId || typeof portalId !== 'string') {
@@ -87,7 +99,7 @@ export default class Auth {
   }
 
   /**
-   * Check nickname format
+   * Checks nickname format
    */
   static isValidNicknameFormat(nickname: string): boolean {
     if (!nickname || typeof nickname !== 'string') {
@@ -97,6 +109,7 @@ export default class Auth {
     const minNicknameLength = 2
     const maxNicknameLength = 20
     /**
+     * Conditions
      * 1. No starts with numbers or _
      * 2. No ends with _
      * 3. No space
@@ -115,7 +128,7 @@ export default class Auth {
   }
 
   /**
-   * Check duplication of nickname
+   * Checks duplication of nickname
    */
   static async isValidNickname(nickname: string): Promise<boolean> {
     if (!nickname || typeof nickname !== 'string') {
@@ -126,7 +139,8 @@ export default class Auth {
   }
 
   /**
-   * Verify the given access token and return user ID if it is valid. Otherwise return false.
+   * Verifies the given access token and returns user ID if it is valid.
+   * Otherwise returns false.
    */
   static async isSignedUser(accessToken: string): Promise<number | false> {
     if (!accessToken) {
@@ -208,9 +222,13 @@ export default class Auth {
     }
   }
 
+  /**
+   * Clears session
+   * @deprecated It does nothing on server side in favor of JWT
+   */
   static async signOut(session: Express.Session): Promise<boolean> {
-    return new Promise(resolve => {
-      session.destroy(err => {
+    return new Promise((resolve) => {
+      session.destroy((err) => {
         if (err) {
           console.error(err)
           resolve(false)

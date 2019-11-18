@@ -6,6 +6,7 @@ import User from '@/db/user'
 
 const router = express.Router()
 
+// Finds and returns user information
 router.get('/information', async (req, res) => {
   const accessToken = req.headers.accesstoken as string
   const userId = await Auth.isSignedUser(accessToken)
