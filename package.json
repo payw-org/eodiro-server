@@ -20,8 +20,8 @@
     "clear": "rimraf build/*"
   },
   "_moduleAliases": {
-    "@": "src",
-    "@@": "."
+    "@": "build/src",
+    "@@": "build"
   },
   "dependencies": {
     "body-parser": "^1.19.0",
