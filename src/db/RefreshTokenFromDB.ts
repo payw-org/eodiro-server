@@ -68,6 +68,9 @@ export default class RefreshTokenFromDB {
     return results
   }
 
+  /**
+   * Deletes refresh token from database
+   */
   static async deleteRefreshToken(
     userId: number
   ): Promise<MysqlResult | false> {
