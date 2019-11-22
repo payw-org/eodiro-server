@@ -3,6 +3,7 @@ import Auth from '@/modules/auth'
 import { SignUpInfo } from '@/modules/auth'
 import JwtManager from '@/modules/jwtManager'
 import User from '@/db/user'
+import RefreshTokenFromDB from '@/db/RefreshTokenFromDB'
 
 const router = express.Router()
 
@@ -132,6 +133,23 @@ router.post('/refresh-token', async (req, res) => {
     const tokens = await JwtManager.refresh(req.headers.refreshtoken as string)
     res.send(tokens)
   } catch (err) {
+    res.sendStatus(401)
+  }
+})
+
+// Delete refresh token
+router.delete('/refresh-token', async (req, res) => {
+  const accessToken = req.headers.accesstoken as string
+  const userId = await Auth.isSignedUser(accessToken)
+
+  if (userId) {
+    const result = await RefreshTokenFromDB.deleteRefreshToken(userId)
+    if (result) {
+      res.sendStatus(200)
+    } else {
+      res.sendStatus(500)
+    }
+  } else {
     res.sendStatus(401)
   }
 })
