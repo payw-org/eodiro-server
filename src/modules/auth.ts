@@ -176,7 +176,7 @@ export default class Auth {
     }
 
     // Trim information
-    portalId = portalId.trim()
+    portalId = portalId.trim().toLowerCase()
     password = password.trim()
     nickname = nickname.trim()
 
