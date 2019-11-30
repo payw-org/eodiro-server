@@ -16,7 +16,6 @@ export default class JwtManager {
     if (row === false || row === undefined) {
       // no refresh token in db
       const refreshToken = new RefreshToken()
-      console.log(payload)
       await refreshToken.create(payload)
       await RefreshTokenFromDB.addRefreshToken(refreshToken)
       result.refreshToken = refreshToken.token
