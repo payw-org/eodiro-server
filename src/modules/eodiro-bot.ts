@@ -33,8 +33,14 @@ export default class EodiroBot {
         from pending_user
       `
       const [err, results] = await Db.query(query)
+
       if (err) {
         console.error(err.message)
+        return
+      }
+
+      if (!results) {
+        return
       }
 
       ;(results as Array<UserModel>).forEach(async (row) => {
