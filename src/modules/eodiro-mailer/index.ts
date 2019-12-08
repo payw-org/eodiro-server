@@ -34,6 +34,7 @@ export default class EodiroMailer {
     })
   }
 
+  // TODO: Asynchronous
   static sendMail(options: MailOption): void {
     this.transporter.sendMail({
       from: '"어디로" <contact@payw.org>',
