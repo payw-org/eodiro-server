@@ -6,13 +6,31 @@ import Comment from '@/db/comment'
 
 const router = express.Router()
 
+// Experimental
+// Single end point for all APIs
+router.post('/', (req, res) => {
+  return
+})
+
 router.get('/', (req, res) => {
   res.json(req.session.userId)
 })
 
 // Get posts data
 router.get('/posts', async (req, res) => {
-  const { from, quantity } = req.query
+  const { quantity } = req.query
+
+  if (quantity === undefined) {
+    res.sendStatus(400)
+    return
+  }
+
+  let { from } = req.query
+
+  if (from === undefined) {
+    from = 0
+  }
+
   const posts = await Post.getPosts(Number(from), Number(quantity))
 
   if (posts) {
@@ -25,6 +43,12 @@ router.get('/posts', async (req, res) => {
 // Get recent posts
 router.get('/posts/recent', async (req, res) => {
   const { from } = req.query
+
+  if (from === undefined) {
+    res.sendStatus(400)
+    return
+  }
+
   const posts = await Post.getRecentPosts(Number(from))
 
   if (posts) {
@@ -80,7 +104,7 @@ router.post('/post', async (req, res) => {
 // Update post data
 router.patch('/posts', async (req, res) => {
   // Not signed in
-  if (!await Auth.isSignedUser(req.headers.accesstoken as string)) {
+  if (!(await Auth.isSignedUser(req.headers.accesstoken as string))) {
     res.sendStatus(401)
     return
   }
@@ -117,7 +141,7 @@ router.delete('/posts', async (req, res) => {
   // If signed in, check the post ownership
   const userId = undefined
   if (
-    !await Auth.isSignedUser(req.headers.accesstoken as string) ||
+    !(await Auth.isSignedUser(req.headers.accesstoken as string)) ||
     !(await Post.isOwnedBy(postId, userId))
   ) {
     res.sendStatus(401)
