@@ -1,6 +1,7 @@
-import User from '@/db/user'
+import User, { UserId } from '@/db/user'
 import crypto from 'crypto'
 import EodiroMailer from '@/modules/eodiro-mailer'
+import EodiroEncrypt from '@/modules/eodiro-encrypt'
 import { SignUpTemplate } from '@/modules/eodiro-mailer/templates'
 import JwtManager from './jwtManager'
 
@@ -16,14 +17,12 @@ export interface SignUpInfo {
 }
 
 export default class Auth {
+  // TODO: Encrypt with bcrypt
   /**
    * Returns an encrypted password
    */
-  static encryptPw(password: string): string {
-    return crypto
-      .createHash('sha256')
-      .update(password)
-      .digest('base64')
+  static async encryptPw(password: string): Promise<string> {
+    return await EodiroEncrypt.hash(password)
   }
 
   /**
@@ -142,7 +141,7 @@ export default class Auth {
    * Verifies the given access token and returns user ID if it is valid.
    * Otherwise returns false.
    */
-  static async isSignedUser(accessToken: string): Promise<number | false> {
+  static async isSignedUser(accessToken: string): Promise<UserId | false> {
     if (!accessToken) {
       return false
     }
@@ -150,21 +149,23 @@ export default class Auth {
     return result
   }
 
-  static async signIn(info: SignInInfo): Promise<[number, boolean]> {
+  static async signIn(info: SignInInfo): Promise<[UserId, boolean]> {
     let { portalId, password } = info
 
-    portalId = portalId ? portalId.trim() : portalId
+    // Refine information
+    portalId = portalId ? portalId.trim().toLowerCase() : portalId
     password = password ? password.trim() : password
 
     if (!portalId || !password) {
       return [undefined, false]
     }
 
-    const user = await User.findWithPortalIdAndPw(portalId, password)
+    const user = await User.findWithPortalId(portalId)
 
-    if (user) {
+    if (user && (await EodiroEncrypt.isSame(password, user.password))) {
       return [user.id, true]
     }
+
     return [undefined, false]
   }
 
@@ -177,7 +178,7 @@ export default class Auth {
 
     // Trim information
     portalId = portalId.trim().toLowerCase()
-    password = password.trim()
+    password = password
     nickname = nickname.trim()
 
     // Check the validity of portal email
@@ -210,11 +211,11 @@ export default class Auth {
       })
 
       // Send an additional registration notification email to us
-      EodiroMailer.sendMail({
-        to: 'contact@payw.org',
-        subject: `회원가입: ${portalId}`,
-        html: ''
-      })
+      // EodiroMailer.sendMail({
+      //   to: 'contact@payw.org',
+      //   subject: `회원가입: ${portalId}`,
+      //   html: ''
+      // })
 
       return true
     } else {

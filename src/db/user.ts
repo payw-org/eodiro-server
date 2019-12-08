@@ -14,21 +14,30 @@ export interface UserModel {
   password: string
 }
 
+export interface UserModelWithoutPassword {
+  id: number
+  portal_id: string
+  registered_at: string
+  nickname: string
+  random_nickname: string
+}
+
+export type UserId = number
+
 export default class User {
-  static async findWithPortalIdAndPw(
-    portalId: string,
-    password: string
-  ): Promise<UserModel | false> {
+  static async findWithPortalId(portalId: string): Promise<UserModel | false> {
+    portalId = portalId.trim()
+
     const query = `
       select *
       from user
-      where portal_id = ? and password = ?
+      where portal_id = ?
     `
-    const encryptedPassword = Auth.encryptPw(password)
-    const [err, results] = await Db.query(query, [portalId, encryptedPassword])
+
+    const [err, results] = await Db.query(query, [portalId])
 
     if (err) {
-      console.error(err.stack)
+      console.error(err)
       return false
     }
 
@@ -37,9 +46,6 @@ export default class User {
     }
 
     const user: UserModel = results[0]
-
-    // Delete password
-    delete user.password
 
     return user
   }
@@ -136,7 +142,7 @@ export default class User {
       (portal_id, password, registered_at, nickname, random_nickname, token)
       values (?, ?, ?, ?, ?, ?)
     `
-    const encryptedPassword = Auth.encryptPw(info.password)
+    const encryptedPassword = await Auth.encryptPw(info.password)
     const pendingToken = Auth.generatePendingToken()
     const values = [
       info.portalId,
