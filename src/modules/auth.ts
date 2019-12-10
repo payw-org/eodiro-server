@@ -17,12 +17,22 @@ export interface SignUpInfo {
 }
 
 export default class Auth {
-  // TODO: Encrypt with bcrypt
   /**
    * Returns an encrypted password
    */
   static async encryptPw(password: string): Promise<string> {
     return await EodiroEncrypt.hash(password)
+  }
+
+  /**
+   * @deprecated
+   * Legacy password encryption
+   */
+  static encryptPwLegacy(password: string): string {
+    return crypto
+      .createHash('sha256')
+      .update(password)
+      .digest('base64')
   }
 
   /**
@@ -162,7 +172,12 @@ export default class Auth {
 
     const user = await User.findWithPortalId(portalId)
 
-    if (user && (await EodiroEncrypt.isSame(password, user.password))) {
+    // TODO: Remove the legacy password matching process
+    if (
+      user &&
+      ((await EodiroEncrypt.isSame(password, user.password)) ||
+        user.password === Auth.encryptPwLegacy(password))
+    ) {
       return [user.id, true]
     }
 
