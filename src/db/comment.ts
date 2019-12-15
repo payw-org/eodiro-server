@@ -1,28 +1,14 @@
 import Db from '@/db'
 import User from '@/db/user'
 import Time from '@/modules/time'
-
-export interface CommentModel {
-  id: number
-  post_id: number
-  content: string
-  uploaded_at: string
-  user_id: number
-  likes: number
-  random_nickname: string
-}
-
-export interface CommentNew {
-  postId: number
-  body: string
-}
+import { NewComment } from '@/db/models'
 
 export default class Comment {
   static isValidBody(body: string): boolean {
     return body.length > 0
   }
 
-  static async add(userId: number, commentData: CommentNew): Promise<boolean> {
+  static async add(userId: number, commentData: NewComment): Promise<boolean> {
     if (!this.isValidBody(commentData.body)) {
       return false
     }
