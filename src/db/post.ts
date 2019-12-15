@@ -1,5 +1,5 @@
 import Db from '@/db'
-import { CommentModel } from './comment'
+import { CommentModel } from '@/db/models'
 import Time from '@/modules/time'
 import User from '@/db/user'
 
