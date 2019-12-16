@@ -1,9 +1,11 @@
 {
   "editor.formatOnSave": true,
-  "eslint.autoFixOnSave": true,
   "files.insertFinalNewline": true,
   "eslint.enable": true,
   "files.trimTrailingWhitespace": true,
   "javascript.format.semicolons": "remove",
-  "typescript.format.semicolons": "remove"
+  "typescript.format.semicolons": "remove",
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true
+  }
 }
