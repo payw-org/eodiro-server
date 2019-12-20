@@ -31,6 +31,10 @@ export default class Post {
     fromId?: number,
     quantity = 20
   ): Promise<PostModel[] | false> {
+    if (!quantity) {
+      quantity = 20
+    }
+
     let query = `
       select *,
       (
