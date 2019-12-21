@@ -19,12 +19,6 @@ router.get('/', (req, res) => {
 // Get posts data
 router.get('/posts', async (req, res) => {
   const { quantity } = req.query
-
-  if (quantity === undefined) {
-    res.sendStatus(400)
-    return
-  }
-
   let { from } = req.query
 
   if (from === undefined) {
