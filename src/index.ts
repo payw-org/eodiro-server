@@ -49,8 +49,11 @@ async function main(): Promise<void> {
     return
   }
 
-  app.listen(Config.PORT, () => {
-    console.info(`👂 Listening on port ${Config.PORT}`)
+  const port =
+    process.env.NODE_ENV === 'development' ? Config.DEV_PORT : Config.PORT
+
+  app.listen(port, () => {
+    console.info(`👂 Listening on port ${port}`)
   })
 }
 
