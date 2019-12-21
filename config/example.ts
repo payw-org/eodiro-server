@@ -3,7 +3,8 @@
  */
 
 export default {
-  PORT: 4000,
+  PORT: 0,
+  DEV_PORT: 0,
 
   // DB
   DB_HOST: '',
