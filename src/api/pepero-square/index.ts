@@ -152,7 +152,7 @@ router.delete('/posts', async (req, res) => {
 })
 
 // Get comments of the post
-router.get('/posts/comments', async (req, res) => {
+router.get('/post/comments', async (req, res) => {
   // Unauthorized user or not signed in
   const userId = await Auth.isSignedUser(req.headers.accesstoken as string)
 
@@ -173,7 +173,7 @@ router.get('/posts/comments', async (req, res) => {
 })
 
 // Upload a comment
-router.post('/posts/comment', async (req, res) => {
+router.post('/post/comment', async (req, res) => {
   // Unauthorized user or not signed in
   const userId = await Auth.isSignedUser(req.headers.accesstoken as string)
 
