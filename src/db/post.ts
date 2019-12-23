@@ -76,7 +76,12 @@ export default class Post {
 
   static async getRecentPosts(fromId: number): Promise<PostModel[] | false> {
     const query = `
-      select *
+      select *,
+      (
+        select count(*)
+        from comment
+        where comment.post_id = post.id
+      ) as comment_count
       from post
       where id >= ?
       order by id desc
