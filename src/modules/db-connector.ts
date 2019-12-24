@@ -5,7 +5,7 @@ export default class DbConnector {
   private static connection: mysql.Connection | undefined
 
   static connect(): Promise<boolean> {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       if (this.connection) {
         return
       }
@@ -24,7 +24,7 @@ export default class DbConnector {
         multipleStatements: true
       })
 
-      this.connection.connect(err => {
+      this.connection.connect((err) => {
         if (err) {
           this.connection = undefined
           console.error(err.message)
