@@ -7,22 +7,16 @@ export type QueryValues = (string | number)[] | string | number
 
 export default class Db {
   static query(query: string): Promise<MysqlQueryReturn>
-
   static query(query: string, values: QueryValues): Promise<MysqlQueryReturn>
-
   static query(query: string, values?: QueryValues): Promise<MysqlQueryReturn> {
     return new Promise(async (resolve) => {
       const conn = await DbConnector.getConnection()
 
-      if (values) {
-        conn.query(query, values, (err, results, fields) => {
-          if (err) {
-            console.error(err)
-          }
-          resolve([err, results, fields])
-        })
+      if (!values) {
+        values = null
       }
-      conn.query(query, (err, results, fields) => {
+
+      conn.query(query, values, (err, results, fields) => {
         if (err) {
           console.error(err)
         }
