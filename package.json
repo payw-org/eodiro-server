@@ -17,7 +17,7 @@
     "set-pkg-start": "ts-node src/dev/modify-package.ts",
     "set-pkg-dev": "cross-env NODE_ENV=development ts-node src/dev/modify-package.ts",
     "clear": "rimraf build/*",
-    "test": "mocha -r ts-node",
+    "test": "mocha -r ts-node/register -r module-alias/register test/**/*.spec.ts",
     "dev-legacy": "npm run clear && nodemon -e ts --exec \"npm run compile\""
   },
   "_moduleAliases": {
