@@ -68,7 +68,6 @@ export default class Post {
     const [err, results] = await Db.query(query, values)
 
     if (err) {
-      console.error(err.stack)
       return false
     }
 
@@ -76,22 +75,24 @@ export default class Post {
   }
 
   static async getRecentPosts(fromId: number): Promise<PostModel[] | false> {
-    const query = `
-      select *,
-      (
-        select count(*)
-        from comment
-        where comment.post_id = post.id
-      ) as comment_count
-      from post
-      where id >= ?
-      order by id desc
-    `
+    const query = SqlB()
+      .select(
+        '*',
+        SqlB()
+          .select('count(*)')
+          .from('comment')
+          .where('comment.post_id = post.id')
+          .as('comment_count')
+          .build()
+      )
+      .from('post')
+      .where('id >= ?')
+      .order('id', 'DESC')
+      .build()
     const values = [fromId]
     const [err, results] = await Db.query(query, values)
 
     if (err) {
-      console.error(err.stack)
       return false
     }
 
@@ -109,7 +110,6 @@ export default class Post {
     const [err, results] = await Db.query(query, postId)
 
     if (err) {
-      console.error(err.message)
       return false
     }
 
@@ -146,7 +146,6 @@ export default class Post {
     const [err, results] = await Db.query(query, values)
 
     if (err) {
-      console.error(err.stack)
       return false
     }
 
@@ -204,7 +203,6 @@ export default class Post {
     const [err, results] = await Db.query(query, values)
 
     if (err) {
-      console.error(err.message)
       return false
     }
 
@@ -222,7 +220,6 @@ export default class Post {
     const [err] = await Db.query(query, values)
 
     if (err) {
-      console.error(err)
       return false
     }
 
@@ -238,7 +235,6 @@ export default class Post {
     const [err] = await Db.query(query, postId)
 
     if (err) {
-      console.error(err.message)
       return false
     }
 
@@ -255,7 +251,6 @@ export default class Post {
     const [err, results] = await Db.query(query, postId)
 
     if (err) {
-      console.error(err.message)
       return false
     }
 
