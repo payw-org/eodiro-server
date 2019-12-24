@@ -16,10 +16,16 @@ export default class Db {
 
       if (values) {
         conn.query(query, values, (err, results, fields) => {
+          if (err) {
+            console.error(err)
+          }
           resolve([err, results, fields])
         })
       }
       conn.query(query, (err, results, fields) => {
+        if (err) {
+          console.error(err)
+        }
         resolve([err, results, fields])
       })
     })
