@@ -23,12 +23,9 @@ router.get('/information', async (req, res) => {
 router.post('/is-signed-in', async (req, res) => {
   // headers key names are case insensitive
   const accessToken = req.headers.accesstoken as string
-  const isSignedUser = await Auth.isSignedUser(accessToken)
-  if (isSignedUser) {
-    res.sendStatus(200)
-  } else {
-    res.sendStatus(401)
-  }
+  const userId = await Auth.isSignedUser(accessToken)
+
+  res.status(200).json({ isSignedIn: userId ? true : false })
 })
 
 // Sign up
