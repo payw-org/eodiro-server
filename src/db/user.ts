@@ -184,6 +184,18 @@ export default class User {
     return true
   }
 
+  // TODO: update password
+  // static async updatePassword(
+  //   userId: number,
+  //   newPassword: string
+  // ): Promise<boolean> {
+  //   const query = `
+  //     update user
+  //     set password = ?
+  //     where id = ?
+  //   `
+  // }
+
   /**
    * Update all users' random nickname.
    */
@@ -206,6 +218,7 @@ export default class User {
       Db.query(query, values)
     })
 
+    // TODO: send email from the bot
     EodiroMailer.sendMail({
       to: 'contact@payw.org',
       subject: 'Updating user random nickname'
