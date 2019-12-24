@@ -2,6 +2,7 @@ import Db from '@/db'
 import { CommentModel } from '@/db/models'
 import Time from '@/modules/time'
 import User from '@/db/user'
+import SqlB from '@/modules/sqlb'
 
 export interface PostModel {
   id: number
@@ -176,11 +177,16 @@ export default class Post {
       return false
     }
 
-    const query = `
-      insert into post
-      (title, body, user_id, uploaded_at, random_nickname)
-      values (?, ?, ?, ?, ?)
-    `
+    const query = SqlB()
+      .insert('post', {
+        title: undefined,
+        body: undefined,
+        user_id: undefined,
+        uploaded_at: undefined,
+        random_nickname: undefined
+      })
+      .build()
+
     const userInfo = await User.findAtId(userId)
 
     if (!userInfo) {
