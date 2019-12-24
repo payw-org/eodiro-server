@@ -5,7 +5,7 @@ import { expect } from 'chai'
 describe('Test SqlB', () => {
   const sqlB = SqlB()
 
-  it('Select posts', () => {
+  it('Select posts using subquery, as, order, limit', () => {
     expect(
       sqlB
         .select(
@@ -26,7 +26,7 @@ describe('Test SqlB', () => {
     )
   })
 
-  it('Insert', () => {
+  it('Insert with 5 placeholders', () => {
     expect(
       sqlB
         .insert('post', {
@@ -42,7 +42,7 @@ describe('Test SqlB', () => {
     )
   })
 
-  it('Update', () => {
+  it('Update with 1 placeholder, 1 string and 1 number', () => {
     expect(
       sqlB
         .update('post', {
