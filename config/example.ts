@@ -29,5 +29,9 @@ export default {
 
   // CAU Portal
   CAU_ID: '',
-  CAU_PW: ''
+  CAU_PW: '',
+
+  // Storage
+  STORAGE_PATH: '',
+  STORAGE_PATH_DEV: ''
 }
