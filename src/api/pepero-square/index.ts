@@ -12,10 +12,6 @@ router.post('/', (req, res) => {
   return
 })
 
-router.get('/', (req, res) => {
-  res.json(req.session.userId)
-})
-
 // Get posts data
 router.get('/posts', async (req, res) => {
   const { quantity } = req.query
