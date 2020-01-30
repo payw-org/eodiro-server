@@ -12,10 +12,6 @@ import Config from '@@/config'
 import cors from 'cors'
 
 async function main(): Promise<void> {
-  // Run eodiro bot
-  const eodiroBot = new EodiroBot()
-  eodiroBot.run()
-
   // Create Express app
   const app = express()
 
@@ -55,6 +51,12 @@ async function main(): Promise<void> {
   app.listen(port, () => {
     console.info(`👂 Listening on port ${port}`)
   })
+
+  // Run eodiro bot
+  const eodiroBot = new EodiroBot()
+  eodiroBot.run()
+
+  timetableSeeder()
 }
 
 // Run the app
