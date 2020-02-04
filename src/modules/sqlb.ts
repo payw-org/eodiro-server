@@ -57,7 +57,7 @@ class SqlBInstance {
     return built
   }
 
-  select(...what: string[]): SqlBInstance {
+  select(...what: Array<string>): SqlBInstance {
     if (what.length === 0) {
       what = ['*']
     }
