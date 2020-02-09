@@ -95,7 +95,7 @@ class SqlBInstance {
     if (!conditions) {
       this.append(`WHERE`)
     } else if (typeof conditions === 'string') {
-    this.append(`WHERE ${this.singleQuotify(conditions)}`)
+      this.append(`WHERE ${this.singleQuotify(conditions)}`)
     } else {
       this.append(`WHERE ${this.singleQuotify(conditions.build())}`)
     }
@@ -109,8 +109,35 @@ class SqlBInstance {
     return this
   }
 
-  limit(amount: number | undefined): SqlBInstance {
-    this.append(`LIMIT ${this.convert(amount)}`)
+  multiOrder(options: [string, 'ASC' | 'DESC'][]): SqlBInstance {
+    this.append(`ORDER BY`)
+    this.append(
+      options
+        .map((option) => {
+          return option.join(' ')
+        })
+        .join(', ')
+    )
+
+    return this
+  }
+
+  limit(amount: number, offset?: number): SqlBInstance {
+    if (!amount) {
+      return this
+    }
+
+    this.append(`LIMIT ${amount}`)
+
+    if (offset) {
+      this.append(`OFFSET ${offset}`)
+    }
+
+    return this
+  }
+
+  like(column: string, keyword: string): SqlBInstance {
+    this.append(`${column} like '${keyword}'`)
 
     return this
   }
@@ -181,19 +208,26 @@ class SqlBInstance {
 
   delete(): SqlBInstance {
     this.append('DELETE')
-
     return this
   }
 
   when(): SqlBInstance {
     this.append('WHEN')
-
     return this
   }
 
   notExists(sqlB: SqlBInstance): SqlBInstance {
     this.append(`NOT EXISTS (${sqlB.build()})`)
+    return this
+  }
 
+  and(): SqlBInstance {
+    this.append(`AND`)
+    return this
+  }
+
+  or(): SqlBInstance {
+    this.append(`OR`)
     return this
   }
 }
