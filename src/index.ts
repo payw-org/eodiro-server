@@ -10,6 +10,9 @@ import DbConnector from '@/modules/db-connector'
 import EodiroMailer from '@/modules/eodiro-mailer'
 import Config from '@@/config'
 import cors from 'cors'
+import timetableSeeder from '@/db/seeders/timetable-seeder'
+import lectures from '@@/data/lectures.json'
+import { RefinedLectures } from '@payw/cau-timetable-scraper/build/src/types'
 
 async function main(): Promise<void> {
   // Create Express app
@@ -22,7 +25,7 @@ async function main(): Promise<void> {
     session({
       secret: crypto.randomBytes(64).toString(),
       resave: false,
-      saveUninitialized: true
+      saveUninitialized: true,
     })
   )
   app.use(api)
@@ -55,10 +58,13 @@ async function main(): Promise<void> {
   // Run eodiro bot
   const eodiroBot = new EodiroBot()
   eodiroBot.run()
+}
 
-  timetableSeeder()
+function test(): void {
+  timetableSeeder(lectures as RefinedLectures)
 }
 
 // Run the app
 dotenv.config()
 main()
+// test()
