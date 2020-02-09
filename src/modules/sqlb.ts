@@ -88,8 +88,17 @@ class SqlBInstance {
     return this
   }
 
-  where(conditions: string): SqlBInstance {
+  where(): SqlBInstance
+  where(conditions: string): SqlBInstance
+  where(conditions: SqlBInstance): SqlBInstance
+  where(conditions?: SqlBInstance | string): SqlBInstance {
+    if (!conditions) {
+      this.append(`WHERE`)
+    } else if (typeof conditions === 'string') {
     this.append(`WHERE ${this.singleQuotify(conditions)}`)
+    } else {
+      this.append(`WHERE ${this.singleQuotify(conditions.build())}`)
+    }
 
     return this
   }
