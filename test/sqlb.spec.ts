@@ -34,11 +34,34 @@ describe('Test SqlB', () => {
           body: undefined,
           user_id: undefined,
           uploaded_at: undefined,
-          random_nickname: undefined
+          random_nickname: undefined,
         })
         .build()
     ).to.equal(
       'INSERT INTO post (title, body, user_id, uploaded_at, random_nickname) VALUES(?, ?, ?, ?, ?)'
+    )
+  })
+
+  it('Bulk insert', () => {
+    expect(
+      sqlB
+        .insertBulk('lecture', [
+          {
+            year: 2011,
+            semester: '1',
+            grade: 3,
+            code: '9999-01',
+          },
+          {
+            year: 2012,
+            semester: '2',
+            grade: 4,
+            code: '9999-02',
+          },
+        ])
+        .build()
+    ).to.equal(
+      `INSERT INTO lecture (year, semester, grade, code) VALUES (2011, '1', 3, '9999-01'), (2012, '2', 4, '9999-02')`
     )
   })
 
@@ -48,7 +71,7 @@ describe('Test SqlB', () => {
         .update('post', {
           title: undefined,
           body: 'hello',
-          is_edited: 1
+          is_edited: 1,
         })
         .where('id = ?')
         .build()

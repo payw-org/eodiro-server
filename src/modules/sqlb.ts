@@ -76,8 +76,14 @@ class SqlBInstance {
     return this
   }
 
-  from(schema: string): SqlBInstance {
-    this.append(`FROM ${schema}`)
+  from(target: SqlBInstance): SqlBInstance
+  from(target: string): SqlBInstance
+  from(target: SqlBInstance | string): SqlBInstance {
+    if (typeof target === 'string') {
+      this.append(`FROM ${target}`)
+    } else {
+      this.append(`FROM (${target.build()})`)
+    }
 
     return this
   }
@@ -102,7 +108,8 @@ class SqlBInstance {
 
   insert(
     schema: string,
-    items: Record<string, number | string | undefined>
+    items: Record<string, number | string | undefined>,
+    ignore?: boolean
   ): SqlBInstance {
     const targetsQuery = Object.keys(items).join(', ')
     const values = Object.values(items).map((val) => {
@@ -111,10 +118,38 @@ class SqlBInstance {
     const valuesQuery = values.join(', ')
 
     this.append(
-      `INSERT INTO ${schema} ${this.wrap(
+      `INSERT${ignore ? ' IGNORE' : ''} INTO ${schema} ${this.wrap(
         targetsQuery,
         'parentheses'
       )} VALUES${this.wrap(valuesQuery, 'parentheses')}`
+    )
+
+    return this
+  }
+
+  insertBulk(
+    schema: string,
+    items: Record<string, number | string | undefined>[],
+    ignore?: boolean
+  ): SqlBInstance {
+    // Analyze first element
+    this.append(`INSERT${ignore ? ' IGNORE' : ''} INTO ${schema}`)
+
+    const firstItem = items[0]
+    const keys = Object.keys(firstItem)
+
+    this.append(`(${keys.join(', ')}) VALUES`)
+
+    this.append(
+      items
+        .map((item) => {
+          return `(${keys
+            .map((key) => {
+              return this.convert(item[key])
+            })
+            .join(', ')})`
+        })
+        .join(', ')
     )
 
     return this
@@ -137,6 +172,18 @@ class SqlBInstance {
 
   delete(): SqlBInstance {
     this.append('DELETE')
+
+    return this
+  }
+
+  when(): SqlBInstance {
+    this.append('WHEN')
+
+    return this
+  }
+
+  notExists(sqlB: SqlBInstance): SqlBInstance {
+    this.append(`NOT EXISTS (${sqlB.build()})`)
 
     return this
   }
