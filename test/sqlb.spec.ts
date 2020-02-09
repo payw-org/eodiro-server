@@ -22,7 +22,7 @@ describe('Test SqlB', () => {
         .limit(undefined)
         .build()
     ).to.equal(
-      'SELECT *, (SELECT count(*) FROM comment WHERE comment.post_id = post.id) AS comment_count FROM post ORDER BY id DESC LIMIT ?'
+      'SELECT *, (SELECT count(*) FROM comment WHERE comment.post_id = post.id) AS comment_count FROM post ORDER BY id DESC'
     )
   })
 
