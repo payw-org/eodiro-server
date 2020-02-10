@@ -14,6 +14,8 @@
     "pm2-restart": "pm2 restart eodiro-api2",
     "pm2-stop": "pm2 stop eodiro-api2",
     "pm2-delete": "pm2 delete eodiro-api2",
+    "pm2-reboot": "npm run pm2-stop && npm run pm2-delete && npm run build && npm run pm2-start",
+    "deploy": "npm install && npm run pm2-reboot",
     "set-pkg-start": "ts-node src/dev/modify-package.ts",
     "set-pkg-dev": "cross-env NODE_ENV=development ts-node src/dev/modify-package.ts",
     "clear": "rimraf build/*",
