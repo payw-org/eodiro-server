@@ -25,6 +25,9 @@ const lectureCols = [
 
 router.get('/lectures/search', async (req, res) => {
   const searchKeyword = req.query.q
+  const amount = req.query.amount || 20
+  const offset = req.query.offset || 0
+
   const [err, results] = await Db.query(
     SqlB()
       .select(...lectureCols)
@@ -39,7 +42,12 @@ router.get('/lectures/search', async (req, res) => {
       .like('schedule', `%${searchKeyword}%`)
       .or()
       .like('professor', `%${searchKeyword}%`)
-      .order('name', 'ASC')
+      .multiOrder([
+        ['name', 'ASC'],
+        ['professor', 'ASC'],
+        ['schedule', 'ASC'],
+      ])
+      .limit(amount, offset)
       .build()
   )
 
