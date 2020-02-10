@@ -21,18 +21,18 @@ An API server for [eodiro](https://github.com/paywteam/eodiro.com) using MySQL d
 
 **Params**
 
-| Key      | Type                             |
-| -------- | -------------------------------- |
-| year     | `number`                         |
-| semester | `'1' \| '여름' \| '2' \| '겨울'` |
-| campus   | `'서울'`                         |
+| Key        | Type                             |
+| ---------- | -------------------------------- |
+| `year`     | `number`                         |
+| `semester` | `'1' \| '여름' \| '2' \| '겨울'` |
+| `campus`   | `'서울'`                         |
 
 **Queries**
 
-| Key      | Type     |
-| -------- | -------- |
-| `amount` | `number` |
-| `offset` | `number` |
+| Key       | Type     | Description                    |
+| --------- | -------- | ------------------------------ |
+| `amount?` | `number` | The number of lectures you get |
+| `offset?` | `number` | The start index of lectures    |
 
 ### Search Lectures
 
@@ -42,6 +42,8 @@ An API server for [eodiro](https://github.com/paywteam/eodiro.com) using MySQL d
 
 **Queries**
 
-| Key | Type     |
-| --- | -------- |
-| `q` | `string` |
+| Key       | Type     | Description                  |
+| --------- | -------- | ---------------------------- |
+| `q`       | `string` | Search keyword               |
+| `amount?` | `number` | The amount of search results |
+| `offset?` | `number` | The offset of search results |
