@@ -1,6 +1,6 @@
 {
   "name": "eodiro-api2",
-  "version": "1.0.0-beta.0",
+  "version": "1.0.0-beta.1",
   "clientVersion": "2.1.0-beta.15",
   "main": "src/index.ts",
   "repository": "https://github.com/paywteam/eodiro-api2.git",
@@ -21,7 +21,8 @@
     "set-pkg-dev": "cross-env NODE_ENV=development ts-node src/dev/modify-package.ts",
     "clear": "rimraf build/*",
     "dev-legacy": "npm run clear && nodemon -e ts --exec \"npm run compile\"",
-    "deploy": "git reset --hard && git fetch --prune && git checkout v$npm_package_version && npm install && npm run pm2-reboot"
+    "checkout-latest": "git checkout $(git describe --tags `git rev-list --tags --max-count=1`)",
+    "deploy": "git reset --hard && git fetch --prune && npm run checkout-latest && npm install && npm run pm2-reboot"
   },
   "_moduleAliases": {
     "@": "src",
