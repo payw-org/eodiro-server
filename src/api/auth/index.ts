@@ -4,6 +4,7 @@ import { SignUpInfo } from '@/modules/auth'
 import JwtManager from '@/modules/jwtManager'
 import User from '@/db/user'
 import RefreshTokenFromDB from '@/db/RefreshTokenFromDB'
+import Db from '@/db'
 
 const router = express.Router()
 
@@ -31,13 +32,15 @@ router.post('/is-signed-in', async (req, res) => {
 // Sign up
 router.post('/sign-up', async (req, res) => {
   const signUpInfo: SignUpInfo = req.body
-  const { portalId, nickname, password } = signUpInfo
+  const portalId = Db.escape(signUpInfo?.portalId)
+  const nickname = Db.escape(signUpInfo?.nickname)
+  const password = Db.escape(signUpInfo?.password)
   const validations = {
     portalId:
       (await Auth.isValidPortalId(portalId)) &&
       Auth.isValidPortalIdFormat(portalId),
     nickname: await Auth.isValidNickname(nickname),
-    password: Auth.isValidPassword(password)
+    password: Auth.isValidPassword(password),
   }
 
   if (validations.portalId && validations.password && validations.nickname) {

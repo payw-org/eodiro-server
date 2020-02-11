@@ -4,6 +4,7 @@ import EodiroMailer from '@/modules/eodiro-mailer'
 import EodiroEncrypt from '@/modules/eodiro-encrypt'
 import { SignUpTemplate } from '@/modules/eodiro-mailer/templates'
 import JwtManager from './jwtManager'
+import Db from '@/db'
 
 export interface SignInInfo {
   portalId: string
@@ -160,7 +161,8 @@ export default class Auth {
   }
 
   static async signIn(info: SignInInfo): Promise<[UserId, boolean]> {
-    let { portalId, password } = info
+    let portalId = Db.escape(info?.portalId)
+    let password = Db.escape(info?.password)
 
     // Refine information
     portalId = portalId ? portalId.trim().toLowerCase() : portalId
@@ -213,7 +215,7 @@ export default class Auth {
     const verificationCode = await User.addPendingUser({
       portalId,
       password,
-      nickname
+      nickname,
     })
 
     // Verification code has been generated
@@ -222,7 +224,7 @@ export default class Auth {
       EodiroMailer.sendMail({
         to: portalId,
         subject: '어디로 인증 이메일입니다',
-        html: SignUpTemplate(verificationCode)
+        html: SignUpTemplate(verificationCode),
       })
 
       // Send an additional registration notification email to us
