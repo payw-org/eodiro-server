@@ -24,9 +24,11 @@ const lectureCols = [
 ]
 
 router.get('/:year/:semester/:campus/lectures', async (req, res) => {
-  const { year, semester, campus } = req.params
-  const amount = req.query.amount || 20
-  const offset = req.query.offset || 0
+  const year = parseInt(Db.escape(req.params?.year))
+  const semester = Db.escape(req.params?.semester)
+  const campus = Db.escape(req.params?.campus)
+  const amount = parseInt(req.query?.amount) || 20
+  const offset = parseInt(req.query?.offset) || 0
 
   const query = SqlB()
     .select(...lectureCols)
@@ -50,10 +52,12 @@ router.get('/:year/:semester/:campus/lectures', async (req, res) => {
 })
 
 router.get('/:year/:semester/:campus/lectures/search', async (req, res) => {
-  const { year, semester, campus } = req.params
-  const searchKeyword = req.query.q
-  const amount = req.query.amount || 20
-  const offset = req.query.offset || 0
+  const year = parseInt(Db.escape(req.params?.year))
+  const semester = Db.escape(req.params?.semester)
+  const campus = Db.escape(req.params?.campus)
+  const searchKeyword = Db.escape(req.query?.q)
+  const amount = parseInt(req.query?.amount) || 20
+  const offset = parseInt(req.query?.offset) || 0
 
   const [err, results] = await Db.query(
     SqlB()
