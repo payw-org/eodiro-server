@@ -37,8 +37,16 @@ An API server for [eodiro](https://github.com/paywteam/eodiro.com) using MySQL d
 ### Search Lectures
 
 <pre>
-<b>GET</b>  https://api2.eodiro.com/lectures/search
+<b>GET</b>  https://api2.eodiro.com/<b>:year</b>/<b>:semester</b>/<b>:campus</b>/lectures/search
 </pre>
+
+**Params**
+
+| Key        | Type                             |
+| ---------- | -------------------------------- |
+| `year`     | `number`                         |
+| `semester` | `'1' \| '여름' \| '2' \| '겨울'` |
+| `campus`   | `'서울'`                         |
 
 **Queries**
 
