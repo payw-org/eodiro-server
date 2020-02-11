@@ -1,6 +1,6 @@
 {
   "name": "eodiro-api2",
-  "version": "1.0.0-beta.1",
+  "version": "1.0.0-beta.2",
   "clientVersion": "2.1.0-beta.15",
   "main": "src/index.ts",
   "repository": "https://github.com/paywteam/eodiro-api2.git",
