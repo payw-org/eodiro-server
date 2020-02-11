@@ -4,7 +4,7 @@ import SqlB from '@/modules/sqlb'
 
 const router = express.Router()
 
-const lectureCols = [
+const lectureAttrs = [
   'year',
   'semester',
   'campus',
@@ -31,7 +31,7 @@ router.get('/:year/:semester/:campus/lectures', async (req, res) => {
   const offset = parseInt(req.query?.offset) || 0
 
   const query = SqlB()
-    .select(...lectureCols)
+    .select(...lectureAttrs)
     .from('lecture')
     .where(`year=${year} AND semester='${semester}' AND campus='${campus}'`)
     .multiOrder([
@@ -61,7 +61,7 @@ router.get('/:year/:semester/:campus/lectures/search', async (req, res) => {
 
   const [err, results] = await Db.query(
     SqlB()
-      .select(...lectureCols)
+      .select(...lectureAttrs)
       .from('lecture')
       .where(`year=${year} AND semester='${semester}' AND campus='${campus}'`)
       .and()
@@ -89,6 +89,10 @@ router.get('/:year/:semester/:campus/lectures/search', async (req, res) => {
   }
 
   res.json(results)
+})
+
+router.get('/lectures/coverages', async (...ctx) => {
+  const res = ctx[1]
 })
 
 export default router
