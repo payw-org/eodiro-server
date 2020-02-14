@@ -92,7 +92,39 @@ router.get('/:year/:semester/:campus/lectures/search', async (req, res) => {
 })
 
 router.get('/lectures/coverages', async (...ctx) => {
+  type Result = {
+    year: number
+    semester: string
+    campus: string
+  }
+
   const res = ctx[1]
+  const year = [],
+    semester = [],
+    campus = []
+  const query = SqlB()
+    .distinctSelect('year', 'semester', 'campus', 'major')
+    .from('lecture')
+    .build()
+  const [err, results] = await Db.query<Result[]>(query)
+  if (err) {
+    res.sendStatus(500)
+  } else {
+    results.forEach((item) => {
+      if (item.year) year.push(item.year)
+      if (item.semester) semester.push(item.semester)
+      if (item.campus) campus.push(item.campus)
+    })
+    const yearSet = new Set(year)
+    const semesterSet = new Set(semester)
+    const campusSet = new Set(campus)
+    const mixed = {
+      year: Array.from(yearSet).reverse(),
+      semester: Array.from(semesterSet).sort(),
+      campus: Array.from(campusSet).sort(),
+    }
+    res.json(mixed)
+  }
 })
 
 export default router
