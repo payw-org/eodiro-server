@@ -109,16 +109,23 @@ class SqlBInstance {
     return this
   }
 
+  order(
+    attr: string,
+    direction: 'ASC' | 'asc' | 'DESC' | 'desc'
+  ): SqlBInstance {
+    this.append(`ORDER BY ${attr} ${direction.toUpperCase()}`)
 
     return this
   }
 
-  multiOrder(options: [string, 'ASC' | 'DESC'][]): SqlBInstance {
+  multiOrder(
+    options: [string, 'ASC' | 'asc' | 'DESC' | 'desc'][]
+  ): SqlBInstance {
     this.append(`ORDER BY`)
     this.append(
       options
         .map((option) => {
-          return option.join(' ')
+          return `${option[0]} ${option[1].toUpperCase()}`
         })
         .join(', ')
     )
