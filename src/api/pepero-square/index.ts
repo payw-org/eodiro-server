@@ -84,7 +84,7 @@ router.post('/post', async (req, res) => {
 
   if (postId) {
     res.status(201).json({
-      postId
+      postId,
     })
   } else {
     res.sendStatus(400)
