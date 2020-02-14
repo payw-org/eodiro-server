@@ -3,6 +3,7 @@ import peperoSquareRouter from '@/api/pepero-square'
 import authRouter from '@/api/auth'
 import uploadRouter from '@/api/upload'
 import lecturesRouter from '@/api/lectures'
+import myRouter from '@/api/my'
 
 const router = express.Router()
 
@@ -13,9 +14,11 @@ eodiro API 2
 <a href="https://github.com/paywteam/eodiro-api2">Documentation</a>
 </pre>`)
 })
+
 router.use('/pepero-square', peperoSquareRouter)
 router.use('/auth', authRouter)
 router.use(uploadRouter)
 router.use(lecturesRouter)
+router.use(myRouter)
 
 export default router
