@@ -24,6 +24,17 @@ export interface PostUpdate {
   body: string
 }
 
+const postAttrs = [
+  'id',
+  'title',
+  'substring(body, 1, 100) as body',
+  'user_id',
+  'uploaded_at',
+  'likes',
+  'is_edited',
+  'random_nickname',
+]
+
 export default class Post {
   /**
    * Return posts equal or smaller than the given post id with the number of given amount
@@ -77,7 +88,7 @@ export default class Post {
   static async getRecentPosts(fromId: number): Promise<PostModel[] | false> {
     const query = SqlB()
       .select(
-        '*',
+        ...postAttrs,
         SqlB()
           .select('count(*)')
           .from('comment')
