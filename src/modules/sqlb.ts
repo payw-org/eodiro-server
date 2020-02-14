@@ -103,8 +103,12 @@ class SqlBInstance {
     return this
   }
 
-  order(attr: string, direction: 'ASC' | 'DESC'): SqlBInstance {
-    this.append(`ORDER BY ${attr} ${direction}`)
+  same(attr: string, value: number | string): SqlBInstance {
+    this.append(`${attr} = ${this.convert(value)}`)
+
+    return this
+  }
+
 
     return this
   }
