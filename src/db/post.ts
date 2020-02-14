@@ -182,7 +182,7 @@ export default class Post {
         body: undefined,
         user_id: undefined,
         uploaded_at: undefined,
-        random_nickname: undefined
+        random_nickname: undefined,
       })
       .build()
 
@@ -198,7 +198,7 @@ export default class Post {
       body,
       userId,
       Time.getCurrTime(),
-      userInfo.random_nickname
+      userInfo.random_nickname,
     ]
     const [err, results] = await Db.query(query, values)
 
