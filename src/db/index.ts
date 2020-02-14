@@ -2,13 +2,21 @@ import DbConnector from '@/modules/db-connector'
 import { MysqlError, FieldInfo } from 'mysql'
 
 export type MysqlResult = any[] | Record<string, any>
-export type MysqlQueryReturn = [MysqlError, any[] | MysqlResult, FieldInfo[]]
+export type MysqlQueryReturn<ResultType> = [MysqlError, ResultType, FieldInfo[]]
 export type QueryValues = (string | number)[] | string | number
 
 export default class Db {
-  static query(query: string): Promise<MysqlQueryReturn>
-  static query(query: string, values: QueryValues): Promise<MysqlQueryReturn>
-  static query(query: string, values?: QueryValues): Promise<MysqlQueryReturn> {
+  static query<ResultType = MysqlResult>(
+    query: string
+  ): Promise<MysqlQueryReturn<ResultType>>
+  static query<ResultType = MysqlResult>(
+    query: string,
+    values: QueryValues
+  ): Promise<MysqlQueryReturn<ResultType>>
+  static query<ResultType = MysqlResult>(
+    query: string,
+    values?: QueryValues
+  ): Promise<MysqlQueryReturn<ResultType>> {
     return new Promise(async (resolve) => {
       const conn = await DbConnector.getConnection()
 
