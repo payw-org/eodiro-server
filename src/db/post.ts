@@ -47,36 +47,26 @@ export default class Post {
       quantity = 20
     }
 
-    let query = `
-      select *,
-      (
-        select count(*)
-        from comment
-        where comment.post_id = post.id
-      ) as comment_count
-      from post
-      order by id desc
-      limit ?
-    `
-    let values = [quantity]
+    const sqlBInstance = SqlB()
+      .select(
+        ...postAttrs,
+        SqlB()
+          .select('count(*)')
+          .from('comment')
+          .where('comment.post_id = post.id')
+          .as('comment_count')
+          .build()
+      )
+      .from('post')
 
     if (fromId) {
-      query = `
-        select *,
-        (
-          select count(*)
-          from comment
-          where comment.post_id = post.id
-        ) as comment_count
-        from post
-        where id <= ?
-        order by id desc
-        limit ?
-      `
-      values = [fromId, quantity]
+      sqlBInstance.where(`id <= ${fromId}`)
     }
 
-    const [err, results] = await Db.query(query, values)
+    sqlBInstance.order('id', 'desc').limit(quantity)
+
+    const query = sqlBInstance.build()
+    const [err, results] = await Db.query(query)
 
     if (err) {
       return false
