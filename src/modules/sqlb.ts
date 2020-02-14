@@ -62,9 +62,29 @@ class SqlBInstance {
       what = ['*']
     }
 
-    const target = what.join(', ')
+    const attrs = what.join(', ')
 
-    this.append(`SELECT ${target}`)
+    this.append(`SELECT ${attrs}`)
+
+    return this
+  }
+
+  distinctSelect(...what: (string | SqlBInstance)[]): SqlBInstance {
+    if (what.length === 0) {
+      what = ['*']
+    }
+
+    what = what.map((w) => {
+      if (typeof w === 'string') {
+        return w
+      } else {
+        return w.build()
+      }
+    })
+
+    const attrs = what.join(', ')
+
+    this.append(`SELECT DISTINCT ${attrs}`)
 
     return this
   }
@@ -76,8 +96,8 @@ class SqlBInstance {
     return this
   }
 
-  from(target: SqlBInstance): SqlBInstance
   from(target: string): SqlBInstance
+  from(target: SqlBInstance): SqlBInstance
   from(target: SqlBInstance | string): SqlBInstance {
     if (typeof target === 'string') {
       this.append(`FROM ${target}`)
