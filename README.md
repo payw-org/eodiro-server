@@ -61,7 +61,7 @@ An API server for [eodiro](https://github.com/paywteam/eodiro.com) using MySQL d
 
 ## Vacant
 
-- [Get Buildings](#Get-Buildings)
+- [Get Buildings Vacant](#Get-Buildings-Vacant)
 
 ### Get Buildings Vacant
 
