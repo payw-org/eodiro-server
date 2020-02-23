@@ -1,3 +1,7 @@
+import sqlFormatter from 'sql-formatter'
+
+type Order = 'ASC' | 'asc' | 'DESC' | 'desc'
+
 class SqlBInstance {
   private q = ''
 
@@ -57,6 +61,28 @@ class SqlBInstance {
     return built
   }
 
+  format(): SqlBInstance {
+    this.q = sqlFormatter.format(this.q)
+
+    return this
+  }
+
+  raw(str: string): SqlBInstance {
+    this.append(str)
+
+    return this
+  }
+
+  bind(alias?: string): SqlBInstance {
+    this.q = `(${this.q})`
+
+    if (alias) {
+      this.append(alias)
+    }
+
+    return this
+  }
+
   select(...what: Array<string>): SqlBInstance {
     if (what.length === 0) {
       what = ['*']
@@ -96,13 +122,16 @@ class SqlBInstance {
     return this
   }
 
+  from(): SqlBInstance
   from(target: string): SqlBInstance
   from(target: SqlBInstance): SqlBInstance
-  from(target: SqlBInstance | string): SqlBInstance {
-    if (typeof target === 'string') {
+  from(target?: SqlBInstance | string): SqlBInstance {
+    if (!target) {
+      this.append(`FROM`)
+    } else if (typeof target === 'string') {
       this.append(`FROM ${target}`)
     } else {
-      this.append(`FROM (${target.build()})`)
+      this.append(`FROM ${target.build()}`)
     }
 
     return this
@@ -123,24 +152,93 @@ class SqlBInstance {
     return this
   }
 
+  join(schema1: string, schema2: string): SqlBInstance {
+    this.append(`${schema1} JOIN ${schema2}`)
+
+    return this
+  }
+
+  on(condition?: string): SqlBInstance {
+    if (condition) {
+      this.append(`ON ${condition}`)
+    } else {
+      this.append(`ON`)
+    }
+
+    return this
+  }
+
+  /**
+   * @deprecated Use `equal()` instead
+   */
   same(attr: string, value: number | string): SqlBInstance {
     this.append(`${attr} = ${this.convert(value)}`)
 
     return this
   }
 
-  order(
-    attr: string,
-    direction: 'ASC' | 'asc' | 'DESC' | 'desc'
-  ): SqlBInstance {
+  equal(attr: string, value: number | string): SqlBInstance {
+    this.append(`${attr} = ${this.convert(value)}`)
+
+    return this
+  }
+
+  andEqual(attr: string, value: number | string): SqlBInstance {
+    this.and()
+    this.equal(attr, value)
+
+    return this
+  }
+
+  notEqual(attr: string, value: number | string): SqlBInstance {
+    this.append(`${attr} != ${this.convert(value)}`)
+
+    return this
+  }
+  andNotEqual(attr: string, value: number | string): SqlBInstance {
+    this.and()
+    this.notEqual(attr, value)
+
+    return this
+  }
+
+  equalOrMore(attr: string, value: number | string): SqlBInstance {
+    this.append(`${attr} >= ${this.convert(value)}`)
+
+    return this
+  }
+
+  equalOrLess(attr: string, value: number | string): SqlBInstance {
+    this.append(`${attr} <= ${this.convert(value)}`)
+
+    return this
+  }
+
+  more(attr: string, value: number | string): SqlBInstance {
+    this.append(`${attr} > ${this.convert(value)}`)
+
+    return this
+  }
+
+  less(attr: string, value: number | string): SqlBInstance {
+    this.append(`${attr} < ${this.convert(value)}`)
+
+    return this
+  }
+
+  group(by: string): SqlBInstance {
+    this.append(`GROUP BY ${by}`)
+
+    return this
+  }
+
+  order(attr: string, direction: Order = 'asc'): SqlBInstance {
     this.append(`ORDER BY ${attr} ${direction.toUpperCase()}`)
 
     return this
   }
 
-  multiOrder(
-    options: [string, 'ASC' | 'asc' | 'DESC' | 'desc'][]
-  ): SqlBInstance {
+  multiOrder(options: [string, Order][]): SqlBInstance {
     this.append(`ORDER BY`)
     this.append(
       options
@@ -252,13 +350,19 @@ class SqlBInstance {
     return this
   }
 
-  and(): SqlBInstance {
+  and(sql?: SqlBInstance): SqlBInstance {
     this.append(`AND`)
+    if (sql instanceof SqlBInstance) {
+      this.append(sql.build())
+    }
     return this
   }
 
-  or(): SqlBInstance {
+  or(sql?: SqlBInstance): SqlBInstance {
     this.append(`OR`)
+    if (sql instanceof SqlBInstance) {
+      this.append(sql.build())
+    }
     return this
   }
 }
