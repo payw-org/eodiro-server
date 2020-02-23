@@ -33,7 +33,10 @@ export default class Db {
     })
   }
 
-  static escape(str: string): string {
+  static escape(str: string): string | null {
+    if (!str) {
+      return null
+    }
     return str.replace(/[\0\x08\x09\x1a\n\r"'\\\%]/g, function(char) {
       switch (char) {
         case '\0':
