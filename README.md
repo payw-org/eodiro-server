@@ -63,10 +63,10 @@ An API server for [eodiro](https://github.com/paywteam/eodiro.com) using MySQL d
 
 - [Get Buildings](#Get-Buildings)
 
-### Get Buildings
+### Get Buildings Vacant
 
 <pre>
-<b>GET</b>  https://api2.eodiro.com/<b>:year</b>/<b>:semester</b>/<b>:campus</b>/buildings
+<b>GET</b>  https://api2.eodiro.com/<b>:year</b>/<b>:semester</b>/<b>:campus</b>/vacant/buildings
 </pre>
 
 **Params**
@@ -76,3 +76,11 @@ An API server for [eodiro](https://github.com/paywteam/eodiro.com) using MySQL d
 | `year`     | `number`                         |
 | `semester` | `'1' \| '여름' \| '2' \| '겨울'` |
 | `campus`   | `'서울'`                         |
+
+**Queries**
+
+| Key       | Type                                                          |
+| --------- | ------------------------------------------------------------- |
+| `day?`    | `'sun' \| 'mon' \| 'tue' \| 'wed' \| 'thu' \| 'fri' \| 'sat'` |
+| `hour?`   | `number`                                                      |
+| `minute?` | `number`                                                      |
