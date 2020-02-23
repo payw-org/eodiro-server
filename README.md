@@ -5,6 +5,7 @@ An API server for [eodiro](https://github.com/paywteam/eodiro.com) using MySQL d
 ## References
 
 - [Lectures](#Lectures)
+- [Vacant](#Vacant)
 
 ---
 
@@ -55,3 +56,23 @@ An API server for [eodiro](https://github.com/paywteam/eodiro.com) using MySQL d
 | `q`       | `string` | Search keyword               |
 | `amount?` | `number` | The amount of search results |
 | `offset?` | `number` | The offset of search results |
+
+---
+
+## Vacant
+
+- [Get Buildings](#Get-Buildings)
+
+### Get Buildings
+
+<pre>
+<b>GET</b>  https://api2.eodiro.com/<b>:year</b>/<b>:semester</b>/<b>:campus</b>/buildings
+</pre>
+
+**Params**
+
+| Key        | Type                             |
+| ---------- | -------------------------------- |
+| `year`     | `number`                         |
+| `semester` | `'1' \| '여름' \| '2' \| '겨울'` |
+| `campus`   | `'서울'`                         |

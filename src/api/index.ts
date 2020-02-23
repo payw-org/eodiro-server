@@ -4,6 +4,7 @@ import authRouter from '@/api/auth'
 import uploadRouter from '@/api/upload'
 import lecturesRouter from '@/api/lectures'
 import myRouter from '@/api/my'
+import vacantRouter from '@/api/vacant'
 
 const router = express.Router()
 
@@ -20,5 +21,6 @@ router.use('/auth', authRouter)
 router.use(uploadRouter)
 router.use(lecturesRouter)
 router.use(myRouter)
+router.use(vacantRouter)
 
 export default router
