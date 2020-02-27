@@ -62,6 +62,7 @@ An API server for [eodiro](https://github.com/paywteam/eodiro.com) using MySQL d
 ## Vacant
 
 - [Get Buildings Vacant](#Get-Buildings-Vacant)
+- [Get Classrooms](#Get-Classrooms)
 
 ### Get Buildings Vacant
 
@@ -84,3 +85,24 @@ An API server for [eodiro](https://github.com/paywteam/eodiro.com) using MySQL d
 | `day?`    | `'sun' \| 'mon' \| 'tue' \| 'wed' \| 'thu' \| 'fri' \| 'sat'` |
 | `hour?`   | `number`                                                      |
 | `minute?` | `number`                                                      |
+
+### Get Classrooms
+
+<pre>
+<b>GET</b>  https://api2.eodiro.com/<b>:year</b>/<b>:semester</b>/<b>:campus</b>/vacant/<b>:building</b>/classrooms
+</pre>
+
+**Params**
+
+| Key        | Type                             |
+| ---------- | -------------------------------- |
+| `year`     | `number`                         |
+| `semester` | `'1' \| '여름' \| '2' \| '겨울'` |
+| `campus`   | `'서울'`                         |
+| `building` | `string`                         |
+
+**Queries**
+
+| Key    | Type                                                          |
+| ------ | ------------------------------------------------------------- |
+| `day?` | `'sun' \| 'mon' \| 'tue' \| 'wed' \| 'thu' \| 'fri' \| 'sat'` |
