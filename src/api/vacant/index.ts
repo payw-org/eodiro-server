@@ -22,7 +22,7 @@ router.get('/:year/:semester/:campus/vacant/buildings', async (req, res) => {
 
   // Find total classrooms number
   const q1 = SqlB()
-    .select('building', 'count(building) as total')
+    .select('building as building_number', 'count(building) as total')
     .from(
       SqlB()
         .select('distinct *')
@@ -72,7 +72,7 @@ router.get('/:year/:semester/:campus/vacant/buildings', async (req, res) => {
 
   // Find in-class classrooms number
   const q2 = SqlB()
-    .select('building', 'count(building) as in_class_count')
+    .select('building as building_number', 'count(building) as in_class_count')
     .from(
       SqlB()
         .select('building', 'room')
@@ -125,7 +125,7 @@ router.get('/:year/:semester/:campus/vacant/buildings', async (req, res) => {
 
   results2.forEach((b) => {
     const index = results1.findIndex((item) => {
-      return item.building === b.building
+      return item.building_number === b.building_number
     })
 
     if (index !== -1) {
