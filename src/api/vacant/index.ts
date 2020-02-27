@@ -8,14 +8,17 @@ const router = express.Router()
 
 router.get('/:year/:semester/:campus/vacant/buildings', async (req, res) => {
   const now = dayjs()
+
+  // Queries
   const hour = parseInt(Db.escape(req.query?.hour)) || now.hour()
   const minute = parseInt(Db.escape(req.query?.minute)) || now.minute()
   const today = dayIndexToString(now.day())
+  const day = Db.escape(req.query?.day) || today
 
+  // Params
   const year = Db.escape(req.params?.year)
   const semester = Db.escape(req.params?.semester)
   const campus = Db.escape(req.params?.campus)
-  const day = Db.escape(req.query?.day) || today
 
   // Find total classrooms number
   const q1 = SqlB()
@@ -52,9 +55,15 @@ router.get('/:year/:semester/:campus/vacant/buildings', async (req, res) => {
         .bind('t2')
         .group('building')
     )
+    .format()
     .build()
 
   const [err1, results1] = await Db.query(q1)
+
+  // Fill empty key with 0 value
+  results1.forEach((item) => {
+    item.empty = 0
+  })
 
   if (err1) {
     res.sendStatus(500)
@@ -106,7 +115,6 @@ router.get('/:year/:semester/:campus/vacant/buildings', async (req, res) => {
     )
     .group('building')
     .order('building')
-    .format()
     .build()
 
   const [err2, results2] = await Db.query(q2)
@@ -128,6 +136,92 @@ router.get('/:year/:semester/:campus/vacant/buildings', async (req, res) => {
   res.json(results1)
 })
 
-router.get('/:year/:semester/:campus/:building')
+router.get(
+  '/:year/:semester/:campus/vacant/:building/classrooms',
+  async (req, res) => {
+    const now = dayjs()
+
+    // Queries
+    const today = dayIndexToString(now.day())
+    const day = Db.escape(req.query?.day) || today
+
+    // Params
+    const year = Db.escape(req.params?.year)
+    const semester = Db.escape(req.params?.semester)
+    const campus = Db.escape(req.params?.campus)
+    const building = Db.escape(req.params?.building)
+
+    const q1 = SqlB()
+      .select('*')
+      .from(
+        SqlB()
+          .select('*')
+          .from(
+            SqlB()
+              .join('lecture', 'period')
+              .on('lecture.id = period.lecture_id')
+          )
+          .where(
+            SqlB()
+              .equal('year', year)
+              .andEqual('semester', semester)
+              .andEqual('campus', campus)
+              .andEqual('building', building)
+              .andEqual('day', day)
+          )
+          .order('room', 'asc')
+          .bind('t1')
+      )
+      .multiOrder([
+        ['room', 'asc'],
+        ['start_h', 'asc'],
+        ['start_m', 'asc'],
+      ])
+      .build()
+    const [err1, results1] = await Db.query(q1)
+
+    if (err1) {
+      res.sendStatus(500)
+      return
+    }
+
+    const info: {
+      classroom: string
+      lectures: {
+        name: string
+        professor: string
+        start_h: number
+        start_m: number
+        end_h: number
+        end_m: number
+      }[]
+    }[] = []
+
+    results1.forEach((lecture) => {
+      let index = info.findIndex((item) => {
+        return item.classroom === lecture.room
+      })
+
+      if (index === -1) {
+        index =
+          info.push({
+            classroom: lecture.room,
+            lectures: [],
+          }) - 1
+      }
+
+      info[index].lectures.push({
+        name: lecture.name,
+        professor: lecture.professor,
+        start_h: lecture.start_h,
+        start_m: lecture.start_m,
+        end_h: lecture.end_h,
+        end_m: lecture.end_m,
+      })
+    })
+
+    res.json(info)
+  }
+)
 
 export default router
