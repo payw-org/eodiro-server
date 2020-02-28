@@ -67,7 +67,7 @@ router.get('/:year/:semester/:campus/vacant/buildings', async (req, res) => {
 
   // Fill empty key with 0 value
   results1.forEach((item) => {
-    item.empty = 0
+    item.empty = item.total
   })
 
   if (err1) {
