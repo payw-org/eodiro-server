@@ -60,6 +60,11 @@ router.get('/:year/:semester/:campus/vacant/buildings', async (req, res) => {
 
   const [err1, results1] = await Db.query(q1)
 
+  if (err1) {
+    res.sendStatus(500)
+    return
+  }
+
   // Fill empty key with 0 value
   results1.forEach((item) => {
     item.empty = 0
