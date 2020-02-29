@@ -10,9 +10,7 @@ import DbConnector from '@/modules/db-connector'
 import EodiroMailer from '@/modules/eodiro-mailer'
 import Config from '@@/config'
 import cors from 'cors'
-import timetableSeeder from '@/db/seeders/timetable-seeder'
-import lectures from '@@/data/lectures.json'
-import { RefinedLectures } from '@payw/cau-timetable-scraper/build/src/types'
+import dbValidator from '@/db/helpers/db-validator'
 
 async function main(): Promise<void> {
   // Create Express app
@@ -36,6 +34,8 @@ async function main(): Promise<void> {
   if (!isDbConnected) {
     console.info('🛑 Stop the application due to DB connection failed')
     return
+  } else {
+    await dbValidator()
   }
 
   // Connect to Zoho mail server
@@ -60,11 +60,6 @@ async function main(): Promise<void> {
   eodiroBot.run()
 }
 
-function test(): void {
-  timetableSeeder(lectures as RefinedLectures)
-}
-
 // Run the app
 dotenv.config()
 main()
-// test()
