@@ -1,6 +1,6 @@
 import Db from '@/db'
 
-const createCoverageMajorLectureSql = `
+const sql = `
 CREATE TABLE coverage_major_lecture (
   lecture_id char(36) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   coverage_major char(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
@@ -11,6 +11,6 @@ CREATE TABLE coverage_major_lecture (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 `
 
-export async function createCoverageMajorLecture(): Promise<void> {
-  await Db.query(createCoverageMajorLectureSql)
+export async function createCoverageMajorLectureTable(): Promise<void> {
+  await Db.query(sql)
 }

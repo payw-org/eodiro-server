@@ -1,7 +1,11 @@
 import Db from '@/db'
 import SqlB from '@/modules/sqlb'
 import Config from '@@/config'
-import { createLectureTable, createCoverageMajorLecture } from '@/db/create'
+import {
+  createLectureTable,
+  createCoverageMajorLectureTable,
+  createCafeteriaMenuTable,
+} from '@/db/create'
 
 const database =
   process.env.NODE_ENV === 'development' ? Config.DB_NAME_DEV : Config.DB_NAME
@@ -41,5 +45,6 @@ export default async function dbValidator(): Promise<void> {
   console.log(`Validating DB '${database}'`)
 
   await validateTable('lecture', createLectureTable)
-  await validateTable('coverage_major_lecture', createCoverageMajorLecture)
+  await validateTable('coverage_major_lecture', createCoverageMajorLectureTable)
+  await validateTable('cafeteria_menu', createCafeteriaMenuTable)
 }
