@@ -1,7 +1,7 @@
 import { RefinedLectures } from '@payw/cau-timetable-scraper/build/src/types'
 import Db from '@/db'
 import SqlB from '@/modules/sqlb'
-import uuid from 'uuid'
+import { v4 as uuidv4 } from 'uuid'
 import { LectureModel, PeriodModel } from '@/db/models'
 
 export default async function(lectures: RefinedLectures): Promise<void> {
@@ -26,7 +26,7 @@ export default async function(lectures: RefinedLectures): Promise<void> {
 
   for (let i = 0; i < lectures.length; i += 1) {
     const lecture = lectures[i]
-    const lectureId = uuid.v4()
+    const lectureId = uuidv4()
 
     dbLectures.push({
       id: lectureId,
