@@ -191,7 +191,7 @@ router.get(
     }
 
     const info: {
-      classroom: string
+      classroom_number: string
       lectures: {
         name: string
         professor: string
@@ -204,13 +204,13 @@ router.get(
 
     results1.forEach((lecture) => {
       let index = info.findIndex((item) => {
-        return item.classroom === lecture.room
+        return item.classroom_number === lecture.room
       })
 
       if (index === -1) {
         index =
           info.push({
-            classroom: lecture.room,
+            classroom_number: lecture.room,
             lectures: [],
           }) - 1
       }
