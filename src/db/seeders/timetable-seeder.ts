@@ -2,14 +2,22 @@ import { RefinedLectures } from '@payw/cau-timetable-scraper/build/src/types'
 import Db from '@/db'
 import SqlB from '@/modules/sqlb'
 import { v4 as uuidv4 } from 'uuid'
-import { LectureModel, PeriodModel } from '@/db/models'
+import {
+  LectureModel,
+  PeriodModel,
+  CoverageMajorLectureModel,
+} from '@/db/models'
 
 export default async function(lectures: RefinedLectures): Promise<void> {
-  console.log('Seeding lectures')
+  console.log('🌱 Seeding lectures')
   // const lectures: Lectures = lecturesJson
   const sqlB = SqlB()
 
   const firstLecture = lectures[0]
+  if (!firstLecture) {
+    console.log(`🌱 Stop seeding, first lecture doesn't exist`)
+    return
+  }
   const year = firstLecture.year
   const semester = firstLecture.semester
 
@@ -23,6 +31,7 @@ export default async function(lectures: RefinedLectures): Promise<void> {
   const coverageMajors = []
   const dbLectures: LectureModel[] = []
   const dbPeriods: PeriodModel[] = []
+  const dbCoverageMajorLectures: CoverageMajorLectureModel[] = []
 
   for (let i = 0; i < lectures.length; i += 1) {
     const lecture = lectures[i]
@@ -84,6 +93,15 @@ export default async function(lectures: RefinedLectures): Promise<void> {
         })
       }
     }
+
+    for (let j = 0; j < lecture.coverages.length; j += 1) {
+      const coverage = lecture.coverages[j]
+
+      dbCoverageMajorLectures.push({
+        lecture_id: lectureId,
+        coverage_major: coverage.major,
+      })
+    }
   }
 
   await Db.query(
@@ -94,6 +112,11 @@ export default async function(lectures: RefinedLectures): Promise<void> {
   )
   await Db.query(sqlB.insertBulk(`lecture`, dbLectures).build())
   await Db.query(sqlB.insertBulk(`period`, dbPeriods).build())
+  await Db.query(
+    SqlB()
+      .insertBulk(`coverage_major_lecture`, dbCoverageMajorLectures)
+      .build()
+  )
 
-  console.log('Done Seeding lectures')
+  console.log('🌱 Done Seeding lectures')
 }

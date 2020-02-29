@@ -6,6 +6,12 @@ import { CronJob } from 'cron'
 import Db from '@/db'
 import { UserModel } from '@/db/user'
 import User from '@/db/user'
+import fs from 'fs'
+import Config from '@@/config'
+import SqlB from './sqlb'
+import getSemester from './get-semester'
+import { CTTS } from '@payw/cau-timetable-scraper'
+import timetableSeeder from '@/db/seeders/timetable-seeder'
 
 export default class EodiroBot {
   isRunning = false
@@ -19,6 +25,8 @@ export default class EodiroBot {
 
     this.clearPendingUsers()
     this.updateRandomNickname()
+    this.scrapeLectures()
+    // this.garbageCollectFiles()
   }
 
   /**
@@ -67,5 +75,68 @@ export default class EodiroBot {
     const cronTime = '0 0 * * *'
     const timeZone = 'Asia/Seoul'
     new CronJob(cronTime, User.updateRandomNickname, null, true, timeZone)
+  }
+
+  private scrapeLectures(): void {
+    const now = dayjs()
+    const year = now.year()
+    const semester = getSemester()
+
+    const cronTime = '0 0 * * *'
+    const timeZone = 'Asia/Seoul'
+    new CronJob(
+      cronTime,
+      async () => {
+        const lectures = await CTTS(
+          {
+            id: Config.CAU_ID,
+            pw: Config.CAU_PW,
+          },
+          {
+            year,
+            semester,
+          }
+        )
+        timetableSeeder(lectures)
+      },
+      null,
+      true,
+      timeZone
+    )
+  }
+
+  private garbageCollectFiles(): void {
+    const storagePath =
+      process.env.NODE_ENV === 'development'
+        ? Config.STORAGE_PATH_DEV
+        : Config.STORAGE_PATH
+    fs.readdir(storagePath, (err, files) => {
+      if (err) {
+        console.error(err)
+        return
+      }
+
+      const sqlb = SqlB()
+
+      files.forEach((file) => {
+        const fileName = file.split('.')[0]
+        const query = sqlb
+          .select()
+          .from('file')
+          .where(`file_name = '${fileName}'`)
+          .build()
+
+        Db.query(query).then(([err, results]) => {
+          if (results.length === 0) {
+            console.log('file not exist')
+            fs.unlink(`${storagePath}/${file}`, (err) => {
+              if (err) {
+                throw err
+              }
+            })
+          }
+        })
+      })
+    })
   }
 }

@@ -26,3 +26,9 @@ export interface PeriodModel extends Record<string, string | number> {
   end_h: number
   end_m: number
 }
+
+export interface CoverageMajorLectureModel
+  extends Record<string, string | number> {
+  lecture_id: string
+  coverage_major: string
+}
