@@ -15,8 +15,8 @@ export default class EodiroMailer {
     secure: true,
     auth: {
       user: Config.MAIL_USERNAME,
-      pass: Config.MAIL_PASSWORD
-    }
+      pass: Config.MAIL_PASSWORD,
+    },
   })
 
   static async verify(): Promise<boolean> {
@@ -27,7 +27,7 @@ export default class EodiroMailer {
           console.error(err.message)
           resolve(false)
         } else {
-          console.info('⭕️ Connected to Zoho mail server')
+          console.info('✉️ Connected to Zoho mail server')
           resolve(true)
         }
       })
@@ -40,7 +40,7 @@ export default class EodiroMailer {
       from: '"어디로" <contact@payw.org>',
       subject: options.subject,
       to: options.to,
-      html: options.html
+      html: options.html,
     })
   }
 }

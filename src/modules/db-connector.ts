@@ -21,7 +21,7 @@ export default class DbConnector {
         password: Config.DB_PASSWORD,
         database,
         charset: 'utf8mb4',
-        multipleStatements: true
+        multipleStatements: true,
       })
 
       this.connection.connect((err) => {
@@ -31,7 +31,7 @@ export default class DbConnector {
           console.error('❌ Failed to connect to Database')
           resolve(false)
         } else {
-          console.info(`⭕️ Connected to DB (${database})`)
+          console.info(`📦 Connected to DB (${database})`)
           resolve(true)
         }
       })
