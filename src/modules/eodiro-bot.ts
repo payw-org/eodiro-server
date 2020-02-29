@@ -12,6 +12,9 @@ import SqlB from './sqlb'
 import getSemester from './get-semester'
 import { CTTS } from '@payw/cau-timetable-scraper'
 import timetableSeeder from '@/db/seeders/timetable-seeder'
+import { CCMS, Restaurant } from '@payw/cau-cafeteria-menus-scraper'
+import { CafeteriaMenu } from '@/db/models'
+import converCampusName from './convert-campus-name'
 
 export default class EodiroBot {
   isRunning = false
@@ -26,6 +29,7 @@ export default class EodiroBot {
     this.clearPendingUsers()
     this.updateRandomNickname()
     this.scrapeLectures()
+    this.scrapeCafeteriaMenus()
     // this.garbageCollectFiles()
   }
 
@@ -82,7 +86,7 @@ export default class EodiroBot {
     const year = now.year()
     const semester = getSemester()
 
-    const cronTime = '0 0 * * *'
+    const cronTime = '0 2 * * *'
     const timeZone = 'Asia/Seoul'
     new CronJob(
       cronTime,
@@ -102,6 +106,68 @@ export default class EodiroBot {
       null,
       true,
       timeZone
+    )
+  }
+
+  private scrapeCafeteriaMenus(): void {
+    new CronJob(
+      '0 3 * * *',
+      async () => {
+        const menus = await CCMS({
+          id: Config.CAU_ID,
+          pw: Config.CAU_PW,
+          days: 5,
+        })
+        const dbCafeteriaMenus: CafeteriaMenu[] = []
+        const daysList: string[] = []
+        menus.days.forEach((day) => {
+          daysList.push(day.date)
+          const dayProcessFunction = (restaurant: Restaurant): void => {
+            restaurant.meals.forEach((meal) => {
+              dbCafeteriaMenus.push({
+                campus: converCampusName(menus.campus),
+                served_at: day.date,
+                cafeteria_name: restaurant.name,
+                title: meal.title,
+                time: meal.time,
+                price: meal.price,
+                menus: JSON.stringify(meal.menus),
+              })
+            })
+          }
+
+          day.breakfast.forEach(dayProcessFunction)
+          day.lunch.forEach(dayProcessFunction)
+          day.supper.forEach(dayProcessFunction)
+        })
+
+        const [err1] = await Db.query(
+          SqlB()
+            .delete()
+            .from('cafeteria_menu')
+            .where(
+              daysList
+                .map((day) => {
+                  return `served_at = '${day}'`
+                })
+                .join(' OR ')
+            )
+            .build()
+        )
+
+        if (err1) {
+          return
+        }
+
+        await Db.query(
+          SqlB()
+            .insertBulk('cafeteria_menu', dbCafeteriaMenus)
+            .build()
+        )
+      },
+      null,
+      true,
+      Config.TIME_ZONE
     )
   }
 
