@@ -1,11 +1,36 @@
-import 'module-alias/register'
-import { CCMS } from '@payw/cau-cafeteria-menus-scraper'
-import Config from '@@/config'
+import express from 'express'
+import Db from '@/db'
+import SqlB from '@/modules/sqlb'
+import dayjs from 'dayjs'
+import { DbTables } from '@/db/constants'
+import { Campus } from '@/types'
 
-CCMS({
-  id: Config.CAU_ID,
-  pw: Config.CAU_PW,
-  days: 1
-}).then((data) => {
-  console.log(JSON.stringify(data, null, 2))
+const router = express.Router()
+
+router.get('/cafeteria/:servedAt/:campus/menus', async (req, res) => {
+  const now = dayjs()
+  const campus: Campus = (Db.escape(req.params?.campus) as Campus) || '서울'
+  const servedAt = Db.escape(req.params?.servedAt) || now.format('YYYY-MM-DD')
+  const sql = SqlB()
+    .select('data')
+    .from(DbTables.CAFETERIA_MENU)
+    .where()
+    .equal('campus', campus)
+    .andEqual('served_at', servedAt)
+    .build()
+
+  const [err, results] = await Db.query(sql)
+  if (err) {
+    res.sendStatus(500)
+    return
+  }
+
+  if (results.length === 0) {
+    res.sendStatus(204)
+    return
+  }
+
+  res.json(JSON.parse(results[0]?.data))
 })
+
+export default router
