@@ -18,13 +18,6 @@ export default async function(lectures: RefinedLectures): Promise<void> {
     console.log(`🌱 Stop seeding, first lecture doesn't exist`)
     return
   }
-  const year = firstLecture.year
-  const semester = firstLecture.semester
-
-  // Delete all lectures and rewrite
-  await Db.query(
-    `DELETE FROM lecture WHERE year=${year} AND semester='${semester}'`
-  )
 
   // Update college coverage data
   const coverageColleges = []
@@ -110,6 +103,14 @@ export default async function(lectures: RefinedLectures): Promise<void> {
   await Db.query(
     sqlB.insertBulk(`coverage_major`, coverageMajors, true).build()
   )
+
+  // Delete all lectures before rewrite
+  const year = firstLecture.year
+  const semester = firstLecture.semester
+  await Db.query(
+    `DELETE FROM lecture WHERE year=${year} AND semester='${semester}'`
+  )
+
   await Db.query(sqlB.insertBulk(`lecture`, dbLectures).build())
   await Db.query(sqlB.insertBulk(`period`, dbPeriods).build())
   await Db.query(
