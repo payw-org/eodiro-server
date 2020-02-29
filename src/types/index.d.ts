@@ -1,1 +1,2 @@
-export { Year, Semester, Campus } from './campus'
+export * from './campus'
+export * from './db-schema'
