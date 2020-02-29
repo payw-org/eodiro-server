@@ -33,5 +33,8 @@ export default {
 
   // Storage
   STORAGE_PATH: '',
-  STORAGE_PATH_DEV: ''
+  STORAGE_PATH_DEV: '',
+
+  // Cron
+  TIME_ZONE: 'Asia/Seoul',
 }
