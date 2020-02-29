@@ -2,10 +2,29 @@
 
 An API server for [eodiro](https://github.com/paywteam/eodiro.com) using MySQL database.
 
-## References
+## API References
 
 - [Lectures](#Lectures)
 - [Vacant](#Vacant)
+- [Cafeteria](#Cafeteria)
+
+---
+
+## Common
+
+### Response
+
+- Server responds with `500` HTTP response code when there are some problems while processing the APIs
+
+### Types
+
+We share some specific types across the APIs.
+
+| Type       | Detailed Type                                                 |
+| ---------- | ------------------------------------------------------------- |
+| `Day`      | `'sun' \| 'mon' \| 'tue' \| 'wed' \| 'thu' \| 'fri' \| 'sat'` |
+| `Semester` | `'1' \| '하계' \| '2' \| '동계'`                              |
+| `Campus`   | `'서울' \| '안성'`                                            |
 
 ---
 
@@ -72,19 +91,19 @@ An API server for [eodiro](https://github.com/paywteam/eodiro.com) using MySQL d
 
 **Params**
 
-| Key        | Type                             |
-| ---------- | -------------------------------- |
-| `year`     | `number`                         |
-| `semester` | `'1' \| '여름' \| '2' \| '겨울'` |
-| `campus`   | `'서울'`                         |
+| Key        | Type       |
+| ---------- | ---------- |
+| `year`     | `number`   |
+| `semester` | `Semester` |
+| `campus`   | `Campus`   |
 
 **Queries**
 
-| Key       | Type                                                          |
-| --------- | ------------------------------------------------------------- |
-| `day?`    | `'sun' \| 'mon' \| 'tue' \| 'wed' \| 'thu' \| 'fri' \| 'sat'` |
-| `hour?`   | `number`                                                      |
-| `minute?` | `number`                                                      |
+| Key       | Type     |
+| --------- | -------- |
+| `day?`    | `Day`    |
+| `hour?`   | `number` |
+| `minute?` | `number` |
 
 ### Get Classrooms
 
@@ -94,15 +113,36 @@ An API server for [eodiro](https://github.com/paywteam/eodiro.com) using MySQL d
 
 **Params**
 
-| Key        | Type                             |
-| ---------- | -------------------------------- |
-| `year`     | `number`                         |
-| `semester` | `'1' \| '여름' \| '2' \| '겨울'` |
-| `campus`   | `'서울'`                         |
-| `building` | `string`                         |
+| Key        | Type       |
+| ---------- | ---------- |
+| `year`     | `number`   |
+| `semester` | `Semester` |
+| `campus`   | `Campus`   |
+| `building` | `string`   |
 
 **Queries**
 
-| Key    | Type                                                          |
-| ------ | ------------------------------------------------------------- |
-| `day?` | `'sun' \| 'mon' \| 'tue' \| 'wed' \| 'thu' \| 'fri' \| 'sat'` |
+| Key    | Type  |
+| ------ | ----- |
+| `day?` | `Day` |
+
+## Cafeteria
+
+### Get Menus
+
+<pre>
+<b>GET</b>  https://api2.eodiro.com/cafeteria/<b>:servedAt</b>/<b>:campus</b>/menus
+</pre>
+
+**Params**
+
+| Key        | Type         |
+| ---------- | ------------ |
+| `servedAt` | `YYYY-MM-DD` |
+| `campus`   | `Campus`     |
+
+**Response**
+
+| Code | Description              |
+| ---- | ------------------------ |
+| 204  | No menus data on the day |
