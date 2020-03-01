@@ -86,7 +86,7 @@ We share some specific types across the APIs.
 ### Get Buildings Vacant
 
 <pre>
-<b>GET</b>  https://api2.eodiro.com/<b>:year</b>/<b>:semester</b>/<b>:campus</b>/vacant/buildings
+<b>GET</b>  https://api2.eodiro.com/vacant/<b>:year</b>/<b>:semester</b>/<b>:campus</b>/buildings
 </pre>
 
 **Params**
@@ -108,7 +108,7 @@ We share some specific types across the APIs.
 ### Get Classrooms
 
 <pre>
-<b>GET</b>  https://api2.eodiro.com/<b>:year</b>/<b>:semester</b>/<b>:campus</b>/vacant/<b>:building</b>/classrooms
+<b>GET</b>  https://api2.eodiro.com/vacant/<b>:year</b>/<b>:semester</b>/<b>:campus</b>/buildings/<b>:building</b>/classrooms
 </pre>
 
 **Params**

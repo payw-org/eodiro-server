@@ -6,7 +6,7 @@ import dayIndexToString from '@/modules/day-index-to-string'
 
 const router = express.Router()
 
-router.get('/:year/:semester/:campus/vacant/buildings', async (req, res) => {
+router.get('/vacant/:year/:semester/:campus/buildings', async (req, res) => {
   const now = dayjs()
 
   // Queries
@@ -142,7 +142,7 @@ router.get('/:year/:semester/:campus/vacant/buildings', async (req, res) => {
 })
 
 router.get(
-  '/:year/:semester/:campus/vacant/:building/classrooms',
+  '/vacant/:year/:semester/:campus/buildings/:building/classrooms',
   async (req, res) => {
     const now = dayjs()
 
