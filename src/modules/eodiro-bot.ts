@@ -4,7 +4,7 @@
 import dayjs from 'dayjs'
 import { CronJob } from 'cron'
 import Db from '@/db'
-import { UserModel } from '@/db/user'
+import { UserModel } from '@/db/models'
 import User from '@/db/user'
 import fs from 'fs'
 import Config from '@@/config'
