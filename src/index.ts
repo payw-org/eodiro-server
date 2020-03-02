@@ -11,6 +11,11 @@ import EodiroMailer from '@/modules/eodiro-mailer'
 import Config from '@@/config'
 import cors from 'cors'
 import dbValidator from '@/db/helpers/db-validator'
+import dayjs from 'dayjs'
+import getSemester from './modules/get-semester'
+import { CTTS } from '@payw/cau-timetable-scraper'
+import timetableSeeder from './db/seeders/timetable-seeder'
+import CafeteriaMenusSeeder from './db/seeders/cafeteria-menus-seeder'
 
 async function main(): Promise<void> {
   // Create Express app
@@ -62,4 +67,6 @@ async function main(): Promise<void> {
 
 // Run the app
 dotenv.config()
-main()
+;(async (): Promise<void> => {
+  await main()
+})()
