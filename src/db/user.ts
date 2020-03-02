@@ -4,23 +4,7 @@ import Auth from '@/modules/auth'
 import Time from '@/modules/time'
 import rng from '@/modules/random-name-generator'
 import EodiroMailer from '@/modules/eodiro-mailer'
-
-export interface UserModel {
-  id: number
-  portal_id: string
-  registered_at: string
-  nickname: string
-  random_nickname: string
-  password: string
-}
-
-export interface UserModelWithoutPassword {
-  id: number
-  portal_id: string
-  registered_at: string
-  nickname: string
-  random_nickname: string
-}
+import { UserModel } from '@/db/models'
 
 export type UserId = number
 
@@ -150,7 +134,7 @@ export default class User {
       Time.getCurrTime(),
       info.nickname,
       rng(),
-      pendingToken
+      pendingToken,
     ]
     const [err] = await Db.query(query, values)
 
@@ -221,7 +205,7 @@ export default class User {
     // TODO: send email from the bot
     EodiroMailer.sendMail({
       to: 'contact@payw.org',
-      subject: 'Updating user random nickname'
+      subject: 'Updating user random nickname',
     })
   }
 }
