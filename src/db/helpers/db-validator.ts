@@ -8,11 +8,12 @@ import {
   createPendingUserTable,
   createCoverageCollegeTable,
   createCoverageMajorTable,
-  createPost,
+  createPostTable,
   createPeriodTable,
   createLectureTable,
   createCoverageMajorLectureTable,
   createCafeteriaMenuTable,
+  createCommentTable,
 } from '../models'
 
 const database =
@@ -64,5 +65,6 @@ export default async function dbValidator(): Promise<void> {
     createCoverageMajorLectureTable
   )
   await validateTable(DbTables.CAFETERIA_MENU, createCafeteriaMenuTable)
-  await validateTable(DbTables.POST, createPost)
+  await validateTable(DbTables.POST, createPostTable)
+  await validateTable(DbTables.COMMENT, createCommentTable)
 }

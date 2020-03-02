@@ -9,4 +9,5 @@ export const DbTables = {
   COVERAGE_MAJOR_LECTURE: 'coverage_major_lecture',
   CAFETERIA_MENU: 'cafeteria_menu',
   POST: 'post',
+  COMMENT: 'comment',
 }

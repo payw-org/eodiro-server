@@ -1,6 +1,5 @@
 export * from './post-model'
 export * from './user-model'
 export * from './lecture-model'
-export * from './comment-model'
 export * from './cafeteria-menus-model'
 export * from './refresh-token'
