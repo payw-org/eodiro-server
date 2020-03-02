@@ -5,6 +5,7 @@ export interface InquiryModel extends Record<string, string | number> {
   title: string
   body: string
   user_id: number
+  answer: string
   uploaded_at: string
   likes: number
 }
@@ -16,6 +17,7 @@ CREATE TABLE inquiry (
   title varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   body text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   user_id int DEFAULT NULL,
+  answer text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   uploaded_at datetime NOT NULL,
   likes int NOT NULL DEFAULT '0',
   PRIMARY KEY (id),
