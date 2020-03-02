@@ -21,7 +21,7 @@
     "clear": "rimraf build/*",
     "dev-legacy": "npm run clear && nodemon -e ts --exec \"npm run compile\"",
     "checkout-latest": "git checkout $(git describe --tags `git rev-list --tags --max-count=1`)",
-    "deploy": "git reset --hard && git fetch --prune && npm run checkout-latest && npm install && npm run pm2-reboot"
+    "update": "git reset --hard && git fetch --prune && npm run checkout-latest && npm install && npm run pm2-reboot"
   },
   "_moduleAliases": {
     "@": "src",
