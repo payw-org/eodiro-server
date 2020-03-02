@@ -12,9 +12,10 @@ export interface InquiryModel extends Record<string, string | number> {
 const createInquiryTableSql = `
 CREATE TABLE inquiry (
   id int NOT NULL AUTO_INCREMENT,
+  email varchar(320) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   title varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   body text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  user_id int NOT NULL,
+  user_id int DEFAULT NULL,
   uploaded_at datetime NOT NULL,
   likes int NOT NULL DEFAULT '0',
   PRIMARY KEY (id),
