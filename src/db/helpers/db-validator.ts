@@ -1,11 +1,19 @@
 import Db from '@/db'
 import SqlB from '@/modules/sqlb'
 import Config from '@@/config'
+import { DbTables } from '@/db/constants'
 import {
+  createRefreshTokenTable,
+  createUserTable,
+  createPendingUserTable,
+  createCoverageCollegeTable,
+  createCoverageMajorTable,
+  createPost,
+  createPeriodTable,
   createLectureTable,
   createCoverageMajorLectureTable,
   createCafeteriaMenuTable,
-} from '@/db/create'
+} from '../models'
 
 const database =
   process.env.NODE_ENV === 'development' ? Config.DB_NAME_DEV : Config.DB_NAME
@@ -34,7 +42,7 @@ async function validateTable(
     console.log(`✅ Table '${tableName}' exists`)
     return true
   } else {
-    console.log(`❌ Table '${tableName}' doesn't exist`)
+    console.log(`🙅‍♂️ Table '${tableName}' doesn't exist`)
     console.log(`✒️ Creating a table '${tableName}'`)
     await createFunction()
     return false
@@ -42,9 +50,19 @@ async function validateTable(
 }
 
 export default async function dbValidator(): Promise<void> {
-  console.log(`Validating DB '${database}'`)
+  console.log(`🩺 Validating DB [${database}]`)
 
-  await validateTable('lecture', createLectureTable)
-  await validateTable('coverage_major_lecture', createCoverageMajorLectureTable)
-  await validateTable('cafeteria_menu', createCafeteriaMenuTable)
+  await validateTable(DbTables.USER, createUserTable)
+  await validateTable(DbTables.PENDING_USER, createPendingUserTable)
+  await validateTable(DbTables.REFRESH_TOKEN, createRefreshTokenTable)
+  await validateTable(DbTables.COVERAGE_COLLEGE, createCoverageCollegeTable)
+  await validateTable(DbTables.COVERAGE_MAJOR, createCoverageMajorTable)
+  await validateTable(DbTables.LECTURE, createLectureTable)
+  await validateTable(DbTables.PERIOD, createPeriodTable)
+  await validateTable(
+    DbTables.COVERAGE_MAJOR_LECTURE,
+    createCoverageMajorLectureTable
+  )
+  await validateTable(DbTables.CAFETERIA_MENU, createCafeteriaMenuTable)
+  await validateTable(DbTables.POST, createPost)
 }
