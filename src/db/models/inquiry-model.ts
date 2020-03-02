@@ -2,6 +2,7 @@ import Db from '..'
 
 export interface InquiryModel extends Record<string, string | number> {
   id: number
+  email: string
   title: string
   body: string
   user_id: number

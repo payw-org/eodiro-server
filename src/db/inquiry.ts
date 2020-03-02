@@ -1,13 +1,16 @@
 import Db from '@/db'
 import { InquiryModel } from '@/db/models'
 import Time from '@/modules/time'
-import User from '@/db/user'
 import SqlB from '@/modules/sqlb'
 
 export interface InquiryNew {
   title: string
   body: string
-  email: string | null
+  email: string
+}
+export interface AnswerData {
+  inquiryId: number
+  answer: string
 }
 
 export default class Inquiry {
@@ -39,7 +42,6 @@ export default class Inquiry {
       !this.isValidBody(body) ||
       !this.isValidEmail(email)
     ) {
-      console.log('trim')
       return false
     }
     const query = SqlB()
@@ -77,5 +79,36 @@ export default class Inquiry {
       return undefined
     }
     return results as InquiryModel[]
+  }
+
+  static async update(answerData: AnswerData): Promise<boolean> {
+    const query = `
+      update inquiry
+      set answer = ?
+      where id = ?
+      `
+    const values = [answerData.answer, answerData.inquiryId]
+
+    const [err, results] = await Db.query(query, values)
+    //TODO : change results type to OkPacket including "affectedRows: number"
+    //if(err || results.affectedRows != 1)
+    if (err) {
+      return false
+    }
+    return true
+  }
+
+  static async getFromInquiryId(
+    inquiryId: number
+  ): Promise<InquiryModel | false> {
+    const query = `
+        select * from inquiry
+        where id = ?
+      `
+    const [err, results] = await Db.query(query, inquiryId)
+    if (err || !results || results.length != 1) {
+      return false
+    }
+    return results[0] as InquiryModel
   }
 }
