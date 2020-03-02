@@ -1,5 +1,6 @@
-export { default as PostModel } from './post-model'
-export { default as UserModel } from './user-model'
+export * from './post-model'
+export * from './user-model'
 export * from './lecture-model'
 export * from './comment-model'
 export * from './cafeteria-menus-model'
+export * from './refresh-token'
