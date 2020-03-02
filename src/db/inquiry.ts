@@ -62,4 +62,20 @@ export default class Inquiry {
 
     return (results as Record<string, any>).insertId
   }
+  static async getFromUserId(userId: number): Promise<InquiryModel[] | false> {
+    const query = `
+        select * from inquiry
+        where user_id = ?
+      `
+    const [err, results] = await Db.query(query, userId)
+
+    if (err) {
+      return false
+    }
+
+    if (results.length === 0) {
+      return undefined
+    }
+    return results as InquiryModel[]
+  }
 }

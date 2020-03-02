@@ -31,4 +31,21 @@ router.post('/inquiry', async (req, res) => {
   })
 })
 
+router.get('/inquiry', async (req, res) => {
+  const userId = await Auth.isSignedUser(req.headers.accesstoken as string)
+
+  if (!userId) {
+    res.sendStatus(401)
+    return
+  }
+
+  const inquirys = await Inquiry.getFromUserId(userId)
+
+  if (!inquirys) {
+    res.sendStatus(500)
+    return
+  }
+  res.status(200).json(inquirys)
+})
+
 export default router
