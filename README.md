@@ -49,10 +49,10 @@ We share some specific types across the APIs.
 
 **Queries**
 
-| Key       | Type     | Description                    |
-| --------- | -------- | ------------------------------ |
-| `amount?` | `number` | The number of lectures you get |
-| `offset?` | `number` | The start index of lectures    |
+| Key       | Type     | Description                                 |
+| --------- | -------- | ------------------------------------------- |
+| `amount?` | `number` | The number of lectures you get. Default 20. |
+| `offset?` | `number` | The start index of lectures. Initial 0.     |
 
 ### Search Lectures
 
@@ -70,11 +70,11 @@ We share some specific types across the APIs.
 
 **Queries**
 
-| Key       | Type     | Description                  |
-| --------- | -------- | ---------------------------- |
-| `q`       | `string` | Search keyword               |
-| `amount?` | `number` | The amount of search results |
-| `offset?` | `number` | The offset of search results |
+| Key       | Type     | Description                               |
+| --------- | -------- | ----------------------------------------- |
+| `q`       | `string` | Search keyword                            |
+| `amount?` | `number` | The amount of search results. Default 20. |
+| `offset?` | `number` | The offset of search results. Initial 0.  |
 
 ---
 
