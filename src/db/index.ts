@@ -1,5 +1,5 @@
 import DbConnector from '@/modules/db-connector'
-import { MysqlError, FieldInfo } from 'mysql'
+import { FieldInfo, MysqlError } from 'mysql'
 
 export type MysqlResult = any[] | Record<string, any>
 export type MysqlQueryReturn<ResultType> = [MysqlError, ResultType, FieldInfo[]]
