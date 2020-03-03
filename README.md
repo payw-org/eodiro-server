@@ -36,16 +36,16 @@ We share some specific types across the APIs.
 ### Get Lectures
 
 <pre>
-<b>GET</b>  https://api2.eodiro.com/<b>:year</b>/<b>:semester</b>/<b>:campus</b>/lectures
+<b>GET</b>  https://api2.eodiro.com/lectures/<b>:year</b>/<b>:semester</b>/<b>:campus</b>/list
 </pre>
 
 **Params**
 
-| Key        | Type                             |
-| ---------- | -------------------------------- |
-| `year`     | `number`                         |
-| `semester` | `'1' \| '여름' \| '2' \| '겨울'` |
-| `campus`   | `'서울'`                         |
+| Key        | Type       |
+| ---------- | ---------- |
+| `year`     | `number`   |
+| `semester` | `Semester` |
+| `campus`   | `Campus`   |
 
 **Queries**
 
@@ -57,16 +57,16 @@ We share some specific types across the APIs.
 ### Search Lectures
 
 <pre>
-<b>GET</b>  https://api2.eodiro.com/<b>:year</b>/<b>:semester</b>/<b>:campus</b>/lectures/search
+<b>GET</b>  https://api2.eodiro.com/lectures/<b>:year</b>/<b>:semester</b>/<b>:campus</b>/search
 </pre>
 
 **Params**
 
-| Key        | Type                             |
-| ---------- | -------------------------------- |
-| `year`     | `number`                         |
-| `semester` | `'1' \| '여름' \| '2' \| '겨울'` |
-| `campus`   | `'서울'`                         |
+| Key        | Type       |
+| ---------- | ---------- |
+| `year`     | `number`   |
+| `semester` | `Semester` |
+| `campus`   | `Campus`   |
 
 **Queries**
 
