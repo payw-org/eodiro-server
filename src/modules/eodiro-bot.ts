@@ -1,21 +1,15 @@
-// const conn = require('@/modules/db-connector').getConnection()
-// const dayjs = require('dayjs')
-
-import dayjs from 'dayjs'
-import { CronJob } from 'cron'
 import Db from '@/db'
 import { UserModel } from '@/db/models'
-import User from '@/db/user'
-import fs from 'fs'
-import Config from '@@/config'
-import SqlB from './sqlb'
-import getSemester from './get-semester'
-import { CTTS } from '@payw/cau-timetable-scraper'
-import timetableSeeder from '@/db/seeders/timetable-seeder'
-import { CCMS, Restaurant } from '@payw/cau-cafeteria-menus-scraper'
-import { CafeteriaMenuModel } from '@/db/models'
-import convertCampusName from './convert-campus-name'
 import CafeteriaMenusSeeder from '@/db/seeders/cafeteria-menus-seeder'
+import timetableSeeder from '@/db/seeders/timetable-seeder'
+import User from '@/db/user'
+import Config from '@@/config'
+import { CTTS } from '@payw/cau-timetable-scraper'
+import { CronJob } from 'cron'
+import dayjs from 'dayjs'
+import fs from 'fs'
+import getSemester from './get-semester'
+import SqlB from './sqlb'
 
 export default class EodiroBot {
   isRunning = false
@@ -26,6 +20,8 @@ export default class EodiroBot {
     } else {
       this.isRunning = true
     }
+
+    console.log('🤖 eodiro Bot is now running')
 
     this.clearPendingUsers()
     this.updateRandomNickname()
