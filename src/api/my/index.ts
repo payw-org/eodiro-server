@@ -1,18 +1,18 @@
-import express from 'express'
-import Auth from '@/modules/auth'
-import User from '@/db/user'
 import Db from '@/db'
 import { PostModel } from '@/db/models'
+import User from '@/db/user'
+import Auth from '@/modules/auth'
 import SqlB from '@/modules/sqlb'
+import express from 'express'
 
 const router = express.Router()
 
 // Finds and returns user information
 router.get('/my/information', async (req, res) => {
   const accessToken = req.headers.accesstoken as string
-  const userId = await Auth.isSignedUser(accessToken)
-  if (userId) {
-    const user = await User.findAtId(userId)
+  const payload = await Auth.isSignedUser(accessToken)
+  if (payload) {
+    const user = await User.findAtId(payload.userId)
     res.status(200).json(user)
   } else {
     res.sendStatus(401)
@@ -21,11 +21,11 @@ router.get('/my/information', async (req, res) => {
 
 router.get('/my/posts', async (req, res) => {
   const accessToken = req.headers.accesstoken as string
-  const userId = await Auth.isSignedUser(accessToken)
+  const payload = await Auth.isSignedUser(accessToken)
   const amount = req.query.amount || 10
   const offset = req.query.offset || 0
 
-  if (!userId) {
+  if (!payload) {
     res.sendStatus(401)
     return
   }
@@ -34,7 +34,7 @@ router.get('/my/posts', async (req, res) => {
     .select('*')
     .from('post')
     .where()
-    .same('user_id', userId)
+    .same('user_id', payload.userId)
     .order('id', 'desc')
     .limit(amount, offset)
     .build()

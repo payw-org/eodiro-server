@@ -1,10 +1,11 @@
-import User, { UserId } from '@/db/user'
-import crypto from 'crypto'
-import EodiroMailer from '@/modules/eodiro-mailer'
-import EodiroEncrypt from '@/modules/eodiro-encrypt'
-import { SignUpTemplate } from '@/modules/eodiro-mailer/templates'
-import JwtManager from './jwtManager'
 import Db from '@/db'
+import User, { UserId } from '@/db/user'
+import EodiroEncrypt from '@/modules/eodiro-encrypt'
+import EodiroMailer from '@/modules/eodiro-mailer'
+import { SignUpTemplate } from '@/modules/eodiro-mailer/templates'
+import Jwt from '@/modules/jwt'
+import crypto from 'crypto'
+import { Payload } from './jwt/tokens/jwtToken'
 
 export interface SignInInfo {
   portalId: string
@@ -152,11 +153,11 @@ export default class Auth {
    * Verifies the given access token and returns user ID if it is valid.
    * Otherwise returns false.
    */
-  static async isSignedUser(accessToken: string): Promise<UserId | false> {
+  static async isSignedUser(accessToken: string): Promise<Payload | false> {
     if (!accessToken) {
       return false
     }
-    const result = await JwtManager.verify(accessToken)
+    const result = await Jwt.verify(accessToken)
     return result
   }
 
