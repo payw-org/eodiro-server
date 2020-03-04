@@ -1,16 +1,15 @@
-import express from 'express'
+import Inquiry, { AnswerData, InquiryNew } from '@/db/inquiry'
 import Auth from '@/modules/auth'
 import EodiroMailer from '@/modules/eodiro-mailer'
-import { InquiryNew, AnswerData } from '@/db/inquiry'
-import Inquiry from '@/db/inquiry'
+import express from 'express'
 
 const router = express.Router()
 
 router.post('/inquiry', async (req, res) => {
   const inquiryNew: InquiryNew = req.body
   const accessToken = req.headers.accesstoken as string
-  const result = await Auth.isSignedUser(accessToken)
-  const userId = (result ? result : null) as number | null
+  const payload = await Auth.isSignedUser(accessToken)
+  const userId = (payload ? payload.userId : null) as number | null
   const inquiryId = await Inquiry.upload(userId, inquiryNew)
 
   if (!inquiryId) {
@@ -32,14 +31,14 @@ router.post('/inquiry', async (req, res) => {
 })
 
 router.get('/inquiry', async (req, res) => {
-  const userId = await Auth.isSignedUser(req.headers.accesstoken as string)
+  const payload = await Auth.isSignedUser(req.headers.accesstoken as string)
 
-  if (!userId) {
+  if (!payload) {
     res.sendStatus(401)
     return
   }
 
-  const inquirys = await Inquiry.getFromUserId(userId)
+  const inquirys = await Inquiry.getFromUserId(payload.userId)
 
   if (!inquirys) {
     res.sendStatus(500)
