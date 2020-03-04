@@ -3,7 +3,7 @@ module.exports = {
   extends: ['plugin:@typescript-eslint/recommended'],
   parserOptions: {
     ecmaVersion: 2018,
-    sourceType: 'module'
+    sourceType: 'module',
   },
   rules: {
     'space-before-function-paren': [
@@ -11,23 +11,24 @@ module.exports = {
       {
         anonymous: 'never',
         named: 'never',
-        asyncArrow: 'always'
-      }
+        asyncArrow: 'always',
+      },
     ],
+    '@typescript-eslint/no-empty-function': [0],
     '@typescript-eslint/member-delimiter-style': [
       'error',
       {
         multiline: {
           delimiter: 'none',
-          requireLast: false
+          requireLast: false,
         },
         singleline: {
           delimiter: 'comma',
-          requireLast: false
-        }
-      }
+          requireLast: false,
+        },
+      },
     ],
     '@typescript-eslint/no-explicit-any': [0],
-    '@typescript-eslint/camelcase': [0]
-  }
+    '@typescript-eslint/camelcase': [0],
+  },
 }

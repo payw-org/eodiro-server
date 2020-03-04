@@ -1,5 +1,5 @@
 import Db, { MysqlResult } from '@/db'
-import RefreshToken from '@/modules/refreshToken'
+import { RefreshToken } from '@/modules/jwt/tokens'
 
 export interface RefreshTokenModel {
   user_id: number
@@ -7,7 +7,7 @@ export interface RefreshTokenModel {
   manually_changed_at: number
 }
 
-export default class RefreshTokenFromDB {
+export default class RefreshTokenTable {
   static async findWithUserId(
     userId: number
   ): Promise<RefreshTokenModel | false> {
