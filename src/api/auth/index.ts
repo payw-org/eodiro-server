@@ -1,5 +1,5 @@
 import Db from '@/db'
-import RefreshTokenFromDB from '@/db/RefreshTokenFromDB'
+import RefreshTokenTable from '@/db/refreshTokenTable'
 import User from '@/db/user'
 import Auth, { SignUpInfo } from '@/modules/auth'
 import Jwt from '@/modules/jwt'
@@ -142,7 +142,7 @@ router.delete('/refresh-token', async (req, res) => {
   const userId = await Auth.isSignedUser(accessToken)
 
   if (userId) {
-    const result = await RefreshTokenFromDB.deleteRefreshToken(userId)
+    const result = await RefreshTokenTable.deleteRefreshToken(userId)
     if (result) {
       res.sendStatus(200)
     } else {
