@@ -37,8 +37,8 @@ router.get('/inquiry', async (req, res) => {
     res.sendStatus(401)
     return
   }
-  const amount = parseInt(req.query?.offset) || 20
-  const offset = parseInt(req.query?.offset) || 0
+  const amount = parseInt(req.query?.offset, 10) || 20
+  const offset = parseInt(req.query?.offset, 10) || 0
   let inquirys: InquiryModel[] | false
   if (payload.isAdmin) {
     inquirys = await Inquiry.getAll(amount, offset)
