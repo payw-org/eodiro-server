@@ -1,4 +1,5 @@
 import Db from '@/db'
+import Admin from '@/db/admin'
 import RefreshTokenTable from '@/db/refresh-token-table'
 import User from '@/db/user'
 import Auth, { SignUpInfo } from '@/modules/auth'
@@ -73,7 +74,7 @@ router.post('/sign-in', async (req, res) => {
   if (isSucceeded) {
     const payload = {
       userId: userId,
-      isAdmin: false, //TODO : check whether the user is admin or not from db
+      isAdmin: await Admin.isAdmin(userId),
     }
     const tokens = await Jwt.getTokenOrCreate(payload)
     res.send(tokens)
