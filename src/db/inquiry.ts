@@ -1,7 +1,7 @@
 import Db from '@/db'
 import { InquiryModel } from '@/db/models'
-import Time from '@/modules/time'
 import SqlB from '@/modules/sqlb'
+import Time from '@/modules/time'
 
 export interface InquiryNew {
   title: string
@@ -64,12 +64,42 @@ export default class Inquiry {
 
     return (results as Record<string, any>).insertId
   }
-  static async getFromUserId(userId: number): Promise<InquiryModel[] | false> {
+
+  static async getAll(
+    amount: number,
+    offset: number
+  ): Promise<InquiryModel[] | false> {
     const query = `
         select * from inquiry
-        where user_id = ?
+        order by id DESC
+        limit ${amount}
+        offset ${offset}
       `
-    const [err, results] = await Db.query(query, userId)
+    const [err, results] = await Db.query(query)
+
+    if (err) {
+      return false
+    }
+
+    if (results.length === 0) {
+      return undefined
+    }
+    return results as InquiryModel[]
+  }
+
+  static async getFromUserId(
+    userId: number,
+    amount: number,
+    offset: number
+  ): Promise<InquiryModel[] | false> {
+    const query = `
+        select * from inquiry
+        where user_id = ${userId}
+        order by id DESC
+        limit ${amount}
+        offset ${offset}
+      `
+    const [err, results] = await Db.query(query)
 
     if (err) {
       return false

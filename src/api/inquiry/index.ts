@@ -1,4 +1,5 @@
 import Inquiry, { AnswerData, InquiryNew } from '@/db/inquiry'
+import { InquiryModel } from '@/db/models'
 import Auth from '@/modules/auth'
 import EodiroMailer from '@/modules/eodiro-mailer'
 import express from 'express'
@@ -32,13 +33,18 @@ router.post('/inquiry', async (req, res) => {
 
 router.get('/inquiry', async (req, res) => {
   const payload = await Auth.isSignedUser(req.headers.accesstoken as string)
-
   if (!payload) {
     res.sendStatus(401)
     return
   }
-
-  const inquirys = await Inquiry.getFromUserId(payload.userId)
+  const amount = parseInt(req.query?.offset) || 20
+  const offset = parseInt(req.query?.offset) || 0
+  let inquirys: InquiryModel[] | false
+  if (payload.isAdmin) {
+    inquirys = await Inquiry.getAll(amount, offset)
+  } else {
+    inquirys = await Inquiry.getFromUserId(payload.userId, amount, offset)
+  }
 
   if (!inquirys) {
     res.sendStatus(500)
