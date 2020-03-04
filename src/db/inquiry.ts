@@ -113,8 +113,13 @@ export default class Inquiry {
     }
     return results as InquiryModel[]
   }
-
+  static isValidAnswer(answer: string): boolean {
+    return answer.length > 0
+  }
   static async update(answerData: AnswerData): Promise<boolean> {
+    if (!this.isValidAnswer(answerData.answer)) {
+      return false
+    }
     const query = `
       update inquiry
       set answer = ?, answered_at = ?
