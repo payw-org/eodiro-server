@@ -1,5 +1,5 @@
-import mysql from 'mysql'
 import Config from '@@/config'
+import mysql from 'mysql'
 
 export default class DbConnector {
   private static connection: mysql.Connection | undefined

@@ -1,6 +1,6 @@
-import express from 'express'
 import Db from '@/db'
 import SqlB from '@/modules/sqlb'
+import express from 'express'
 
 const router = express.Router()
 
@@ -23,7 +23,7 @@ const lectureAttrs = [
   'note',
 ]
 
-router.get('/:year/:semester/:campus/lectures', async (req, res) => {
+router.get('/lectures/:year/:semester/:campus/list', async (req, res) => {
   const year = parseInt(Db.escape(req.params?.year))
   const semester = Db.escape(req.params?.semester)
   const campus = Db.escape(req.params?.campus)
@@ -51,7 +51,7 @@ router.get('/:year/:semester/:campus/lectures', async (req, res) => {
   res.json(results)
 })
 
-router.get('/:year/:semester/:campus/lectures/search', async (req, res) => {
+router.get('/lectures/:year/:semester/:campus/search', async (req, res) => {
   const year = parseInt(Db.escape(req.params?.year))
   const semester = Db.escape(req.params?.semester)
   const campus = Db.escape(req.params?.campus)
