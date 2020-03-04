@@ -5,7 +5,7 @@ import EodiroMailer from '@/modules/eodiro-mailer'
 import { SignUpTemplate } from '@/modules/eodiro-mailer/templates'
 import Jwt from '@/modules/jwt'
 import crypto from 'crypto'
-import { Payload } from './jwt/tokens/jwtToken'
+import { Payload } from './jwt/tokens/jwt-token'
 
 export interface SignInInfo {
   portalId: string

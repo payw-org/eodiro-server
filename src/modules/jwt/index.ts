@@ -1,6 +1,6 @@
-import refreshTokenTable from '@/db/refreshTokenTable'
+import refreshTokenTable from '@/db/refresh-token-table'
 import { AccessToken, JwtError, RefreshToken } from './tokens'
-import { Payload } from './tokens/jwtToken'
+import { Payload } from './tokens/jwt-token'
 
 export interface Tokens {
   accessToken: string
