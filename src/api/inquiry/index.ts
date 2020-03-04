@@ -53,11 +53,10 @@ router.get('/inquiry', async (req, res) => {
   res.status(200).json(inquirys)
 })
 
-router.patch('/inquiry', async (req, res) => {
-  //TODO : check master auth
-  const isMaster = true
+router.post('/inquiry/answer', async (req, res) => {
+  const payload = await Auth.isSignedUser(req.headers.accesstoken as string)
 
-  if (!isMaster) {
+  if (!payload || !payload.isAdmin) {
     res.sendStatus(401)
     return
   }
