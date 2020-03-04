@@ -8,6 +8,7 @@ export interface InquiryModel extends Record<string, string | number> {
   user_id: number
   answer: string
   uploaded_at: string
+  answered_at: string
 }
 
 const createInquiryTableSql = `
@@ -19,6 +20,7 @@ CREATE TABLE inquiry (
   user_id int DEFAULT NULL,
   answer text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   uploaded_at datetime NOT NULL,
+  answered_at datetime DEFAULT NULL,
   PRIMARY KEY (id),
   KEY user_id_idx (user_id),
   CONSTRAINT fk_inquiry_user_id FOREIGN KEY (user_id) REFERENCES user (id) ON DELETE CASCADE
