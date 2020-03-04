@@ -6,6 +6,7 @@ import lecturesRouter from '@/api/lectures'
 import myRouter from '@/api/my'
 import vacantRouter from '@/api/vacant'
 import cafeteriaRouter from '@/api/cafeteria'
+import inquiryRouter from '@/api/inquiry'
 
 const router = express.Router()
 
@@ -24,5 +25,6 @@ router.use(lecturesRouter)
 router.use(myRouter)
 router.use(vacantRouter)
 router.use(cafeteriaRouter)
+router.use(inquiryRouter)
 
 export default router

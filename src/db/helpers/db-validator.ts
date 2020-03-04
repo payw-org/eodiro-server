@@ -15,6 +15,7 @@ import {
   createPostTable,
   createRefreshTokenTable,
   createUserTable,
+  createInquiryTable,
 } from '../models'
 
 const database =
@@ -69,4 +70,5 @@ export default async function dbValidator(): Promise<void> {
   await validateTable(DbTables.CAFETERIA_MENU, createCafeteriaMenuTable)
   await validateTable(DbTables.POST, createPostTable)
   await validateTable(DbTables.COMMENT, createCommentTable)
+  await validateTable(DbTables.INQUIRY, createInquiryTable)
 }
