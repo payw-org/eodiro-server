@@ -1,19 +1,20 @@
 import Db from '@/db'
+import { DbTables } from '@/db/constants'
 import SqlB from '@/modules/sqlb'
 import Config from '@@/config'
-import { DbTables } from '@/db/constants'
 import {
-  createRefreshTokenTable,
-  createUserTable,
-  createPendingUserTable,
-  createCoverageCollegeTable,
-  createCoverageMajorTable,
-  createPostTable,
-  createPeriodTable,
-  createLectureTable,
-  createCoverageMajorLectureTable,
+  createAdminTable,
   createCafeteriaMenuTable,
   createCommentTable,
+  createCoverageCollegeTable,
+  createCoverageMajorLectureTable,
+  createCoverageMajorTable,
+  createLectureTable,
+  createPendingUserTable,
+  createPeriodTable,
+  createPostTable,
+  createRefreshTokenTable,
+  createUserTable,
   createInquiryTable,
 } from '../models'
 
@@ -54,6 +55,7 @@ async function validateTable(
 export default async function dbValidator(): Promise<void> {
   console.log(`🩺 Validating DB [${database}]`)
 
+  await validateTable(DbTables.ADMIN, createAdminTable)
   await validateTable(DbTables.USER, createUserTable)
   await validateTable(DbTables.PENDING_USER, createPendingUserTable)
   await validateTable(DbTables.REFRESH_TOKEN, createRefreshTokenTable)

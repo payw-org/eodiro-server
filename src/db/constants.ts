@@ -1,4 +1,5 @@
 export const DbTables = {
+  ADMIN: 'admin',
   USER: 'user',
   PENDING_USER: 'pending_user',
   REFRESH_TOKEN: 'refresh_token',
