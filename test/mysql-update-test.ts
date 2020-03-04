@@ -1,6 +1,6 @@
 require('module-alias/register')
 import { boot } from '@/boot'
-import Db, { MysqlUpdateResult } from '@/db'
+import Db, { MysqlInsertOrUpdateResult } from '@/db'
 import SqlB from '@/modules/sqlb'
 ;(async (): Promise<void> => {
   await boot({
@@ -8,7 +8,7 @@ import SqlB from '@/modules/sqlb'
     bot: false,
     isDev: true,
   })
-  const [, results] = await Db.query<MysqlUpdateResult>(
+  const [, results] = await Db.query<MysqlInsertOrUpdateResult>(
     SqlB()
       .update('test', {
         'name': '111',
