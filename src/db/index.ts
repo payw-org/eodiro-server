@@ -2,6 +2,17 @@ import DbConnector from '@/modules/db-connector'
 import { FieldInfo, MysqlError } from 'mysql'
 
 export type MysqlResult = any[] | Record<string, any>
+export type MysqlUpdateResult = {
+  fieldCount: number
+  affectedRows: number
+  insertId: number
+  serverStatus: number
+  warningCount: number
+  message: string
+  protocol41: boolean
+  changedRows: number
+}
+
 export type MysqlQueryReturn<ResultType> = [MysqlError, ResultType, FieldInfo[]]
 export type QueryValues = (string | number)[] | string | number
 
