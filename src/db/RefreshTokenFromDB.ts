@@ -1,5 +1,5 @@
 import Db, { MysqlResult } from '@/db'
-import RefreshToken from '@/modules/refreshToken'
+import { RefreshToken } from '@/modules/jwt/tokens'
 
 export interface RefreshTokenModel {
   user_id: number
