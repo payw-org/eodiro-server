@@ -39,18 +39,18 @@ router.get('/inquiry', async (req, res) => {
   }
   const amount = parseInt(req.query?.offset, 10) || 20
   const offset = parseInt(req.query?.offset, 10) || 0
-  let inquirys: InquiryModel[] | false
+  let inquiries: InquiryModel[] | false
   if (payload.isAdmin) {
-    inquirys = await Inquiry.getAll(amount, offset)
+    inquiries = await Inquiry.getAll(amount, offset)
   } else {
-    inquirys = await Inquiry.getFromUserId(payload.userId, amount, offset)
+    inquiries = await Inquiry.getFromUserId(payload.userId, amount, offset)
   }
 
-  if (!inquirys) {
+  if (!inquiries) {
     res.sendStatus(500)
     return
   }
-  res.status(200).json(inquirys)
+  res.status(200).json(inquiries)
 })
 
 router.post('/inquiry/answer', async (req, res) => {
