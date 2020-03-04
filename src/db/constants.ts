@@ -11,4 +11,5 @@ export const DbTables = {
   CAFETERIA_MENU: 'cafeteria_menu',
   POST: 'post',
   COMMENT: 'comment',
+  INQUIRY: 'inquiry',
 }
