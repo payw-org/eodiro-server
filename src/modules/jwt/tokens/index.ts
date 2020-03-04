@@ -1,3 +1,3 @@
-export * from './accessToken'
-export * from './JwtError'
-export * from './refreshToken'
+export * from './access-token'
+export * from './jwt-error'
+export * from './refresh-token'

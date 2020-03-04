@@ -1,5 +1,5 @@
 import Config from '@@/config'
-import { JwtToken, Payload } from './jwtToken'
+import { JwtToken, Payload } from './jwt-token'
 
 export class RefreshToken extends JwtToken {
   async create(payload: Payload): Promise<void> {

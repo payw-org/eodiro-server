@@ -1,5 +1,5 @@
 import Db from '@/db'
-import RefreshTokenTable from '@/db/refreshTokenTable'
+import RefreshTokenTable from '@/db/refresh-token-table'
 import User from '@/db/user'
 import Auth, { SignUpInfo } from '@/modules/auth'
 import Jwt from '@/modules/jwt'
