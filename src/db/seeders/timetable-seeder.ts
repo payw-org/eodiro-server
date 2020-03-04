@@ -1,12 +1,12 @@
-import { RefinedLectures } from '@payw/cau-timetable-scraper/build/src/types'
 import Db from '@/db'
-import SqlB from '@/modules/sqlb'
-import { v4 as uuidv4 } from 'uuid'
 import {
+  CoverageMajorLectureModel,
   LectureModel,
   PeriodModel,
-  CoverageMajorLectureModel,
 } from '@/db/models'
+import SqlB from '@/modules/sqlb'
+import { RefinedLectures } from '@payw/cau-timetable-scraper/build/src/types'
+import { v4 as uuidv4 } from 'uuid'
 
 export default async function(lectures: RefinedLectures): Promise<void> {
   console.log('🌱 Seeding lectures')
@@ -47,7 +47,7 @@ export default async function(lectures: RefinedLectures): Promise<void> {
       schedule: lecture.schedule,
       building: lecture.building,
       room: lecture.room,
-      note: lecture.name,
+      note: lecture.note,
     })
 
     for (let j = 0; j < lecture.periods.length; j += 1) {
