@@ -1,5 +1,6 @@
 import refreshTokenTable from '@/db/refreshTokenTable'
 import { AccessToken, JwtError, RefreshToken } from './tokens'
+import { Payload } from './tokens/jwtToken'
 
 export interface Tokens {
   accessToken: string
@@ -7,10 +8,9 @@ export interface Tokens {
 }
 
 export default class Jwt {
-  static async getTokenOrCreate(userId: number): Promise<Tokens> {
-    const payload = { userId }
+  static async getTokenOrCreate(payload: Payload): Promise<Tokens> {
     const result = {} as Tokens
-    const row = await refreshTokenTable.findWithUserId(userId)
+    const row = await refreshTokenTable.findWithUserId(payload.userId)
     if (row === false || row === undefined) {
       // no refresh token in db
       const refreshToken = new RefreshToken()
@@ -39,7 +39,7 @@ export default class Jwt {
     return result
   }
 
-  static async verify(token: string): Promise<number | false> {
+  static async verify(token: string): Promise<Payload | false> {
     try {
       const accessToken = new AccessToken(token)
       accessToken.verify()
@@ -53,7 +53,7 @@ export default class Jwt {
         //'access token is created before being manually changed'
         return false
       }
-      return accessToken.decoded.payload.userId
+      return accessToken.decoded.payload
     } catch (err) {
       switch (err.code) {
         case JwtError.ERROR.INVALID_JWT:

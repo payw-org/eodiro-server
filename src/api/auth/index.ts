@@ -10,9 +10,9 @@ const router = express.Router()
 // Finds and returns user information
 router.get('/information', async (req, res) => {
   const accessToken = req.headers.accesstoken as string
-  const userId = await Auth.isSignedUser(accessToken)
-  if (userId) {
-    const user = await User.findAtId(userId)
+  const payload = await Auth.isSignedUser(accessToken)
+  if (payload) {
+    const user = await User.findAtId(payload.userId)
     res.status(200).json(user)
   } else {
     res.sendStatus(401)
@@ -23,9 +23,9 @@ router.get('/information', async (req, res) => {
 router.post('/is-signed-in', async (req, res) => {
   // headers key names are case insensitive
   const accessToken = req.headers.accesstoken as string
-  const userId = await Auth.isSignedUser(accessToken)
+  const payload = await Auth.isSignedUser(accessToken)
 
-  res.status(200).json({ isSignedIn: userId ? true : false })
+  res.status(200).json({ isSignedIn: payload ? true : false })
 })
 
 // Sign up
@@ -71,7 +71,11 @@ router.post('/verify', async (req, res) => {
 router.post('/sign-in', async (req, res) => {
   const [userId, isSucceeded] = await Auth.signIn(req.body)
   if (isSucceeded) {
-    const tokens = await Jwt.getTokenOrCreate(userId)
+    const payload = {
+      userId: userId,
+      isAdmin: false, //TODO : check whether the user is admin or not from db
+    }
+    const tokens = await Jwt.getTokenOrCreate(payload)
     res.send(tokens)
   } else {
     res.sendStatus(401)
@@ -139,10 +143,10 @@ router.post('/refresh-token', async (req, res) => {
 // Delete refresh token
 router.delete('/refresh-token', async (req, res) => {
   const accessToken = req.headers.accesstoken as string
-  const userId = await Auth.isSignedUser(accessToken)
+  const payload = await Auth.isSignedUser(accessToken)
 
-  if (userId) {
-    const result = await RefreshTokenTable.deleteRefreshToken(userId)
+  if (payload) {
+    const result = await RefreshTokenTable.deleteRefreshToken(payload.userId)
     if (result) {
       res.sendStatus(200)
     } else {

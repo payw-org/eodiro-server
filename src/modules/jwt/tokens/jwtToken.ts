@@ -3,6 +3,7 @@ import { JwtError } from './jwtError'
 
 export interface Payload {
   userId: number
+  isAdmin: boolean
 }
 
 export interface Decoded {
