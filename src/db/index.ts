@@ -2,7 +2,7 @@ import DbConnector from '@/modules/db-connector'
 import { FieldInfo, MysqlError } from 'mysql'
 
 export type MysqlResult = any[] | Record<string, any>
-export type MysqlUpdateResult = {
+export type MysqlInsertOrUpdateResult = {
   fieldCount: number
   affectedRows: number
   insertId: number
