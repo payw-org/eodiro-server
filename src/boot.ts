@@ -19,7 +19,7 @@ export async function boot(options: {
   bot?: boolean
   isDev: boolean
 }): Promise<http.Server> {
-  const { db, mail, bot, isDev } = options
+  const { db = true, mail = true, bot = true, isDev } = options
 
   if (isDev) {
     console.log('🔥 Development Mode')
