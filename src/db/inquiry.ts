@@ -56,7 +56,10 @@ export default class Inquiry {
 
     const values = [email, userId, title, body, Time.getCurrTime()]
 
-    const [err, results] = await Db.query(query, values)
+    const [err, results] = await Db.query<MysqlInsertOrUpdateResult>(
+      query,
+      values
+    )
 
     if (err) {
       return false
