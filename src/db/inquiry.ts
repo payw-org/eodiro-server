@@ -1,4 +1,4 @@
-import Db from '@/db'
+import Db, { MysqlInsertOrUpdateResult } from '@/db'
 import { InquiryModel } from '@/db/models'
 import SqlB from '@/modules/sqlb'
 import Time from '@/modules/time'
@@ -119,10 +119,11 @@ export default class Inquiry {
       `
     const values = [answerData.answer, answerData.inquiryId]
 
-    const [err, results] = await Db.query(query, values)
-    //TODO : change results type to OkPacket including "affectedRows: number"
-    //if(err || results.affectedRows != 1)
-    if (err) {
+    const [err, results] = await Db.query<MysqlInsertOrUpdateResult>(
+      query,
+      values
+    )
+    if (err || results.affectedRows != 1) {
       return false
     }
     return true
