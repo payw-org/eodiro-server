@@ -1,5 +1,5 @@
 import Jwt from 'jsonwebtoken'
-import { JwtError } from './jwtError'
+import { JwtError } from './jwt-error'
 
 export interface Payload {
   userId: number
