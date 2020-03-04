@@ -117,10 +117,10 @@ export default class Inquiry {
   static async update(answerData: AnswerData): Promise<boolean> {
     const query = `
       update inquiry
-      set answer = ?
+      set answer = ?, answered_at = ?
       where id = ?
       `
-    const values = [answerData.answer, answerData.inquiryId]
+    const values = [answerData.answer, Time.getCurrTime(), answerData.inquiryId]
 
     const [err, results] = await Db.query<MysqlInsertOrUpdateResult>(
       query,
