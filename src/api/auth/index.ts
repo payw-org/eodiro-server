@@ -1,10 +1,9 @@
-import express from 'express'
-import Auth from '@/modules/auth'
-import { SignUpInfo } from '@/modules/auth'
-import JwtManager from '@/modules/jwtManager'
-import User from '@/db/user'
-import RefreshTokenFromDB from '@/db/RefreshTokenFromDB'
 import Db from '@/db'
+import RefreshTokenFromDB from '@/db/RefreshTokenFromDB'
+import User from '@/db/user'
+import Auth, { SignUpInfo } from '@/modules/auth'
+import Jwt from '@/modules/jwt'
+import express from 'express'
 
 const router = express.Router()
 
@@ -72,7 +71,7 @@ router.post('/verify', async (req, res) => {
 router.post('/sign-in', async (req, res) => {
   const [userId, isSucceeded] = await Auth.signIn(req.body)
   if (isSucceeded) {
-    const tokens = await JwtManager.getToken(userId)
+    const tokens = await Jwt.getTokenOrCreate(userId)
     res.send(tokens)
   } else {
     res.sendStatus(401)
@@ -130,7 +129,7 @@ router.post('/sign-out', async (req, res) => {
 // Refresh access and refresh token
 router.post('/refresh-token', async (req, res) => {
   try {
-    const tokens = await JwtManager.refresh(req.headers.refreshtoken as string)
+    const tokens = await Jwt.refresh(req.headers.refreshtoken as string)
     res.send(tokens)
   } catch (err) {
     res.sendStatus(401)
