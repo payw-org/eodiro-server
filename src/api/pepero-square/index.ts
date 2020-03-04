@@ -1,8 +1,7 @@
-import express from 'express'
-import Post from '@/db/post'
-import { PostNew, PostUpdate } from '@/db/post'
-import Auth from '@/modules/auth'
 import Comment from '@/db/comment'
+import Post, { PostNew, PostUpdate } from '@/db/post'
+import Auth from '@/modules/auth'
+import express from 'express'
 
 const router = express.Router()
 
@@ -51,9 +50,9 @@ router.get('/posts/recent', async (req, res) => {
 // Get a post data
 router.get('/post', async (req, res) => {
   // Unauthorized user or not signed in
-  const userId = await Auth.isSignedUser(req.headers.accesstoken as string)
+  const payload = await Auth.isSignedUser(req.headers.accesstoken as string)
 
-  if (!userId) {
+  if (!payload) {
     res.sendStatus(401)
     return
   }
@@ -71,16 +70,16 @@ router.get('/post', async (req, res) => {
 // Upload a new post
 router.post('/post', async (req, res) => {
   // Unauthorized user or not signed in
-  const userId = await Auth.isSignedUser(req.headers.accesstoken as string)
+  const payload = await Auth.isSignedUser(req.headers.accesstoken as string)
 
-  if (!userId) {
+  if (!payload) {
     res.sendStatus(401)
     return
   }
 
   // Validate post content
   const postData: PostNew = req.body
-  const postId = await Post.upload(userId, postData)
+  const postId = await Post.upload(payload.userId, postData)
 
   if (postId) {
     res.status(201).json({
@@ -150,9 +149,9 @@ router.delete('/posts', async (req, res) => {
 // Get comments of the post
 router.get('/post/comments', async (req, res) => {
   // Unauthorized user or not signed in
-  const userId = await Auth.isSignedUser(req.headers.accesstoken as string)
+  const payload = await Auth.isSignedUser(req.headers.accesstoken as string)
 
-  if (!userId) {
+  if (!payload) {
     res.sendStatus(401)
     return
   }
@@ -171,15 +170,15 @@ router.get('/post/comments', async (req, res) => {
 // Upload a comment
 router.post('/post/comment', async (req, res) => {
   // Unauthorized user or not signed in
-  const userId = await Auth.isSignedUser(req.headers.accesstoken as string)
+  const payload = await Auth.isSignedUser(req.headers.accesstoken as string)
 
-  if (!userId) {
+  if (!payload) {
     res.sendStatus(401)
     return
   }
 
   const commentData = req.body
-  const isUploaded = await Comment.add(userId, commentData)
+  const isUploaded = await Comment.add(payload.userId, commentData)
 
   if (!isUploaded) {
     res.sendStatus(500)
