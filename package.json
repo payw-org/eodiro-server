@@ -20,7 +20,7 @@
     "set-pkg-dev": "cross-env NODE_ENV=development ts-node src/dev/modify-package.ts",
     "clear": "rimraf build/*",
     "dev-legacy": "npm run clear && nodemon -e ts --exec \"npm run compile\"",
-    "checkout-latest": "git checkout $(git describe --tags `git rev-list --tags --max-count=1`)",
+    "checkout-latest": "git reset --hard && git checkout $(git describe --tags `git rev-list --tags --max-count=1`)",
     "update": "git reset --hard && git fetch --prune && npm run checkout-latest && npm install && npm run pm2-reboot"
   },
   "_moduleAliases": {
