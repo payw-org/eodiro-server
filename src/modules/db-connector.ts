@@ -1,5 +1,8 @@
 import Config from '@@/config'
+import chalk from 'chalk'
 import mysql from 'mysql'
+
+const log = console.log
 
 export default class DbConnector {
   private static connection: mysql.Connection | undefined
@@ -27,10 +30,10 @@ export default class DbConnector {
 
       tempConnection.connect((err) => {
         if (err) {
-          console.error('❌ Failed to connect to DB server')
+          log(`[ ${chalk.red('error')} ] failed to connect to db server`)
           resolve(false)
         } else {
-          console.info(`☁️ Connected to DB server`)
+          log(`[ ${chalk.green('db')} ] connected to db server`)
 
           tempConnection.query(createDbSql, () => {
             tempConnection.destroy()
@@ -48,10 +51,14 @@ export default class DbConnector {
               if (err) {
                 this.connection = undefined
                 console.error(err.message)
-                console.error('❌ Failed to connect to DB')
+                log(
+                  `[ ${chalk.red(
+                    'error'
+                  )} ] failed to connect to db '${database}'`
+                )
                 resolve(false)
               } else {
-                console.info(`📦 Connected to DB [${database}]`)
+                log(`[ ${chalk.green('db')} ] connected to db '${database}'`)
                 resolve(true)
               }
             })
