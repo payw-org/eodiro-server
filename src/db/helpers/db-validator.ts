@@ -48,7 +48,7 @@ async function validateTable(
     log(
       `[ ${chalk.greenBright('✔')} ${chalk.cyan(
         'table'
-      )} ] ${tableName}' exists`
+      )} ] '${tableName}' exists`
     )
     return true
   } else {
