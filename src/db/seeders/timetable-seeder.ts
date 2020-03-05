@@ -107,17 +107,48 @@ export default async function(lectures: RefinedLectures): Promise<void> {
   // Delete all lectures before rewrite
   const year = firstLecture.year
   const semester = firstLecture.semester
-  await Db.query(
+
+  console.log('Clearing data...')
+  const [clearErr] = await Db.query(
     `DELETE FROM lecture WHERE year=${year} AND semester='${semester}'`
   )
+  if (clearErr) {
+    console.error('Failed to clearing data')
+    console.error(clearErr)
+    return
+  }
 
-  await Db.query(sqlB.insertBulk(`lecture`, dbLectures).build())
-  await Db.query(sqlB.insertBulk(`period`, dbPeriods).build())
-  await Db.query(
+  console.log('Inserting lectures...')
+  const [insertLecturesErr] = await Db.query(
+    sqlB.insertBulk(`lecture`, dbLectures).build()
+  )
+  if (insertLecturesErr) {
+    console.error('Failed to insert lectures')
+    console.error(insertLecturesErr)
+    return
+  }
+
+  console.log('Inserting periods...')
+  const [insertPeriodsErr] = await Db.query(
+    sqlB.insertBulk(`period`, dbPeriods).build()
+  )
+  if (insertPeriodsErr) {
+    console.error('Failed to insert periods')
+    console.error(insertPeriodsErr)
+    return
+  }
+
+  console.log('Inserting coverage major lecture relations...')
+  const [insertRelationsErr] = await Db.query(
     SqlB()
       .insertBulk(`coverage_major_lecture`, dbCoverageMajorLectures)
       .build()
   )
+  if (insertRelationsErr) {
+    console.log('Failed to insert relations')
+    console.log(insertRelationsErr)
+    return
+  }
 
   console.log('🌱 Done Seeding lectures')
 }
