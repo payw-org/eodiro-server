@@ -6,12 +6,15 @@ import EodiroBot from '@/modules/eodiro-bot'
 import EodiroMailer from '@/modules/eodiro-mailer'
 import Config from '@@/config'
 import bodyParser from 'body-parser'
+import chalk from 'chalk'
 import cors from 'cors'
 import dotenv from 'dotenv'
 import express from 'express'
 import http from 'http'
 
 dotenv.config()
+
+const log = console.log
 
 export async function boot(options: {
   db?: boolean
@@ -29,10 +32,10 @@ export async function boot(options: {
   } = options
 
   if (isDev) {
-    console.log('🔥 Development Mode')
+    log(`[ ${chalk.gray('mode')} ] ${chalk.blueBright('development')} mode`)
     process.env.NODE_ENV = 'development'
   } else {
-    console.log('🌈 Production Mode')
+    log(`[ ${chalk.gray('mode')} ] ${chalk.blueBright('production')} mode`)
   }
 
   // Create Express app
@@ -49,13 +52,17 @@ export async function boot(options: {
     const isDbConnected = await DbConnector.connect()
 
     if (!isDbConnected) {
-      console.info('🛑 Stop the application due to DB connection failure')
+      log(
+        `[ ${chalk.red(
+          'error'
+        )} ] stop the application due to db connection failure`
+      )
       return
     } else {
       await dbValidator()
     }
   } else {
-    console.info('⏩ Skipping DB connection')
+    log(`[ ${chalk.green('db')} ] skip db connection`)
   }
 
   if (mail) {
@@ -63,13 +70,15 @@ export async function boot(options: {
     const isMailServerConnected = await EodiroMailer.verify()
 
     if (!isMailServerConnected) {
-      console.info(
-        '🛑 Stop the application due to Email server connection failure'
+      log(
+        `[ ${chalk.red(
+          'error'
+        )} ] stop the application due to email server connection failure`
       )
       return
     }
   } else {
-    console.info('⏩ Skipping Email server connection')
+    log(`[ ${chalk.yellow('email')} ] skip connection`)
   }
 
   if (bot) {
@@ -77,14 +86,14 @@ export async function boot(options: {
     const eodiroBot = new EodiroBot()
     eodiroBot.run()
   } else {
-    console.info('🤖🏖 eodiro Bot is not running')
+    log(`[ ${chalk.blue('eodiro bot')} ] not running`)
   }
 
   // Open the gate
   if (listen) {
     const port = isDev ? Config.DEV_PORT : Config.PORT
     const server = app.listen(port, () => {
-      console.info(`👂 Listening on port ${port}`)
+      log(`[ ${chalk.magenta('server')} ] listening on port ${port}`)
     })
 
     return server

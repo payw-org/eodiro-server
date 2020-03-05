@@ -2,6 +2,7 @@ import Db from '@/db'
 import { DbTables } from '@/db/constants'
 import SqlB from '@/modules/sqlb'
 import Config from '@@/config'
+import chalk from 'chalk'
 import {
   createAdminTable,
   createCafeteriaMenuTable,
@@ -9,14 +10,16 @@ import {
   createCoverageCollegeTable,
   createCoverageMajorLectureTable,
   createCoverageMajorTable,
+  createInquiryTable,
   createLectureTable,
   createPendingUserTable,
   createPeriodTable,
   createPostTable,
   createRefreshTokenTable,
   createUserTable,
-  createInquiryTable,
 } from '../models'
+
+const log = console.log
 
 const database =
   process.env.NODE_ENV === 'development' ? Config.DB_NAME_DEV : Config.DB_NAME
@@ -42,18 +45,30 @@ async function validateTable(
   }
 
   if (results.length > 0) {
-    console.log(`✅ Table '${tableName}' exists`)
+    log(
+      `[ ${chalk.greenBright('✔')} ${chalk.cyan(
+        'table'
+      )} ] ${tableName}' exists`
+    )
     return true
   } else {
-    console.log(`🙅‍♂️ Table '${tableName}' doesn't exist`)
-    console.log(`✒️ Creating a table '${tableName}'`)
+    log(
+      `[ ${chalk.red('x')} ${chalk.cyan(
+        'table'
+      )} ] ${tableName}' doesn't exists`
+    )
+    log(
+      `[ ${chalk.blue('↻')} ${chalk.cyan(
+        'table'
+      )} ] creating a table '${tableName}'`
+    )
     await createFunction()
     return false
   }
 }
 
 export default async function dbValidator(): Promise<void> {
-  console.log(`🩺 Validating DB [${database}]`)
+  log(`[ ${chalk.green('db')} ] validating db '${database}'`)
 
   await validateTable(DbTables.ADMIN, createAdminTable)
   await validateTable(DbTables.USER, createUserTable)

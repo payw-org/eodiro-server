@@ -5,11 +5,14 @@ import timetableSeeder from '@/db/seeders/timetable-seeder'
 import User from '@/db/user'
 import Config from '@@/config'
 import { CTTS } from '@payw/cau-timetable-scraper'
+import chalk from 'chalk'
 import { CronJob } from 'cron'
 import dayjs from 'dayjs'
 import fs from 'fs'
 import getSemester from './get-semester'
 import SqlB from './sqlb'
+
+const log = console.log
 
 export default class EodiroBot {
   isRunning = false
@@ -21,7 +24,7 @@ export default class EodiroBot {
       this.isRunning = true
     }
 
-    console.log('🤖 eodiro Bot is now running')
+    log(`[ ${chalk.blueBright('eodiro bot')} ] running`)
 
     this.clearPendingUsers()
     this.updateRandomNickname()

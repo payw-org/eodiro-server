@@ -1,5 +1,8 @@
-import NodeMailer from 'nodemailer'
 import Config from '@@/config'
+import chalk from 'chalk'
+import NodeMailer from 'nodemailer'
+
+const log = console.log
 
 interface MailOption {
   subject: string
@@ -23,11 +26,11 @@ export default class EodiroMailer {
     return new Promise((resolve) => {
       this.transporter.verify((err) => {
         if (err) {
-          console.error('❌ Failed to connect to Zoho mail server')
+          log(`[ ${chalk.red('error')} ] failed to connect to zoho mail server`)
           console.error(err.message)
           resolve(false)
         } else {
-          console.info('✉️ Connected to Zoho mail server')
+          log(`[ ${chalk.yellow('email')} ] connected to zoho mail server`)
           resolve(true)
         }
       })
