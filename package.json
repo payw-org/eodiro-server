@@ -6,6 +6,7 @@
   "author": "PAYW",
   "license": "MIT",
   "scripts": {
+    "seed-lectures": "ts-node src/actions/seed-lectures.ts",
     "test": "mocha -r ts-node/register -r module-alias/register test/**/*.spec.ts",
     "build": "npm run clear && tsc",
     "dev": "npm run clear && npm run set-pkg-dev && nodemon --exec cross-env NODE_ENV=development ts-node -- src/main.ts",

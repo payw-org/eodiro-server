@@ -25,7 +25,7 @@ export default class EodiroBot {
 
     this.clearPendingUsers()
     this.updateRandomNickname()
-    this.scrapeLectures()
+    // this.scrapeLectures()
     this.scrapeCafeteriaMenus()
     // this.garbageCollectFiles()
   }
