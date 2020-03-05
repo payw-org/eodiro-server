@@ -18,8 +18,15 @@ export async function boot(options: {
   mail?: boolean
   bot?: boolean
   isDev: boolean
+  listen?: boolean
 }): Promise<http.Server> {
-  const { db = true, mail = true, bot = true, isDev } = options
+  const {
+    db = false,
+    mail = false,
+    bot = false,
+    isDev = true,
+    listen = true,
+  } = options
 
   if (isDev) {
     console.log('🔥 Development Mode')
@@ -74,10 +81,12 @@ export async function boot(options: {
   }
 
   // Open the gate
-  const port = isDev ? Config.DEV_PORT : Config.PORT
-  const server = app.listen(port, () => {
-    console.info(`👂 Listening on port ${port}`)
-  })
+  if (listen) {
+    const port = isDev ? Config.DEV_PORT : Config.PORT
+    const server = app.listen(port, () => {
+      console.info(`👂 Listening on port ${port}`)
+    })
 
-  return server
+    return server
+  }
 }
