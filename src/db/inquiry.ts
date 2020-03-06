@@ -79,13 +79,8 @@ export default class Inquiry {
         offset ${offset}
       `
     const [err, results] = await Db.query(query)
-
     if (err) {
       return false
-    }
-
-    if (results.length === 0) {
-      return undefined
     }
     return results as InquiryModel[]
   }
@@ -103,14 +98,10 @@ export default class Inquiry {
         offset ${offset}
       `
     const [err, results] = await Db.query(query)
-
     if (err) {
       return false
     }
 
-    if (results.length === 0) {
-      return undefined
-    }
     return results as InquiryModel[]
   }
   static isValidAnswer(answer: string): boolean {
