@@ -46,14 +46,13 @@ router.post('/sign-up', async (req, res) => {
   if (validations.portalId && validations.password && validations.nickname) {
     const signUpResult = await Auth.signUp(signUpInfo)
 
-    if (signUpResult) {
-      res.sendStatus(201)
-    } else {
+    if (!signUpResult) {
       res.sendStatus(500)
+      return
     }
-  } else {
-    res.status(409).json(validations)
   }
+
+  res.json(validations)
 })
 
 // Verify pending user
@@ -77,9 +76,9 @@ router.post('/sign-in', async (req, res) => {
       isAdmin: await Admin.isAdmin(userId),
     }
     const tokens = await Jwt.getTokenOrCreate(payload)
-    res.send(tokens)
+    res.json(tokens)
   } else {
-    res.sendStatus(401)
+    res.json(false)
   }
 })
 
@@ -90,10 +89,9 @@ router.post('/validate/portal-id', async (req, res) => {
     (await Auth.isValidPortalId(portalId)) &&
     Auth.isValidPortalIdFormat(portalId)
   ) {
-    res.sendStatus(200)
-    return
+    res.json(true)
   } else {
-    res.sendStatus(403)
+    res.json(false)
   }
 })
 
@@ -104,10 +102,9 @@ router.post('/validate/nickname', async (req, res) => {
     (await Auth.isValidNickname(nickname)) &&
     Auth.isValidNicknameFormat(nickname)
   ) {
-    res.sendStatus(200)
-    return
+    res.json(true)
   } else {
-    res.sendStatus(403)
+    res.json(false)
   }
 })
 
@@ -115,10 +112,9 @@ router.post('/validate/nickname', async (req, res) => {
 router.post('/validate/password', async (req, res) => {
   const password = req.body.password
   if (Auth.isValidPassword(password)) {
-    res.sendStatus(200)
-    return
+    res.json(true)
   } else {
-    res.sendStatus(403)
+    res.json(false)
   }
 })
 
