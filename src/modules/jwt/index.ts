@@ -34,16 +34,14 @@ export default class Jwt {
         result.refreshToken = refreshToken.token
       }
     }
-    const accessToken = new AccessToken<Payload>()
-    accessToken.create(payload)
+    const accessToken = new AccessToken<Payload>({ payload })
     result.accessToken = accessToken.token
     return result
   }
 
   static async verify(token: string): Promise<Payload | false> {
     try {
-      const accessToken = new AccessToken<Payload>(token)
-      accessToken.verify()
+      const accessToken = new AccessToken<Payload>({ token })
       const row = await refreshTokenTable.findWithUserId(
         accessToken.decoded.payload.userId
       )
@@ -87,8 +85,9 @@ export default class Jwt {
       await refreshTokenTable.updateRefreshToken(refreshTokenFromDb)
     }
     result.refreshToken = refreshTokenFromDb.token
-    const accessToken = new AccessToken<Payload>()
-    accessToken.create(refreshTokenFromDb.decoded.payload)
+    const accessToken = new AccessToken<Payload>({
+      payload: refreshTokenFromDb.decoded.payload,
+    })
     result.accessToken = accessToken.token
     return result
   }
