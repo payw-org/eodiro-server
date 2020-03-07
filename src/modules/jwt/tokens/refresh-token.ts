@@ -3,6 +3,17 @@ import { JwtToken } from './jwt-token'
 import dayjs = require('dayjs')
 
 export class RefreshToken<T> extends JwtToken<T> {
+  constructor(config: { token?: string, payload?: T }) {
+    super()
+    if (config.payload !== undefined) {
+      this.create(config.payload)
+    }
+    if (config.token !== undefined) {
+      super(config.token)
+      this.verify()
+    }
+  }
+
   create(payload: T): void {
     super.create(
       payload,
