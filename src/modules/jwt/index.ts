@@ -17,22 +17,19 @@ export default class Jwt {
     const row = await refreshTokenTable.findWithUserId(payload.userId)
     if (row === false || row === undefined) {
       // no refresh token in db
-      const refreshToken = new RefreshToken<Payload>()
-      refreshToken.create(payload)
+      const refreshToken = new RefreshToken<Payload>({ payload })
       await refreshTokenTable.addRefreshToken(refreshToken)
       result.refreshToken = refreshToken.token
     } else {
       try {
-        const refreshToken = new RefreshToken<Payload>(row.token)
-        refreshToken.verify()
+        const refreshToken = new RefreshToken<Payload>({ token: row.token })
         if (refreshToken.refreshRefreshTokenIfPossible()) {
           // refreshToken is refreshed
           await refreshTokenTable.updateRefreshToken(refreshToken)
         }
         result.refreshToken = refreshToken.token
       } catch (err) {
-        const refreshToken = new RefreshToken<Payload>()
-        refreshToken.create(payload)
+        const refreshToken = new RefreshToken<Payload>({ payload })
         await refreshTokenTable.updateRefreshToken(refreshToken)
         result.refreshToken = refreshToken.token
       }
@@ -76,8 +73,7 @@ export default class Jwt {
 
   static async refresh(token: string): Promise<Tokens> {
     const result = {} as Tokens
-    const refreshToken = new RefreshToken<Payload>(token)
-    refreshToken.verify()
+    const refreshToken = new RefreshToken<Payload>({ token })
     const row = await refreshTokenTable.findWithUserId(
       refreshToken.decoded.payload.userId
     )
@@ -86,8 +82,7 @@ export default class Jwt {
     } else if (row.manually_changed_at > refreshToken.decoded.iat) {
       throw new Error('refersh token is created before being manually changed')
     }
-    const refreshTokenFromDb = new RefreshToken<Payload>(row.token)
-    refreshTokenFromDb.verify()
+    const refreshTokenFromDb = new RefreshToken<Payload>({ token: row.token })
     if (refreshTokenFromDb.refreshRefreshTokenIfPossible()) {
       await refreshTokenTable.updateRefreshToken(refreshTokenFromDb)
     }
