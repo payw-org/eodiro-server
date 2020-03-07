@@ -12,6 +12,7 @@ const router = express.Router()
 router.get('/information', async (req, res) => {
   const accessToken = req.headers.accesstoken as string
   const payload = await Auth.isSignedUser(accessToken)
+
   if (payload) {
     const user = await User.findAtId(payload.userId)
     res.status(200).json(user)
@@ -26,7 +27,17 @@ router.post('/is-signed-in', async (req, res) => {
   const accessToken = req.headers.accesstoken as string
   const payload = await Auth.isSignedUser(accessToken)
 
-  res.status(200).json({ isSignedIn: payload ? true : false })
+  if (payload) {
+    res.json({
+      isSigned: true,
+      userId: payload.userId,
+      isAdmin: payload.isAdmin,
+    })
+  } else {
+    res.json({
+      isSigned: false,
+    })
+  }
 })
 
 // Sign up
