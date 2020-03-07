@@ -1,8 +1,8 @@
 import Config from '@@/config'
-import { JwtToken, Payload } from './jwt-token'
+import { JwtToken } from './jwt-token'
 
-export class AccessToken extends JwtToken {
-  create(payload: Payload): void {
+export class AccessToken<T> extends JwtToken<T> {
+  create(payload: T): void {
     super.create(
       payload,
       Config.ACCESS_TOKEN_SECRET,
