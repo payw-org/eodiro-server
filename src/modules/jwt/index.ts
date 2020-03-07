@@ -1,6 +1,10 @@
 import refreshTokenTable from '@/db/refresh-token-table'
 import { AccessToken, JwtError, RefreshToken } from './tokens'
-import { Payload } from './tokens/jwt-token'
+
+export interface Payload {
+  userId: number
+  isAdmin: boolean
+}
 
 export interface Tokens {
   accessToken: string
@@ -13,13 +17,13 @@ export default class Jwt {
     const row = await refreshTokenTable.findWithUserId(payload.userId)
     if (row === false || row === undefined) {
       // no refresh token in db
-      const refreshToken = new RefreshToken()
+      const refreshToken = new RefreshToken<Payload>()
       await refreshToken.create(payload)
       await refreshTokenTable.addRefreshToken(refreshToken)
       result.refreshToken = refreshToken.token
     } else {
       try {
-        const refreshToken = new RefreshToken(row.token)
+        const refreshToken = new RefreshToken<Payload>(row.token)
         await refreshToken.verify()
         if (await refreshToken.refreshRefreshTokenIfPossible()) {
           // refreshToken is refreshed
@@ -27,13 +31,13 @@ export default class Jwt {
         }
         result.refreshToken = refreshToken.token
       } catch (err) {
-        const refreshToken = new RefreshToken()
+        const refreshToken = new RefreshToken<Payload>()
         await refreshToken.create(payload)
         await refreshTokenTable.updateRefreshToken(refreshToken)
         result.refreshToken = refreshToken.token
       }
     }
-    const accessToken = new AccessToken()
+    const accessToken = new AccessToken<Payload>()
     await accessToken.create(payload)
     result.accessToken = accessToken.token
     return result
@@ -41,7 +45,7 @@ export default class Jwt {
 
   static async verify(token: string): Promise<Payload | false> {
     try {
-      const accessToken = new AccessToken(token)
+      const accessToken = new AccessToken<Payload>(token)
       accessToken.verify()
       const row = await refreshTokenTable.findWithUserId(
         accessToken.decoded.payload.userId
@@ -72,7 +76,7 @@ export default class Jwt {
 
   static async refresh(token: string): Promise<Tokens> {
     const result = {} as Tokens
-    const refreshToken = new RefreshToken(token)
+    const refreshToken = new RefreshToken<Payload>(token)
     await refreshToken.verify()
     const row = await refreshTokenTable.findWithUserId(
       refreshToken.decoded.payload.userId
@@ -82,13 +86,13 @@ export default class Jwt {
     } else if (row.manually_changed_at > refreshToken.decoded.iat) {
       throw new Error('refersh token is created before being manually changed')
     }
-    const refreshTokenFromDb = new RefreshToken(row.token)
+    const refreshTokenFromDb = new RefreshToken<Payload>(row.token)
     await refreshTokenFromDb.verify()
     if (await refreshTokenFromDb.refreshRefreshTokenIfPossible()) {
       await refreshTokenTable.updateRefreshToken(refreshTokenFromDb)
     }
     result.refreshToken = refreshTokenFromDb.token
-    const accessToken = new AccessToken()
+    const accessToken = new AccessToken<Payload>()
     await accessToken.create(refreshTokenFromDb.decoded.payload)
     result.accessToken = accessToken.token
     return result

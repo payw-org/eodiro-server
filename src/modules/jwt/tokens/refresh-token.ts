@@ -1,9 +1,9 @@
 import Config from '@@/config'
-import { JwtToken, Payload } from './jwt-token'
+import { JwtToken } from './jwt-token'
 import dayjs = require('dayjs')
 
-export class RefreshToken extends JwtToken {
-  async create(payload: Payload): Promise<void> {
+export class RefreshToken<T> extends JwtToken<T> {
+  async create(payload: T): Promise<void> {
     await super.create(
       payload,
       Config.REFRESH_TOKEN_SECRET,

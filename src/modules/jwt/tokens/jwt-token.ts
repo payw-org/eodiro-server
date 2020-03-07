@@ -1,20 +1,15 @@
 import Jwt from 'jsonwebtoken'
 import { JwtError } from './jwt-error'
 
-export interface Payload {
-  userId: number
-  isAdmin: boolean
-}
-
-export interface Decoded {
-  payload: Payload
+export interface Decoded<T> {
+  payload: T
   exp: number
   iat: number
 }
 
-export class JwtToken {
+export class JwtToken<T> {
   public token: string
-  public decoded: Decoded
+  public decoded: Decoded<T>
 
   constructor(token: string = null) {
     this.token = token
@@ -34,7 +29,7 @@ export class JwtToken {
     return err
   }
 
-  create(payload: Payload, secret: string, expire: string): void {
+  create(payload: T, secret: string, expire: string): void {
     if (!payload) {
       throw new JwtError('no payload')
     }
@@ -43,7 +38,7 @@ export class JwtToken {
 
   verify(secret: string): void {
     try {
-      this.decoded = Jwt.verify(this.token, secret) as Decoded
+      this.decoded = Jwt.verify(this.token, secret) as Decoded<T>
     } catch (err) {
       if (err.name === 'TokenExpiredError') {
         throw JwtToken.errorWrapper(JwtError.ERROR.EXPIRED_JWT)
