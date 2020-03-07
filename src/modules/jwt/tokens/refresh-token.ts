@@ -1,5 +1,6 @@
 import Config from '@@/config'
 import { JwtToken, Payload } from './jwt-token'
+import dayjs = require('dayjs')
 
 export class RefreshToken extends JwtToken {
   async create(payload: Payload): Promise<void> {
@@ -16,12 +17,13 @@ export class RefreshToken extends JwtToken {
   }
 
   async isAllowedRefresh(): Promise<boolean> {
-    const refreshTokenExpireDate = new Date(this.decoded.exp * 1000).getTime()
-    const nowDate = new Date().getTime()
-    const differenceDate = Math.floor(
-      (refreshTokenExpireDate - nowDate) / (1000 * 60 * 60 * 24)
-    )
-    if (differenceDate <= Config.REFRESH_TOKEN_REFRESH_ALLOWED_DAY) {
+    const refreshTokenExpireDate = dayjs.unix(this.decoded.exp)
+    if (
+      refreshTokenExpireDate.diff(
+        dayjs(),
+        Config.REFRESH_TOKEN_REFRESH_ALLOWED_STANDARD
+      ) <= Config.REFRESH_TOKEN_REFRESH_ALLOWED_VALUE
+    ) {
       return true
     } else {
       return false
