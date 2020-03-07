@@ -1,5 +1,7 @@
 import refreshTokenTable from '@/db/refresh-token-table'
-import { AccessToken, JwtError, RefreshToken } from './tokens'
+import config from '@@/config'
+import { JwtError, RefreshToken } from './tokens'
+import { JwtToken } from './tokens/jwt-token'
 
 export interface Payload {
   userId: number
@@ -12,36 +14,70 @@ export interface Tokens {
 }
 
 export default class Jwt {
+  private static RefreshTokenOption = {
+    secret: config.REFRESH_TOKEN_SECRET,
+    expire: config.REFRESH_TOKEN_EXPIRE,
+    refreshTokenOption: {
+      refreshRefreshTokenAllowedUnit: config.REFRESH_TOKEN_REFRESH_ALLOWED_UNIT,
+      refreshRefreshTokenAllowedValue:
+        config.REFRESH_TOKEN_REFRESH_ALLOWED_VALUE,
+    },
+  }
+  private static AccessTokenOption = {
+    secret: config.ACCESS_TOKEN_SECRET,
+    expire: config.ACCESS_TOKEN_EXPIRE,
+  }
   static async getTokenOrCreate(payload: Payload): Promise<Tokens> {
     const result = {} as Tokens
+
     const row = await refreshTokenTable.findWithUserId(payload.userId)
     if (row === false || row === undefined) {
       // no refresh token in db
-      const refreshToken = new RefreshToken<Payload>({ payload })
+      const refreshToken = new RefreshToken<Payload>({
+        payload,
+        ...this.RefreshTokenOption,
+      })
       await refreshTokenTable.addRefreshToken(refreshToken)
       result.refreshToken = refreshToken.token
     } else {
       try {
-        const refreshToken = new RefreshToken<Payload>({ token: row.token })
-        if (refreshToken.refreshRefreshTokenIfPossible()) {
+        const refreshToken = new RefreshToken<Payload>({
+          payload,
+          ...this.RefreshTokenOption,
+        })
+        if (
+          refreshToken.refreshRefreshTokenIfPossible({
+            payload,
+            ...this.RefreshTokenOption,
+          })
+        ) {
           // refreshToken is refreshed
           await refreshTokenTable.updateRefreshToken(refreshToken)
         }
         result.refreshToken = refreshToken.token
       } catch (err) {
-        const refreshToken = new RefreshToken<Payload>({ payload })
+        const refreshToken = new RefreshToken<Payload>({
+          payload,
+          ...this.RefreshTokenOption,
+        })
         await refreshTokenTable.updateRefreshToken(refreshToken)
         result.refreshToken = refreshToken.token
       }
     }
-    const accessToken = new AccessToken<Payload>({ payload })
+    const accessToken = new JwtToken<Payload>({
+      payload,
+      ...this.AccessTokenOption,
+    })
     result.accessToken = accessToken.token
     return result
   }
 
   static async verify(token: string): Promise<Payload | false> {
     try {
-      const accessToken = new AccessToken<Payload>({ token })
+      const accessToken = new JwtToken<Payload>({
+        token,
+        ...this.AccessTokenOption,
+      })
       const row = await refreshTokenTable.findWithUserId(
         accessToken.decoded.payload.userId
       )
@@ -71,7 +107,10 @@ export default class Jwt {
 
   static async refresh(token: string): Promise<Tokens> {
     const result = {} as Tokens
-    const refreshToken = new RefreshToken<Payload>({ token })
+    const refreshToken = new RefreshToken<Payload>({
+      token,
+      ...this.RefreshTokenOption,
+    })
     const row = await refreshTokenTable.findWithUserId(
       refreshToken.decoded.payload.userId
     )
@@ -80,13 +119,23 @@ export default class Jwt {
     } else if (row.manually_changed_at > refreshToken.decoded.iat) {
       throw new Error('refersh token is created before being manually changed')
     }
-    const refreshTokenFromDb = new RefreshToken<Payload>({ token: row.token })
-    if (refreshTokenFromDb.refreshRefreshTokenIfPossible()) {
+    const refreshTokenFromDb = new RefreshToken<Payload>({
+      token: row.token,
+      ...this.RefreshTokenOption,
+    })
+    const payload = refreshTokenFromDb.decoded.payload
+    if (
+      refreshTokenFromDb.refreshRefreshTokenIfPossible({
+        payload,
+        ...this.RefreshTokenOption,
+      })
+    ) {
       await refreshTokenTable.updateRefreshToken(refreshTokenFromDb)
     }
     result.refreshToken = refreshTokenFromDb.token
-    const accessToken = new AccessToken<Payload>({
+    const accessToken = new JwtToken<Payload>({
       payload: refreshTokenFromDb.decoded.payload,
+      ...this.AccessTokenOption,
     })
     result.accessToken = accessToken.token
     return result
