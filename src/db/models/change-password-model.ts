@@ -8,7 +8,7 @@ export interface ChangePasswordModel extends Record<string, string | number> {
 
 const createChangePasswordTableSql = `
 CREATE TABLE change_password(
-  temp_key varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  temp_key varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL UNIQUE,
   user_id int NOT NULL,
   created_at datetime NOT NULL,
   PRIMARY KEY(user_id),
