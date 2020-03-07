@@ -3,20 +3,20 @@ import { JwtToken } from './jwt-token'
 import dayjs = require('dayjs')
 
 export class RefreshToken<T> extends JwtToken<T> {
-  async create(payload: T): Promise<void> {
-    await super.create(
+  create(payload: T): void {
+    super.create(
       payload,
       Config.REFRESH_TOKEN_SECRET,
       Config.REFRESH_TOKEN_EXPIRE
     )
-    await this.verify()
+    this.verify()
   }
 
-  async verify(): Promise<void> {
-    await super.verify(Config.REFRESH_TOKEN_SECRET)
+  verify(): void {
+    super.verify(Config.REFRESH_TOKEN_SECRET)
   }
 
-  async isAllowedRefresh(): Promise<boolean> {
+  isAllowedRefresh(): boolean {
     const refreshTokenExpireDate = dayjs.unix(this.decoded.exp)
     if (
       refreshTokenExpireDate.diff(
@@ -30,10 +30,10 @@ export class RefreshToken<T> extends JwtToken<T> {
     }
   }
 
-  async refreshRefreshTokenIfPossible(): Promise<boolean> {
-    const isAllowed = await this.isAllowedRefresh()
+  refreshRefreshTokenIfPossible(): boolean {
+    const isAllowed = this.isAllowedRefresh()
     if (isAllowed) {
-      await this.create(this.decoded.payload)
+      this.create(this.decoded.payload)
     }
     return isAllowed
   }

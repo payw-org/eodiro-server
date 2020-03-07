@@ -18,27 +18,27 @@ export default class Jwt {
     if (row === false || row === undefined) {
       // no refresh token in db
       const refreshToken = new RefreshToken<Payload>()
-      await refreshToken.create(payload)
+      refreshToken.create(payload)
       await refreshTokenTable.addRefreshToken(refreshToken)
       result.refreshToken = refreshToken.token
     } else {
       try {
         const refreshToken = new RefreshToken<Payload>(row.token)
-        await refreshToken.verify()
-        if (await refreshToken.refreshRefreshTokenIfPossible()) {
+        refreshToken.verify()
+        if (refreshToken.refreshRefreshTokenIfPossible()) {
           // refreshToken is refreshed
           await refreshTokenTable.updateRefreshToken(refreshToken)
         }
         result.refreshToken = refreshToken.token
       } catch (err) {
         const refreshToken = new RefreshToken<Payload>()
-        await refreshToken.create(payload)
+        refreshToken.create(payload)
         await refreshTokenTable.updateRefreshToken(refreshToken)
         result.refreshToken = refreshToken.token
       }
     }
     const accessToken = new AccessToken<Payload>()
-    await accessToken.create(payload)
+    accessToken.create(payload)
     result.accessToken = accessToken.token
     return result
   }
@@ -77,7 +77,7 @@ export default class Jwt {
   static async refresh(token: string): Promise<Tokens> {
     const result = {} as Tokens
     const refreshToken = new RefreshToken<Payload>(token)
-    await refreshToken.verify()
+    refreshToken.verify()
     const row = await refreshTokenTable.findWithUserId(
       refreshToken.decoded.payload.userId
     )
@@ -87,13 +87,13 @@ export default class Jwt {
       throw new Error('refersh token is created before being manually changed')
     }
     const refreshTokenFromDb = new RefreshToken<Payload>(row.token)
-    await refreshTokenFromDb.verify()
-    if (await refreshTokenFromDb.refreshRefreshTokenIfPossible()) {
+    refreshTokenFromDb.verify()
+    if (refreshTokenFromDb.refreshRefreshTokenIfPossible()) {
       await refreshTokenTable.updateRefreshToken(refreshTokenFromDb)
     }
     result.refreshToken = refreshTokenFromDb.token
     const accessToken = new AccessToken<Payload>()
-    await accessToken.create(refreshTokenFromDb.decoded.payload)
+    accessToken.create(refreshTokenFromDb.decoded.payload)
     result.accessToken = accessToken.token
     return result
   }
