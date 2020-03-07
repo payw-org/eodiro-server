@@ -82,12 +82,14 @@ export default class Jwt {
     } else if (row.manually_changed_at > refreshToken.decoded.iat) {
       throw new Error('refersh token is created before being manually changed')
     }
-    if (await refreshToken.refreshRefreshTokenIfPossible()) {
-      await refreshTokenTable.updateRefreshToken(refreshToken)
+    const refreshTokenFromDb = new RefreshToken(row.token)
+    await refreshTokenFromDb.verify()
+    if (await refreshTokenFromDb.refreshRefreshTokenIfPossible()) {
+      await refreshTokenTable.updateRefreshToken(refreshTokenFromDb)
     }
-    result.refreshToken = refreshToken.token
+    result.refreshToken = refreshTokenFromDb.token
     const accessToken = new AccessToken()
-    await accessToken.create(refreshToken.decoded.payload)
+    await accessToken.create(refreshTokenFromDb.decoded.payload)
     result.accessToken = accessToken.token
     return result
   }
