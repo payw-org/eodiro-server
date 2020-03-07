@@ -4,6 +4,7 @@ import ChangePassword from '@/db/chnage-password'
 import RefreshTokenTable from '@/db/refresh-token-table'
 import User from '@/db/user'
 import Auth, { SignUpInfo } from '@/modules/auth'
+import EodiroMailer from '@/modules/eodiro-mailer'
 import Jwt from '@/modules/jwt'
 import dayjs from 'dayjs'
 import express from 'express'
@@ -159,6 +160,12 @@ router.delete('/refresh-token', async (req, res) => {
 router.post('/change-password', async (req, res) => {
   const portalId = req.body.portalId as string
 
+  const user = await User.findWithPortalId(portalId)
+  if (!user) {
+    res.sendStatus(401)
+    return
+  }
+
   const mask = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789~' //`!@#$%^&*()_+-={}[]:";\'<>?,./|\\'
   let tempKey = ''
   let isExist = true
@@ -174,23 +181,23 @@ router.post('/change-password', async (req, res) => {
       isExist = false
     }
   }
-
-  const user = await User.findWithPortalId(portalId)
-  if (!user) {
-    res.sendStatus(401)
-    return
-  }
   const result = await ChangePassword.createOrUpdateTempKey(user.id, tempKey)
 
   if (!result) {
     res.sendStatus(500)
     return
   }
+  EodiroMailer.sendMail({
+    to: portalId,
+    subject: '어디로 비밀번호 변경 이메일입니다',
+    html: `<a href="https://eodiro.com/auth/change-password/request/?tk=${tempKey}">비밀번호변경</a>`,
+  })
   res.sendStatus(200)
 })
 
 router.post('/change-password/request', async (req, res) => {
   const tempKey = Db.escape(req.query?.tk)
+
   const changePassword = await ChangePassword.findWithTempKey(tempKey)
   if (!changePassword) {
     res.sendStatus(401)

@@ -17,7 +17,7 @@ export default class ChangePassword {
       return false
     }
 
-    return results.length > 0 ? results[0] : null
+    return results.length > 0 ? results[0] : false
   }
 
   static async findWithTempKey(
@@ -32,7 +32,7 @@ export default class ChangePassword {
     if (err) {
       return false
     }
-    return results.length > 0 ? results[0] : null
+    return results.length > 0 ? results[0] : false
   }
 
   static async createOrUpdateTempKey(
