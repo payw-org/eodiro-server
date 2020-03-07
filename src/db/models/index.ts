@@ -1,5 +1,6 @@
 export * from './admin-model'
 export * from './cafeteria-menus-model'
+export * from './change-password-model'
 export * from './lecture-model'
 export * from './post-model'
 export * from './refresh-token'
