@@ -21,7 +21,7 @@ export class RefreshToken extends JwtToken {
     if (
       refreshTokenExpireDate.diff(
         dayjs(),
-        Config.REFRESH_TOKEN_REFRESH_ALLOWED_STANDARD
+        Config.REFRESH_TOKEN_REFRESH_ALLOWED_UNIT
       ) <= Config.REFRESH_TOKEN_REFRESH_ALLOWED_VALUE
     ) {
       return true

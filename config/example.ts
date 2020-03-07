@@ -28,7 +28,7 @@ export default {
   ACCESS_TOKEN_EXPIRE: '',
   REFRESH_TOKEN_EXPIRE: '',
   REFRESH_TOKEN_REFRESH_ALLOWED_VALUE: 3,
-  REFRESH_TOKEN_REFRESH_ALLOWED_STANDARD: 'day' as dayjs.UnitType,
+  REFRESH_TOKEN_REFRESH_ALLOWED_UNIT: 'day' as dayjs.UnitType,
 
   // CAU Portal
   CAU_ID: '',
