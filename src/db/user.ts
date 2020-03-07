@@ -1,10 +1,9 @@
-import Db from '@/db'
-import { SignUpInfo } from '@/modules/auth'
-import Auth from '@/modules/auth'
-import Time from '@/modules/time'
-import rng from '@/modules/random-name-generator'
-import EodiroMailer from '@/modules/eodiro-mailer'
+import Db, { MysqlInsertOrUpdateResult } from '@/db'
 import { UserModel } from '@/db/models'
+import Auth, { SignUpInfo } from '@/modules/auth'
+import EodiroMailer from '@/modules/eodiro-mailer'
+import rng from '@/modules/random-name-generator'
+import Time from '@/modules/time'
 
 export type UserId = number
 
@@ -207,5 +206,26 @@ export default class User {
       to: 'contact@payw.org',
       subject: 'Updating user random nickname',
     })
+  }
+  static async updatePassword(
+    userId: number,
+    newPassword: string
+  ): Promise<boolean> {
+    const query = `
+      update user
+      set password = ?
+      where id = ?
+    `
+
+    const encryptedPassword = await Auth.encryptPw(newPassword)
+    const values = [encryptedPassword, userId]
+    const [err, results] = await Db.query<MysqlInsertOrUpdateResult>(
+      query,
+      values
+    )
+    if (err || results.affectedRows === 0) {
+      return false
+    }
+    return true
   }
 }
