@@ -1,4 +1,4 @@
-import dayjs = require('dayjs')
+import dayjs from 'dayjs'
 
 /**
  * Create index.ts based on this example
