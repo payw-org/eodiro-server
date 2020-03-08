@@ -16,7 +16,7 @@
     "pm2-restart": "if pm2 show eodiro-api2 ; then pm2 restart eodiro-api2 ; else echo 'No PM2 instance for eodiro API 2' ; fi",
     "pm2-stop": "if pm2 show eodiro-api2 ; then pm2 stop eodiro-api2 ; else echo 'No PM2 instance for eodiro API 2' ; fi",
     "pm2-delete": "if pm2 show eodiro-api2 ; then pm2 delete eodiro-api2 ; else echo 'No PM2 instance for eodiro API 2' ; fi",
-    "pm2-reboot": "npm run pm2-stop && npm run pm2-delete && npm run build && npm run pm2-start",
+    "pm2-reboot": "npm run build && npm run pm2-stop && npm run pm2-delete && npm run pm2-start",
     "set-pkg-start": "ts-node src/dev/modify-package.ts",
     "set-pkg-dev": "cross-env NODE_ENV=development ts-node src/dev/modify-package.ts",
     "clear": "rimraf build/*",
