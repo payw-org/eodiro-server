@@ -1,4 +1,5 @@
 import Db, { MysqlResult } from '@/db'
+import { Payload } from '@/modules/jwt'
 import { RefreshToken } from '@/modules/jwt/tokens'
 
 export interface RefreshTokenModel {
@@ -29,7 +30,7 @@ export default class RefreshTokenTable {
   }
 
   static async addRefreshToken(
-    refreshToken: RefreshToken
+    refreshToken: RefreshToken<Payload>
   ): Promise<MysqlResult | false> {
     const query = `
       insert into refresh_token
@@ -49,7 +50,7 @@ export default class RefreshTokenTable {
   }
 
   static async updateRefreshToken(
-    refreshToken: RefreshToken
+    refreshToken: RefreshToken<Payload>
   ): Promise<MysqlResult | false> {
     const query = `
       UPDATE refresh_token
