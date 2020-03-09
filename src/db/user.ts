@@ -5,23 +5,45 @@ import EodiroMailer from '@/modules/eodiro-mailer'
 import rng from '@/modules/random-name-generator'
 import SqlB from '@/modules/sqlb'
 import Time from '@/modules/time'
+import { DbTables } from './constants'
 
 export type UserId = number
 
 export default class User {
-  static async findWithPortalId(portalId: string): Promise<UserModel | false> {
+  /**
+   * Get user information using portal email id.
+   *
+   * @param portalId With/without email address.
+   * @param passwordIncluded If set to true, return password included information.
+   * @returns `false`: server error. `undefined`: no user found.
+   */
+  static async findWithPortalId(
+    portalId: string,
+    passwordIncluded?: true
+  ): Promise<UserModel | false>
+  static async findWithPortalId(
+    portalId: string,
+    passwordIncluded = false
+  ): Promise<UserModel | UserModelPasswordOmitted | false> {
     portalId = portalId.trim()
 
-    const query = `
-      select *
-      from user
-      where portal_id = ?
-    `
+    if (!portalId.includes('@')) {
+      portalId += '@cau.ac.kr'
+    }
+
+    const selection: ('*' | keyof UserModel)[] = passwordIncluded
+      ? ['*']
+      : ['id', 'nickname', 'portal_id', 'random_nickname', 'registered_at']
+    const query = SqlB<UserModel>()
+      .select(...selection)
+      .from(DbTables.user)
+      .where()
+      .equal('portal_id', portalId)
+      .build()
 
     const [err, results] = await Db.query(query, [portalId])
 
     if (err) {
-      console.error(err)
       return false
     }
 
@@ -29,9 +51,13 @@ export default class User {
       return undefined
     }
 
-    const user: UserModel = results[0]
+    const user = results[0]
 
-    return user
+    if (passwordIncluded) {
+      return user as UserModel
+    } else {
+      return user as UserModelPasswordOmitted
+    }
   }
 
   static async findAtId(id: number): Promise<UserModelPasswordOmitted | false> {
@@ -124,7 +150,7 @@ export default class User {
       values (?, ?, ?, ?, ?, ?)
     `
     const encryptedPassword = await Auth.encryptPw(info.password)
-    const pendingToken = Auth.generatePendingToken()
+    const pendingToken = Auth.generateToken()
     const values = [
       info.portalId,
       encryptedPassword,
@@ -205,6 +231,14 @@ export default class User {
       subject: 'Updating user random nickname',
     })
   }
+
+  /**
+   * Update user password with newer one.
+   *
+   * @param userId
+   * @param newPassword
+   * @returns `false`: error. `undefined`: no user.
+   */
   static async updatePassword(
     userId: number,
     newPassword: string
@@ -221,9 +255,15 @@ export default class User {
       query,
       values
     )
-    if (err || results.affectedRows === 0) {
+
+    if (err) {
       return false
     }
+
+    if (results.affectedRows === 0) {
+      return undefined
+    }
+
     return true
   }
 }

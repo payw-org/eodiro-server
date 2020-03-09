@@ -41,7 +41,7 @@ export default class Auth {
    * stored in DB and will be used later
    * for email verification
    */
-  static generatePendingToken(): string {
+  static generateToken(): string {
     return crypto.randomBytes(20).toString('hex')
   }
 
@@ -172,7 +172,7 @@ export default class Auth {
       return [undefined, false]
     }
 
-    const user = await User.findWithPortalId(portalId)
+    const user = await User.findWithPortalId(portalId, true)
 
     // TODO: Remove the legacy password matching process
     if (
