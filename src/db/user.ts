@@ -1,10 +1,10 @@
 import Db from '@/db'
-import { SignUpInfo } from '@/modules/auth'
-import Auth from '@/modules/auth'
-import Time from '@/modules/time'
-import rng from '@/modules/random-name-generator'
+import { UserModel, UserModelPasswordOmitted } from '@/db/models'
+import Auth, { SignUpInfo } from '@/modules/auth'
 import EodiroMailer from '@/modules/eodiro-mailer'
-import { UserModel } from '@/db/models'
+import rng from '@/modules/random-name-generator'
+import SqlB from '@/modules/sqlb'
+import Time from '@/modules/time'
 
 export type UserId = number
 
@@ -34,16 +34,16 @@ export default class User {
     return user
   }
 
-  static async findAtId(id: number): Promise<UserModel | false> {
-    const query = `
-      select *
-      from user
-      where id = ?
-    `
-    const [err, results] = await Db.query(query, id)
+  static async findAtId(id: number): Promise<UserModelPasswordOmitted | false> {
+    const query = SqlB<UserModel>()
+      .select('id', 'nickname', 'portal_id', 'random_nickname', 'registered_at')
+      .from('user')
+      .where(SqlB().equal('id', undefined))
+      .build()
+
+    const [err, results] = await Db.query<UserModelPasswordOmitted[]>(query, id)
 
     if (err) {
-      console.error(err.stack)
       return false
     }
 
@@ -51,10 +51,7 @@ export default class User {
       return undefined
     }
 
-    const user: UserModel = results[0]
-
-    // Delete password
-    delete user.password
+    const user = results[0]
 
     return user
   }
