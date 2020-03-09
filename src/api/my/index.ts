@@ -34,7 +34,7 @@ router.get('/my/posts', async (req, res) => {
     .select('*')
     .from('post')
     .where()
-    .same('user_id', payload.userId)
+    .equal('user_id', payload.userId)
     .order('id', 'desc')
     .limit(amount, offset)
     .build()
