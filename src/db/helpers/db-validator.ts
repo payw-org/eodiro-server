@@ -6,6 +6,7 @@ import chalk from 'chalk'
 import {
   createAdminTable,
   createCafeteriaMenuTable,
+  createChangePasswordTable,
   createCommentTable,
   createCoverageCollegeTable,
   createCoverageMajorLectureTable,
@@ -86,4 +87,5 @@ export default async function dbValidator(): Promise<void> {
   await validateTable(DbTables.POST, createPostTable)
   await validateTable(DbTables.COMMENT, createCommentTable)
   await validateTable(DbTables.INQUIRY, createInquiryTable)
+  await validateTable(DbTables.CHANGE_PASSWORD, createChangePasswordTable)
 }
