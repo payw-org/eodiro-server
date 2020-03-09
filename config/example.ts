@@ -1,3 +1,5 @@
+import dayjs from 'dayjs'
+
 /**
  * Create index.ts based on this example
  */
@@ -25,7 +27,8 @@ export default {
   REFRESH_TOKEN_SECRET: '',
   ACCESS_TOKEN_EXPIRE: '',
   REFRESH_TOKEN_EXPIRE: '',
-  REFRESH_TOKEN_REFRESH_ALLOWED_DAY: 3,
+  REFRESH_TOKEN_REFRESH_ALLOWED_VALUE: 3,
+  REFRESH_TOKEN_REFRESH_ALLOWED_UNIT: 'day' as dayjs.UnitType,
 
   // CAU Portal
   CAU_ID: '',

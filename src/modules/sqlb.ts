@@ -2,7 +2,7 @@ import sqlFormatter from 'sql-formatter'
 
 type Order = 'ASC' | 'asc' | 'DESC' | 'desc'
 
-class SqlBInstance {
+class SqlBInstance<T = any> {
   private q = ''
 
   private space(): void {
@@ -61,19 +61,19 @@ class SqlBInstance {
     return built
   }
 
-  format(): SqlBInstance {
+  format(): SqlBInstance<T> {
     this.q = sqlFormatter.format(this.q)
 
     return this
   }
 
-  raw(str: string): SqlBInstance {
+  raw(str: string): SqlBInstance<T> {
     this.append(str)
 
     return this
   }
 
-  bind(alias?: string): SqlBInstance {
+  bind(alias?: string): SqlBInstance<T> {
     this.q = `(${this.q})`
 
     if (alias) {
@@ -83,7 +83,7 @@ class SqlBInstance {
     return this
   }
 
-  select(...what: Array<string>): SqlBInstance {
+  select(...what: Array<keyof T> | ['*']): SqlBInstance<T> {
     if (what.length === 0) {
       what = ['*']
     }
@@ -95,37 +95,39 @@ class SqlBInstance {
     return this
   }
 
-  distinctSelect(...what: (string | SqlBInstance)[]): SqlBInstance {
+  distinctSelect(
+    ...what: (keyof T | '*' | SqlBInstance<T>)[]
+  ): SqlBInstance<T> {
     if (what.length === 0) {
       what = ['*']
     }
 
-    what = what.map((w) => {
-      if (typeof w === 'string') {
-        return w
-      } else {
-        return w.build()
-      }
-    })
-
-    const attrs = what.join(', ')
+    const attrs = what
+      .map((w) => {
+        if (w instanceof SqlBInstance) {
+          return w.build()
+        } else {
+          return w
+        }
+      })
+      .join(', ')
 
     this.append(`SELECT DISTINCT ${attrs}`)
 
     return this
   }
 
-  as(alias: string): SqlBInstance {
+  as(alias: string): SqlBInstance<T> {
     this.q = this.wrap(this.q, 'parentheses')
     this.append(`AS ${alias}`)
 
     return this
   }
 
-  from(): SqlBInstance
-  from(target: string): SqlBInstance
-  from(target: SqlBInstance): SqlBInstance
-  from(target?: SqlBInstance | string): SqlBInstance {
+  from(): SqlBInstance<T>
+  from(target: string): SqlBInstance<T>
+  from(target: SqlBInstance<T>): SqlBInstance<T>
+  from(target?: SqlBInstance<T> | string): SqlBInstance<T> {
     if (!target) {
       this.append(`FROM`)
     } else if (typeof target === 'string') {
@@ -137,10 +139,10 @@ class SqlBInstance {
     return this
   }
 
-  where(): SqlBInstance
-  where(conditions: string): SqlBInstance
-  where(conditions: SqlBInstance): SqlBInstance
-  where(conditions?: SqlBInstance | string): SqlBInstance {
+  where(): SqlBInstance<T>
+  where(conditions: string): SqlBInstance<T>
+  where(conditions: SqlBInstance<T>): SqlBInstance<T>
+  where(conditions?: SqlBInstance<T> | string): SqlBInstance<T> {
     if (!conditions) {
       this.append(`WHERE`)
     } else if (typeof conditions === 'string') {
@@ -152,13 +154,13 @@ class SqlBInstance {
     return this
   }
 
-  join(schema1: string, schema2: string): SqlBInstance {
+  join(schema1: string, schema2: string): SqlBInstance<T> {
     this.append(`${schema1} JOIN ${schema2}`)
 
     return this
   }
 
-  on(condition?: string): SqlBInstance {
+  on(condition?: string): SqlBInstance<T> {
     if (condition) {
       this.append(`ON ${condition}`)
     } else {
@@ -171,74 +173,74 @@ class SqlBInstance {
   /**
    * @deprecated Use `equal()` instead
    */
-  same(attr: string, value: number | string): SqlBInstance {
+  same(attr: string, value: number | string): SqlBInstance<T> {
     this.append(`${attr} = ${this.convert(value)}`)
 
     return this
   }
 
-  equal(attr: string, value: number | string): SqlBInstance {
+  equal(attr: string, value: number | string): SqlBInstance<T> {
     this.append(`${attr} = ${this.convert(value)}`)
 
     return this
   }
 
-  andEqual(attr: string, value: number | string): SqlBInstance {
+  andEqual(attr: string, value: number | string): SqlBInstance<T> {
     this.and()
     this.equal(attr, value)
 
     return this
   }
 
-  notEqual(attr: string, value: number | string): SqlBInstance {
+  notEqual(attr: string, value: number | string): SqlBInstance<T> {
     this.append(`${attr} != ${this.convert(value)}`)
 
     return this
   }
-  andNotEqual(attr: string, value: number | string): SqlBInstance {
+  andNotEqual(attr: string, value: number | string): SqlBInstance<T> {
     this.and()
     this.notEqual(attr, value)
 
     return this
   }
 
-  equalOrMore(attr: string, value: number | string): SqlBInstance {
+  equalOrMore(attr: string, value: number | string): SqlBInstance<T> {
     this.append(`${attr} >= ${this.convert(value)}`)
 
     return this
   }
 
-  equalOrLess(attr: string, value: number | string): SqlBInstance {
+  equalOrLess(attr: string, value: number | string): SqlBInstance<T> {
     this.append(`${attr} <= ${this.convert(value)}`)
 
     return this
   }
 
-  more(attr: string, value: number | string): SqlBInstance {
+  more(attr: string, value: number | string): SqlBInstance<T> {
     this.append(`${attr} > ${this.convert(value)}`)
 
     return this
   }
 
-  less(attr: string, value: number | string): SqlBInstance {
+  less(attr: string, value: number | string): SqlBInstance<T> {
     this.append(`${attr} < ${this.convert(value)}`)
 
     return this
   }
 
-  group(by: string): SqlBInstance {
+  group(by: string): SqlBInstance<T> {
     this.append(`GROUP BY ${by}`)
 
     return this
   }
 
-  order(attr: string, direction: Order = 'asc'): SqlBInstance {
+  order(attr: string, direction: Order = 'asc'): SqlBInstance<T> {
     this.append(`ORDER BY ${attr} ${direction.toUpperCase()}`)
 
     return this
   }
 
-  multiOrder(options: [string, Order][]): SqlBInstance {
+  multiOrder(options: [string, Order][]): SqlBInstance<T> {
     this.append(`ORDER BY`)
     this.append(
       options
@@ -251,7 +253,7 @@ class SqlBInstance {
     return this
   }
 
-  limit(amount: number, offset?: number): SqlBInstance {
+  limit(amount: number, offset?: number): SqlBInstance<T> {
     if (!amount) {
       return this
     }
@@ -265,7 +267,7 @@ class SqlBInstance {
     return this
   }
 
-  like(column: string, keyword: string): SqlBInstance {
+  like(column: string, keyword: string): SqlBInstance<T> {
     this.append(`${column} like '${keyword}'`)
 
     return this
@@ -275,7 +277,7 @@ class SqlBInstance {
     schema: string,
     items: Record<string, number | string | undefined>,
     ignore?: boolean
-  ): SqlBInstance {
+  ): SqlBInstance<T> {
     const targetsQuery = Object.keys(items).join(', ')
     const values = Object.values(items).map((val) => {
       return this.convert(val)
@@ -296,7 +298,7 @@ class SqlBInstance {
     schema: string,
     items: Record<string, number | string | undefined>[],
     ignore?: boolean
-  ): SqlBInstance {
+  ): SqlBInstance<T> {
     // Analyze first element
     this.append(`INSERT${ignore ? ' IGNORE' : ''} INTO ${schema}`)
 
@@ -323,7 +325,7 @@ class SqlBInstance {
   update(
     schema: string,
     items: Record<string, number | string | undefined>
-  ): SqlBInstance {
+  ): SqlBInstance<T> {
     const setQuery = Object.keys(items)
       .map((key) => {
         return `${key} = ${this.convert(items[key])}`
@@ -335,22 +337,22 @@ class SqlBInstance {
     return this
   }
 
-  delete(): SqlBInstance {
+  delete(): SqlBInstance<T> {
     this.append('DELETE')
     return this
   }
 
-  when(): SqlBInstance {
+  when(): SqlBInstance<T> {
     this.append('WHEN')
     return this
   }
 
-  notExists(sqlB: SqlBInstance): SqlBInstance {
+  notExists(sqlB: SqlBInstance<T>): SqlBInstance<T> {
     this.append(`NOT EXISTS (${sqlB.build()})`)
     return this
   }
 
-  and(sql?: SqlBInstance): SqlBInstance {
+  and(sql?: SqlBInstance<T>): SqlBInstance<T> {
     this.append(`AND`)
     if (sql instanceof SqlBInstance) {
       this.append(sql.build())
@@ -358,7 +360,7 @@ class SqlBInstance {
     return this
   }
 
-  or(sql?: SqlBInstance): SqlBInstance {
+  or(sql?: SqlBInstance<T>): SqlBInstance<T> {
     this.append(`OR`)
     if (sql instanceof SqlBInstance) {
       this.append(sql.build())
@@ -367,6 +369,6 @@ class SqlBInstance {
   }
 }
 
-export default function SqlB(): SqlBInstance {
-  return new SqlBInstance()
+export default function SqlB<T = any>(): SqlBInstance<T> {
+  return new SqlBInstance<T>()
 }
