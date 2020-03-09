@@ -1,4 +1,4 @@
-import Db from '@/db'
+import Db, { MysqlInsertOrUpdateResult } from '@/db'
 import { UserModel, UserModelPasswordOmitted } from '@/db/models'
 import Auth, { SignUpInfo } from '@/modules/auth'
 import EodiroMailer from '@/modules/eodiro-mailer'
@@ -204,5 +204,26 @@ export default class User {
       to: 'contact@payw.org',
       subject: 'Updating user random nickname',
     })
+  }
+  static async updatePassword(
+    userId: number,
+    newPassword: string
+  ): Promise<boolean> {
+    const query = `
+      update user
+      set password = ?
+      where id = ?
+    `
+
+    const encryptedPassword = await Auth.encryptPw(newPassword)
+    const values = [encryptedPassword, userId]
+    const [err, results] = await Db.query<MysqlInsertOrUpdateResult>(
+      query,
+      values
+    )
+    if (err || results.affectedRows === 0) {
+      return false
+    }
+    return true
   }
 }

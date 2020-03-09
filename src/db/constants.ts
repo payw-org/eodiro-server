@@ -12,4 +12,5 @@ export const DbTables = {
   POST: 'post',
   COMMENT: 'comment',
   INQUIRY: 'inquiry',
+  CHANGE_PASSWORD: 'change_password',
 }
