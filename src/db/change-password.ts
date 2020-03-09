@@ -22,6 +22,11 @@ export default class ChangePassword {
     return results.length > 0 ? results[0] : undefined
   }
 
+  /**
+   *
+   * @param token
+   * @returns `false`: server error
+   */
   static async findWithToken(
     token: string
   ): Promise<ChangePasswordModel | false> {
