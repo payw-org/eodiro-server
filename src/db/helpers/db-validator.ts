@@ -1,5 +1,5 @@
 import Db from '@/db'
-import { DbTables } from '@/db/constants'
+import { DbTableNames, DbTables } from '@/db/constants'
 import SqlB from '@/modules/sqlb'
 import Config from '@@/config'
 import chalk from 'chalk'
@@ -26,7 +26,7 @@ const database =
   process.env.NODE_ENV === 'development' ? Config.DB_NAME_DEV : Config.DB_NAME
 
 async function validateTable(
-  tableName: string,
+  tableName: DbTableNames,
   createFunction: () => Promise<void>
 ): Promise<boolean> {
   const sql = SqlB()
@@ -71,21 +71,21 @@ async function validateTable(
 export default async function dbValidator(): Promise<void> {
   log(`[ ${chalk.green('db')} ] validating db '${database}'`)
 
-  await validateTable(DbTables.ADMIN, createAdminTable)
-  await validateTable(DbTables.USER, createUserTable)
-  await validateTable(DbTables.PENDING_USER, createPendingUserTable)
-  await validateTable(DbTables.REFRESH_TOKEN, createRefreshTokenTable)
-  await validateTable(DbTables.COVERAGE_COLLEGE, createCoverageCollegeTable)
-  await validateTable(DbTables.COVERAGE_MAJOR, createCoverageMajorTable)
-  await validateTable(DbTables.LECTURE, createLectureTable)
-  await validateTable(DbTables.PERIOD, createPeriodTable)
+  await validateTable(DbTables.admin, createAdminTable)
+  await validateTable(DbTables.user, createUserTable)
+  await validateTable(DbTables.pending_user, createPendingUserTable)
+  await validateTable(DbTables.refresh_token, createRefreshTokenTable)
+  await validateTable(DbTables.coverage_college, createCoverageCollegeTable)
+  await validateTable(DbTables.coverage_major, createCoverageMajorTable)
+  await validateTable(DbTables.lecture, createLectureTable)
+  await validateTable(DbTables.period, createPeriodTable)
   await validateTable(
-    DbTables.COVERAGE_MAJOR_LECTURE,
+    DbTables.coverage_major_lecture,
     createCoverageMajorLectureTable
   )
-  await validateTable(DbTables.CAFETERIA_MENU, createCafeteriaMenuTable)
-  await validateTable(DbTables.POST, createPostTable)
-  await validateTable(DbTables.COMMENT, createCommentTable)
-  await validateTable(DbTables.INQUIRY, createInquiryTable)
-  await validateTable(DbTables.CHANGE_PASSWORD, createChangePasswordTable)
+  await validateTable(DbTables.cafeteria_menu, createCafeteriaMenuTable)
+  await validateTable(DbTables.post, createPostTable)
+  await validateTable(DbTables.comment, createCommentTable)
+  await validateTable(DbTables.inquiry, createInquiryTable)
+  await validateTable(DbTables.change_password, createChangePasswordTable)
 }
