@@ -3,9 +3,8 @@ import User, { UserId } from '@/db/user'
 import EodiroEncrypt from '@/modules/eodiro-encrypt'
 import EodiroMailer from '@/modules/eodiro-mailer'
 import { SignUpTemplate } from '@/modules/eodiro-mailer/templates'
-import Jwt from '@/modules/jwt'
+import Jwt, { Payload } from '@/modules/jwt'
 import crypto from 'crypto'
-import { Payload } from './jwt/tokens/jwt-token'
 
 export interface SignInInfo {
   portalId: string

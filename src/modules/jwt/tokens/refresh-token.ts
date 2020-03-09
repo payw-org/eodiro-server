@@ -1,37 +1,51 @@
-import Config from '@@/config'
-import { JwtToken, Payload } from './jwt-token'
+import { CreateTokenOption, DecodeTokenOption, JwtToken } from './jwt-token'
+import dayjs = require('dayjs')
 
-export class RefreshToken extends JwtToken {
-  async create(payload: Payload): Promise<void> {
-    await super.create(
-      payload,
-      Config.REFRESH_TOKEN_SECRET,
-      Config.REFRESH_TOKEN_EXPIRE
-    )
-    await this.verify()
+export interface RefreshTokenOption {
+  refreshRefreshTokenAllowedValue: number
+  refreshRefreshTokenAllowedUnit: dayjs.UnitType
+}
+
+export interface DecodeRefreshTokenOption extends DecodeTokenOption {
+  refreshTokenOption: RefreshTokenOption
+}
+
+export interface CreateRefreshTokenOption<T> extends CreateTokenOption<T> {
+  refreshTokenOption: RefreshTokenOption
+}
+
+export class RefreshToken<T> extends JwtToken<T> {
+  private refreshOption?: {
+    allowedValue: number
+    unit: dayjs.UnitType
   }
 
-  async verify(): Promise<void> {
-    await super.verify(Config.REFRESH_TOKEN_SECRET)
+  constructor(config: DecodeRefreshTokenOption | CreateRefreshTokenOption<T>) {
+    super(config)
   }
 
-  async isAllowedRefresh(): Promise<boolean> {
-    const refreshTokenExpireDate = new Date(this.decoded.exp * 1000).getTime()
-    const nowDate = new Date().getTime()
-    const differenceDate = Math.floor(
-      (refreshTokenExpireDate - nowDate) / (1000 * 60 * 60 * 24)
-    )
-    if (differenceDate <= Config.REFRESH_TOKEN_REFRESH_ALLOWED_DAY) {
+  isAllowedRefresh(refreshTokenOption: RefreshTokenOption): boolean {
+    const refreshTokenExpireDate = dayjs.unix(this.decoded.exp)
+    if (
+      refreshTokenExpireDate.diff(
+        dayjs(),
+        refreshTokenOption.refreshRefreshTokenAllowedUnit
+      ) <= refreshTokenOption.refreshRefreshTokenAllowedValue
+    ) {
       return true
     } else {
       return false
     }
   }
 
-  async refreshRefreshTokenIfPossible(): Promise<boolean> {
-    const isAllowed = await this.isAllowedRefresh()
+  refreshRefreshTokenIfPossible(
+    CreaterefreshTokenOption: CreateRefreshTokenOption<T>
+  ): boolean {
+    const isAllowed = this.isAllowedRefresh(
+      CreaterefreshTokenOption.refreshTokenOption
+    )
     if (isAllowed) {
-      await this.create(this.decoded.payload)
+      this.create(CreaterefreshTokenOption)
     }
     return isAllowed
   }

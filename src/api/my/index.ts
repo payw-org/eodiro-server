@@ -38,7 +38,7 @@ router.get('/my/posts', async (req, res) => {
     .order('id', 'desc')
     .limit(amount, offset)
     .build()
-  const [err, results] = await Db.query<PostModel>(query)
+  const [err, results] = await Db.query<PostModel[]>(query)
   if (err) {
     res.sendStatus(500)
     return
