@@ -1,6 +1,6 @@
 import Db from '@/db'
 import Admin from '@/db/admin'
-import ChangePassword from '@/db/chnage-password'
+import ChangePassword from '@/db/change-password'
 import RefreshTokenTable from '@/db/refresh-token-table'
 import User from '@/db/user'
 import Auth, { SignUpInfo } from '@/modules/auth'
