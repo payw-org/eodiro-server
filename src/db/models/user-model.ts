@@ -3,7 +3,7 @@ import Db from '@/db'
 // User
 
 // Model
-export interface UserModel extends Record<string, string | number> {
+export interface UserModel {
   id: number
   portal_id: string
   password: string
