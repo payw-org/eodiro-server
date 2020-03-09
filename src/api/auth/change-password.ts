@@ -4,6 +4,7 @@ import User from '@/db/user'
 import Auth from '@/modules/auth'
 import { HttpStatusCode } from '@/modules/constants/http-status-code'
 import EodiroMailer from '@/modules/eodiro-mailer'
+import dayjs from 'dayjs'
 import express from 'express'
 
 const router = express.Router()
@@ -38,14 +39,31 @@ router.post('/change-password', async (req, res) => {
   res.sendStatus(200)
 })
 
+router.get('/change-password', async (req, res) => {
+  const token = Db.escape(req.body.token)
+  const request = await ChangePassword.findWithToken(token)
+
+  if (request === false) {
+    res.sendStatus(HttpStatusCode.INTERNAL_SERVER_ERROR)
+    return
+  }
+
+  if (dayjs().isAfter(dayjs(request.requested_at).add(30, 'minute'))) {
+    await ChangePassword.deleteWithToken(token)
+    res.json(false)
+  } else {
+    res.json(true)
+  }
+})
+
 router.patch('/change-password', async (req, res) => {
   const token = Db.escape(req.body.token)
-  const newPassword = req.body.newPassword
+  const newPassword = Db.escape(req.body.newPassword)
 
-  const changePassword = await ChangePassword.findWithToken(token)
+  const changePasswordRequest = await ChangePassword.findWithToken(token)
 
-  if (!changePassword) {
-    res.sendStatus(401)
+  if (!changePasswordRequest) {
+    res.sendStatus(HttpStatusCode.UNAUTHORIZED)
     return
   }
 
@@ -54,16 +72,19 @@ router.patch('/change-password', async (req, res) => {
     return
   }
 
-  const result = await User.updatePassword(changePassword.user_id, newPassword)
+  const result = await User.updatePassword(
+    changePasswordRequest.user_id,
+    newPassword
+  )
 
   if (result === undefined) {
     res.sendStatus(HttpStatusCode.UNAUTHORIZED)
-    return
   } else if (result === false) {
     res.sendStatus(HttpStatusCode.INTERNAL_SERVER_ERROR)
-    return
+  } else {
+    await ChangePassword.deleteWithToken(token)
+    res.json(true)
   }
-  res.json(true)
 })
 
 export default router
