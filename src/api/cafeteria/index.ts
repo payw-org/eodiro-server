@@ -1,9 +1,9 @@
-import express from 'express'
 import Db from '@/db'
-import SqlB from '@/modules/sqlb'
-import dayjs from 'dayjs'
 import { DbTables } from '@/db/constants'
+import SqlB from '@/modules/sqlb'
 import { Campus } from '@/types'
+import dayjs from 'dayjs'
+import express from 'express'
 
 const router = express.Router()
 
@@ -13,7 +13,7 @@ router.get('/cafeteria/:servedAt/:campus/menus', async (req, res) => {
   const servedAt = Db.escape(req.params?.servedAt) || now.format('YYYY-MM-DD')
   const sql = SqlB()
     .select('data')
-    .from(DbTables.CAFETERIA_MENU)
+    .from(DbTables.cafeteria_menu)
     .where()
     .equal('campus', campus)
     .andEqual('served_at', servedAt)
