@@ -5,14 +5,25 @@ const router = express.Router()
 
 // Validate portal email id
 router.post('/validate/portal-id', async (req, res) => {
-  const portalId = req.body.portalId
-  if (
-    (await Auth.isValidPortalId(portalId)) &&
-    Auth.isValidPortalIdFormat(portalId)
-  ) {
-    res.json(true)
+  let portalId: string = req.body.portalId
+  const existence: boolean = req.body.existence
+
+  portalId = portalId.trim()
+
+  if (!portalId.includes('@')) {
+    portalId += '@cau.ac.kr'
+  }
+
+  if (existence) {
+    res.json(
+      !(await Auth.isValidPortalId(portalId)) &&
+        Auth.isValidPortalIdFormat(portalId)
+    )
   } else {
-    res.json(false)
+    res.json(
+      (await Auth.isValidPortalId(portalId)) &&
+        Auth.isValidPortalIdFormat(portalId)
+    )
   }
 })
 
