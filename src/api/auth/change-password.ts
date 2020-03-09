@@ -2,6 +2,7 @@ import Db from '@/db'
 import ChangePassword from '@/db/change-password'
 import User from '@/db/user'
 import Auth from '@/modules/auth'
+import { HttpStatusCode } from '@/modules/constants/http-status-code'
 import EodiroMailer from '@/modules/eodiro-mailer'
 import express from 'express'
 
@@ -55,8 +56,11 @@ router.patch('/change-password', async (req, res) => {
 
   const result = await User.updatePassword(changePassword.user_id, newPassword)
 
-  if (!result) {
-    res.sendStatus(500)
+  if (result === undefined) {
+    res.sendStatus(HttpStatusCode.UNAUTHORIZED)
+    return
+  } else if (result === false) {
+    res.sendStatus(HttpStatusCode.INTERNAL_SERVER_ERROR)
     return
   }
   res.json(true)
