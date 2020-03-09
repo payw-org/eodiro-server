@@ -44,11 +44,22 @@ export default class Db {
     })
   }
 
-  static escape(str: string): string | null {
-    if (!str) {
+  static escape(input: string): string | null
+  static escape(input: number): number | null
+  static escape(input: string | number): string | number | null {
+    if (typeof input === 'number') {
+      return input
+    }
+
+    if (!input) {
       return null
     }
-    return str.replace(/[\0\x08\x09\x1a\n\r"'\\\%]/g, function(char) {
+
+    input = input.toString()
+
+    const escaped = input.replace(/[\0\x08\x09\x1a\n\r"'\\\%]/g, function(
+      char
+    ) {
       switch (char) {
         case '\0':
           return '\\0'
@@ -72,5 +83,7 @@ export default class Db {
           return char
       }
     })
+
+    return escaped
   }
 }
