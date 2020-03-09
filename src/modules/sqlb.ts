@@ -83,7 +83,7 @@ class SqlBInstance<T = any> {
     return this
   }
 
-  select(...what: Array<keyof T> | ['*']): SqlBInstance<T> {
+  select(...what: Array<keyof T | '*'>): SqlBInstance<T> {
     if (what.length === 0) {
       what = ['*']
     }
@@ -154,7 +154,7 @@ class SqlBInstance<T = any> {
     return this
   }
 
-  join(schema1: string, schema2: string): SqlBInstance<T> {
+  join(schema1: keyof T, schema2: keyof T): SqlBInstance<T> {
     this.append(`${schema1} JOIN ${schema2}`)
 
     return this
@@ -170,77 +170,69 @@ class SqlBInstance<T = any> {
     return this
   }
 
-  /**
-   * @deprecated Use `equal()` instead
-   */
-  same(attr: string, value: number | string): SqlBInstance<T> {
+  equal(attr: keyof T, value: number | string): SqlBInstance<T> {
     this.append(`${attr} = ${this.convert(value)}`)
 
     return this
   }
 
-  equal(attr: string, value: number | string): SqlBInstance<T> {
-    this.append(`${attr} = ${this.convert(value)}`)
-
-    return this
-  }
-
-  andEqual(attr: string, value: number | string): SqlBInstance<T> {
+  andEqual(attr: keyof T, value: number | string): SqlBInstance<T> {
     this.and()
     this.equal(attr, value)
 
     return this
   }
 
-  notEqual(attr: string, value: number | string): SqlBInstance<T> {
+  notEqual(attr: keyof T, value: number | string): SqlBInstance<T> {
     this.append(`${attr} != ${this.convert(value)}`)
 
     return this
   }
-  andNotEqual(attr: string, value: number | string): SqlBInstance<T> {
+
+  andNotEqual(attr: keyof T, value: number | string): SqlBInstance<T> {
     this.and()
     this.notEqual(attr, value)
 
     return this
   }
 
-  equalOrMore(attr: string, value: number | string): SqlBInstance<T> {
+  equalOrMore(attr: keyof T, value: number | string): SqlBInstance<T> {
     this.append(`${attr} >= ${this.convert(value)}`)
 
     return this
   }
 
-  equalOrLess(attr: string, value: number | string): SqlBInstance<T> {
+  equalOrLess(attr: keyof T, value: number | string): SqlBInstance<T> {
     this.append(`${attr} <= ${this.convert(value)}`)
 
     return this
   }
 
-  more(attr: string, value: number | string): SqlBInstance<T> {
+  more(attr: keyof T, value: number | string): SqlBInstance<T> {
     this.append(`${attr} > ${this.convert(value)}`)
 
     return this
   }
 
-  less(attr: string, value: number | string): SqlBInstance<T> {
+  less(attr: keyof T, value: number | string): SqlBInstance<T> {
     this.append(`${attr} < ${this.convert(value)}`)
 
     return this
   }
 
-  group(by: string): SqlBInstance<T> {
+  group(by: keyof T): SqlBInstance<T> {
     this.append(`GROUP BY ${by}`)
 
     return this
   }
 
-  order(attr: string, direction: Order = 'asc'): SqlBInstance<T> {
+  order(attr: keyof T, direction: Order = 'asc'): SqlBInstance<T> {
     this.append(`ORDER BY ${attr} ${direction.toUpperCase()}`)
 
     return this
   }
 
-  multiOrder(options: [string, Order][]): SqlBInstance<T> {
+  multiOrder(options: [keyof T, Order][]): SqlBInstance<T> {
     this.append(`ORDER BY`)
     this.append(
       options
@@ -267,7 +259,7 @@ class SqlBInstance<T = any> {
     return this
   }
 
-  like(column: string, keyword: string): SqlBInstance<T> {
+  like(column: keyof T, keyword: string): SqlBInstance<T> {
     this.append(`${column} like '${keyword}'`)
 
     return this
@@ -275,13 +267,15 @@ class SqlBInstance<T = any> {
 
   insert(
     schema: string,
-    items: Record<string, number | string | undefined>,
+    items: Record<keyof T, number | string>,
     ignore?: boolean
   ): SqlBInstance<T> {
     const targetsQuery = Object.keys(items).join(', ')
-    const values = Object.values(items).map((val) => {
-      return this.convert(val)
-    })
+    const values = Object.values(items as Record<string, number | string>).map(
+      (val) => {
+        return this.convert(val)
+      }
+    )
     const valuesQuery = values.join(', ')
 
     this.append(
@@ -296,7 +290,7 @@ class SqlBInstance<T = any> {
 
   insertBulk(
     schema: string,
-    items: Record<string, number | string | undefined>[],
+    items: Record<keyof T, number | string>[],
     ignore?: boolean
   ): SqlBInstance<T> {
     // Analyze first element
@@ -324,7 +318,7 @@ class SqlBInstance<T = any> {
 
   update(
     schema: string,
-    items: Record<string, number | string | undefined>
+    items: Record<keyof T, number | string | undefined>
   ): SqlBInstance<T> {
     const setQuery = Object.keys(items)
       .map((key) => {
