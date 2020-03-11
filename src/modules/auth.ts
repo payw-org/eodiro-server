@@ -2,9 +2,10 @@ import Db from '@/db'
 import User, { UserId } from '@/db/user'
 import EodiroEncrypt from '@/modules/eodiro-encrypt'
 import EodiroMailer from '@/modules/eodiro-mailer'
-import { SignUpTemplate } from '@/modules/eodiro-mailer/templates'
 import Jwt, { Payload } from '@/modules/jwt'
 import crypto from 'crypto'
+import Mustache from 'mustache'
+import joinEmailTemplate from '../modules/eodiro-mailer/templates/join.html'
 
 export interface SignInInfo {
   portalId: string
@@ -50,7 +51,6 @@ export default class Auth {
    */
   static async verifyPendingUser(token: string): Promise<boolean> {
     if (!token || typeof token !== 'string') {
-      console.error('The given token has invalid type')
       return false
     }
 
@@ -212,19 +212,22 @@ export default class Auth {
     // Available
     // There's no user with this portal ID yet
     // Generate hash and send a verification email
-    const verificationCode = await User.addPendingUser({
+    const token = await User.addPendingUser({
       portalId,
       password,
       nickname,
     })
 
     // Verification code has been generated
-    if (verificationCode) {
+    if (token) {
       // Send a verification email
+
+      const html = Mustache.render(joinEmailTemplate, { token })
+
       EodiroMailer.sendMail({
         to: portalId,
-        subject: '어디로 인증 이메일입니다',
-        html: SignUpTemplate(verificationCode),
+        subject: '[회원가입] 인증 이메일',
+        html,
       })
 
       // Send an additional registration notification email to us
