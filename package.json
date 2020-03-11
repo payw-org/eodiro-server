@@ -8,7 +8,7 @@
   "scripts": {
     "seed-lectures": "ts-node src/actions/seed-lectures.ts",
     "test": "mocha -r ts-node/register -r module-alias/register build/test/**/*.spec.js",
-    "dev": "concurrently 'npm run build:watch' 'wait-on build/z.js && npm run type-check:watch' 'nodemon --quiet --watch build --exec \"wait-on build/z.js && npm run start:dev\"'",
+    "dev": "concurrently 'npm run build:watch' 'wait-on build/z.js && npm run type-check:watch' 'wait-on build/z.js && nodemon --watch build --exec \"npm run start:dev\"'",
     "build": "npm run clear && babel src --out-dir build --extensions \".ts\" --source-maps inline",
     "build:watch": "npm run build -- --watch",
     "start": "node build/main.js",
