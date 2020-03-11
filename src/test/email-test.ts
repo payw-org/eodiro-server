@@ -1,4 +1,3 @@
-require('module-alias/register')
 import EodiroMailer from '@/modules/eodiro-mailer'
 ;(async (): Promise<void> => {
   const verified = await EodiroMailer.verify()

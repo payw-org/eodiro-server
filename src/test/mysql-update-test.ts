@@ -1,4 +1,3 @@
-require('module-alias/register')
 import { boot } from '@/boot'
 import Db, { MysqlInsertOrUpdateResult } from '@/db'
 import SqlB from '@/modules/sqlb'
