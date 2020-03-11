@@ -1,7 +1,7 @@
+import Config from '@/config'
 import Db from '@/db'
 import { DbTableNames, DbTables } from '@/db/constants'
 import SqlB from '@/modules/sqlb'
-import Config from '@@/config'
 import chalk from 'chalk'
 import {
   createAdminTable,

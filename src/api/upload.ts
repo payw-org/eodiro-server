@@ -1,11 +1,10 @@
-import express from 'express'
-import multer from 'multer'
-import Config from '@@/config'
-import uuidv4 from 'uuid/v4'
-import mime from 'mime'
-import fs from 'fs'
+import Config from '@/config'
 import SqlB from '@/modules/sqlb'
-import Db from '@/db'
+import express from 'express'
+import fs from 'fs'
+import mime from 'mime'
+import multer from 'multer'
+import uuidv4 from 'uuid/v4'
 
 const router = express.Router()
 const upload = multer().array('file')
@@ -31,7 +30,7 @@ router.post('/upload', (req, res) => {
 
       if (file.size > 1024 * 1024 * 5) {
         res.status(200).json({
-          err: 'fileTooLarge'
+          err: 'fileTooLarge',
         })
         return
       }
@@ -54,7 +53,7 @@ router.post('/upload', (req, res) => {
     }
 
     res.status(200).json({
-      uuids
+      uuids,
     })
   })
 })
