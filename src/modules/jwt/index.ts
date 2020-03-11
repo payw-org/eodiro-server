@@ -1,5 +1,5 @@
+import config from '@/config'
 import refreshTokenTable from '@/db/refresh-token-table'
-import config from '@@/config'
 import { JwtError, RefreshToken } from './tokens'
 import { JwtToken } from './tokens/jwt-token'
 
