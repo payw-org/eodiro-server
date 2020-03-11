@@ -22,11 +22,17 @@
     "clear": "rimraf build/*",
     "dev-legacy": "npm run clear && nodemon -e ts --exec \"npm run compile\"",
     "checkout-latest": "git reset --hard && git checkout $(git describe --tags `git rev-list --tags --max-count=1`)",
-    "update": "git reset --hard && git fetch --prune && npm run checkout-latest && npm install && npm run pm2-reboot"
+    "update": "git reset --hard && git fetch --prune && npm run checkout-latest && npm install && npm run pm2-reboot",
+    "type-check": "tsc --noEmit",
+    "type-check:watch": "npm run type-check -- --watch",
+    "dev:babel": "concurrently 'npm run build:babel:watch' 'wait-on build/z.js && npm run type-check:watch' 'nodemon --quiet --watch build --exec \"wait-on build/z.js && npm run start:babel:dev\"'",
+    "build:babel": "babel src --out-dir build --extensions \".ts\" --source-maps inline",
+    "build:babel:watch": "npm run build:babel -- --watch",
+    "start:babel": "node build/main.js",
+    "start:babel:dev": "cross-env NODE_ENV=development node build/main.js"
   },
   "_moduleAliases": {
-    "@": "src",
-    "@@": "."
+    "@": "build"
   },
   "dependencies": {
     "@payw/cau-cafeteria-menus-scraper": "^2.1.3",
@@ -48,6 +54,12 @@
     "uuid": "^7.0.1"
   },
   "devDependencies": {
+    "@babel/cli": "^7.8.4",
+    "@babel/core": "^7.8.7",
+    "@babel/plugin-proposal-class-properties": "^7.8.3",
+    "@babel/plugin-transform-runtime": "^7.8.3",
+    "@babel/preset-env": "^7.8.7",
+    "@babel/preset-typescript": "^7.8.3",
     "@types/bcrypt": "^3.0.0",
     "@types/chai": "^4.2.10",
     "@types/cors": "^2.8.6",
@@ -62,15 +74,19 @@
     "@types/uuid": "^7.0.0",
     "@typescript-eslint/eslint-plugin": "^2.22.0",
     "@typescript-eslint/parser": "^2.22.0",
+    "babel-plugin-transform-html-import-to-string": "0.0.1",
     "chai": "^4.2.0",
     "chalk": "^3.0.0",
+    "concurrently": "^5.1.0",
     "cross-env": "^7.0.1",
     "dotenv": "^8.2.0",
     "eslint": "^6.8.0",
     "mocha": "^7.1.0",
     "nodemon": "^2.0.2",
     "rimraf": "^3.0.2",
+    "serve": "^11.3.0",
     "ts-node": "^8.6.2",
-    "typescript": "^3.8.3"
+    "typescript": "^3.8.3",
+    "wait-on": "^4.0.1"
   }
 }
