@@ -7,11 +7,14 @@
   "license": "MIT",
   "scripts": {
     "seed-lectures": "ts-node src/actions/seed-lectures.ts",
-    "test": "mocha -r ts-node/register -r module-alias/register test/**/*.spec.ts",
-    "build": "npm run clear && tsc",
-    "dev": "npm run clear && npm run set-pkg-dev && nodemon --exec cross-env NODE_ENV=development ts-node -- src/main.ts",
-    "start": "npm run set-pkg-start && node build/src/main.js",
-    "start-dev": "npm run set-pkg-start && NODE_ENV=development node build/src/main.js",
+    "test": "mocha -r ts-node/register -r module-alias/register build/test/**/*.spec.js",
+    "dev": "concurrently 'npm run build:watch' 'wait-on build/z.js && npm run type-check:watch' 'nodemon --quiet --watch build --exec \"wait-on build/z.js && npm run start:dev\"'",
+    "build": "npm run clear && babel src --out-dir build --extensions \".ts\" --source-maps inline",
+    "build:watch": "npm run build -- --watch",
+    "start": "node build/main.js",
+    "start:dev": "cross-env NODE_ENV=development node build/main.js",
+    "type-check": "tsc --noEmit",
+    "type-check:watch": "npm run type-check -- --watch",
     "pm2-start": "if pm2 show eodiro-api2 ; then npm run pm2-stop && npm run pm2-delete && npm run pm2-start ; else npm run set-pkg-start && pm2 start build/src/main.js --name \"eodiro-api2\" ; fi",
     "pm2-restart": "if pm2 show eodiro-api2 ; then pm2 restart eodiro-api2 ; else echo 'No PM2 instance for eodiro API 2' ; fi",
     "pm2-stop": "if pm2 show eodiro-api2 ; then pm2 stop eodiro-api2 ; else echo 'No PM2 instance for eodiro API 2' ; fi",
@@ -22,14 +25,7 @@
     "clear": "rimraf build/*",
     "dev-legacy": "npm run clear && nodemon -e ts --exec \"npm run compile\"",
     "checkout-latest": "git reset --hard && git checkout $(git describe --tags `git rev-list --tags --max-count=1`)",
-    "update": "git reset --hard && git fetch --prune && npm run checkout-latest && npm install && npm run pm2-reboot",
-    "type-check": "tsc --noEmit",
-    "type-check:watch": "npm run type-check -- --watch",
-    "dev:babel": "concurrently 'npm run build:babel:watch' 'wait-on build/z.js && npm run type-check:watch' 'nodemon --quiet --watch build --exec \"wait-on build/z.js && npm run start:babel:dev\"'",
-    "build:babel": "babel src --out-dir build --extensions \".ts\" --source-maps inline",
-    "build:babel:watch": "npm run build:babel -- --watch",
-    "start:babel": "node build/main.js",
-    "start:babel:dev": "cross-env NODE_ENV=development node build/main.js"
+    "update": "git reset --hard && git fetch --prune && npm run checkout-latest && npm install && npm run pm2-reboot"
   },
   "_moduleAliases": {
     "@": "build"
