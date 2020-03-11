@@ -1,4 +1,4 @@
-import Config from '@@/config'
+import Config from '@/config'
 import chalk from 'chalk'
 import NodeMailer from 'nodemailer'
 

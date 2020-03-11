@@ -1,5 +1,5 @@
+import dayjs from 'dayjs'
 import { CreateTokenOption, DecodeTokenOption, JwtToken } from './jwt-token'
-import dayjs = require('dayjs')
 
 export interface RefreshTokenOption {
   refreshRefreshTokenAllowedValue: number

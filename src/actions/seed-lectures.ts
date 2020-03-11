@@ -1,10 +1,10 @@
 require('module-alias/register')
 import { boot } from '@/boot'
+import Config from '@/config'
 import timetableSeeder from '@/db/seeders/timetable-seeder'
 import argv from '@/dev/argv'
 import getSemester from '@/modules/get-semester'
 import { Semester } from '@/types'
-import Config from '@@/config'
 import { CTTS } from '@payw/cau-timetable-scraper'
 import dayjs from 'dayjs'
 
