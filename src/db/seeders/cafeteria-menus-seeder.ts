@@ -1,9 +1,9 @@
-import { CCMS } from '@payw/cau-cafeteria-menus-scraper'
-import Config from '@@/config'
+import Config from '@/config'
+import Db from '@/db'
 import { CafeteriaMenuModel } from '@/db/models'
 import convertCampusName from '@/modules/convert-campus-name'
-import Db from '@/db'
 import SqlB from '@/modules/sqlb'
+import { CCMS } from '@payw/cau-cafeteria-menus-scraper'
 
 const CafeteriaMenusSeeder = (): void => {
   return

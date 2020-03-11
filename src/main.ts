@@ -1,3 +1,4 @@
+import 'module-alias/register'
 import { boot } from './boot'
 ;(async (): Promise<void> => {
   await boot({

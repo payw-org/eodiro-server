@@ -1,18 +1,14 @@
-require('module-alias/register')
-import api from '@/api'
-import dbValidator from '@/db/helpers/db-validator'
-import DbConnector from '@/modules/db-connector'
-import EodiroBot from '@/modules/eodiro-bot'
-import EodiroMailer from '@/modules/eodiro-mailer'
-import Config from '@@/config'
 import bodyParser from 'body-parser'
 import chalk from 'chalk'
 import cors from 'cors'
-import dotenv from 'dotenv'
 import express from 'express'
 import http from 'http'
-
-dotenv.config()
+import api from './api'
+import Config from './config'
+import dbValidator from './db/helpers/db-validator'
+import DbConnector from './modules/db-connector'
+import EodiroBot from './modules/eodiro-bot'
+import EodiroMailer from './modules/eodiro-mailer'
 
 const log = console.log
 
