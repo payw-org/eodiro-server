@@ -33,7 +33,7 @@ router.post('/change-password', async (req, res) => {
   EodiroMailer.sendMail({
     to: user.portal_id,
     subject: '어디로 암호 변경 이메일입니다',
-    html: `<a href="https://eodiro.com/auth/change-password/request?t=${token}">비밀번호변경</a>`,
+    html: `<a href="https://eodiro.com/forgot/change-password?t=${token}">비밀번호변경</a>`,
   })
 
   res.sendStatus(200)
