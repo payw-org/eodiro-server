@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "declaration": true,
+    "moduleResolution": "node",
+    "target": "ESNext",
+    "module": "commonjs",
+    "outDir": "./build",
+    "esModuleInterop": true,
+    "resolveJsonModule": true
+  },
+  "exclude": ["node_modules", "build"]
+}

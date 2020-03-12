@@ -5,12 +5,6 @@ import express from 'express'
 
 const router = express.Router()
 
-// Experimental
-// Single end point for all APIs
-router.post('/', (req, res) => {
-  return
-})
-
 // Get posts data
 router.get('/posts', async (req, res) => {
   const { quantity } = req.query
