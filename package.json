@@ -12,7 +12,7 @@
     "dev": "npm run --silent dev:silent",
     "dev:silent": "npm run clear && npm run dev:parallel",
     "dev:parallel": "npm-run-all --parallel build:watch type-check:watch:wait start:dev:watch:wait",
-    "build": "npm run clear && babel src --out-dir build --extensions '.ts' --source-maps inline",
+    "build": "npm run clear && npm run symlink && babel src --out-dir build --extensions '.ts' --source-maps inline",
     "build:watch": "npm run build -- --watch",
     "start": "node --harmony build/main.js",
     "start:dev": "cross-env NODE_ENV=development node --harmony build/main.js",
