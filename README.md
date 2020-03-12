@@ -1,14 +1,44 @@
-# eodiro API MySQL (eodiro API 2)
+<h1 align="center">eodiro API 2</h1>
+<p align="center">The next generation API server for <a href="https://eodiro.com"><b>eodiro</b></a></p>
 
-An API server for [eodiro](https://github.com/paywteam/eodiro.com) using MySQL database.
+<p align="center">
+  <img src="https://img.shields.io/github/license/paywteam/eodiro-api2" />
+  <a href="https://github.com/paywteam/eodiro-api2/actions">
+    <img src="https://github.com/paywteam/eodiro-api2/workflows/ci/badge.svg" />
+  </a>
+  <a href="https://github.com/paywteam/eodiro-api2/releases">
+    <img src="https://img.shields.io/github/v/release/paywteam/eodiro-api2?label=server" />
+  </a>
+  <a href="https://github.com/paywteam/eodiro-api2/tree/master/src/api/eodiro-one-api">
+    <img alt="npm" src="https://img.shields.io/npm/v/@payw/eodiro-one-api?label=one-api">
+  </a>
+  <a href="https://github.com/nodejs/node/blob/master/doc/changelogs/CHANGELOG_V13.md#13.10.1">
+    <img alt="npm" src="https://img.shields.io/badge/node-v13.10.1-brightgreen">
+  </a>
+</p>
+
+---
+
+## Server
+
+Node.js running on NGINX using reverse proxy.
+
+## Database
+
+It uses MySQL internally as its database.
+
+## Build
+
+- Babel
+  - Entire project
+- TSC
+  - One API
 
 ## API References
 
 - [Lectures](#Lectures)
 - [Vacant](#Vacant)
 - [Cafeteria](#Cafeteria)
-
----
 
 ## Common
 
