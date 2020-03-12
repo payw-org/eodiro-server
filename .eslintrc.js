@@ -14,6 +14,7 @@ module.exports = {
         asyncArrow: 'always',
       },
     ],
+    '@typescript-eslint/no-namespace': [0],
     '@typescript-eslint/no-empty-function': [0],
     '@typescript-eslint/member-delimiter-style': [
       'error',
