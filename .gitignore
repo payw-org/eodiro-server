@@ -8,3 +8,4 @@ build
 config/index.ts
 /storage
 data
+src/api/eodiro-one-api/db-schema
