@@ -1,6 +1,5 @@
 import { APIScheme } from './scheme'
 import * as square from './scheme/functions'
-export { oneAPIClient } from './client'
 
 const apiFunctions: Record<APIScheme['action'], (data: any) => Promise<any>> = {
   ...square,

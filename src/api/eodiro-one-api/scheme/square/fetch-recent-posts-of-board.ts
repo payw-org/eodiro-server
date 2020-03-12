@@ -11,9 +11,3 @@ export interface FetchRecentPostsOfBoard {
   }
   payload: DBSchema.Post[]
 }
-
-export async function fetchRecentPostsOfBoard(
-  data: FetchRecentPostsOfBoard['data']
-): Promise<FetchRecentPostsOfBoard['payload']> {
-  return
-}
