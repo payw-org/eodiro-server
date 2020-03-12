@@ -1,7 +1,7 @@
 import Auth from '@/modules/auth'
 import SqlB from '@/modules/sqlb'
 import Time from '@/modules/time'
-import Db, { MysqlInsertOrUpdateResult } from '.'
+import Db, { MysqlInsertOrUpdateResult } from './'
 import { DbTables } from './constants'
 import { ChangePasswordModel } from './models'
 
