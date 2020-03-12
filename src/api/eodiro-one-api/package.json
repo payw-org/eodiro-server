@@ -1,12 +1,14 @@
 {
   "name": "@payw/eodiro-one-api",
-  "version": "1.0.0-alpha.9",
+  "version": "1.0.0-alpha.12",
   "description": "",
   "main": "index.js",
   "scripts": {
     "build": "tsc",
     "clear": "rm -f -r build/*",
-    "deploy": "npm run clear && npm run build && cp package.json build && npm publish build --access public"
+    "clear-tsconfig-paths": "node --harmony dev/clear-tsconfig-paths.js",
+    "append-tsconfig-paths": "node --harmony dev/append-tsconfig-paths.js",
+    "deploy": "npm run clear && npm run clear-tsconfig-paths && npm run build && npm run append-tsconfig-paths && cp package.json build && npm publish build --access public"
   },
   "author": "PAYW",
   "license": "MIT"
