@@ -1,16 +1,13 @@
-import * as square from './api-functions/square'
 import { APIScheme } from './scheme'
+import * as square from './scheme/functions'
 export { oneAPIClient } from './client'
 
-const apiFunctions: Record<
-  APIScheme['request']['action'],
-  (data: any) => Promise<any>
-> = {
+const apiFunctions: Record<APIScheme['action'], (data: any) => Promise<any>> = {
   ...square,
 }
 
 export async function oneAPI<T extends APIScheme>(
-  request: T['request']
+  request: Omit<T, 'payload'>
 ): Promise<T['payload']> {
   const apiF = apiFunctions[request.action]
 
