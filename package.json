@@ -7,7 +7,7 @@
   "license": "MIT",
   "scripts": {
     "seed-lectures": "ts-node src/actions/seed-lectures.ts",
-    "test": "mocha -r build/test/**/*.spec.js",
+    "test": "mocha build/test/**/*.spec.js",
     "symlink": "node --harmony src/dev/symlink.js",
     "dev": "npm run clear && npm run dev:parallel",
     "dev:parallel": "npm-run-all --parallel build:watch type-check:watch:wait start:dev:watch:wait",
