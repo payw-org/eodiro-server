@@ -6,7 +6,11 @@
     "module": "commonjs",
     "outDir": "./build",
     "esModuleInterop": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "baseUrl": "../../../",
+    "paths": {
+      "@/*": ["./src/*"]
+    }
   },
   "exclude": ["node_modules", "build"]
 }
