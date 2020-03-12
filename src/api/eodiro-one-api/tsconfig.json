@@ -9,9 +9,7 @@
     "resolveJsonModule": true,
     "baseUrl": "../../../",
     "paths": {
-      "@/*": [
-        "./src/*"
-      ]
+      "@/*": ["./src/*"]
     }
   },
   "exclude": [
@@ -19,7 +17,7 @@
     "build",
     "index.ts",
     "**/functions.ts",
-    "**/*.f.ts",
+    "**/*.func.ts",
     "dev",
     "**/__TEST__"
   ]
