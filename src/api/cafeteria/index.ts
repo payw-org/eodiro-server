@@ -1,5 +1,5 @@
 import Db from '@/db'
-import { DbTables } from '@/db/constants'
+import { DbTables } from '@/db/utils/constants'
 import SqlB from '@/modules/sqlb'
 import { Campus } from '@/types'
 import dayjs from 'dayjs'

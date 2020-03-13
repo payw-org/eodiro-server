@@ -2,8 +2,8 @@ import Auth from '@/modules/auth'
 import SqlB from '@/modules/sqlb'
 import Time from '@/modules/time'
 import Db, { MysqlInsertOrUpdateResult } from './'
-import { DbTables } from './constants'
 import { ChangePasswordModel } from './models'
+import { DbTables } from './utils/constants'
 
 export default class ChangePassword {
   static async findWithUserId(userId: number): Promise<ChangePasswordModel> {
