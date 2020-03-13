@@ -37,19 +37,16 @@ class SqlBInstance<T = any> {
   private convert(data: number | string | undefined): number | string {
     let convertedData: number | string
 
-    switch (typeof data) {
-      case 'string':
-        convertedData = this.wrap(data, 'singleQuote')
-        break
-      case 'number':
-        convertedData = data
-        break
-      case 'undefined':
-        convertedData = '?'
-        break
-      default:
-        convertedData = data
-        break
+    if (typeof data === 'string') {
+      convertedData = this.wrap(data, 'singleQuote')
+    } else if (typeof data === 'number') {
+      convertedData = data
+    } else if (typeof data === 'undefined') {
+      convertedData = '?'
+    } else if (data === null) {
+      convertedData = 'NULL'
+    } else {
+      convertedData = 'NULL'
     }
 
     return convertedData
