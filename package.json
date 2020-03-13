@@ -6,7 +6,7 @@
   "author": "PAYW",
   "license": "MIT",
   "scripts": {
-    "seed-lectures": "node --harmony build/actions/seed-lectures.ts",
+    "seed-lectures": "node --harmony build/actions/seed-lectures.js",
     "test": "mocha build/test/**/*.spec.js",
     "refresh-db": "node src/dev/before-dev/refresh-db.js",
     "symlink": "node --harmony src/dev/symlink.js",
