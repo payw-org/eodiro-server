@@ -37,7 +37,7 @@ export default class Db {
 
       conn.query(query, values, (err, results, fields) => {
         if (err) {
-          console.error(err)
+          console.error(err.sqlMessage)
         }
         resolve([err, results, fields])
       })
