@@ -1,6 +1,6 @@
 import Db from '@/db'
-import ChangePassword from '@/db/change-password'
-import User from '@/db/user'
+import ChangePassword from '@/db/modules/change-password'
+import User from '@/db/modules/user'
 import Auth from '@/modules/auth'
 import { HttpStatusCode } from '@/modules/constants/http-status-code'
 import EodiroMailer from '@/modules/eodiro-mailer'

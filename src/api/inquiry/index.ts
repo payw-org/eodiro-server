@@ -1,5 +1,5 @@
-import Inquiry, { AnswerData, InquiryNew } from '@/db/inquiry'
 import { InquiryModel } from '@/db/models'
+import Inquiry, { AnswerData, InquiryNew } from '@/db/modules/inquiry'
 import Auth from '@/modules/auth'
 import EodiroMailer from '@/modules/eodiro-mailer'
 import express from 'express'

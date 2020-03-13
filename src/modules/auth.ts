@@ -1,5 +1,5 @@
 import Db from '@/db'
-import User, { UserId } from '@/db/user'
+import User, { UserId } from '@/db/modules/user'
 import EodiroEncrypt from '@/modules/eodiro-encrypt'
 import EodiroMailer from '@/modules/eodiro-mailer'
 import Jwt, { Payload } from '@/modules/jwt'

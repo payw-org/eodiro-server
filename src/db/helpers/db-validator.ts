@@ -1,8 +1,10 @@
 import Config from '@/config'
 import Db from '@/db'
-import { DbTableNames, DbTables } from '@/db/constants'
+import { SchemaModule } from '@/db/schema'
+import { DbTableNames, DbTables } from '@/db/utils/constants'
 import SqlB from '@/modules/sqlb'
 import chalk from 'chalk'
+import fs from 'fs'
 import {
   createAdminTable,
   createCafeteriaMenuTable,
@@ -88,4 +90,21 @@ export default async function dbValidator(): Promise<void> {
   await validateTable(DbTables.comment, createCommentTable)
   await validateTable(DbTables.inquiry, createInquiryTable)
   await validateTable(DbTables.change_password, createChangePasswordTable)
+
+  const schemaSources = fs
+    .readdirSync('./build/db/schema')
+    .filter((file) => file.endsWith('.schema.js'))
+  console.log(schemaSources)
+
+  schemaSources.forEach((file) => {
+    const schemaModule: SchemaModule = require(`../schema/${file}`)
+    const schemaName = file.replace(/.schema.js$/g, '')
+    const createSQL = schemaModule.sql
+    if (!createSQL) {
+      throw new Error(
+        `Create SQL of schema ${chalk.yellow(schemaName)} is not provied`
+      )
+    }
+    console.log(schemaName, createSQL)
+  })
 }
