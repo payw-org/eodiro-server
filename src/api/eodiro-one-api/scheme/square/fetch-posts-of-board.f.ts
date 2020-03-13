@@ -1,5 +1,6 @@
 import Db from '@/db'
 import SqlB from '@/modules/sqlb'
+import { ArrayUtil } from '@/modules/utils/array-util'
 import { DBSchema } from '../../db-schema'
 import { FetchPostsOfBoard } from './fetch-posts-of-board'
 
@@ -9,9 +10,15 @@ export async function fetchPostsOfBoard(
   const fromID = data?.fromID || 0
   const amount = data?.amount || 20
 
+  const trimmedPostFields = ArrayUtil.replace(
+    DBSchema.postFields,
+    'body',
+    'substring(body, 1, 100) as body'
+  )
+
   const sqlBInstance = SqlB()
     .select(
-      ...DBSchema.trimmedPostFields,
+      ...trimmedPostFields,
       SqlB()
         .select('count(*)')
         .from('comment')
