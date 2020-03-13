@@ -53,7 +53,7 @@ It uses MySQL internally as its database.
 
 Introducing a new way to create APIs on server side and to use them on client side.
 
-**One API** does not follow the traditional RESTy way. It has only **one** endpoint for all of its APIs. All you have to do is send a `post` request with an `action` and `data`.
+**One API** does not follow the traditional RESTful way. It has only **one** endpoint for all of its APIs. All you have to do is send a `post` request with an `action` and `data`.
 
 ```
 https://api2.eodiro.com/one
