@@ -1,36 +1,17 @@
 import Config from '@/config'
 import Db from '@/db'
-import { SchemaModule } from '@/db/schema'
-import { DbTableNames, DbTables } from '@/db/utils/constants'
+import { DbTableNames } from '@/db/utils/constants'
 import SqlB from '@/modules/sqlb'
+import { ArrayUtil } from '@/modules/utils/array-util'
 import chalk from 'chalk'
 import fs from 'fs'
-import {
-  createAdminTable,
-  createCafeteriaMenuTable,
-  createChangePasswordTable,
-  createCommentTable,
-  createCoverageCollegeTable,
-  createCoverageMajorLectureTable,
-  createCoverageMajorTable,
-  createInquiryTable,
-  createLectureTable,
-  createPendingUserTable,
-  createPeriodTable,
-  createPostTable,
-  createRefreshTokenTable,
-  createUserTable,
-} from '../models'
 
 const log = console.log
 
 const database =
   process.env.NODE_ENV === 'development' ? Config.DB_NAME_DEV : Config.DB_NAME
 
-async function validateTable(
-  tableName: DbTableNames,
-  createFunction: () => Promise<void>
-): Promise<boolean> {
+async function validateTable(tableName: DbTableNames): Promise<boolean> {
   const sql = SqlB()
     .select('*')
     .from('INFORMATION_SCHEMA.TABLES')
@@ -60,51 +41,97 @@ async function validateTable(
         'table'
       )} ] ${tableName}' doesn't exists`
     )
-    log(
-      `[ ${chalk.blue('↻')} ${chalk.cyan(
-        'table'
-      )} ] creating a table '${tableName}'`
-    )
-    await createFunction()
+
     return false
   }
+}
+
+async function createTable(
+  createSQL: string,
+  schemaName: string
+): Promise<boolean> {
+  log(
+    `[ ${chalk.blue('↻')} ${chalk.cyan(
+      'table'
+    )} ] creating a table '${schemaName}'`
+  )
+  const [err] = await Db.query(createSQL)
+
+  return !err
 }
 
 export default async function dbValidator(): Promise<void> {
   log(`[ ${chalk.green('db')} ] validating db '${database}'`)
 
-  await validateTable(DbTables.admin, createAdminTable)
-  await validateTable(DbTables.user, createUserTable)
-  await validateTable(DbTables.pending_user, createPendingUserTable)
-  await validateTable(DbTables.refresh_token, createRefreshTokenTable)
-  await validateTable(DbTables.coverage_college, createCoverageCollegeTable)
-  await validateTable(DbTables.coverage_major, createCoverageMajorTable)
-  await validateTable(DbTables.lecture, createLectureTable)
-  await validateTable(DbTables.period, createPeriodTable)
-  await validateTable(
-    DbTables.coverage_major_lecture,
-    createCoverageMajorLectureTable
-  )
-  await validateTable(DbTables.cafeteria_menu, createCafeteriaMenuTable)
-  await validateTable(DbTables.post, createPostTable)
-  await validateTable(DbTables.comment, createCommentTable)
-  await validateTable(DbTables.inquiry, createInquiryTable)
-  await validateTable(DbTables.change_password, createChangePasswordTable)
-
   const schemaSources = fs
-    .readdirSync('./build/db/schema')
-    .filter((file) => file.endsWith('.schema.js'))
-  console.log(schemaSources)
+    .readdirSync('./build/db/schema/create')
+    .filter((file) => file.endsWith('.js'))
 
-  schemaSources.forEach((file) => {
-    const schemaModule: SchemaModule = require(`../schema/${file}`)
-    const schemaName = file.replace(/.schema.js$/g, '')
-    const createSQL = schemaModule.sql
+  const processed: string[] = []
+  const queue: {
+    schemaName: string
+    references: string[]
+    createSQL: string
+  }[] = []
+
+  for (const file of schemaSources) {
+    const createSQL: string = require(`../schema/create/${file}`)
+    const schemaName = file.replace(/.js$/g, '')
+
     if (!createSQL) {
       throw new Error(
         `Create SQL of schema ${chalk.yellow(schemaName)} is not provied`
       )
     }
-    console.log(schemaName, createSQL)
-  })
+
+    const refRegExp = /REFERENCES ([a-z_]*)/g
+    const matchedAll = createSQL.matchAll(refRegExp)
+    let matched
+    const references: string[] = []
+    while ((matched = matchedAll.next().value)) {
+      references.push(matched[1])
+    }
+
+    const exist = await validateTable(schemaName as DbTableNames)
+
+    if (!exist) {
+      queue.push({
+        schemaName,
+        createSQL,
+        references,
+      })
+    }
+  }
+
+  let i = queue.length - 1
+  while (i >= 0) {
+    const q = queue[i]
+
+    if (q.references.length === 0) {
+      // No foreign keys
+      await createTable(q.createSQL, q.schemaName)
+      processed.push(q.schemaName)
+      queue.pop()
+      i -= 1
+    } else {
+      // Foreign keys
+      let allSet = true
+      for (const ref of q.references) {
+        if (!ArrayUtil.has(processed, ref)) {
+          allSet = false
+          break
+        }
+      }
+
+      if (allSet) {
+        await createTable(q.createSQL, q.schemaName)
+        processed.push(q.schemaName)
+        queue.pop()
+        i -= 1
+      } else {
+        const popped = queue.pop()
+        queue.unshift(popped)
+      }
+    }
+  }
 }
