@@ -11,7 +11,7 @@
  * please update the source "src/dev/refresh-db.js".
  */
 
-export interface RefreshToken {
+export type RefreshToken = {
   user_id: number
   token: string
   manually_changed_at: number

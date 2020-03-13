@@ -11,7 +11,7 @@
  * please update the source "src/dev/refresh-db.js".
  */
 
-export interface CafeteriaMenu {
+export type CafeteriaMenu = {
   campus: string
   served_at: string
   data: string

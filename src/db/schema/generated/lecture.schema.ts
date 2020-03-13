@@ -11,7 +11,7 @@
  * please update the source "src/dev/refresh-db.js".
  */
 
-export interface Lecture {
+export type Lecture = {
   id: number
   year: number
   semester: string

@@ -11,7 +11,7 @@
  * please update the source "src/dev/refresh-db.js".
  */
 
-export interface CoverageMajorLecture {
+export type CoverageMajorLecture = {
   lecture_id: number
   coverage_major: string
 }

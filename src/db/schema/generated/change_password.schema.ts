@@ -11,7 +11,7 @@
  * please update the source "src/dev/refresh-db.js".
  */
 
-export interface ChangePassword {
+export type ChangePassword = {
   token: string
   user_id: number
   requested_at: string
