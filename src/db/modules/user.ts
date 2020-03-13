@@ -5,7 +5,7 @@ import EodiroMailer from '@/modules/eodiro-mailer'
 import rng from '@/modules/random-name-generator'
 import SqlB from '@/modules/sqlb'
 import Time from '@/modules/time'
-import { DbTables } from './utils/constants'
+import { DbTables } from '../utils/constants'
 
 export type UserId = number
 

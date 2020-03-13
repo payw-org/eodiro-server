@@ -1,8 +1,8 @@
 import Db from '@/db'
 import { CommentModel } from '@/db/models'
-import Time from '@/modules/time'
-import User from '@/db/user'
+import User from '@/db/modules/user'
 import SqlB from '@/modules/sqlb'
+import Time from '@/modules/time'
 
 export interface PostModel {
   id: number

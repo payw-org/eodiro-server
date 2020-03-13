@@ -1,5 +1,5 @@
-import Comment from '@/db/comment'
-import Post, { PostNew, PostUpdate } from '@/db/post'
+import Comment from '@/db/modules/comment'
+import Post, { PostNew, PostUpdate } from '@/db/modules/post'
 import Auth from '@/modules/auth'
 import express from 'express'
 

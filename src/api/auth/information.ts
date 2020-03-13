@@ -1,4 +1,4 @@
-import User from '@/db/user'
+import User from '@/db/modules/user'
 import Auth from '@/modules/auth'
 import express from 'express'
 

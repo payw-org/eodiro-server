@@ -1,4 +1,4 @@
-import RefreshTokenTable from '@/db/refresh-token-table'
+import RefreshTokenTable from '@/db/modules/refresh-token-table'
 import Auth from '@/modules/auth'
 import Jwt from '@/modules/jwt'
 import express from 'express'

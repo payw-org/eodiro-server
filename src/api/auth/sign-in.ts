@@ -1,4 +1,4 @@
-import Admin from '@/db/admin'
+import Admin from '@/db/modules/admin'
 import Auth from '@/modules/auth'
 import Jwt from '@/modules/jwt'
 import express from 'express'

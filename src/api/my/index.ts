@@ -1,6 +1,6 @@
 import Db from '@/db'
 import { PostModel } from '@/db/models'
-import User from '@/db/user'
+import User from '@/db/modules/user'
 import Auth from '@/modules/auth'
 import SqlB from '@/modules/sqlb'
 import express from 'express'

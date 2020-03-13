@@ -1,7 +1,7 @@
 import Db from '@/db'
-import User from '@/db/user'
-import Time from '@/modules/time'
 import { NewComment } from '@/db/models'
+import User from '@/db/modules/user'
+import Time from '@/modules/time'
 
 export default class Comment {
   static isValidBody(body: string): boolean {
@@ -29,7 +29,7 @@ export default class Comment {
       userInfo.random_nickname,
       commentData.postId,
       commentData.body,
-      Time.getCurrTime()
+      Time.getCurrTime(),
     ]
     const [err] = await Db.query(query, values)
 
