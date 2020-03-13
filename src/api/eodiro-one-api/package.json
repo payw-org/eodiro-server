@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc -p tsconfig.one-api.json",
     "clear": "rm -f -r build/*",
     "clear-tsconfig-paths": "node --harmony dev/clear-tsconfig-paths.js",
     "append-tsconfig-paths": "node --harmony dev/append-tsconfig-paths.js",

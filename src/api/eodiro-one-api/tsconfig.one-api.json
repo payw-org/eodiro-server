@@ -6,18 +6,14 @@
     "module": "commonjs",
     "outDir": "./build",
     "esModuleInterop": true,
-    "resolveJsonModule": true,
-    "baseUrl": "../../../",
-    "paths": {
-      "@/*": ["./src/*"]
-    }
+    "resolveJsonModule": true
   },
   "exclude": [
     "node_modules",
     "build",
     "index.ts",
     "**/functions.ts",
-    "**/*.func.ts",
+    "**/*.f.ts",
     "dev",
     "**/__TEST__"
   ]
