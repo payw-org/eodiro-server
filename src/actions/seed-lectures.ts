@@ -1,4 +1,3 @@
-require('module-alias/register')
 import { boot } from '@/boot'
 import Config from '@/config'
 import timetableSeeder from '@/db/seeders/timetable-seeder'
