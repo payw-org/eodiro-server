@@ -7,4 +7,8 @@ export class ArrayUtil {
     const index = arr.indexOf(value)
     return index !== -1 ? arr.splice(index, 1, newValue) : arr
   }
+
+  static has(arr: any[], value: any): boolean {
+    return arr.indexOf(value) !== -1
+  }
 }
