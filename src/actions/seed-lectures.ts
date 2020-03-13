@@ -6,6 +6,7 @@ import argv from '@/dev/argv'
 import getSemester from '@/modules/get-semester'
 import { Semester } from '@/types'
 import { CTTS } from '@payw/cau-timetable-scraper'
+import chalk from 'chalk'
 import dayjs from 'dayjs'
 
 async function main(): Promise<void> {
@@ -29,7 +30,9 @@ async function main(): Promise<void> {
   const semester =
     (args.semester as Semester) || (args.s as Semester) || getSemester()
 
-  console.log(`Seeding lectures: ${year}, ${semester}`)
+  console.log(
+    `[ ${chalk.blue('seeding')} ] seeding lectures: ${year}, ${semester}`
+  )
 
   const lectures = await CTTS(
     {
@@ -44,7 +47,7 @@ async function main(): Promise<void> {
 
   await timetableSeeder(lectures)
 
-  console.log(`Done seeding lectures`)
+  console.log(`[ ${chalk.blue('seeding')} ] Done seeding lectures`)
 }
 
 main()
