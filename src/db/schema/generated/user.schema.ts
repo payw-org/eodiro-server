@@ -11,7 +11,7 @@
  * please update the source "src/dev/refresh-db.js".
  */
 
-export interface User {
+export type User = {
   id: number
   portal_id: string
   password: string

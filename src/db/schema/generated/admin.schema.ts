@@ -11,7 +11,7 @@
  * please update the source "src/dev/refresh-db.js".
  */
 
-export interface Admin {
+export type Admin = {
   user_id: number
 }
 

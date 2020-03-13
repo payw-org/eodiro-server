@@ -11,7 +11,7 @@
  * please update the source "src/dev/refresh-db.js".
  */
 
-export interface Period {
+export type Period = {
   lecture_id: number
   day: string
   start_h: number

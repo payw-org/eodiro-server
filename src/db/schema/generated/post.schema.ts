@@ -11,7 +11,7 @@
  * please update the source "src/dev/refresh-db.js".
  */
 
-export interface Post {
+export type Post = {
   id: number
   title: string
   body: string

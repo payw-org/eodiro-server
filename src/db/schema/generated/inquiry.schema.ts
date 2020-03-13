@@ -11,7 +11,7 @@
  * please update the source "src/dev/refresh-db.js".
  */
 
-export interface Inquiry {
+export type Inquiry = {
   id: number
   email: string
   title: string

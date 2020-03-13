@@ -104,7 +104,7 @@ dbSchemaFiles.forEach((file, i) => {
   const schemaTS = `
 ${msg}
 
-export interface ${pascalCase(schemaName)} {
+export type ${pascalCase(schemaName)} = {
   ${attrs.map((attr) => `${attr[0]}: ${attr[1]}`).join('\n')}
 }
 

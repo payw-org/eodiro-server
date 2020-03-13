@@ -11,7 +11,7 @@
  * please update the source "src/dev/refresh-db.js".
  */
 
-export interface Comment {
+export type Comment = {
   id: number
   body: string
   uploaded_at: string
