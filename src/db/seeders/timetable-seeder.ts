@@ -1,12 +1,7 @@
 import Db from '@/db'
-import {
-  CoverageMajorLectureModel,
-  LectureModel,
-  PeriodModel,
-} from '@/db/models'
+import { DBSchema } from '@/db/schema'
 import SqlB from '@/modules/sqlb'
 import { RefinedLectures } from '@payw/cau-timetable-scraper/build/src/types'
-import { v4 as uuidv4 } from 'uuid'
 
 export default async function(lectures: RefinedLectures): Promise<void> {
   console.log('🌱 Seeding lectures')
@@ -22,13 +17,26 @@ export default async function(lectures: RefinedLectures): Promise<void> {
   // Update college coverage data
   const coverageColleges = []
   const coverageMajors = []
-  const dbLectures: LectureModel[] = []
-  const dbPeriods: PeriodModel[] = []
-  const dbCoverageMajorLectures: CoverageMajorLectureModel[] = []
+  const dbLectures: DBSchema.Lecture[] = []
+  const dbPeriods: DBSchema.Period[] = []
+  const dbCoverageMajorLectures: DBSchema.CoverageMajorLecture[] = []
+
+  const [err, results] = await Db.query<{ maxID: number }[]>(
+    SqlB()
+      .select('max(id) as maxID')
+      .from('lecture')
+      .build()
+  )
+
+  if (err) {
+    throw err
+  }
+
+  let maxID = results[0].maxID || 0
 
   for (let i = 0; i < lectures.length; i += 1) {
     const lecture = lectures[i]
-    const lectureId = uuidv4()
+    const lectureId = ++maxID
 
     dbLectures.push({
       id: lectureId,
@@ -45,8 +53,8 @@ export default async function(lectures: RefinedLectures): Promise<void> {
       name: lecture.name,
       professor: lecture.professor,
       schedule: lecture.schedule,
-      building: lecture.building,
-      room: lecture.room,
+      building: Number(lecture.building) || null,
+      room: Number(lecture.room) || null,
       note: lecture.note,
     })
 
