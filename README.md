@@ -34,11 +34,71 @@ It uses MySQL internally as its database.
 - TSC
   - One API
 
+---
+
 ## API References
 
+**[One API](#One-API)**
+
+**Legacy APIs**
+
+- [Common](#Common)
 - [Lectures](#Lectures)
 - [Vacant](#Vacant)
 - [Cafeteria](#Cafeteria)
+
+---
+
+## One API
+
+Introducing a new way to create APIs on server side and to use them on client side.
+
+**One API** does not follow the traditional RESTy way. It has only **one** endpoint for all of its APIs. All you have to do is send a `post` request with an `action` and `data`.
+
+```
+https://api2.eodiro.com/one
+```
+
+### [One API Client](https://www.npmjs.com/package/@payw/eodiro-one-api)
+
+Another amazing thing is that the One API provides client side npm module ready to be used right now. Thanks to this module, you don't have to write duplicate type definitions or AJAX calls every time the new APIs are added. Just npm update and you're good to go.
+
+**Install**
+
+```zsh
+npm install @payw/eodiro-one-api
+```
+
+**Dependencies**
+
+- Axios
+
+**Usage**
+
+```ts
+import { oneAPIClient } from '@payw/eodiro-one-api/client'
+
+oneAPIClient<ActionType>(
+  action: 'actionName',
+  data: { ... }
+).then(payload => {
+  ...
+})
+```
+
+### [API References](https://github.com/paywteam/eodiro-api2/tree/master/src/api/eodiro-one-api/scheme)
+
+They are written in TypeScript interfaces.
+
+```ts
+export interface ActionType {
+  actions: 'actionName'
+  data: { ... }
+  payload: { ... }
+}
+```
+
+---
 
 ## Common
 
