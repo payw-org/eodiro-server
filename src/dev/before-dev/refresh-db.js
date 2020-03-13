@@ -4,6 +4,7 @@ const appRoot = require('app-root-path')
 const chalk = require('chalk')
 const prettierOptions = require('../../../.prettier.config')
 const { pascalCase, camelCase } = require('change-case')
+const clearDirectory = require('../clear-directory')
 
 let prettierOptionsTS = { ...prettierOptions }
 prettierOptionsTS.parser = 'typescript'
@@ -69,6 +70,9 @@ const dbSchemaGeneratedDir = './src/db/schema/generated'
 
 // index.ts for export all
 let indexTS = msg + '\n'
+
+// Clear directory before generation
+clearDirectory(dbSchemaGeneratedDir)
 
 // Loop through schema files
 dbSchemaFiles.forEach((file, i) => {
