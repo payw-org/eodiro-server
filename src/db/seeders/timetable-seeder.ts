@@ -105,9 +105,11 @@ export default async function(lectures: RefinedLectures): Promise<void> {
     }
   }
 
-  await Db.query(
-    sqlB.insertBulk(`coverage_college`, coverageColleges, true).build()
-  )
+  // TODO: delete table `coverage_college`
+
+  // await Db.query(
+  //   sqlB.insertBulk(`coverage_college`, coverageColleges, true).build()
+  // )
   await Db.query(
     sqlB.insertBulk(`coverage_major`, coverageMajors, true).build()
   )
