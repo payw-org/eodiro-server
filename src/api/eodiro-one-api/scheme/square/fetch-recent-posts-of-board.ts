@@ -7,7 +7,8 @@ export interface FetchRecentPostsOfBoard {
   action: 'fetchRecentPostsOfBoard'
   data: {
     boardID: number
-    mostlyRecentPostID: number
+    mostRecentPostID: number
+    noBody?: boolean
   }
   payload: DBSchema.Post[]
 }

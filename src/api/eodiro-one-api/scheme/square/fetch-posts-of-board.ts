@@ -4,9 +4,9 @@ export interface FetchPostsOfBoard {
   action: 'fetchPostsOfBoard'
   data: {
     boardID: number
-    fromID?: number
-    offset?: number
+    lastPostID?: number
     amount?: number
+    noBody?: boolean
   }
-  payload: DBSchema.Post[]
+  payload: (DBSchema.Post & { comment_count: number })[]
 }
