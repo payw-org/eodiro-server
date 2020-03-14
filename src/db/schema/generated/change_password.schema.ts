@@ -17,4 +17,6 @@ export type ChangePassword = {
   requested_at: string
 }
 
+export type ChangePasswords = ChangePassword[]
+
 export const changePasswordFields = ['token', 'user_id', 'requested_at']

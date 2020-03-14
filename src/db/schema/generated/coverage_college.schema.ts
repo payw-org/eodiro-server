@@ -15,4 +15,6 @@ export type CoverageCollege = {
   name: string
 }
 
+export type CoverageColleges = CoverageCollege[]
+
 export const coverageCollegeFields = ['name']

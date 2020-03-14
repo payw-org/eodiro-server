@@ -21,6 +21,8 @@ export type Comment = {
   random_nickname: string
 }
 
+export type Comments = Comment[]
+
 export const commentFields = [
   'id',
   'body',

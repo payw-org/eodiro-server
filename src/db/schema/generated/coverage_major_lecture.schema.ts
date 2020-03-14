@@ -16,4 +16,6 @@ export type CoverageMajorLecture = {
   coverage_major: string
 }
 
+export type CoverageMajorLectures = CoverageMajorLecture[]
+
 export const coverageMajorLectureFields = ['lecture_id', 'coverage_major']

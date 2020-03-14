@@ -31,6 +31,8 @@ export type Lecture = {
   note: string
 }
 
+export type Lectures = Lecture[]
+
 export const lectureFields = [
   'id',
   'year',

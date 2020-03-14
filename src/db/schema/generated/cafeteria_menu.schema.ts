@@ -17,4 +17,6 @@ export type CafeteriaMenu = {
   data: string
 }
 
+export type CafeteriaMenus = CafeteriaMenu[]
+
 export const cafeteriaMenuFields = ['campus', 'served_at', 'data']

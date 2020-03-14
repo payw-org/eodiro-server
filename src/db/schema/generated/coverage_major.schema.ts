@@ -16,4 +16,6 @@ export type CoverageMajor = {
   coverage_college: string
 }
 
+export type CoverageMajors = CoverageMajor[]
+
 export const coverageMajorFields = ['name', 'coverage_college']

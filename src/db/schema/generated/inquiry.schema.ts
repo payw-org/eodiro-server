@@ -22,6 +22,8 @@ export type Inquiry = {
   answered_at: string
 }
 
+export type Inquirys = Inquiry[]
+
 export const inquiryFields = [
   'id',
   'email',

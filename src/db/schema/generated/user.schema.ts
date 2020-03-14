@@ -21,6 +21,8 @@ export type User = {
   temp_password: string
 }
 
+export type Users = User[]
+
 export const userFields = [
   'id',
   'portal_id',

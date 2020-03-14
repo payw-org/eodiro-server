@@ -17,4 +17,6 @@ export type RefreshToken = {
   manually_changed_at: number
 }
 
+export type RefreshTokens = RefreshToken[]
+
 export const refreshTokenFields = ['user_id', 'token', 'manually_changed_at']
