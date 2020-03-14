@@ -15,4 +15,6 @@ export type Admin = {
   user_id: number
 }
 
+export type Admins = Admin[]
+
 export const adminFields = ['user_id']

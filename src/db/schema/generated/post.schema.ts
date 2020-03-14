@@ -22,6 +22,8 @@ export type Post = {
   random_nickname: string
 }
 
+export type Posts = Post[]
+
 export const postFields = [
   'id',
   'title',

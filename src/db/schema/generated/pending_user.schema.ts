@@ -21,6 +21,8 @@ export type PendingUser = {
   token: string
 }
 
+export type PendingUsers = PendingUser[]
+
 export const pendingUserFields = [
   'id',
   'portal_id',

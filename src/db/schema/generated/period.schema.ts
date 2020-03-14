@@ -20,6 +20,8 @@ export type Period = {
   end_m: number
 }
 
+export type Periods = Period[]
+
 export const periodFields = [
   'lecture_id',
   'day',

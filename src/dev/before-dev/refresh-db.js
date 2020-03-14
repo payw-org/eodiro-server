@@ -108,6 +108,8 @@ export type ${pascalCase(schemaName)} = {
   ${attrs.map((attr) => `${attr[0]}: ${attr[1]}`).join('\n')}
 }
 
+export type ${pascalCase(schemaName)}s = ${pascalCase(schemaName)}[]
+
 export const ${camelCase(schemaName)}Fields = [
 ${attrs.map((attr) => `'${attr[0]}'`).join(',\n')}
 ]
