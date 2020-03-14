@@ -7,18 +7,23 @@ import { FetchPostsOfBoard } from './fetch-posts-of-board'
 export async function fetchPostsOfBoard(
   data: FetchPostsOfBoard['data']
 ): Promise<FetchPostsOfBoard['payload']> {
-  const fromID = data?.fromID || 0
+  const fromID = data?.lastPostID || 0
   const amount = data?.amount || 20
+  const { noBody } = data
 
-  const trimmedPostFields = ArrayUtil.replace(
+  let fields = ArrayUtil.replace(
     DBSchema.postFields,
     'body',
     'substring(body, 1, 100) as body'
   )
 
+  if (noBody) {
+    fields = ArrayUtil.remove<string>(fields, 'body')
+  }
+
   const sqlBInstance = SqlB()
     .select(
-      ...trimmedPostFields,
+      ...fields,
       SqlB()
         .select('count(*)')
         .from('comment')
@@ -29,7 +34,7 @@ export async function fetchPostsOfBoard(
     .from('post')
 
   if (fromID) {
-    sqlBInstance.where(`id <= ${fromID}`)
+    sqlBInstance.where(`id < ${fromID}`)
   }
 
   sqlBInstance.order('id', 'desc').limit(amount)
