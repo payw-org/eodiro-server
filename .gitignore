@@ -9,4 +9,6 @@ build
 config/index.ts
 /storage
 data
+
+# Symlinks
 src/api/eodiro-one-api/db-schema
