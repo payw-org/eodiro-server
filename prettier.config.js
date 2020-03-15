@@ -1,5 +1,5 @@
 module.exports = {
-  parser: 'babel',
+  parser: 'typescript',
   singleQuote: true,
   tabWidth: 2,
   useTabs: false,
@@ -9,4 +9,4 @@ module.exports = {
   htmlWhitespaceSensitivity: 'ignore',
   quoteProps: 'preserve',
   trailingComma: 'es5',
-}
+};

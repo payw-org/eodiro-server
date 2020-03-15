@@ -2,12 +2,12 @@ const fs = require('fs')
 const prettier = require('prettier')
 const appRoot = require('app-root-path')
 const chalk = require('chalk')
-const prettierOptions = require('../../../.prettier.config')
+const prettierOptionsTS = require('../../../prettier.config')
 const { pascalCase, camelCase } = require('change-case')
 const clearDirectory = require('../clear-directory')
 
-let prettierOptionsTS = { ...prettierOptions }
-prettierOptionsTS.parser = 'typescript'
+let prettierOptions = { ...prettierOptionsTS }
+prettierOptions.parser = 'babel'
 
 // Update DB constants
 
