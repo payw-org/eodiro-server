@@ -22,7 +22,7 @@
     "type-check": "tsc --noEmit",
     "type-check:watch": "npm run type-check -- --watch",
     "type-check:watch:wait": "wait-on build/z.js && npm run type-check:watch",
-    "pm2-start": "if pm2 show eodiro-api2 ; then npm run pm2-stop && npm run pm2-delete && npm run pm2-start ; else npm run set-pkg-start && pm2 start build/src/main.js --name \"eodiro-api2\" ; fi",
+    "pm2-start": "if pm2 show eodiro-api2 ; then npm run pm2-stop && npm run pm2-delete && npm run pm2-start ; else pm2 start build/src/main.js --name \"eodiro-api2\" ; fi",
     "pm2-restart": "if pm2 show eodiro-api2 ; then pm2 restart eodiro-api2 ; else echo 'No PM2 instance for eodiro API 2' ; fi",
     "pm2-stop": "if pm2 show eodiro-api2 ; then pm2 stop eodiro-api2 ; else echo 'No PM2 instance for eodiro API 2' ; fi",
     "pm2-delete": "if pm2 show eodiro-api2 ; then pm2 delete eodiro-api2 ; else echo 'No PM2 instance for eodiro API 2' ; fi",
@@ -95,6 +95,7 @@
     "rimraf": "^3.0.2",
     "serve": "^11.3.0",
     "ts-node": "^8.6.2",
+    "tsconfig-paths": "^3.9.0",
     "typescript": "^3.8.3",
     "wait-on": "^4.0.1"
   }
