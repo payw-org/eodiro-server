@@ -1,6 +1,6 @@
 {
   "name": "@payw/eodiro-one-api",
-  "version": "1.0.0-alpha.14",
+  "version": "1.0.0-alpha.19",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -10,7 +10,8 @@
     "append-tsconfig-paths": "node --harmony dev/append-tsconfig-paths.js",
     "copy-packagejson": "cp package.json build",
     "pub": "npm publish build --access public",
-    "deploy": "npm run clear && npm run build && npm run copy-packagejson && npm run pub"
+    "deploy": "npm run clear && npm run refresh && npm run build && npm run copy-packagejson && npm run pub",
+    "refresh": "node dev/refresh"
   },
   "author": "PAYW",
   "license": "MIT"
