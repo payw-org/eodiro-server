@@ -1,13 +1,18 @@
+import { Payload } from '@/modules/jwt'
 import { APIScheme } from './scheme'
-import * as square from './scheme/functions'
+import * as funcs from './scheme/functions'
+import { OneAPIPayload } from './scheme/types/utils'
 
-const apiFunctions: Record<APIScheme['action'], (data: any) => Promise<any>> = {
-  ...square,
+const apiFunctions: Record<
+  APIScheme['action'],
+  (data: any, authPayload?: Payload) => Promise<any>
+> = {
+  ...funcs,
 }
 
 export async function oneAPI<T extends APIScheme>(
   request: Omit<T, 'payload'>
-): Promise<T['payload']> {
+): Promise<OneAPIPayload<T>> {
   const apiF = apiFunctions[request.action]
 
   if (!apiF) {

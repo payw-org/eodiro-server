@@ -23,6 +23,11 @@ eodiro API 2
 // Single end point for all APIs
 router.post('/one', async (req, res) => {
   const { action, data } = req.body
+  const { accesstoken } = req.headers
+
+  if (accesstoken) {
+    data.accessToken = accesstoken
+  }
 
   const payload = await oneAPI({
     action,
