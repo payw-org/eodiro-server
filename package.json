@@ -6,14 +6,17 @@
   "author": "PAYW",
   "license": "MIT",
   "scripts": {
+    "ts-node:prod": "ts-node -r tsconfig-paths/register",
     "ts-node": "cross-env NODE_ENV=development ts-node -r tsconfig-paths/register",
     "seed-lectures": "node --harmony build/actions/seed-lectures.js",
-    "test": "mocha -r ts-node/register -r tsconfig-paths/register src/test/**/*.spec.ts",
+    "test": "mocha -r ts-node/register -r tsconfig-paths/register src/**/*.spec.ts",
     "refresh-db": "node src/dev/before-dev/refresh-db.js",
     "symlink": "node --harmony src/dev/symlink.js",
     "prepare": "npm run refresh-db && npm run symlink",
     "predev": "npm run prepare",
-    "dev": "ts-node-dev -r tsconfig-paths/register --clear src/main.ts",
+    "dev": "npm-run-all --parallel dev-ts type-check:watch",
+    "dev-ts": "tsnd --no-notify --respawn --transpile-only -r tsconfig-paths/register src/main.ts",
+    "type-check:watch": "tsc --noEmit --watch",
     "prebuild": "npm run clear && npm run prepare",
     "build": " babel src --out-dir build --extensions '.ts,.js'",
     "start": "node --harmony build/main.js",
@@ -93,6 +96,7 @@
     "ts-node": "^8.7.0",
     "ts-node-dev": "^1.0.0-pre.44",
     "tsconfig-paths": "^3.9.0",
+    "tsmon": "^0.6.4",
     "typescript": "^3.8.3",
     "wait-on": "^4.0.1"
   }
