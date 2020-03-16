@@ -117,7 +117,10 @@ export default async function dbValidator(): Promise<void> {
       // Foreign keys
       let allSet = true
       for (const ref of q.references) {
-        if (!ArrayUtil.has(processed, ref)) {
+        if (
+          !ArrayUtil.has(processed, ref) &&
+          !(await validateTable(ref as DbTableNames))
+        ) {
           allSet = false
           break
         }
