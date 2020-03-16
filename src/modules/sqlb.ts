@@ -192,50 +192,64 @@ class SqlBInstance<T = any> {
 
   notEqual(attr: keyof T, value: number | string): SqlBInstance<T> {
     this.append(`${attr} != ${this.convert(value)}`)
-
     return this
   }
 
   andNotEqual(attr: keyof T, value: number | string): SqlBInstance<T> {
     this.and()
     this.notEqual(attr, value)
-
     return this
   }
 
+  /** attr >= value */
   equalOrMore(attr: keyof T, value: number | string): SqlBInstance<T> {
     this.append(`${attr} >= ${this.convert(value)}`)
-
+    return this
+  }
+  /** AND attr >= value */
+  andEqualOrMore(attr: keyof T, value: number | string): SqlBInstance<T> {
+    this.and()
+    this.equalOrMore(attr, value)
     return this
   }
 
+  /** attr <= value */
   equalOrLess(attr: keyof T, value: number | string): SqlBInstance<T> {
     this.append(`${attr} <= ${this.convert(value)}`)
-
+    return this
+  }
+  /** AND attr <= value */
+  andEqualOrLess(attr: keyof T, value: number | string): SqlBInstance<T> {
+    this.and()
+    this.equalOrLess(attr, value)
     return this
   }
 
+  /** attr > value */
   more(attr: keyof T, value: number | string): SqlBInstance<T> {
     this.append(`${attr} > ${this.convert(value)}`)
-
+    return this
+  }
+  /** AND attr > value */
+  andMore(attr: keyof T, value: number | string): SqlBInstance<T> {
+    this.and()
+    this.more(attr, value)
     return this
   }
 
+  /** attr < value */
   less(attr: keyof T, value: number | string): SqlBInstance<T> {
     this.append(`${attr} < ${this.convert(value)}`)
-
     return this
   }
 
   group(by: keyof T): SqlBInstance<T> {
     this.append(`GROUP BY ${by}`)
-
     return this
   }
 
   order(attr: keyof T, direction: Order = 'asc'): SqlBInstance<T> {
     this.append(`ORDER BY ${attr} ${direction.toUpperCase()}`)
-
     return this
   }
 
@@ -253,22 +267,14 @@ class SqlBInstance<T = any> {
   }
 
   limit(amount: number, offset?: number): SqlBInstance<T> {
-    if (!amount) {
-      return this
-    }
-
-    this.append(`LIMIT ${amount}`)
-
-    if (offset) {
-      this.append(`OFFSET ${offset}`)
-    }
-
+    if (!amount) return this
+    this.append(`LIMIT ${this.convert(amount)}`)
+    if (offset) this.append(`OFFSET ${this.convert(offset)}`)
     return this
   }
 
   like(column: keyof T, keyword: string): SqlBInstance<T> {
-    this.append(`${column} LIKE '${keyword}'`)
-
+    this.append(`${column} LIKE ${this.convert(keyword)}`)
     return this
   }
 
