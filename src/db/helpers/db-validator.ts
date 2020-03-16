@@ -5,6 +5,7 @@ import SqlB from '@/modules/sqlb'
 import { ArrayUtil } from '@/modules/utils/array-util'
 import chalk from 'chalk'
 import fs from 'fs'
+import path from 'path'
 
 const log = console.log
 
@@ -64,7 +65,7 @@ export default async function dbValidator(): Promise<void> {
   log(`[ ${chalk.green('db')} ] validating db '${database}'`)
 
   const schemaSources = fs
-    .readdirSync('./build/db/schema/create')
+    .readdirSync(path.resolve(__dirname, '../schema/create'))
     .filter((file) => file.endsWith('.js'))
 
   const processed: string[] = []
