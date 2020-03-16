@@ -14,6 +14,8 @@
     "index.ts",
     "**/functions.ts",
     "**/*.f.ts",
+    "**/*.spec.ts",
+    "**/*.test.ts",
     "dev",
     "**/__TEST__"
   ]
