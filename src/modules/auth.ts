@@ -5,7 +5,7 @@ import EodiroMailer from '@/modules/eodiro-mailer'
 import Jwt, { Payload } from '@/modules/jwt'
 import crypto from 'crypto'
 import Mustache from 'mustache'
-import joinEmailTemplate from '../modules/eodiro-mailer/templates/join.html'
+import joinEmailTemplate from './eodiro-mailer/templates/join'
 
 export interface SignInInfo {
   portalId: string
