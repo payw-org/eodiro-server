@@ -77,11 +77,6 @@ export default class DbConnector {
   }
 
   static getConnConfident(): mysql.Connection {
-    if (!this.connection) {
-      throw new Error(
-        `You are trying to use a DB connection without its initializtion. Try to bootstrap the app before using the connection.`
-      )
-    }
-    return this.connection
+    return this.connection || mysql.createConnection({})
   }
 }

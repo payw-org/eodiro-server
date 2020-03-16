@@ -1,6 +1,6 @@
 import SqlB from '@/modules/sqlb'
-import { describe, it } from 'mocha'
 import { expect } from 'chai'
+import { describe, it } from 'mocha'
 
 describe('Test SqlB', () => {
   const sqlB = SqlB()
@@ -88,5 +88,22 @@ describe('Test SqlB', () => {
         .where('id = ?')
         .build()
     ).to.equal('DELETE FROM post WHERE id = ?')
+  })
+})
+
+describe('Test SQL Injections', () => {
+  it('Prevent sign in bypass', () => {
+    const sql = SqlB()
+      .select('*')
+      .from('users')
+      .where(
+        SqlB()
+          .equal('username', 'admin')
+          .andEqual('password', `password' OR 1=1 --`)
+      )
+      .build()
+    expect(sql).not.equal(
+      `SELECT * FROM users WHERE username = 'admin' AND password = 'password' OR 1=1 --`
+    )
   })
 })

@@ -1,15 +1,21 @@
+import mysql from 'mysql'
 import sqlFormatter from 'sql-formatter'
-import DbConnector from './db-connector'
 
 type Order = 'ASC' | 'asc' | 'DESC' | 'desc'
 
 class SqlBInstance<T = any> {
   private q = ''
 
+  /**
+   * Add a space at the end
+   */
   private space(): void {
     this.q = this.q ? this.q.concat(' ') : this.q
   }
 
+  /**
+   * Append
+   */
   private append(appendingQuery: string): void {
     this.space()
     this.q = this.q.concat(appendingQuery)
@@ -35,9 +41,12 @@ class SqlBInstance<T = any> {
     return text.replace(/"/g, "'")
   }
 
+  /**
+   * Convert `undefined` to '?' and escape others
+   */
   private convert(data: number | string | undefined): number | string {
     let convertedData: number | string
-    const escaped = DbConnector.getConnConfident().escape(data)
+    const escaped = mysql.createConnection({}).escape(data)
 
     if (typeof data === 'undefined') {
       convertedData = '?'
@@ -56,6 +65,9 @@ class SqlBInstance<T = any> {
     return built
   }
 
+  /**
+   * Format the output. Use this after `build()`.
+   */
   format(): SqlBInstance<T> {
     this.q = sqlFormatter.format(this.q)
 
@@ -343,17 +355,13 @@ class SqlBInstance<T = any> {
 
   and(sql?: SqlBInstance<T>): SqlBInstance<T> {
     this.append(`AND`)
-    if (sql instanceof SqlBInstance) {
-      this.append(sql.build())
-    }
+    if (sql instanceof SqlBInstance) this.append(sql.build())
     return this
   }
 
   or(sql?: SqlBInstance<T>): SqlBInstance<T> {
     this.append(`OR`)
-    if (sql instanceof SqlBInstance) {
-      this.append(sql.build())
-    }
+    if (sql instanceof SqlBInstance) this.append(sql.build())
     return this
   }
 }
