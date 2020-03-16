@@ -30,7 +30,7 @@ export async function fetchRecentPostsOfBoard(
         .build()
     )
     .from('post')
-    .where('id >= ?')
+    .where('id > ?')
     .order('id', 'DESC')
     .build()
   const values = [mostRecentPostID]
