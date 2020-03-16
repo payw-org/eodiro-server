@@ -5,7 +5,6 @@ import { RefinedLectures } from '@payw/cau-timetable-scraper/build/src/types'
 
 export default async function(lectures: RefinedLectures): Promise<void> {
   console.log('🌱 Seeding lectures')
-  // const lectures: Lectures = lecturesJson
   const sqlB = SqlB()
 
   const firstLecture = lectures[0]
@@ -15,7 +14,6 @@ export default async function(lectures: RefinedLectures): Promise<void> {
   }
 
   // Update college coverage data
-  const coverageColleges = []
   const coverageMajors = []
   const dbLectures: DBSchema.Lecture[] = []
   const dbPeriods: DBSchema.Period[] = []
@@ -75,15 +73,6 @@ export default async function(lectures: RefinedLectures): Promise<void> {
     for (let j = 0; j < lecture.coverages.length; j += 1) {
       const coverage = lecture.coverages[j]
       if (
-        coverageColleges.findIndex((item) => {
-          return item?.name === coverage.college
-        }) === -1
-      ) {
-        coverageColleges.push({
-          name: coverage.college,
-        })
-      }
-      if (
         coverageMajors.findIndex((item) => {
           return item?.name === coverage.major
         }) === -1
@@ -105,11 +94,6 @@ export default async function(lectures: RefinedLectures): Promise<void> {
     }
   }
 
-  // TODO: delete table `coverage_college`
-
-  // await Db.query(
-  //   sqlB.insertBulk(`coverage_college`, coverageColleges, true).build()
-  // )
   await Db.query(
     sqlB.insertBulk(`coverage_major`, coverageMajors, true).build()
   )
