@@ -1,4 +1,5 @@
 import sqlFormatter from 'sql-formatter'
+import DbConnector from './db-connector'
 
 type Order = 'ASC' | 'asc' | 'DESC' | 'desc'
 
@@ -36,17 +37,14 @@ class SqlBInstance<T = any> {
 
   private convert(data: number | string | undefined): number | string {
     let convertedData: number | string
+    const escaped = DbConnector.getConnConfident().escape(data)
 
-    if (typeof data === 'string') {
-      convertedData = this.wrap(data, 'singleQuote')
-    } else if (typeof data === 'number') {
-      convertedData = data
-    } else if (typeof data === 'undefined') {
+    if (typeof data === 'undefined') {
       convertedData = '?'
     } else if (data === null) {
       convertedData = 'NULL'
     } else {
-      convertedData = 'NULL'
+      convertedData = escaped
     }
 
     return convertedData
@@ -257,7 +255,7 @@ class SqlBInstance<T = any> {
   }
 
   like(column: keyof T, keyword: string): SqlBInstance<T> {
-    this.append(`${column} like '${keyword}'`)
+    this.append(`${column} LIKE '${keyword}'`)
 
     return this
   }

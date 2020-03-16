@@ -9,8 +9,8 @@ const router = express.Router()
 
 router.get('/cafeteria/:servedAt/:campus/menus', async (req, res) => {
   const now = dayjs()
-  const campus: Campus = (Db.escape(req.params?.campus) as Campus) || '서울'
-  const servedAt = Db.escape(req.params?.servedAt) || now.format('YYYY-MM-DD')
+  const campus: Campus = (req.params?.campus as Campus) || '서울'
+  const servedAt = req.params?.servedAt || now.format('YYYY-MM-DD')
   const sql = SqlB()
     .select('data')
     .from(DbTables.cafeteria_menu)
