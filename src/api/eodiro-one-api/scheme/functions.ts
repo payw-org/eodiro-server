@@ -11,7 +11,7 @@
  * please update the source "dev/refresh.js".
  */
 
-export { fetchCommentsOfPost } from './square/fetch-comments-of-post.f'
+export { getCommentsOfPost } from './square/comment/get-comments-of-post.f'
 export { fetchPostsOfBoard } from './square/fetch-posts-of-board.f'
 export { fetchRecentPostsOfBoard } from './square/fetch-recent-posts-of-board.f'
 export { getPostById } from './square/get-post-by-id.f'

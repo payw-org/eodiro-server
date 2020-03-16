@@ -11,8 +11,8 @@
  * please update the source "dev/refresh.js".
  */
 
-import { FetchCommentsOfPost } from './square/fetch-comments-of-post'
-export { FetchCommentsOfPost } from './square/fetch-comments-of-post'
+import { GetCommentsOfPost } from './square/comment/get-comments-of-post'
+export { GetCommentsOfPost } from './square/comment/get-comments-of-post'
 import { FetchPostsOfBoard } from './square/fetch-posts-of-board'
 export { FetchPostsOfBoard } from './square/fetch-posts-of-board'
 import { FetchRecentPostsOfBoard } from './square/fetch-recent-posts-of-board'
@@ -23,7 +23,7 @@ import { UploadPost } from './square/upload-post'
 export { UploadPost } from './square/upload-post'
 
 export type APIScheme =
-  | FetchCommentsOfPost
+  | GetCommentsOfPost
   | FetchPostsOfBoard
   | FetchRecentPostsOfBoard
   | GetPostById
