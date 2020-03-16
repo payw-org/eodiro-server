@@ -7,6 +7,7 @@ import { Semester } from '@/types'
 import { CTTS } from '@payw/cau-timetable-scraper'
 import chalk from 'chalk'
 import dayjs from 'dayjs'
+import fs from 'fs'
 
 async function main(): Promise<void> {
   const args = argv<{
@@ -15,6 +16,7 @@ async function main(): Promise<void> {
     semester: string
     s: string
     D: undefined
+    file: string
   }>()
 
   const isDev = 'D' in args
@@ -33,16 +35,28 @@ async function main(): Promise<void> {
     `[ ${chalk.blue('seeding')} ] seeding lectures: ${year}, ${semester}`
   )
 
-  const lectures = await CTTS(
-    {
-      id: Config.CAU_ID,
-      pw: Config.CAU_PW,
-    },
-    {
-      year,
-      semester,
-    }
-  )
+  let lectures
+
+  if (args.file) {
+    lectures = JSON.parse(fs.readFileSync(args.file, 'utf8'))
+    console.log(lectures)
+  } else {
+    lectures = await CTTS(
+      {
+        id: Config.CAU_ID,
+        pw: Config.CAU_PW,
+      },
+      {
+        year,
+        semester,
+      }
+    )
+
+    fs.writeFileSync(
+      `data/lectures-${year}-${semester}.json`,
+      JSON.stringify(lectures, null, 2)
+    )
+  }
 
   await timetableSeeder(lectures)
 
