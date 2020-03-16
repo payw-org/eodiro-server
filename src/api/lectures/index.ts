@@ -24,16 +24,16 @@ const lectureAttrs = [
 ]
 
 router.get('/lectures/:year/:semester/:campus/list', async (req, res) => {
-  const year = parseInt(Db.escape(req.params?.year))
-  const semester = Db.escape(req.params?.semester)
-  const campus = Db.escape(req.params?.campus)
+  const year = parseInt(req.params?.year)
+  const semester = req.params?.semester
+  const campus = req.params?.campus
   const amount = parseInt(req.query?.amount) || 20
   const offset = parseInt(req.query?.offset) || 0
 
   const query = SqlB()
     .select(...lectureAttrs)
     .from('lecture')
-    .where(`year=${year} AND semester='${semester}' AND campus='${campus}'`)
+    .where(`year=? AND semester=? AND campus=?`)
     .multiOrder([
       ['name', 'ASC'],
       ['professor', 'ASC'],
@@ -41,7 +41,7 @@ router.get('/lectures/:year/:semester/:campus/list', async (req, res) => {
     ])
     .limit(amount, offset)
     .build()
-  const [err, results] = await Db.query(query)
+  const [err, results] = await Db.query(query, [year, semester, campus])
 
   if (err) {
     res.sendStatus(500)
@@ -52,10 +52,10 @@ router.get('/lectures/:year/:semester/:campus/list', async (req, res) => {
 })
 
 router.get('/lectures/:year/:semester/:campus/search', async (req, res) => {
-  const year = parseInt(Db.escape(req.params?.year))
-  const semester = Db.escape(req.params?.semester)
-  const campus = Db.escape(req.params?.campus)
-  const searchKeyword = Db.escape(req.query?.q)
+  const year = parseInt(req.params?.year)
+  const semester = req.params?.semester
+  const campus = req.params?.campus
+  const searchKeyword = req.query?.q
   const amount = parseInt(req.query?.amount) || 20
   const offset = parseInt(req.query?.offset) || 0
 
@@ -63,7 +63,7 @@ router.get('/lectures/:year/:semester/:campus/search', async (req, res) => {
     SqlB()
       .select(...lectureAttrs)
       .from('lecture')
-      .where(`year=${year} AND semester='${semester}' AND campus='${campus}'`)
+      .where(`year=? AND semester=? AND campus=?`)
       .and()
       .like('college', `%${searchKeyword}%`)
       .or()
@@ -80,7 +80,8 @@ router.get('/lectures/:year/:semester/:campus/search', async (req, res) => {
         ['schedule', 'ASC'],
       ])
       .limit(amount, offset)
-      .build()
+      .build(),
+    [year, semester, campus]
   )
 
   if (err) {

@@ -1,4 +1,3 @@
-import Db from '@/db'
 import ChangePassword from '@/db/modules/change-password'
 import User from '@/db/modules/user'
 import Auth from '@/modules/auth'
@@ -40,7 +39,7 @@ router.post('/change-password', async (req, res) => {
 })
 
 router.get('/change-password', async (req, res) => {
-  const token = Db.escape(req.body.token)
+  const token = req.body.token
   const request = await ChangePassword.findWithToken(token)
 
   if (request === false) {
@@ -57,8 +56,8 @@ router.get('/change-password', async (req, res) => {
 })
 
 router.patch('/change-password', async (req, res) => {
-  const token = Db.escape(req.body.token)
-  const newPassword = Db.escape(req.body.newPassword)
+  const token = req.body.token
+  const newPassword = req.body.newPassword
 
   const changePasswordRequest = await ChangePassword.findWithToken(token)
 

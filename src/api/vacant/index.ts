@@ -1,8 +1,8 @@
-import express from 'express'
 import Db from '@/db'
+import dayIndexToString from '@/modules/day-index-to-string'
 import SqlB from '@/modules/sqlb'
 import dayjs from 'dayjs'
-import dayIndexToString from '@/modules/day-index-to-string'
+import express from 'express'
 
 const router = express.Router()
 
@@ -10,15 +10,15 @@ router.get('/vacant/:year/:semester/:campus/buildings', async (req, res) => {
   const now = dayjs()
 
   // Queries
-  const hour = parseInt(Db.escape(req.query?.hour)) || now.hour()
-  const minute = parseInt(Db.escape(req.query?.minute)) || now.minute()
+  const hour = parseInt(req.query?.hour) || now.hour()
+  const minute = parseInt(req.query?.minute) || now.minute()
   const today = dayIndexToString(now.day())
-  const day = Db.escape(req.query?.day) || today
+  const day = req.query?.day || today
 
   // Params
-  const year = Db.escape(req.params?.year)
-  const semester = Db.escape(req.params?.semester)
-  const campus = Db.escape(req.params?.campus)
+  const year = req.params?.year
+  const semester = req.params?.semester
+  const campus = req.params?.campus
 
   // Find total classrooms number
   const q1 = SqlB()
@@ -148,13 +148,13 @@ router.get(
 
     // Queries
     const today = dayIndexToString(now.day())
-    const day = Db.escape(req.query?.day) || today
+    const day = req.query?.day || today
 
     // Params
-    const year = Db.escape(req.params?.year)
-    const semester = Db.escape(req.params?.semester)
-    const campus = Db.escape(req.params?.campus)
-    const building = Db.escape(req.params?.building)
+    const year = req.params?.year
+    const semester = req.params?.semester
+    const campus = req.params?.campus
+    const building = req.params?.building
 
     const q1 = SqlB()
       .select('*')
