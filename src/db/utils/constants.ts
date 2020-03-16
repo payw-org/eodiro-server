@@ -16,7 +16,6 @@ export type DbTableNames =
   | 'cafeteria_menu'
   | 'change_password'
   | 'comment'
-  | 'coverage_college'
   | 'coverage_major'
   | 'coverage_major_lecture'
   | 'inquiry'
@@ -32,7 +31,6 @@ export const DbTables: Record<DbTableNames, DbTableNames> = {
   cafeteria_menu: 'cafeteria_menu',
   change_password: 'change_password',
   comment: 'comment',
-  coverage_college: 'coverage_college',
   coverage_major: 'coverage_major',
   coverage_major_lecture: 'coverage_major_lecture',
   inquiry: 'inquiry',
