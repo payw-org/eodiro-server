@@ -1,3 +1,4 @@
+export default `
 <div
   class="join-body"
   style="
@@ -107,3 +108,4 @@
     </a>
   </div>
 </div>
+`
