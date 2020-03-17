@@ -5,7 +5,10 @@ export class ArrayUtil {
 
   static replace<T = any>(arr: T[], value: T, newValue: T): T[] {
     const index = arr.indexOf(value)
-    return index !== -1 ? arr.splice(index, 1, newValue) : arr
+    if (index !== -1) {
+      arr.splice(index, 1, newValue)
+    }
+    return arr
   }
 
   static has<T = any>(arr: T[], value: T): boolean {
