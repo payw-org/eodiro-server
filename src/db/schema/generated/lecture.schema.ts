@@ -27,7 +27,7 @@ export type Lecture = {
   professor: string
   schedule: string
   building: number
-  room: number
+  room: string
   note: string
 }
 
