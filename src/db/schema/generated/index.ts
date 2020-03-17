@@ -12,6 +12,7 @@
  */
 
 export * from './admin.schema'
+export * from './board.schema'
 export * from './cafeteria_menu.schema'
 export * from './change_password.schema'
 export * from './comment.schema'

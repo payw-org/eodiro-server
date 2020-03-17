@@ -13,6 +13,7 @@
 
 export type DbTableNames =
   | 'admin'
+  | 'board'
   | 'cafeteria_menu'
   | 'change_password'
   | 'comment'
@@ -28,6 +29,7 @@ export type DbTableNames =
 
 export const DbTables: Record<DbTableNames, DbTableNames> = {
   admin: 'admin',
+  board: 'board',
   cafeteria_menu: 'cafeteria_menu',
   change_password: 'change_password',
   comment: 'comment',

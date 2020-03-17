@@ -13,6 +13,7 @@
 
 export type Post = {
   id: number
+  board_id: number
   title: string
   body: string
   user_id: number
@@ -26,6 +27,7 @@ export type Posts = Post[]
 
 export const postFields = [
   'id',
+  'board_id',
   'title',
   'body',
   'user_id',
