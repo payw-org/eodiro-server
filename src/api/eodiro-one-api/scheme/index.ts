@@ -22,9 +22,13 @@ export { UploadPost } from './square/upload-post'
 import { Interface as GetCommentsRaw } from './square/get-comments.action/interface'
 export type GetComments = GetCommentsRaw & { action: 'getComments' }
 
+import { Interface as UploadCommentRaw } from './square/upload-comment.action/interface'
+export type UploadComment = UploadCommentRaw & { action: 'uploadComment' }
+
 export type APIScheme =
   | FetchPostsOfBoard
   | FetchRecentPostsOfBoard
   | GetPostById
   | UploadPost
   | GetComments
+  | UploadComment
