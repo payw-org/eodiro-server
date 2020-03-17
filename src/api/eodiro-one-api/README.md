@@ -38,10 +38,10 @@ export interface Interface {
 
 ### Function
 
-It exports a default function where it gets request data as an argument and returns the payload.
+It exports a default async function where it gets request data as an argument and returns the payload.
 
 ```ts
-export default function(data: Interface['data']): Interface['payload'] {
+export default async function(data: Interface['data']): Promise<Interface['payload']> {
   // do something
   // ...
 
