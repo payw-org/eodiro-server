@@ -86,17 +86,7 @@ oneAPIClient<ActionType>(
 })
 ```
 
-### [API References](https://github.com/paywteam/eodiro-api2/tree/master/src/api/eodiro-one-api/scheme)
-
-They are written in TypeScript interfaces.
-
-```ts
-export interface ActionType {
-  actions: 'actionName'
-  data: { ... }
-  payload: { ... }
-}
-```
+### [Development Guide](https://github.com/paywteam/eodiro-api2/tree/master/src/api/eodiro-one-api)
 
 ---
 
