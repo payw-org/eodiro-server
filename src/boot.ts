@@ -16,18 +16,11 @@ export async function boot(options: {
   db?: boolean
   mail?: boolean
   bot?: boolean
-  isDev: boolean
   listen?: boolean
 }): Promise<http.Server> {
-  const {
-    db = false,
-    mail = false,
-    bot = false,
-    isDev = true,
-    listen = true,
-  } = options
+  const { db = false, mail = false, bot = false, listen = true } = options
 
-  if (isDev) {
+  if (process.env.NODE_ENV === 'development') {
     log(`[ ${chalk.gray('mode')} ] ${chalk.blueBright('development')} mode`)
     process.env.NODE_ENV = 'development'
   } else {
@@ -87,7 +80,8 @@ export async function boot(options: {
 
   // Open the gate
   if (listen) {
-    const port = isDev ? Config.DEV_PORT : Config.PORT
+    const port =
+      process.env.NODE_ENV === 'development' ? Config.DEV_PORT : Config.PORT
     const server = app.listen(port, () => {
       log(`[ ${chalk.magenta('server')} ] listening on port ${port}`)
     })
