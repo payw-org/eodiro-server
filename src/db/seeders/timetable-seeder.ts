@@ -52,7 +52,7 @@ export default async function(lectures: RefinedLectures): Promise<void> {
       professor: lecture.professor,
       schedule: lecture.schedule,
       building: Number(lecture.building) || null,
-      room: Number(lecture.room) || null,
+      room: lecture.room || null,
       note: lecture.note,
     })
 
