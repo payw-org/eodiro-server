@@ -8,7 +8,7 @@
   "scripts": {
     "ts-node:prod": "ts-node -r tsconfig-paths/register",
     "ts-node": "cross-env NODE_ENV=development ts-node -r tsconfig-paths/register",
-    "seed-lectures": "node --harmony build/actions/seed-lectures.js",
+    "seed-lectures": "ts-node -r tsconfig-paths/register src/actions/seed-lectures.ts",
     "test": "mocha -r ts-node/register -r tsconfig-paths/register src/**/*.spec.ts",
     "refresh-db": "node src/dev/before-dev/refresh-db.js",
     "symlink": "node --harmony src/dev/symlink.js",
