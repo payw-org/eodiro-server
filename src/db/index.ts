@@ -1,4 +1,5 @@
 import DbConnector from '@/modules/db-connector'
+import { SqlBInstance } from '@/modules/sqlb'
 import { FieldInfo, MysqlError } from 'mysql'
 
 export type MysqlResult = any[] | Record<string, any>
@@ -18,6 +19,9 @@ export type QueryValues = (string | number)[] | string | number
 
 export default class Db {
   static query<ResultType = MysqlResult>(
+    query: SqlBInstance
+  ): Promise<MysqlQueryReturn<ResultType>>
+  static query<ResultType = MysqlResult>(
     query: string
   ): Promise<MysqlQueryReturn<ResultType>>
   static query<ResultType = MysqlResult>(
@@ -25,7 +29,7 @@ export default class Db {
     values: QueryValues
   ): Promise<MysqlQueryReturn<ResultType>>
   static query<ResultType = MysqlResult>(
-    query: string,
+    query: string | SqlBInstance,
     values?: QueryValues
   ): Promise<MysqlQueryReturn<ResultType>> {
     return new Promise(async (resolve) => {
@@ -33,6 +37,11 @@ export default class Db {
 
       if (!values) {
         values = null
+      }
+
+      // Build SqlB
+      if (query instanceof SqlBInstance) {
+        query = query.build()
       }
 
       conn.query(query, values, (err, results, fields) => {
