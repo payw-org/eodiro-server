@@ -28,7 +28,7 @@ export async function oneAPIClient<T extends APIScheme>(
   } catch (err) {
     console.error(err)
     if (typeof window !== 'undefined') {
-      window.alert('서버와 연결할 수 없습니다.')
+      window.alert('[One API] 서버와 연결할 수 없습니다.')
     }
     throw err
   }

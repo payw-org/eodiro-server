@@ -1,5 +1,7 @@
 const fs = require('fs')
+const util = require('util')
 const glob = require('glob')
+const globAsync = util.promisify(glob)
 const path = require('path')
 const prettier = require('prettier')
 const prettierRC = require('../../../../prettier.config')
@@ -52,17 +54,55 @@ function exportFunction(fTSPath) {
   return `export { ${funcName} } from '${pathWithoutExt}'`
 }
 
-glob('scheme/**/*.f.ts', {}, (err, files) => {
-  files = files.map((file) => file.replace(/^scheme/g, '.'))
+;(async () => {
+  // New method interfaces
+  const interfacesPaths = (
+    await globAsync('scheme/**/*.action/interface.ts')
+  ).map((path) => path.replace(/^scheme/g, '.'))
+  let interfacesNames = []
+  let importStmts = []
+  interfacesPaths.forEach((path) => {
+    const name = pascalCase(/([a-z-]*)\.action\/interface.ts$/g.exec(path)[1])
+    interfacesNames.push(name)
+    const pathWithoutExt = path.replace(/\.ts$/g, '')
+    const stmt = `import { Interface as ${name}Raw } from '${pathWithoutExt}'
+export type ${name} = ${name}Raw & { action: '${camelCase(name)}' }
+`
+    importStmts.push(stmt)
+  })
+
+  // New mthod functions
+  const newFuncExports = (
+    await globAsync('scheme/**/*.action/function.ts')
+  ).map((path) => {
+    return `export { default as ${camelCase(
+      /([a-z-]*)\.action\/function.ts$/g.exec(path)[1]
+    )} } from '${path.replace(/^scheme/g, '.').replace(/\.ts$/g, '')}'`
+  })
+
+  /*********************************************************
+   *                                                       *
+   * Legacy method using [api-name].ts and [api-name].f.ts *
+   *                                                       *
+   *********************************************************/
+
+  let legacyFTSFiles = await globAsync('scheme/**/*.f.ts')
+  legacyFTSFiles = legacyFTSFiles.map((file) => file.replace(/^scheme/g, '.'))
 
   // Interfaces
-  const interfaceImports = files.map((file) => importType(file)).join('\n')
+  const interfaceImports = legacyFTSFiles
+    .map((file) => importType(file))
+    .concat(importStmts)
+    .join('\n')
   const interfaceFile = prettier.format(
     `${msg}
 
 ${interfaceImports}
 
-export type APIScheme = ${files.map((file) => getPascalName(file)).join(' | ')}
+export type APIScheme = ${legacyFTSFiles
+      .map((file) => getPascalName(file))
+      .concat(interfacesNames)
+      .join(' | ')}
 `,
     prettierRC
   )
@@ -70,7 +110,10 @@ export type APIScheme = ${files.map((file) => getPascalName(file)).join(' | ')}
   fs.writeFileSync('./scheme/index.ts', interfaceFile)
 
   // Functions
-  const functionExports = files.map((file) => exportFunction(file)).join('\n')
+  const functionExports = legacyFTSFiles
+    .map((file) => exportFunction(file))
+    .concat(newFuncExports)
+    .join('\n')
   const functionExportFile = prettier.format(
     `${msg}
 
@@ -80,4 +123,4 @@ ${functionExports}
   )
 
   fs.writeFileSync('./scheme/functions.ts', functionExportFile)
-})
+})()
