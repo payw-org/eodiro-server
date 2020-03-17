@@ -5,7 +5,6 @@ import SqlB from '@/modules/sqlb'
   await boot({
     mail: false,
     bot: false,
-    isDev: true,
   })
   const [, results] = await Db.query<MysqlInsertOrUpdateResult>(
     SqlB()

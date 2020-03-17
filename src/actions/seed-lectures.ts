@@ -15,15 +15,11 @@ async function main(): Promise<void> {
     year: string
     semester: string
     s: string
-    D: undefined
     file: string
   }>()
 
-  const isDev = 'D' in args
-
   await boot({
     db: true,
-    isDev,
     listen: false,
   })
 

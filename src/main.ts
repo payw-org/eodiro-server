@@ -4,7 +4,6 @@ import { boot } from './boot'
     db: true,
     mail: true,
     bot: true,
-    isDev: process.env.NODE_ENV === 'development',
     listen: true,
   })
 })()
