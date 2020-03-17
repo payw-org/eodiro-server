@@ -16,6 +16,7 @@ export async function oneAPI<T extends APIScheme>(
   const apiF = apiFunctions[request.action]
 
   if (!apiF) {
+    console.log('API function not exists')
     return undefined
   }
 
