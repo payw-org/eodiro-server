@@ -280,7 +280,9 @@ class SqlBInstance<T = any> {
 
   insert(
     schema: string,
-    items: Record<keyof T, number | string>,
+    items: {
+      [K in keyof T]?: string | number | null | undefined
+    },
     ignore?: boolean
   ): SqlBInstance<T> {
     const targetsQuery = Object.keys(items).join(', ')
@@ -303,7 +305,9 @@ class SqlBInstance<T = any> {
 
   insertBulk(
     schema: string,
-    items: Record<keyof T, number | string>[],
+    items: {
+      [K in keyof T]?: string | number | null | undefined
+    }[],
     ignore?: boolean
   ): SqlBInstance<T> {
     // Analyze first element
@@ -331,7 +335,9 @@ class SqlBInstance<T = any> {
 
   update(
     schema: string,
-    items: Record<keyof T, number | string | undefined>
+    items: {
+      [K in keyof T]?: string | number | null | undefined
+    }
   ): SqlBInstance<T> {
     const setQuery = Object.keys(items)
       .map((key) => {
