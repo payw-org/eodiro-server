@@ -1,9 +1,12 @@
+import { DbTableNames } from '@/db/utils/constants'
 import mysql from 'mysql'
 import sqlFormatter from 'sql-formatter'
 
 type Order = 'ASC' | 'asc' | 'DESC' | 'desc'
+type SqlBValue = number | string | undefined
+type SqlBNullableValue = SqlBValue | null
 
-class SqlBInstance<T = any> {
+export class SqlBInstance<T = any> {
   private q = ''
 
   /**
@@ -133,8 +136,9 @@ class SqlBInstance<T = any> {
 
   from(): SqlBInstance<T>
   from(target: string): SqlBInstance<T>
+  from(target: DbTableNames): SqlBInstance<T>
   from(target: SqlBInstance<T>): SqlBInstance<T>
-  from(target?: SqlBInstance<T> | string): SqlBInstance<T> {
+  from(target?: SqlBInstance<T> | string | DbTableNames): SqlBInstance<T> {
     if (!target) {
       this.append(`FROM`)
     } else if (typeof target === 'string') {
@@ -177,68 +181,68 @@ class SqlBInstance<T = any> {
     return this
   }
 
-  equal(attr: keyof T, value: number | string): SqlBInstance<T> {
+  equal(attr: keyof T, value: SqlBValue): SqlBInstance<T> {
     this.append(`${attr} = ${this.convert(value)}`)
 
     return this
   }
 
-  andEqual(attr: keyof T, value: number | string): SqlBInstance<T> {
+  andEqual(attr: keyof T, value: SqlBValue): SqlBInstance<T> {
     this.and()
     this.equal(attr, value)
 
     return this
   }
 
-  notEqual(attr: keyof T, value: number | string): SqlBInstance<T> {
+  notEqual(attr: keyof T, value: SqlBValue): SqlBInstance<T> {
     this.append(`${attr} != ${this.convert(value)}`)
     return this
   }
 
-  andNotEqual(attr: keyof T, value: number | string): SqlBInstance<T> {
+  andNotEqual(attr: keyof T, value: SqlBValue): SqlBInstance<T> {
     this.and()
     this.notEqual(attr, value)
     return this
   }
 
   /** attr >= value */
-  equalOrMore(attr: keyof T, value: number | string): SqlBInstance<T> {
+  equalOrMore(attr: keyof T, value: SqlBValue): SqlBInstance<T> {
     this.append(`${attr} >= ${this.convert(value)}`)
     return this
   }
   /** AND attr >= value */
-  andEqualOrMore(attr: keyof T, value: number | string): SqlBInstance<T> {
+  andEqualOrMore(attr: keyof T, value: SqlBValue): SqlBInstance<T> {
     this.and()
     this.equalOrMore(attr, value)
     return this
   }
 
   /** attr <= value */
-  equalOrLess(attr: keyof T, value: number | string): SqlBInstance<T> {
+  equalOrLess(attr: keyof T, value: SqlBValue): SqlBInstance<T> {
     this.append(`${attr} <= ${this.convert(value)}`)
     return this
   }
   /** AND attr <= value */
-  andEqualOrLess(attr: keyof T, value: number | string): SqlBInstance<T> {
+  andEqualOrLess(attr: keyof T, value: SqlBValue): SqlBInstance<T> {
     this.and()
     this.equalOrLess(attr, value)
     return this
   }
 
   /** attr > value */
-  more(attr: keyof T, value: number | string): SqlBInstance<T> {
+  more(attr: keyof T, value: SqlBValue): SqlBInstance<T> {
     this.append(`${attr} > ${this.convert(value)}`)
     return this
   }
   /** AND attr > value */
-  andMore(attr: keyof T, value: number | string): SqlBInstance<T> {
+  andMore(attr: keyof T, value: SqlBValue): SqlBInstance<T> {
     this.and()
     this.more(attr, value)
     return this
   }
 
   /** attr < value */
-  less(attr: keyof T, value: number | string): SqlBInstance<T> {
+  less(attr: keyof T, value: SqlBValue): SqlBInstance<T> {
     this.append(`${attr} < ${this.convert(value)}`)
     return this
   }
