@@ -2,11 +2,10 @@ import { OneAPIError } from '../../types/utils'
 
 export interface Interface {
   data: {
-    accessToken: string
-    postId: number
-    body: string
+    boardName: string
   }
   payload: {
-    err: OneAPIError<'No Body' | 'No Post'>
+    err: OneAPIError<'No Board'>
+    data: number
   }
 }

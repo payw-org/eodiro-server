@@ -19,6 +19,15 @@ import { GetPostById } from './square/get-post-by-id'
 export { GetPostById } from './square/get-post-by-id'
 import { UploadPost } from './square/upload-post'
 export { UploadPost } from './square/upload-post'
+import { Interface as GetUserIdRaw } from './auth/get-user-id.action/interface'
+export type GetUserId = GetUserIdRaw & { action: 'getUserId' }
+
+import { Interface as DeleteCommentRaw } from './square/delete-comment.action/interface'
+export type DeleteComment = DeleteCommentRaw & { action: 'deleteComment' }
+
+import { Interface as GetBoardIdRaw } from './square/get-board-id.action/interface'
+export type GetBoardId = GetBoardIdRaw & { action: 'getBoardId' }
+
 import { Interface as GetCommentsRaw } from './square/get-comments.action/interface'
 export type GetComments = GetCommentsRaw & { action: 'getComments' }
 
@@ -30,5 +39,8 @@ export type APIScheme =
   | FetchRecentPostsOfBoard
   | GetPostById
   | UploadPost
+  | GetUserId
+  | DeleteComment
+  | GetBoardId
   | GetComments
   | UploadComment

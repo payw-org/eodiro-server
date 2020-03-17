@@ -1,6 +1,7 @@
 import Db from '@/db'
 import User from '@/db/modules/user'
 import { DBSchema } from '@/db/schema'
+import { DbTables } from '@/db/utils/constants'
 import Auth from '@/modules/auth'
 import SqlB from '@/modules/sqlb'
 import Time from '@/modules/time'
@@ -17,7 +18,23 @@ export default async function(
     }
   }
 
+  // Get user info
   const user = await User.findAtId(authPayload.userId)
+
+  // Check if the post exist
+  const [, posts] = await Db.query(
+    SqlB<DBSchema.Post>()
+      .select('*')
+      .from(DbTables.post)
+      .where()
+      .equal('id', data.postId)
+  )
+
+  if (posts.length === 0) {
+    return {
+      err: 'No Post',
+    }
+  }
 
   const body = data.body.trim()
   if (body.length === 0) {
