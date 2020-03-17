@@ -1,7 +1,7 @@
 import DbConnector from '@/modules/db-connector'
-import { getCommentsOfPost } from './get-comments-of-post.f'
+import { getComments } from '../../functions'
 ;(async () => {
-  const posts = await getCommentsOfPost({
+  const posts = await getComments({
     postId: 91,
     mostRecentCommentId: 0,
   })

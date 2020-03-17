@@ -1,14 +1,11 @@
 import Db from '@/db'
 import { Comment, Comments } from '@/db/schema/generated'
 import SqlB from '@/modules/sqlb'
-import { GetCommentsOfPost } from './get-comments-of-post'
+import { Interface } from './interface'
 
-/**
- * Return posts equal or smaller than the given post id with the number of given amount
- */
-export async function getCommentsOfPost(
-  data: GetCommentsOfPost['data']
-): Promise<GetCommentsOfPost['payload']> {
+export default async function(
+  data: Interface['data']
+): Promise<Interface['payload']> {
   const query = SqlB<Comment>()
     .select('*')
     .from('comment')
