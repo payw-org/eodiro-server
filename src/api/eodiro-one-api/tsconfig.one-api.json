@@ -12,10 +12,12 @@
     "node_modules",
     "build",
     "index.ts",
+    "**/function.ts",
     "**/functions.ts",
     "**/*.f.ts",
     "**/*.spec.ts",
     "**/*.test.ts",
+    "**/test.ts",
     "dev",
     "**/__TEST__"
   ]
