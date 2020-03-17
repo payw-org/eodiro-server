@@ -60,22 +60,14 @@ export default class User {
     }
   }
 
-  static async findAtId(id: number): Promise<UserModelPasswordOmitted | false> {
+  static async findAtId(id: number): Promise<UserModelPasswordOmitted> {
     const query = SqlB<UserModel>()
       .select('id', 'nickname', 'portal_id', 'random_nickname', 'registered_at')
       .from('user')
       .where(SqlB().equal('id', undefined))
       .build()
 
-    const [err, results] = await Db.query<UserModelPasswordOmitted[]>(query, id)
-
-    if (err) {
-      return false
-    }
-
-    if (results.length === 0) {
-      return undefined
-    }
+    const [, results] = await Db.query<UserModelPasswordOmitted[]>(query, id)
 
     const user = results[0]
 
