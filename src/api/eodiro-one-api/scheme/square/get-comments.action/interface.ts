@@ -1,4 +1,4 @@
-import { Comments } from '../../../db-schema/generated'
+import { CommentType } from '@/database/models/comment'
 import { OneAPIError } from '../../types/utils'
 
 export interface Interface {
@@ -10,6 +10,6 @@ export interface Interface {
   }
   payload: {
     err: OneAPIError<void>
-    data: Comments
+    data: CommentType[]
   }
 }

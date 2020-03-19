@@ -1,5 +1,5 @@
+import { TableNames } from '@/database/table-names'
 import Db from '@/db'
-import { DbTables } from '@/db/utils/constants'
 import SqlB from '@/modules/sqlb'
 import { Campus } from '@/types'
 import dayjs from 'dayjs'
@@ -13,7 +13,7 @@ router.get('/cafeteria/:servedAt/:campus/menus', async (req, res) => {
   const servedAt = req.params?.servedAt || now.format('YYYY-MM-DD')
   const sql = SqlB()
     .select('data')
-    .from(DbTables.cafeteria_menu)
+    .from(TableNames.cafeteria_menu)
     .where()
     .equal('campus', campus)
     .andEqual('served_at', servedAt)

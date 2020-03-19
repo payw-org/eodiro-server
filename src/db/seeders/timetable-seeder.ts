@@ -1,5 +1,7 @@
+import { CoverageMajorLectureType } from '@/database/models/coverage_major_lecture'
+import { LectureType } from '@/database/models/lecture'
+import { PeriodType } from '@/database/models/period'
 import Db from '@/db'
-import { DBSchema } from '@/db/schema'
 import SqlB from '@/modules/sqlb'
 import { RefinedLectures } from '@payw/cau-timetable-scraper/build/src/types'
 
@@ -15,9 +17,9 @@ export default async function(lectures: RefinedLectures): Promise<void> {
 
   // Update college coverage data
   const coverageMajors = []
-  const dbLectures: DBSchema.Lecture[] = []
-  const dbPeriods: DBSchema.Period[] = []
-  const dbCoverageMajorLectures: DBSchema.CoverageMajorLecture[] = []
+  const dbLectures: LectureType[] = []
+  const dbPeriods: PeriodType[] = []
+  const dbCoverageMajorLectures: CoverageMajorLectureType[] = []
 
   const [err, results] = await Db.query<{ maxID: number }[]>(
     SqlB()

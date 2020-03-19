@@ -33,7 +33,7 @@ export default class DbConnector {
           log(`[ ${chalk.red('error')} ] failed to connect to db server`)
           resolve(false)
         } else {
-          log(`[ ${chalk.green('db')} ] connected to db server`)
+          log(`[ ${chalk.green('DB')} ] connected to db server`)
 
           tempConnection.query(createDbSql, () => {
             tempConnection.destroy()
@@ -58,7 +58,7 @@ export default class DbConnector {
                 )
                 resolve(false)
               } else {
-                log(`[ ${chalk.green('db')} ] connected to db '${database}'`)
+                log(`[ ${chalk.green('DB')} ] connected to db '${database}'`)
                 resolve(true)
               }
             })

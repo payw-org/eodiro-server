@@ -1,4 +1,4 @@
-import { Post } from '../../db-schema/generated'
+import { PostType } from '@/database/models/post'
 import { OneAPIError, RequireAuth } from '../types/utils'
 
 export interface GetPostById {
@@ -8,6 +8,6 @@ export interface GetPostById {
   }>
   payload: {
     err: OneAPIError<void>
-    data: Post
+    data: PostType
   }
 }

@@ -1,6 +1,6 @@
-import { DBSchema } from '@/api/eodiro-one-api/db-schema'
+import { CommentType } from '@/database/models/comment'
+import { user } from '@/database/models/user'
 import Db from '@/db'
-import User from '@/db/modules/user'
 import Auth from '@/modules/auth'
 import SqlB from '@/modules/sqlb'
 import { OneApiError } from '../../types/utils'
@@ -16,10 +16,11 @@ export default async function(
     }
   }
 
-  const user = await User.findAtId(authPayload.userId)
+  const User = await user()
+  const userInfo = await User.findAtId(authPayload.userId)
 
-  const [, results] = await Db.query<DBSchema.Comments>(
-    SqlB<DBSchema.Comment>()
+  const [, results] = await Db.query<CommentType[]>(
+    SqlB<CommentType>()
       .select('user_id')
       .from('comment')
       .where()
@@ -34,14 +35,14 @@ export default async function(
   }
 
   // Not your comment
-  if (results[0].user_id !== user.id) {
+  if (results[0].user_id !== userInfo.id) {
     return {
       err: OneApiError.FORBIDDEN,
     }
   }
 
   await Db.query(
-    SqlB<DBSchema.Comment>()
+    SqlB<CommentType>()
       .delete()
       .from('comment')
       .where()

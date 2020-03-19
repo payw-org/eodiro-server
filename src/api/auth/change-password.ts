@@ -1,5 +1,5 @@
-import ChangePassword from '@/db/modules/change-password'
-import User from '@/db/modules/user'
+import { changePassword } from '@/database/models/change_password'
+import { user } from '@/database/models/user'
 import Auth from '@/modules/auth'
 import { HttpStatusCode } from '@/modules/constants/http-status-code'
 import EodiroMailer from '@/modules/eodiro-mailer'
@@ -10,19 +10,21 @@ const router = express.Router()
 
 router.post('/change-password', async (req, res) => {
   const portalId = req.body.portalId as string
-  const user = await User.findWithPortalId(portalId)
+  const User = await user()
+  const userInfo = await User.findWithPortalId(portalId)
 
-  if (user === false) {
+  if (userInfo === false) {
     res.sendStatus(500)
     return
   }
 
-  if (user === undefined) {
+  if (userInfo === undefined) {
     res.sendStatus(401)
     return
   }
 
-  const token = await ChangePassword.createOrUpdateToken(user.id)
+  const ChangePassword = await changePassword()
+  const token = await ChangePassword.createOrUpdateToken(userInfo.id)
 
   if (token === undefined) {
     res.sendStatus(500)
@@ -30,7 +32,7 @@ router.post('/change-password', async (req, res) => {
   }
 
   EodiroMailer.sendMail({
-    to: user.portal_id,
+    to: userInfo.portal_id,
     subject: '어디로 암호 변경 이메일입니다',
     html: `<a href="https://eodiro.com/forgot/change-password?t=${token}">비밀번호변경</a>`,
   })
@@ -40,6 +42,7 @@ router.post('/change-password', async (req, res) => {
 
 router.get('/change-password', async (req, res) => {
   const token = req.body.token
+  const ChangePassword = await changePassword()
   const request = await ChangePassword.findWithToken(token)
 
   if (request === false) {
@@ -59,6 +62,7 @@ router.patch('/change-password', async (req, res) => {
   const token = req.body.token
   const newPassword = req.body.newPassword
 
+  const ChangePassword = await changePassword()
   const changePasswordRequest = await ChangePassword.findWithToken(token)
 
   if (!changePasswordRequest) {
@@ -71,6 +75,7 @@ router.patch('/change-password', async (req, res) => {
     return
   }
 
+  const User = await user()
   const result = await User.updatePassword(
     changePasswordRequest.user_id,
     newPassword

@@ -1,5 +1,5 @@
+import { PostType } from '@/database/models/post'
 import Db from '@/db'
-import { Post, Posts } from '@/db/schema/generated'
 import Auth from '@/modules/auth'
 import SqlB from '@/modules/sqlb'
 import { OneAPIData, OneAPIPayload } from '../types/utils'
@@ -26,14 +26,14 @@ export async function getPostById(
     }
   }
 
-  const query = SqlB<Post>()
+  const query = SqlB<PostType>()
     .select('*')
     .from('post')
     .where()
     .equal('id', postID)
     .build()
 
-  const [err, results] = await Db.query<Posts>(query)
+  const [err, results] = await Db.query<PostType[]>(query)
 
   if (err) {
     return {

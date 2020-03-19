@@ -1,4 +1,4 @@
-import User, { UserId } from '@/db/modules/user'
+import { user as getUser } from '@/database/models/user'
 import EodiroEncrypt from '@/modules/eodiro-encrypt'
 import EodiroMailer from '@/modules/eodiro-mailer'
 import Jwt, { Payload } from '@/modules/jwt'
@@ -53,6 +53,7 @@ export default class Auth {
       return false
     }
 
+    const User = await getUser()
     const user = await User.findWithToken(token)
 
     if (!user) {
@@ -103,6 +104,7 @@ export default class Auth {
     if (!portalId || typeof portalId !== 'string') {
       return false
     }
+    const User = await getUser()
     const user = await User.findWithAttrFromAll('portal_id', portalId)
     return user ? false : true
   }
@@ -143,6 +145,7 @@ export default class Auth {
     if (!nickname || typeof nickname !== 'string') {
       return false
     }
+    const User = await getUser()
     const user = await User.findWithAttrFromAll('nickname', nickname)
     return user ? false : true
   }
@@ -159,7 +162,7 @@ export default class Auth {
     return result
   }
 
-  static async signIn(info: SignInInfo): Promise<[UserId, boolean]> {
+  static async signIn(info: SignInInfo): Promise<[number, boolean]> {
     let portalId = info?.portalId
     let password = info?.password
 
@@ -171,6 +174,7 @@ export default class Auth {
       return [undefined, false]
     }
 
+    const User = await getUser()
     const user = await User.findWithPortalId(portalId, true)
 
     // TODO: Remove the legacy password matching process
@@ -207,6 +211,8 @@ export default class Auth {
     ) {
       return false
     }
+
+    const User = await getUser()
 
     // Available
     // There's no user with this portal ID yet

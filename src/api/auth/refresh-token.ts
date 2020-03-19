@@ -1,4 +1,4 @@
-import RefreshTokenTable from '@/db/modules/refresh-token-table'
+import { refreshToken } from '@/database/models/refresh_token'
 import Auth from '@/modules/auth'
 import Jwt from '@/modules/jwt'
 import express from 'express'
@@ -21,6 +21,7 @@ router.delete('/refresh-token', async (req, res) => {
   const payload = await Auth.isSignedUser(accessToken)
 
   if (payload) {
+    const RefreshTokenTable = await refreshToken()
     const result = await RefreshTokenTable.deleteRefreshToken(payload.userId)
     if (result) {
       res.sendStatus(200)

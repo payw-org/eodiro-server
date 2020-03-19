@@ -1,10 +1,10 @@
 import config from '@/config'
 import wait from '@/modules/wait'
+import chalk from 'chalk'
 import { Sequelize } from 'sequelize'
 
-// const database =
-//   process.env.NODE_ENV === 'development' ? config.DB_NAME_DEV : config.DB_NAME
-const database = config.DB_NAME
+const database =
+  process.env.NODE_ENV === 'development' ? config.DB_NAME_DEV : config.DB_NAME
 
 export class Database {
   private static sequelize: Sequelize
@@ -36,7 +36,13 @@ export class Database {
 
     try {
       await sequelize.authenticate()
-      console.log('Connected to database')
+      console.log(
+        `[ ${chalk.rgb(
+          0,
+          168,
+          201
+        )('sequelize')} ] connected to db <${database}>`
+      )
       this.sequelize = sequelize
 
       this.initializing = false
