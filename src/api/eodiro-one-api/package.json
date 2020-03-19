@@ -1,18 +1,14 @@
 {
   "name": "@payw/eodiro-one-api",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "tsc -p tsconfig.one-api.json",
-    "clear": "rm -f -r build/*",
-    "clear-tsconfig-paths": "node --harmony dev/clear-tsconfig-paths.js",
-    "append-tsconfig-paths": "node --harmony dev/append-tsconfig-paths.js",
-    "copy-packagejson": "cp package.json build",
-    "pub": "npm publish build --access public",
-    "deploy": "npm run clear && npm run refresh && npm run build && npm run copy-packagejson && npm run pub",
+    "copy-packagejson": "node copy-packagejson.js",
+    "pub": "npm publish --access public",
     "refresh": "node dev/refresh"
   },
+  "files": ["src/api/eodiro-one-api/client", "src/database/models"],
   "author": "PAYW",
   "license": "MIT"
 }

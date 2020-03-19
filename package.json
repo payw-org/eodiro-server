@@ -6,7 +6,8 @@
   "author": "PAYW",
   "license": "MIT",
   "scripts": {
-    "sync-db": "ts-node -r tsconfig-paths/register src/database/sync.ts",
+    "sync-db:prod": "ts-node -r tsconfig-paths/register src/database/sync.ts",
+    "sync-db:dev": "cross-env NODE_ENV=development ts-node -r tsconfig-paths/register src/database/sync.ts",
     "ts-node:prod": "ts-node -r tsconfig-paths/register",
     "ts-node": "cross-env NODE_ENV=development ts-node -r tsconfig-paths/register",
     "seed-lectures": "ts-node -r tsconfig-paths/register src/direct/seed-lectures.ts",
