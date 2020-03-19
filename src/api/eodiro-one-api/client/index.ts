@@ -1,8 +1,36 @@
 import axios from 'axios'
-import { APIScheme } from '../scheme'
+import {
+  APIScheme,
+  DeleteComment,
+  GetBoardId,
+  GetComments,
+  GetUserId,
+  UploadComment,
+} from '../scheme'
 import { OneApiError, OneAPIPayload } from '../scheme/types/utils'
 
-// One API for client application
+// ** AUTOMATICALLY GENERATED FUNCTION OVERLOADINGS, DO NOT MODIFY HERE MANUALLY **
+export async function oneAPIClient(
+  host: string,
+  request: Omit<GetUserId, 'payload'>
+): Promise<GetUserId['payload']>
+export async function oneAPIClient(
+  host: string,
+  request: Omit<DeleteComment, 'payload'>
+): Promise<DeleteComment['payload']>
+export async function oneAPIClient(
+  host: string,
+  request: Omit<GetBoardId, 'payload'>
+): Promise<GetBoardId['payload']>
+export async function oneAPIClient(
+  host: string,
+  request: Omit<GetComments, 'payload'>
+): Promise<GetComments['payload']>
+export async function oneAPIClient(
+  host: string,
+  request: Omit<UploadComment, 'payload'>
+): Promise<UploadComment['payload']>
+// ** AUTOMATICALLY GENERATED FUNCTION OVERLOADINGS, DO NOT MODIFY HERE MANUALLY **
 export async function oneAPIClient<T extends APIScheme>(
   host: string,
   request: Omit<T, 'payload'>

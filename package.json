@@ -78,6 +78,7 @@
     "@types/mysql": "^2.15.9",
     "@types/node": "^13.9.1",
     "@types/nodemailer": "^6.4.0",
+    "@types/prettier": "^1.19.0",
     "@types/uuid": "^7.0.0",
     "@types/validator": "^12.0.1",
     "@typescript-eslint/eslint-plugin": "^2.23.0",
