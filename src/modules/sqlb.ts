@@ -1,10 +1,13 @@
-import { DbTableNames } from '@/db/utils/constants'
+import { TableNames } from '@/database/table-names'
 import mysql from 'mysql'
 import sqlFormatter from 'sql-formatter'
 
 type Order = 'ASC' | 'asc' | 'DESC' | 'desc'
 type SqlBValue = number | string | undefined
 type SqlBNullableValue = SqlBValue | null
+type KeyValue<T> = {
+  [K in keyof T]?: T[K]
+}
 
 export class SqlBInstance<T = any> {
   private q = ''
@@ -136,9 +139,9 @@ export class SqlBInstance<T = any> {
 
   from(): SqlBInstance<T>
   from(target: string): SqlBInstance<T>
-  from(target: DbTableNames): SqlBInstance<T>
+  from(target: TableNames): SqlBInstance<T>
   from(target: SqlBInstance<T>): SqlBInstance<T>
-  from(target?: SqlBInstance<T> | string | DbTableNames): SqlBInstance<T> {
+  from(target?: SqlBInstance<T> | string | TableNames): SqlBInstance<T> {
     if (!target) {
       this.append(`FROM`)
     } else if (typeof target === 'string') {
@@ -165,7 +168,10 @@ export class SqlBInstance<T = any> {
     return this
   }
 
-  join(schema1: keyof T, schema2: keyof T): SqlBInstance<T> {
+  join(
+    schema1: TableNames | string,
+    schema2: TableNames | string
+  ): SqlBInstance<T> {
     this.append(`${schema1} JOIN ${schema2}`)
 
     return this
