@@ -1,4 +1,4 @@
-import { CommentType } from '@/database/models/comment'
+import { CommentType } from '../../../../../database/models/comment'
 import { OneAPIError } from '../../types/utils'
 
 export interface Interface {

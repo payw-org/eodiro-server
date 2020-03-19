@@ -1,4 +1,4 @@
-import { PostType } from '@/database/models/post'
+import { PostType } from '../../../../database/models/post'
 
 /**
  * Fetch recetly updated new posts

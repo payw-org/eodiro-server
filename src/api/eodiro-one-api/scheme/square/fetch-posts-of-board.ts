@@ -1,4 +1,4 @@
-import { PostType } from '@/database/models/post'
+import { PostType } from '../../../../database/models/post'
 
 export interface FetchPostsOfBoard {
   action: 'fetchPostsOfBoard'
