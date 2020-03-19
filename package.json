@@ -17,7 +17,7 @@
     "dev-ts": "tsnd --no-notify --respawn --transpile-only -r tsconfig-paths/register src/main.ts",
     "type-check:watch": "tsc --noEmit --watch",
     "prebuild": "npm run clear",
-    "build": "babel . --out-dir build --extensions '.ts,.js'",
+    "build": "babel . --out-dir build --extensions '.ts,.js' && tsc --declaration --declarationDir build --emitDeclarationOnly",
     "start": "node --harmony build/src/main.js",
     "start:dev": "cross-env NODE_ENV=development node --harmony build/src/main.js",
     "pm2-start": "if pm2 show eodiro-api2 ; then npm run pm2-stop && npm run pm2-delete && npm run pm2-start ; else pm2 start build/src/main.js --name \"eodiro-api2\" ; fi",
