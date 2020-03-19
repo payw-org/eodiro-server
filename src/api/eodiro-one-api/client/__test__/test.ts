@@ -1,7 +1,6 @@
-import { FetchPostsOfBoard } from '../../scheme'
 import { oneAPIClient } from '../index'
 
-oneAPIClient<FetchPostsOfBoard>('http://localhost:4020', {
+oneAPIClient('http://localhost:4020', {
   action: 'fetchPostsOfBoard',
   data: {
     boardID: 0,
