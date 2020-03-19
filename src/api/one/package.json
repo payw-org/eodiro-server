@@ -1,14 +1,13 @@
 {
   "name": "@payw/eodiro-one-api",
-  "version": "1.2.0",
+  "version": "1.2.6",
   "description": "",
   "main": "index.js",
   "scripts": {
     "copy-packagejson": "node copy-packagejson.js",
-    "pub": "npm publish --access public",
     "refresh": "node dev/refresh"
   },
-  "files": ["src/api/eodiro-one-api/client", "src/database/models"],
+  "files": ["api/one/client", "api/one/scheme", "database/models", "index.d.ts"],
   "author": "PAYW",
   "license": "MIT"
 }
