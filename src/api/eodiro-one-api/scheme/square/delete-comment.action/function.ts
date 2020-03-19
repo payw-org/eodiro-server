@@ -3,6 +3,7 @@ import Db from '@/db'
 import User from '@/db/modules/user'
 import Auth from '@/modules/auth'
 import SqlB from '@/modules/sqlb'
+import { OneApiError } from '../../types/utils'
 import { Interface } from './interface'
 
 export default async function(
@@ -11,7 +12,7 @@ export default async function(
   const authPayload = await Auth.isSignedUser(data.accessToken)
   if (!authPayload) {
     return {
-      err: 'Unauthorized',
+      err: OneApiError.UNAUTHORIZED,
     }
   }
 
@@ -28,14 +29,14 @@ export default async function(
   // No comment
   if (results.length === 0) {
     return {
-      err: 'No Content',
+      err: OneApiError.NO_CONTENT,
     }
   }
 
   // Not your comment
   if (results[0].user_id !== user.id) {
     return {
-      err: 'Forbidden',
+      err: OneApiError.FORBIDDEN,
     }
   }
 

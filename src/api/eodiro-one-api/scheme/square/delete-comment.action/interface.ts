@@ -1,4 +1,4 @@
-import { OneAPIError } from '../../types/utils'
+import { OneApiError } from '../../types/utils'
 
 export interface Interface {
   data: {
@@ -6,6 +6,6 @@ export interface Interface {
     commentId: number
   }
   payload: {
-    err: OneAPIError<void>
+    err: OneApiError
   }
 }
