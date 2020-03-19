@@ -48,7 +48,7 @@ export async function boot(options: {
       return
     }
   } else {
-    log(`[ ${chalk.green('db')} ] skip db connection`)
+    log(`[ ${chalk.green('DB')} ] skip db connection`)
   }
 
   if (mail) {

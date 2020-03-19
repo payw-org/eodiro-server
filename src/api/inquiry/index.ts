@@ -1,5 +1,9 @@
-import { InquiryModel } from '@/db/models'
-import Inquiry, { AnswerData, InquiryNew } from '@/db/modules/inquiry'
+import {
+  AnswerData,
+  inquiry,
+  InquiryNew,
+  InquiryType,
+} from '@/database/models/inquiry'
 import Auth from '@/modules/auth'
 import EodiroMailer from '@/modules/eodiro-mailer'
 import express from 'express'
@@ -11,6 +15,7 @@ router.post('/inquiry', async (req, res) => {
   const accessToken = req.headers.accesstoken as string
   const payload = await Auth.isSignedUser(accessToken)
   const userId = (payload ? payload.userId : null) as number | null
+  const Inquiry = await inquiry()
   const inquiryId = await Inquiry.upload(userId, inquiryNew)
 
   if (!inquiryId) {
@@ -39,7 +44,8 @@ router.get('/inquiry', async (req, res) => {
   }
   const amount = parseInt(req.query?.offset, 10) || 20
   const offset = parseInt(req.query?.offset, 10) || 0
-  let inquiries: InquiryModel[] | false
+  const Inquiry = await inquiry()
+  let inquiries: InquiryType[] | false
   if (payload.isAdmin) {
     inquiries = await Inquiry.getAll(amount, offset)
   } else {
@@ -62,7 +68,8 @@ router.post('/inquiry/answer', async (req, res) => {
   }
 
   const answerData: AnswerData = req.body
-  const isUpdated = await Inquiry.update(answerData)
+  const Inquiry = await inquiry()
+  const isUpdated = await Inquiry.updateInquiry(answerData)
   if (!isUpdated) {
     res.sendStatus(500)
     return

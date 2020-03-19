@@ -1,4 +1,4 @@
-import { DBSchema } from '../../db-schema'
+import { PostType } from '@/database/models/post'
 
 export interface FetchPostsOfBoard {
   action: 'fetchPostsOfBoard'
@@ -8,5 +8,5 @@ export interface FetchPostsOfBoard {
     amount?: number
     noBody?: boolean
   }
-  payload: (DBSchema.Post & { comment_count: number })[]
+  payload: (PostType & { comment_count: number })[]
 }

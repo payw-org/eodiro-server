@@ -1,7 +1,8 @@
+import { CommentType } from '@/database/models/comment'
+import { PostType } from '@/database/models/post'
+import { user } from '@/database/models/user'
+import { TableNames } from '@/database/table-names'
 import Db from '@/db'
-import User from '@/db/modules/user'
-import { DBSchema } from '@/db/schema'
-import { DbTables } from '@/db/utils/constants'
 import Auth from '@/modules/auth'
 import SqlB from '@/modules/sqlb'
 import Time from '@/modules/time'
@@ -19,13 +20,14 @@ export default async function(
   }
 
   // Get user info
-  const user = await User.findAtId(authPayload.userId)
+  const User = await user()
+  const userInfo = await User.findAtId(authPayload.userId)
 
   // Check if the post exist
   const [, posts] = await Db.query(
-    SqlB<DBSchema.Post>()
+    SqlB<PostType>()
       .select('*')
-      .from(DbTables.post)
+      .from(TableNames.post)
       .where()
       .equal('id', data.postId)
   )
@@ -43,10 +45,10 @@ export default async function(
     }
   }
 
-  const query = SqlB<DBSchema.Comment>()
+  const query = SqlB<CommentType>()
     .insert('comment', {
-      user_id: user.id,
-      random_nickname: user.random_nickname,
+      user_id: userInfo.id,
+      random_nickname: userInfo.random_nickname,
       post_id: data.postId,
       body: data.body,
       uploaded_at: Time.getCurrTime(),

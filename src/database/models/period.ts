@@ -41,3 +41,12 @@ export const period = createModelFunction(Period, 'period', {
     primaryKey: true,
   },
 })
+
+export type PeriodType = {
+  lecture_id: number
+  day: string
+  start_h: number
+  start_m: number
+  end_h: number
+  end_m: number
+}

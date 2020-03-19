@@ -1,4 +1,4 @@
-import { DBSchema } from '../../db-schema'
+import { PostType } from '@/database/models/post'
 
 /**
  * Fetch recetly updated new posts
@@ -10,5 +10,5 @@ export interface FetchRecentPostsOfBoard {
     mostRecentPostID: number
     noBody?: boolean
   }
-  payload: DBSchema.Post[]
+  payload: PostType[]
 }

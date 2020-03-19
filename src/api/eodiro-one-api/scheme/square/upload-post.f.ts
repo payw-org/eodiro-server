@@ -1,5 +1,6 @@
+import { PostType } from '@/database/models/post'
+import { user } from '@/database/models/user'
 import Db, { MysqlInsertOrUpdateResult } from '@/db'
-import User from '@/db/modules/user'
 import Auth from '@/modules/auth'
 import SqlB from '@/modules/sqlb'
 import Time from '@/modules/time'
@@ -30,8 +31,10 @@ export async function uploadPost(
     }
   }
 
-  const query = SqlB()
+  // TODO: Proper board ID
+  const query = SqlB<PostType>()
     .insert('post', {
+      board_id: 1,
       title: undefined,
       body: undefined,
       user_id: undefined,
@@ -40,6 +43,7 @@ export async function uploadPost(
     })
     .build()
 
+  const User = await user()
   const userInfo = await User.findAtId(authPayload.userId)
 
   if (!userInfo) {

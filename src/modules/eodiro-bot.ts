@@ -1,7 +1,6 @@
 import Config from '@/config'
+import { user, UserType } from '@/database/models/user'
 import Db from '@/db'
-import { UserModel } from '@/db/models'
-import User from '@/db/modules/user'
 import CafeteriaMenusSeeder from '@/db/seeders/cafeteria-menus-seeder'
 import timetableSeeder from '@/db/seeders/timetable-seeder'
 import { CTTS } from '@payw/cau-timetable-scraper'
@@ -55,7 +54,7 @@ export default class EodiroBot {
         return
       }
 
-      ;(results as Array<UserModel>).forEach(async (row) => {
+      ;(results as Array<UserType>).forEach(async (row) => {
         const registeredAt = dayjs(row.registered_at)
         const now = dayjs()
         const timeDiffMs = now.diff(registeredAt)
@@ -75,7 +74,8 @@ export default class EodiroBot {
     }, patrolTime)
   }
 
-  private updateRandomNickname(): void {
+  private async updateRandomNickname(): Promise<void> {
+    const User = await user()
     const cronTime = '0 0 * * *'
     const timeZone = 'Asia/Seoul'
     new CronJob(cronTime, User.updateRandomNickname, null, true, timeZone)

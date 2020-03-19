@@ -1,6 +1,6 @@
 import Config from '@/config'
+import { CafeteriaMenuType } from '@/database/models/cafeteria_menu'
 import Db from '@/db'
-import { CafeteriaMenuModel } from '@/db/models'
 import convertCampusName from '@/modules/convert-campus-name'
 import SqlB from '@/modules/sqlb'
 import { CCMS } from '@payw/cau-cafeteria-menus-scraper'
@@ -20,7 +20,7 @@ CafeteriaMenusSeeder.seed = async (): Promise<void> => {
     pw: Config.CAU_PW,
     days: 5,
   })
-  const dbCafeteriaMenus: CafeteriaMenuModel[] = []
+  const dbCafeteriaMenus: CafeteriaMenuType[] = []
   const daysList: string[] = []
 
   menus.days.forEach((day) => {

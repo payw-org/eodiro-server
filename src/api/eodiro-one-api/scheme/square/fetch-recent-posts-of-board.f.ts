@@ -1,5 +1,5 @@
+import { postAttrs, PostType } from '@/database/models/post'
 import Db from '@/db'
-import { DBSchema } from '@/db/schema'
 import SqlB from '@/modules/sqlb'
 import { ArrayUtil } from '@/modules/utils/array-util'
 import { FetchRecentPostsOfBoard } from './fetch-recent-posts-of-board'
@@ -10,7 +10,7 @@ export async function fetchRecentPostsOfBoard(
   const { boardID, mostRecentPostID, noBody } = data
 
   let fields = ArrayUtil.replace<string>(
-    DBSchema.postFields,
+    postAttrs,
     'body',
     'substring(body, 1, 100) as body'
   )
@@ -40,5 +40,5 @@ export async function fetchRecentPostsOfBoard(
     return undefined
   }
 
-  return results as DBSchema.Post[]
+  return results as PostType[]
 }

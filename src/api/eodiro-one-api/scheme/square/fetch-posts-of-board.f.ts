@@ -1,7 +1,7 @@
+import { postAttrs } from '@/database/models/post'
 import Db from '@/db'
 import SqlB from '@/modules/sqlb'
 import { ArrayUtil } from '@/modules/utils/array-util'
-import { DBSchema } from '../../db-schema'
 import { FetchPostsOfBoard } from './fetch-posts-of-board'
 
 export async function fetchPostsOfBoard(
@@ -12,7 +12,7 @@ export async function fetchPostsOfBoard(
   const { noBody } = data
 
   let fields = ArrayUtil.replace(
-    DBSchema.postFields,
+    postAttrs,
     'body',
     'substring(body, 1, 100) as body'
   )

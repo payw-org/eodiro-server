@@ -1,5 +1,5 @@
 import config from '@/config'
-import refreshTokenTable from '@/db/modules/refresh-token-table'
+import { refreshToken as refreshTokenTable } from '@/database/models/refresh_token'
 import { JwtError, RefreshToken } from './tokens'
 import { JwtToken } from './tokens/jwt-token'
 
@@ -30,14 +30,15 @@ export default class Jwt {
   static async getTokenOrCreate(payload: Payload): Promise<Tokens> {
     const result = {} as Tokens
 
-    const row = await refreshTokenTable.findWithUserId(payload.userId)
+    const RefreshTokenTable = await refreshTokenTable()
+    const row = await RefreshTokenTable.findWithUserId(payload.userId)
     if (row === false || row === undefined) {
       // no refresh token in db
       const refreshToken = new RefreshToken<Payload>({
         payload,
         ...this.RefreshTokenOption,
       })
-      await refreshTokenTable.addRefreshToken(refreshToken)
+      await RefreshTokenTable.addRefreshToken(refreshToken)
       result.refreshToken = refreshToken.token
     } else {
       try {
@@ -52,7 +53,7 @@ export default class Jwt {
           })
         ) {
           // refreshToken is refreshed
-          await refreshTokenTable.updateRefreshToken(refreshToken)
+          await RefreshTokenTable.updateRefreshToken(refreshToken)
         }
         result.refreshToken = refreshToken.token
       } catch (err) {
@@ -60,7 +61,7 @@ export default class Jwt {
           payload,
           ...this.RefreshTokenOption,
         })
-        await refreshTokenTable.updateRefreshToken(refreshToken)
+        await RefreshTokenTable.updateRefreshToken(refreshToken)
         result.refreshToken = refreshToken.token
       }
     }
@@ -73,12 +74,13 @@ export default class Jwt {
   }
 
   static async verify(token: string): Promise<Payload | false> {
+    const RefreshTokenTable = await refreshTokenTable()
     try {
       const accessToken = new JwtToken<Payload>({
         token,
         ...this.AccessTokenOption,
       })
-      const row = await refreshTokenTable.findWithUserId(
+      const row = await RefreshTokenTable.findWithUserId(
         accessToken.decoded.payload.userId
       )
       if (row === false || row === undefined) {
@@ -111,7 +113,8 @@ export default class Jwt {
       token,
       ...this.RefreshTokenOption,
     })
-    const row = await refreshTokenTable.findWithUserId(
+    const RefreshTokenTable = await refreshTokenTable()
+    const row = await RefreshTokenTable.findWithUserId(
       refreshToken.decoded.payload.userId
     )
     if (row === false || row === undefined) {
@@ -130,7 +133,7 @@ export default class Jwt {
         ...this.RefreshTokenOption,
       })
     ) {
-      await refreshTokenTable.updateRefreshToken(refreshTokenFromDb)
+      await RefreshTokenTable.updateRefreshToken(refreshTokenFromDb)
     }
     result.refreshToken = refreshTokenFromDb.token
     const accessToken = new JwtToken<Payload>({
