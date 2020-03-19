@@ -14,5 +14,5 @@ module.exports = {
       },
     ],
   ],
-  ignore: ['**/*.d.ts'],
+  ignore: ['**/*.d.ts', 'node_modules'],
 }
