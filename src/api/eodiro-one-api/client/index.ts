@@ -1,15 +1,35 @@
 import axios from 'axios'
 import {
   APIScheme,
+  FetchPostsOfBoard,
+  FetchRecentPostsOfBoard,
+  GetPostById,
+  UploadPost,
+  GetUserId,
   DeleteComment,
   GetBoardId,
   GetComments,
-  GetUserId,
   UploadComment,
 } from '../scheme'
 import { OneApiError, OneAPIPayload } from '../scheme/types/utils'
 
 // ** AUTOMATICALLY GENERATED FUNCTION OVERLOADINGS, DO NOT MODIFY HERE MANUALLY **
+export async function oneAPIClient(
+  host: string,
+  request: Omit<FetchPostsOfBoard, 'payload'>
+): Promise<FetchPostsOfBoard['payload']>
+export async function oneAPIClient(
+  host: string,
+  request: Omit<FetchRecentPostsOfBoard, 'payload'>
+): Promise<FetchRecentPostsOfBoard['payload']>
+export async function oneAPIClient(
+  host: string,
+  request: Omit<GetPostById, 'payload'>
+): Promise<GetPostById['payload']>
+export async function oneAPIClient(
+  host: string,
+  request: Omit<UploadPost, 'payload'>
+): Promise<UploadPost['payload']>
 export async function oneAPIClient(
   host: string,
   request: Omit<GetUserId, 'payload'>
