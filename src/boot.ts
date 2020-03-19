@@ -5,7 +5,6 @@ import express from 'express'
 import http from 'http'
 import api from './api'
 import Config from './config'
-import dbValidator from './db/helpers/db-validator'
 import DbConnector from './modules/db-connector'
 import EodiroBot from './modules/eodiro-bot'
 import EodiroMailer from './modules/eodiro-mailer'
@@ -47,8 +46,6 @@ export async function boot(options: {
         )} ] stop the application due to db connection failure`
       )
       return
-    } else {
-      await dbValidator()
     }
   } else {
     log(`[ ${chalk.green('db')} ] skip db connection`)
