@@ -1,6 +1,6 @@
 import Db, { MysqlResult } from '@/db'
 import { Payload } from '@/modules/jwt'
-import { RefreshToken as JwtRefreshToken } from '@/modules/jwt/tokens'
+import { RefreshToken as JwtRefreshToken } from 'jwt-token'
 import { DataTypes, Model } from 'sequelize'
 import { createModelFunction } from '../create-model-function'
 

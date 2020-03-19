@@ -1,7 +1,6 @@
 import config from '@/config'
 import { refreshToken as refreshTokenTable } from '@/database/models/refresh_token'
-import { JwtError, RefreshToken } from './tokens'
-import { JwtToken } from './tokens/jwt-token'
+import { JwtError, JwtToken, RefreshToken } from 'jwt-token'
 
 export interface Payload {
   userId: number
