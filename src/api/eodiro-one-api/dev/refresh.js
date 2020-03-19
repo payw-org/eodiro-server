@@ -71,7 +71,60 @@ export type ${name} = ${name}Raw & { action: '${camelCase(name)}' }
     importStmts.push(stmt)
   })
 
-  // New mthod functions
+  /**
+   * Client auto import interfaces for function overloadings
+   */
+  const clientImportStatements = `import {${[
+    'APIScheme',
+    ...interfacesNames,
+  ].join(',')}} from '../scheme'`
+  let clientSource = fs.readFileSync('client/index.ts', 'utf8')
+  clientSource = clientSource.replace(
+    /import {[\s\S]*?} from '\.\.\/scheme'/g,
+    clientImportStatements
+  )
+  const clientSourceSplitted = clientSource.split('\n')
+  const overloadingBegin = clientSourceSplitted.indexOf(
+    '// ** AUTOMATICALLY GENERATED FUNCTION OVERLOADINGS, DO NOT MODIFY HERE MANUALLY **'
+  )
+  if (overloadingBegin === -1) {
+    throw new Error(
+      'Could not find eodiro client function overloading beginning line'
+    )
+  }
+  const overloadingEnd = clientSourceSplitted.indexOf(
+    '// ** AUTOMATICALLY GENERATED FUNCTION OVERLOADINGS, DO NOT MODIFY HERE MANUALLY **',
+    overloadingBegin + 1
+  )
+  if (overloadingEnd === -1) {
+    throw new Error(
+      'Could not find eodiro client function overloading ending line'
+    )
+  }
+
+  // Generate overloading functions
+  const overloadings = interfacesNames.map(
+    (interfaceName) =>
+      `export async function oneAPIClient(host: string, request: Omit<${interfaceName}, 'payload'>): Promise<${interfaceName}['payload']>`
+  )
+
+  // Remove old overloadings
+  const overloadingLinesCount = overloadingEnd - overloadingBegin - 1
+  clientSourceSplitted.splice(
+    overloadingBegin + 1,
+    overloadingLinesCount,
+    ...overloadings
+  )
+
+  const newClientSource = prettier.format(
+    clientSourceSplitted.join('\n'),
+    prettierRC
+  )
+
+  // Save the file
+  fs.writeFileSync('client/index.ts', newClientSource, 'utf8')
+
+  // New method functions
   const newFuncExports = (
     await globAsync('scheme/**/*.action/function.ts')
   ).map((path) => {
