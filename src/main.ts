@@ -1,9 +1,12 @@
 import { boot } from './boot'
-;(async (): Promise<void> => {
+
+async function main() {
   await boot({
     db: true,
     mail: true,
     bot: true,
     listen: true,
   })
-})()
+}
+
+main()
