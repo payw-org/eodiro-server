@@ -20,7 +20,7 @@
     "build": "babel . --out-dir build --extensions '.ts,.js' && tsc --declaration",
     "start": "node --harmony build/src/main.js",
     "start:dev": "cross-env NODE_ENV=development node --harmony build/src/main.js",
-    "pm2-start": "if pm2 show eodiro-api2 ; then npm run pm2-stop && npm run pm2-delete && npm run pm2-start ; else pm2 start build/main.js --name \"eodiro-api2\" ; fi",
+    "pm2-start": "if pm2 show eodiro-api2 ; then npm run pm2-stop && npm run pm2-delete && npm run pm2-start ; else pm2 start build/src/main.js --name \"eodiro-api2\" ; fi",
     "pm2-restart": "if pm2 show eodiro-api2 ; then pm2 restart eodiro-api2 ; else echo 'No PM2 instance for eodiro API 2' ; fi",
     "pm2-stop": "if pm2 show eodiro-api2 ; then pm2 stop eodiro-api2 ; else echo 'No PM2 instance for eodiro API 2' ; fi",
     "pm2-delete": "if pm2 show eodiro-api2 ; then pm2 delete eodiro-api2 ; else echo 'No PM2 instance for eodiro API 2' ; fi",
