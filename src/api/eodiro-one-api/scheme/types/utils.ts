@@ -15,3 +15,11 @@ export type OneAPIError<T> =
   | 'Forbidden'
   | 'Internal Server Error'
   | T
+
+export enum OneApiError {
+  UNAUTHORIZED = 'Unauthorized',
+  BAD_REQUEST = 'Bad Request',
+  FORBIDDEN = 'Forbidden',
+  INTERNAL_SERVER_ERROR = 'Internal Server Error',
+  NO_CONTENT = 'No Content',
+}
