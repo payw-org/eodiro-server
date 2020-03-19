@@ -1,0 +1,16 @@
+export enum TableNames {
+  admin = 'admin',
+  board = 'board',
+  cafeteria_menu = 'cafeteria_menu',
+  change_password = 'change_password',
+  comment = 'comment',
+  coverage_major = 'coverage_major',
+  coverage_major_lecture = 'coverage_major_lecture',
+  inquiry = 'inquiry',
+  lecture = 'lecture',
+  pending_user = 'pending_user',
+  period = 'period',
+  post = 'post',
+  refresh_token = 'refresh_token',
+  user = 'user',
+}
