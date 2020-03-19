@@ -7,7 +7,7 @@ import peperoSquareRouter from '@/api/pepero-square'
 import uploadRouter from '@/api/upload'
 import vacantRouter from '@/api/vacant'
 import express from 'express'
-import { oneAPI } from './eodiro-one-api'
+import { oneAPI } from './one'
 
 const router = express.Router()
 

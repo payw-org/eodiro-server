@@ -76,15 +76,17 @@ npm install @payw/eodiro-one-api
 **Usage**
 
 ```ts
-import { oneAPIClient } from '@payw/eodiro-one-api/client'
+import { oneAPIClient } from '@payw/eodiro-one-api'
 
-oneAPIClient<ActionType>(
+oneAPIClient(
   action: 'actionName',
   data: { ... }
 ).then(payload => {
   ...
 })
 ```
+
+TypeScript will automatically inference the types of request data and payload as you choose the action.
 
 ### [Development Guide](https://github.com/paywteam/eodiro-api2/tree/master/src/api/eodiro-one-api)
 

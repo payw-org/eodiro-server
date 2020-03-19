@@ -6,7 +6,7 @@ One API distinguishes each API with an **action** instead of url and request met
 
 ## Structure
 
-Actions are placed under `src/api/eodiro-one-api/scheme`.
+Actions are placed under `src/api/one/scheme`.
 
 ### Folder
 
@@ -28,7 +28,7 @@ It exports an interface with the name `Interface`.
 export interface Interface {
   data: {} // Request data
   payload: {
-    err: OneAPIError<...>
+    err: OneApiError // additional err types using union type
     data: {} // Response data
   }
 }
@@ -51,7 +51,7 @@ export default async function(data: Interface['data']): Promise<Interface['paylo
 
 ## Refresh
 
-After creating an action, you have to refresh the package by running the script `refresh` in `../eodiro-one-api/package.json`.
+After creating an action, you have to refresh the package by running the script `refresh` in `one/package.json`.
 
 ```zsh
 npm run refresh

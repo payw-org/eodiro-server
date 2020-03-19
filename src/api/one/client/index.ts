@@ -1,15 +1,15 @@
 import axios from 'axios'
 import {
   APIScheme,
+  DeleteComment,
   FetchPostsOfBoard,
   FetchRecentPostsOfBoard,
-  GetPostById,
-  UploadPost,
-  GetUserId,
-  DeleteComment,
   GetBoardId,
   GetComments,
+  GetPostById,
+  GetUserId,
   UploadComment,
+  UploadPost,
 } from '../scheme'
 import { OneApiError, OneAPIPayload } from '../scheme/types/utils'
 
@@ -93,7 +93,10 @@ export async function oneAPIClient<T extends APIScheme>(
           default:
             break
         }
-        window.alert(msg)
+
+        if (msg) {
+          window.alert(msg)
+        }
       }
     }
 
