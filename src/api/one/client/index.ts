@@ -113,8 +113,9 @@ export async function oneAPIClient<T extends APIScheme>(
     return data
   } catch (err) {
     try {
-      window.alert('[One API] 서버와 연결할 수 없습니다.')
+      window.alert(`[One API] 서버와 연결할 수 없습니다. ${err}`)
+      console.log(err)
     } catch (error) {}
-    throw err
+    throw new Error(err)
   }
 }
