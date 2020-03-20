@@ -43,8 +43,8 @@ export default async function(
   await query(
     SqlB<PostType>()
       .update('post', {
-        title: data.title,
-        body: data.body,
+        title,
+        body,
         edited_at: Time.getCurrTime(),
       })
       .where()
