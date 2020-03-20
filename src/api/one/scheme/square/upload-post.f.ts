@@ -31,18 +31,6 @@ export async function uploadPost(
     }
   }
 
-  // TODO: Proper board ID
-  const insertQuery = SqlB<PostType>()
-    .insert('post', {
-      board_id: data.boardID,
-      title: undefined,
-      body: undefined,
-      user_id: undefined,
-      uploaded_at: undefined,
-      random_nickname: undefined,
-    })
-    .build()
-
   const User = await getUser()
   const userInfo = await User.findAtId(authPayload.userId)
 
@@ -52,20 +40,18 @@ export async function uploadPost(
     }
   }
 
-  // Upload a new post
+  const insertQuery = SqlB<PostType>()
+    .insert('post', {
+      board_id: data.boardID,
+      title,
+      body,
+      user_id: authPayload.userId,
+      uploaded_at: Time.getCurrTime(),
+      random_nickname: userInfo.random_nickname,
+    })
+    .build()
 
-  // Pass trimmed title and body
-  const values = [
-    title,
-    body,
-    authPayload.userId,
-    Time.getCurrTime(),
-    userInfo.random_nickname,
-  ]
-  const [err, results] = await Db.query<MysqlInsertOrUpdateResult>(
-    insertQuery,
-    values
-  )
+  const [err, results] = await Db.query<MysqlInsertOrUpdateResult>(insertQuery)
 
   if (err) {
     return {
