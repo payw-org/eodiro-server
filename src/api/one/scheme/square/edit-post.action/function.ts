@@ -26,6 +26,20 @@ export default async function(
     }
   }
 
+  const title = data.title.trim()
+  if (title.length === 0) {
+    return {
+      err: 'No Title',
+    }
+  }
+
+  const body = data.body.trim()
+  if (body.length === 0) {
+    return {
+      err: 'No Body',
+    }
+  }
+
   await query(
     SqlB<PostType>()
       .update('post', {
