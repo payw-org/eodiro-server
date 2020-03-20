@@ -24,6 +24,7 @@ export class Database {
       {
         host: config.DB_HOST,
         dialect: 'mysql',
+        logging: false,
         define: {
           freezeTableName: true,
           charset: 'utf8mb4',
