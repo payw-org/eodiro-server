@@ -88,7 +88,7 @@ oneAPIClient(
 
 TypeScript will automatically inference the types of request data and payload as you choose the action.
 
-### [Development Guide](https://github.com/paywteam/eodiro-api2/tree/master/src/api/eodiro-one-api)
+### [Development Guide](https://github.com/paywteam/eodiro-api2/tree/master/src/api/one)
 
 ---
 
