@@ -36,7 +36,7 @@ export default class EodiroJwt {
     expire: config.ACCESS_TOKEN_EXPIRE,
   }
   static async getTokenOrCreate(payload: Payload): Promise<Tokens<Payload>> {
-    return await Jwt.getTokenOrCreateTokens(
+    return Jwt.getTokenOrCreateTokens(
       payload,
       this.RefreshTokenOption,
       {
