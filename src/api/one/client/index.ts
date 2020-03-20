@@ -1,42 +1,21 @@
-import { isClient } from '@/modules/utils/is-client'
 import axios from 'axios'
 import {
   APIScheme,
-  FetchPostsOfBoard,
-  FetchRecentPostsOfBoard,
-  GetPostById,
-  UploadPost,
-  GetUserId,
   DeleteComment,
   DeletePost,
   EditPost,
+  FetchPostsOfBoard,
+  FetchRecentPostsOfBoard,
   GetBoardId,
   GetComments,
+  GetPostById,
+  GetUserId,
   UploadComment,
+  UploadPost,
 } from '../scheme'
 import { OneApiError, OneAPIPayload } from '../scheme/types/utils'
 
 // ** AUTOMATICALLY GENERATED FUNCTION OVERLOADINGS, DO NOT MODIFY HERE MANUALLY **
-export async function oneAPIClient(
-  host: string,
-  request: Omit<FetchPostsOfBoard, 'payload'>
-): Promise<FetchPostsOfBoard['payload']>
-export async function oneAPIClient(
-  host: string,
-  request: Omit<FetchRecentPostsOfBoard, 'payload'>
-): Promise<FetchRecentPostsOfBoard['payload']>
-export async function oneAPIClient(
-  host: string,
-  request: Omit<GetPostById, 'payload'>
-): Promise<GetPostById['payload']>
-export async function oneAPIClient(
-  host: string,
-  request: Omit<UploadPost, 'payload'>
-): Promise<UploadPost['payload']>
-export async function oneAPIClient(
-  host: string,
-  request: Omit<GetUserId, 'payload'>
-): Promise<GetUserId['payload']>
 export async function oneAPIClient(
   host: string,
   request: Omit<DeleteComment, 'payload'>
@@ -51,6 +30,14 @@ export async function oneAPIClient(
 ): Promise<EditPost['payload']>
 export async function oneAPIClient(
   host: string,
+  request: Omit<FetchPostsOfBoard, 'payload'>
+): Promise<FetchPostsOfBoard['payload']>
+export async function oneAPIClient(
+  host: string,
+  request: Omit<FetchRecentPostsOfBoard, 'payload'>
+): Promise<FetchRecentPostsOfBoard['payload']>
+export async function oneAPIClient(
+  host: string,
   request: Omit<GetBoardId, 'payload'>
 ): Promise<GetBoardId['payload']>
 export async function oneAPIClient(
@@ -59,8 +46,20 @@ export async function oneAPIClient(
 ): Promise<GetComments['payload']>
 export async function oneAPIClient(
   host: string,
+  request: Omit<GetPostById, 'payload'>
+): Promise<GetPostById['payload']>
+export async function oneAPIClient(
+  host: string,
+  request: Omit<GetUserId, 'payload'>
+): Promise<GetUserId['payload']>
+export async function oneAPIClient(
+  host: string,
   request: Omit<UploadComment, 'payload'>
 ): Promise<UploadComment['payload']>
+export async function oneAPIClient(
+  host: string,
+  request: Omit<UploadPost, 'payload'>
+): Promise<UploadPost['payload']>
 // ** AUTOMATICALLY GENERATED FUNCTION OVERLOADINGS, DO NOT MODIFY HERE MANUALLY **
 export async function oneAPIClient<T extends APIScheme>(
   host: string,
@@ -113,10 +112,9 @@ export async function oneAPIClient<T extends APIScheme>(
 
     return data
   } catch (err) {
-    console.error(err)
-    if (isClient()) {
+    try {
       window.alert('[One API] 서버와 연결할 수 없습니다.')
-    }
+    } catch (error) {}
     throw err
   }
 }
