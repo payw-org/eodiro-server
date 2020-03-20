@@ -1,4 +1,4 @@
-import { user as getUser } from '@/database/models/user'
+import { getUser } from '@/database/models/user'
 import EodiroEncrypt from '@/modules/eodiro-encrypt'
 import EodiroMailer from '@/modules/eodiro-mailer'
 import Jwt, { Payload } from '@/modules/jwt'

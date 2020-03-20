@@ -1,9 +1,9 @@
 import { DataTypes, Model } from 'sequelize'
-import { createModelFunction } from '../create-model-function'
+import { createGetModelFunction } from '../create-model-function'
 
 class Period extends Model {}
 
-export const period = createModelFunction(Period, 'period', {
+export const period = createGetModelFunction(Period, 'period', {
   lecture_id: {
     type: DataTypes.INTEGER,
     allowNull: false,

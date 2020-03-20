@@ -1,5 +1,5 @@
 import { PostType } from '@/database/models/post'
-import { user } from '@/database/models/user'
+import { getUser } from '@/database/models/user'
 import Db from '@/db'
 import Auth from '@/modules/auth'
 import SqlB from '@/modules/sqlb'
@@ -12,7 +12,7 @@ router.get('/my/information', async (req, res) => {
   const accessToken = req.headers.accesstoken as string
   const payload = await Auth.isSignedUser(accessToken)
   if (payload) {
-    const User = await user()
+    const User = await getUser()
     const userInfo = await User.findAtId(payload.userId)
     res.status(200).json(userInfo)
   } else {

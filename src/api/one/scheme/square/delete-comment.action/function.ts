@@ -1,5 +1,5 @@
 import { CommentType } from '@/database/models/comment'
-import { user } from '@/database/models/user'
+import { getUser } from '@/database/models/user'
 import Db from '@/db'
 import Auth from '@/modules/auth'
 import SqlB from '@/modules/sqlb'
@@ -16,7 +16,7 @@ export default async function(
     }
   }
 
-  const User = await user()
+  const User = await getUser()
   const userInfo = await User.findAtId(authPayload.userId)
 
   const [, results] = await Db.query<CommentType[]>(

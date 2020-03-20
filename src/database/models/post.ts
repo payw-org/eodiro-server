@@ -2,9 +2,10 @@ import Db from '@/db'
 import SqlB from '@/modules/sqlb'
 import Time from '@/modules/time'
 import { DataTypes, Model } from 'sequelize'
-import { createModelFunction } from '../create-model-function'
+import { createGetModelFunction } from '../create-model-function'
+import { query, QueryTypes } from '../query'
 import { CommentType } from './comment'
-import { user } from './user'
+import { getUser } from './user'
 
 export interface PostNew {
   title: string
@@ -181,7 +182,7 @@ class Post extends Model {
       })
       .build()
 
-    const User = await user()
+    const User = await getUser()
     const userInfo = await User.findAtId(userId)
 
     if (!userInfo) {
@@ -238,30 +239,24 @@ class Post extends Model {
   }
 
   static async isOwnedBy(postId: number, userId: number): Promise<boolean> {
-    const query = `
-      select user_id
-      from post
-      where id = ?
-    `
+    const result = await query<PostType>(
+      SqlB<PostType>()
+        .select('*')
+        .from('post')
+        .where()
+        .equal('id', postId)
+        .andEqual('user_id', userId),
+      {
+        type: QueryTypes.SELECT,
+        plain: true,
+      }
+    )
 
-    const [err, results] = await Db.query(query, postId)
-
-    if (err) {
-      return false
-    }
-
-    // Post not found
-    if (results.length === 0) {
-      return false
-    }
-
-    const post: PostType = results[0]
-
-    return post.user_id === userId
+    return !!result
   }
 }
 
-export const post = createModelFunction(Post, 'post', {
+export const getPost = createGetModelFunction(Post, 'post', {
   id: {
     type: DataTypes.INTEGER,
     primaryKey: true,

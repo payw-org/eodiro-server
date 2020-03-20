@@ -1,5 +1,5 @@
 import Config from '@/config'
-import { user, UserType } from '@/database/models/user'
+import { getUser, UserType } from '@/database/models/user'
 import Db from '@/db'
 import CafeteriaMenusSeeder from '@/db/seeders/cafeteria-menus-seeder'
 import timetableSeeder from '@/db/seeders/timetable-seeder'
@@ -75,7 +75,7 @@ export default class EodiroBot {
   }
 
   private async updateRandomNickname(): Promise<void> {
-    const User = await user()
+    const User = await getUser()
     const cronTime = '0 0 * * *'
     const timeZone = 'Asia/Seoul'
     new CronJob(cronTime, User.updateRandomNickname, null, true, timeZone)

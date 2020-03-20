@@ -1,13 +1,14 @@
 import { PostType } from '../../../../database/models/post'
-import { OneAPIError, RequireAuth } from '../types/utils'
+import { OneApiError, RequireAuth } from '../types/utils'
 
 export interface GetPostById {
   action: 'getPostById'
   data: RequireAuth<{
     postID: number
+    edit?: boolean
   }>
   payload: {
-    err: OneAPIError<void>
+    err: OneApiError
     data: PostType
   }
 }

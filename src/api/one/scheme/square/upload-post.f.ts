@@ -1,10 +1,10 @@
 import { PostType } from '@/database/models/post'
-import { user } from '@/database/models/user'
+import { getUser } from '@/database/models/user'
 import Db, { MysqlInsertOrUpdateResult } from '@/db'
 import Auth from '@/modules/auth'
 import SqlB from '@/modules/sqlb'
 import Time from '@/modules/time'
-import { OneAPIData, OneAPIPayload } from '../types/utils'
+import { OneAPIData, OneApiError, OneAPIPayload } from '../types/utils'
 import { UploadPost } from './upload-post'
 
 export async function uploadPost(
@@ -13,7 +13,7 @@ export async function uploadPost(
   const authPayload = await Auth.isSignedUser(data.accessToken)
   if (!authPayload) {
     return {
-      err: 'Unauthorized',
+      err: OneApiError.UNAUTHORIZED,
     }
   }
 
@@ -32,9 +32,9 @@ export async function uploadPost(
   }
 
   // TODO: Proper board ID
-  const query = SqlB<PostType>()
+  const insertQuery = SqlB<PostType>()
     .insert('post', {
-      board_id: 1,
+      board_id: data.boardID,
       title: undefined,
       body: undefined,
       user_id: undefined,
@@ -43,14 +43,16 @@ export async function uploadPost(
     })
     .build()
 
-  const User = await user()
+  const User = await getUser()
   const userInfo = await User.findAtId(authPayload.userId)
 
   if (!userInfo) {
     return {
-      err: 'Unauthorized',
+      err: OneApiError.UNAUTHORIZED,
     }
   }
+
+  // Upload a new post
 
   // Pass trimmed title and body
   const values = [
@@ -61,13 +63,13 @@ export async function uploadPost(
     userInfo.random_nickname,
   ]
   const [err, results] = await Db.query<MysqlInsertOrUpdateResult>(
-    query,
+    insertQuery,
     values
   )
 
   if (err) {
     return {
-      err: 'Internal Server Error',
+      err: OneApiError.INTERNAL_SERVER_ERROR,
     }
   }
 

@@ -1,6 +1,6 @@
 import { CommentType } from '@/database/models/comment'
 import { PostType } from '@/database/models/post'
-import { user } from '@/database/models/user'
+import { getUser } from '@/database/models/user'
 import { TableNames } from '@/database/table-names'
 import Db from '@/db'
 import Auth from '@/modules/auth'
@@ -20,7 +20,7 @@ export default async function(
   }
 
   // Get user info
-  const User = await user()
+  const User = await getUser()
   const userInfo = await User.findAtId(authPayload.userId)
 
   // Check if the post exist

@@ -25,6 +25,12 @@ export type GetUserId = GetUserIdRaw & { action: 'getUserId' }
 import { Interface as DeleteCommentRaw } from './square/delete-comment.action/interface'
 export type DeleteComment = DeleteCommentRaw & { action: 'deleteComment' }
 
+import { Interface as DeletePostRaw } from './square/delete-post.action/interface'
+export type DeletePost = DeletePostRaw & { action: 'deletePost' }
+
+import { Interface as EditPostRaw } from './square/edit-post.action/interface'
+export type EditPost = EditPostRaw & { action: 'editPost' }
+
 import { Interface as GetBoardIdRaw } from './square/get-board-id.action/interface'
 export type GetBoardId = GetBoardIdRaw & { action: 'getBoardId' }
 
@@ -41,6 +47,8 @@ export type APIScheme =
   | UploadPost
   | GetUserId
   | DeleteComment
+  | DeletePost
+  | EditPost
   | GetBoardId
   | GetComments
   | UploadComment

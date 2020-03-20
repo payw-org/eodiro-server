@@ -1,9 +1,9 @@
 import { DataTypes, Model } from 'sequelize'
-import { createModelFunction } from '../create-model-function'
+import { createGetModelFunction } from '../create-model-function'
 
 class CafeteriaMenu extends Model {}
 
-export const cafeteriaMenu = createModelFunction(
+export const cafeteriaMenu = createGetModelFunction(
   CafeteriaMenu,
   'cafeteria_menu',
   {

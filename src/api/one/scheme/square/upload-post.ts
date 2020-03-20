@@ -1,15 +1,15 @@
-import { OneAPIError } from '../types/utils'
+import { OneApiError } from '../types/utils'
 
 export interface UploadPost {
   action: 'uploadPost'
   data: {
+    accessToken: string
     boardID: number
     title: string
     body: string
-    accessToken: string
   }
   payload: {
-    err: OneAPIError<'No Title' | 'No Body' | 'Title Too Long'>
+    err: OneApiError | 'No Title' | 'No Body' | 'Title Too Long'
     data?: number // Insert ID
   }
 }

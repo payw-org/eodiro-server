@@ -1,15 +1,17 @@
 import axios from 'axios'
 import {
   APIScheme,
-  DeleteComment,
   FetchPostsOfBoard,
   FetchRecentPostsOfBoard,
+  GetPostById,
+  UploadPost,
+  GetUserId,
+  DeleteComment,
+  DeletePost,
+  EditPost,
   GetBoardId,
   GetComments,
-  GetPostById,
-  GetUserId,
   UploadComment,
-  UploadPost,
 } from '../scheme'
 import { OneApiError, OneAPIPayload } from '../scheme/types/utils'
 
@@ -38,6 +40,14 @@ export async function oneAPIClient(
   host: string,
   request: Omit<DeleteComment, 'payload'>
 ): Promise<DeleteComment['payload']>
+export async function oneAPIClient(
+  host: string,
+  request: Omit<DeletePost, 'payload'>
+): Promise<DeletePost['payload']>
+export async function oneAPIClient(
+  host: string,
+  request: Omit<EditPost, 'payload'>
+): Promise<EditPost['payload']>
 export async function oneAPIClient(
   host: string,
   request: Omit<GetBoardId, 'payload'>

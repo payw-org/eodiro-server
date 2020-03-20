@@ -1,5 +1,5 @@
 import { changePassword } from '@/database/models/change_password'
-import { user } from '@/database/models/user'
+import { getUser } from '@/database/models/user'
 import Auth from '@/modules/auth'
 import { HttpStatusCode } from '@/modules/constants/http-status-code'
 import EodiroMailer from '@/modules/eodiro-mailer'
@@ -10,7 +10,7 @@ const router = express.Router()
 
 router.post('/change-password', async (req, res) => {
   const portalId = req.body.portalId as string
-  const User = await user()
+  const User = await getUser()
   const userInfo = await User.findWithPortalId(portalId)
 
   if (userInfo === false) {
@@ -75,7 +75,7 @@ router.patch('/change-password', async (req, res) => {
     return
   }
 
-  const User = await user()
+  const User = await getUser()
   const result = await User.updatePassword(
     changePasswordRequest.user_id,
     newPassword

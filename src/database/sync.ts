@@ -9,22 +9,22 @@ import { inquiry } from './models/inquiry'
 import { lecture } from './models/lecture'
 import { pendingUser } from './models/pending_user'
 import { period } from './models/period'
-import { post } from './models/post'
+import { getPost } from './models/post'
 import { refreshToken } from './models/refresh_token'
-import { user } from './models/user'
+import { getUser } from './models/user'
 
 const alter = {
   alter: true,
 }
 
 export async function sync(): Promise<void> {
-  await (await user()).sync(alter)
+  await (await getUser()).sync(alter)
   await (await admin()).sync(alter)
   await (await pendingUser()).sync(alter)
   await (await refreshToken()).sync(alter)
   await (await changePassword()).sync(alter)
   await (await board()).sync(alter)
-  await (await post()).sync(alter)
+  await (await getPost()).sync(alter)
   await (await comment()).sync(alter)
   await (await cafeteriaMenu()).sync(alter)
   await (await coverageMajor()).sync(alter)

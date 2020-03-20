@@ -1,8 +1,8 @@
-import { PostType } from '@/database/models/post'
+import { getPost, PostType } from '@/database/models/post'
 import Db from '@/db'
 import Auth from '@/modules/auth'
 import SqlB from '@/modules/sqlb'
-import { OneAPIData, OneAPIPayload } from '../types/utils'
+import { OneAPIData, OneApiError, OneAPIPayload } from '../types/utils'
 import { GetPostById } from './get-post-by-id'
 
 export async function getPostById(
@@ -12,7 +12,7 @@ export async function getPostById(
 
   if (!authPayload) {
     return {
-      err: 'Unauthorized',
+      err: OneApiError.UNAUTHORIZED,
       data: null,
     }
   }
@@ -21,7 +21,7 @@ export async function getPostById(
 
   if (typeof postID !== 'number') {
     return {
-      err: 'Bad Request',
+      err: OneApiError.BAD_REQUEST,
       data: null,
     }
   }
@@ -37,15 +37,26 @@ export async function getPostById(
 
   if (err) {
     return {
-      err: 'Internal Server Error',
+      err: OneApiError.INTERNAL_SERVER_ERROR,
       data: null,
     }
   }
 
   if (results.length === 0) {
     return {
-      err: 'No Content',
+      err: OneApiError.NO_CONTENT,
       data: null,
+    }
+  }
+
+  if (data.edit === true) {
+    const Post = await getPost()
+    const isYourPost = await Post.isOwnedBy(data.postID, authPayload.userId)
+    if (!isYourPost) {
+      return {
+        err: OneApiError.FORBIDDEN,
+        data: null,
+      }
     }
   }
 

@@ -1,4 +1,4 @@
-import { user } from '@/database/models/user'
+import { getUser } from '@/database/models/user'
 import Auth from '@/modules/auth'
 import express from 'express'
 
@@ -10,7 +10,7 @@ router.get('/information', async (req, res) => {
   const payload = await Auth.isSignedUser(accessToken)
 
   if (payload) {
-    const User = await user()
+    const User = await getUser()
     const userInfo = await User.findAtId(payload.userId)
     res.status(200).json(userInfo)
   } else {

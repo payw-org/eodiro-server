@@ -1,9 +1,9 @@
 import Db from '@/db'
 import Time from '@/modules/time'
 import { DataTypes, Model } from 'sequelize'
-import { createModelFunction } from '../create-model-function'
+import { createGetModelFunction } from '../create-model-function'
 import { PrimaryAIAttribute } from '../utils/model-attributes'
-import { user } from './user'
+import { getUser } from './user'
 
 export interface NewComment {
   postId: number
@@ -20,7 +20,7 @@ class Comment extends Model {
       return false
     }
 
-    const User = await user()
+    const User = await getUser()
     const userInfo = await User.findAtId(userId)
 
     if (!userInfo) {
@@ -50,7 +50,7 @@ class Comment extends Model {
   }
 }
 
-export const comment = createModelFunction(Comment, 'comment', {
+export const comment = createGetModelFunction(Comment, 'comment', {
   id: PrimaryAIAttribute,
   body: {
     type: DataTypes.TEXT,
