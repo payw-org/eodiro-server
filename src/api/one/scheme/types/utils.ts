@@ -1,6 +1,6 @@
 import { APIScheme } from '..'
 
-export type RequireAuth<T> = T & {
+export type AuthRequired<T> = T & {
   accessToken: string
 }
 
