@@ -49,12 +49,55 @@ export default async function(data: Interface['data']): Promise<Interface['paylo
 }
 ```
 
-## Refresh
+## Refresh and auto-generate imports
 
-After creating an action, you have to refresh the package by running the script `refresh` in `one/package.json`.
+After created new actions or modified the existing ones, you have to refresh the package by running the script `refresh` in `one/package.json`.
 
 ```zsh
 npm run refresh
 ```
 
-It automatically generates named imports and exports. It also adds some universal interface properties and creates union types.
+It automatically generates named imports and exports. It also adds several universal interface properties and creates union types.
+
+## Types
+
+### `OneApiError`
+
+This is Enum consists of some general errors. By default, you should set the payload's error type with it and furthermore extend using union types.
+
+**Example**
+
+```ts
+export interface Interface {
+  payload: {
+    err: OneApiError | 'No Title' | ...
+  }
+}
+```
+
+### `AuthReqired<T>`
+
+This is an utility type for the actions where the authentication is required. This type simply includes `accessToken` property to your generic `T`.
+
+**Example**
+
+```ts
+export interface Interface {
+  data: AuthRequired<{
+    title: string
+    body: string
+  }>
+}
+```
+
+It is same as
+
+```ts
+export interface Interface {
+  data: AuthRequired<{
+    accessToken: string
+    title: string
+    body: string
+  }>
+}
+```
