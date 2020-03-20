@@ -6,7 +6,7 @@ build
 .vscode/*
 !.vscode/settings.json
 .idea
-config/index.ts
+**/config/index.ts
 /storage
 data
 
