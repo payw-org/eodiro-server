@@ -130,6 +130,7 @@ ${functionExports}
   const allInterfacesNames = legacyFTSFiles
     .map((file) => getPascalName(file))
     .concat(interfacesNames) // Combine legacy interface names and new interface.ts
+  // !!! Insert 'APIScheme' at the beginning for regular expression matching
   const clientImportStatements = `import {${[
     'APIScheme',
     ...allInterfacesNames,
