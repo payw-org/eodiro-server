@@ -136,7 +136,7 @@ ${functionExports}
   ].join(',')}} from '../scheme'`
   let clientSource = fs.readFileSync('client/index.ts', 'utf8')
   clientSource = clientSource.replace(
-    /import {[\s\S]*?} from '\.\.\/scheme'/g,
+    /import {[\s]*?APIScheme[\s\S]*?} from '\.\.\/scheme'/g,
     clientImportStatements
   )
   const clientSourceSplitted = clientSource.split('\n')
