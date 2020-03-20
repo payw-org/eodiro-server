@@ -133,7 +133,7 @@ ${functionExports}
   // !!! Insert 'APIScheme' at the beginning for regular expression matching
   const clientImportStatements = `import {${[
     'APIScheme',
-    ...allInterfacesNames,
+    ...allInterfacesNames.sort(),
   ].join(',')}} from '../scheme'`
   let clientSource = fs.readFileSync('client/index.ts', 'utf8')
   clientSource = clientSource.replace(
