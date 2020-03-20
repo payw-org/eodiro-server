@@ -1,11 +1,11 @@
-import { OneAPIError } from '../../types/utils'
+import { OneApiError } from '../../types/utils'
 
 export interface Interface {
   data: {
     boardName: string
   }
   payload: {
-    err: OneAPIError<'No Board'>
+    err: OneApiError | 'No Board'
     data: number
   }
 }
