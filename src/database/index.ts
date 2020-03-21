@@ -10,7 +10,7 @@ export class Database {
   private static sequelize: Sequelize
   private static initializing: boolean
 
-  static async initSequelize(): Promise<void> {
+  static async initSequelize(logging = false): Promise<void> {
     if (this.sequelize || this.initializing) {
       return
     }
@@ -24,7 +24,7 @@ export class Database {
       {
         host: config.DB_HOST,
         dialect: 'mysql',
-        logging: false,
+        logging,
         define: {
           freezeTableName: true,
           charset: 'utf8mb4',
