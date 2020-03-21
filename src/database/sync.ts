@@ -18,8 +18,9 @@ const alter = {
   alter: true,
 }
 
-export async function sync(): Promise<void> {
+async function sync(): Promise<void> {
   await Database.initSequelize(true)
+
   await (await getUser()).sync(alter)
   await (await admin()).sync(alter)
   await (await pendingUser()).sync(alter)
@@ -34,6 +35,8 @@ export async function sync(): Promise<void> {
   await (await period()).sync(alter)
   await (await coverageMajorLecture()).sync(alter)
   await (await inquiry()).sync(alter)
+
+  await (await Database.getSequelize()).close()
 }
 
 sync()
