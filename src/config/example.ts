@@ -1,8 +1,8 @@
-import dayjs from 'dayjs'
-
 /**
  * Create index.ts based on this example
  */
+
+import dayjs from 'dayjs'
 
 export default {
   PORT: 0,
@@ -40,4 +40,9 @@ export default {
 
   // Cron
   TIME_ZONE: 'Asia/Seoul',
+
+  // CDN
+  CDN_PORT: 0,
+  CDN_DEV_PORT: 0,
+  PUBLIC_DIR: '',
 }
