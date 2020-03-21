@@ -1,4 +1,7 @@
-import { PostTypeWithCommentCount } from '../../../../database/models/post'
+import {
+  PostType,
+  PostTypeWithCommentCount,
+} from '../../../../database/models/post'
 
 export interface FetchPostsOfBoard {
   action: 'fetchPostsOfBoard'
@@ -7,7 +10,7 @@ export interface FetchPostsOfBoard {
     lastPostID?: number
     amount?: number
     noBody?: boolean
-    columns?: (keyof PostTypeWithCommentCount)[]
+    columns?: (keyof PostType)[]
   }
   payload: PostTypeWithCommentCount[]
 }

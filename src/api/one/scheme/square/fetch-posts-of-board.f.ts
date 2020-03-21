@@ -1,4 +1,4 @@
-import { postAttrs } from '@/database/models/post'
+import { postAttrs, PostType } from '@/database/models/post'
 import Db from '@/db'
 import SqlB from '@/modules/sqlb'
 import { ArrayUtil } from '@/modules/utils/array-util'
@@ -21,8 +21,8 @@ export async function fetchPostsOfBoard(
     ArrayUtil.replace(columns, 'body', 'substring(body, 1, 100) as body')
   }
 
-  const sqlBInstance = SqlB()
-    .select(
+  const sqlBInstance = SqlB<PostType>()
+    .selectAny(
       ...columns,
       SqlB()
         .select('count(*)')
@@ -32,9 +32,11 @@ export async function fetchPostsOfBoard(
         .build()
     )
     .from('post')
+    .where()
+    .equal('board_id', data.boardID)
 
   if (fromID) {
-    sqlBInstance.where(`id < ${SqlB.escape(fromID)}`)
+    sqlBInstance.and(`id < ${SqlB.escape(fromID)}`)
   }
 
   sqlBInstance.order('id', 'desc').limit(amount)
