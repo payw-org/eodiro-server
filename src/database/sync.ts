@@ -1,5 +1,6 @@
+import { Database } from './index'
 import { admin } from './models/admin'
-import { board } from './models/board'
+import { getBoard } from './models/board'
 import { cafeteriaMenu } from './models/cafeteria_menu'
 import { changePassword } from './models/change_password'
 import { comment } from './models/comment'
@@ -18,12 +19,13 @@ const alter = {
 }
 
 export async function sync(): Promise<void> {
+  await Database.initSequelize(true)
   await (await getUser()).sync(alter)
   await (await admin()).sync(alter)
   await (await pendingUser()).sync(alter)
   await (await refreshToken()).sync(alter)
   await (await changePassword()).sync(alter)
-  await (await board()).sync(alter)
+  await (await getBoard()).sync(alter)
   await (await getPost()).sync(alter)
   await (await comment()).sync(alter)
   await (await cafeteriaMenu()).sync(alter)
