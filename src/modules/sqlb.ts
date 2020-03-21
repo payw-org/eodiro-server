@@ -96,12 +96,24 @@ export class SqlBInstance<T = any> {
     return this
   }
 
-  select(...what: Array<keyof T | '*'>): SqlBInstance<T> {
+  /**
+   *
+   * @param what Array of strings or SqlB instances. Empty will select all.
+   */
+  select(...what: Array<keyof T | '*' | SqlBInstance>): SqlBInstance<T> {
     if (what.length === 0) {
       what = ['*']
     }
 
-    const attrs = what.join(', ')
+    const attrs = what
+      .map((col) => {
+        if (col instanceof SqlBInstance) {
+          return col.build()
+        } else {
+          return col
+        }
+      })
+      .join(', ')
 
     this.append(`SELECT ${attrs}`)
 
