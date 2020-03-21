@@ -77,7 +77,7 @@ export interface Interface {
 
 ### `AuthReqired<T>`
 
-This is an utility type for the actions where the authentication is required. This type simply includes `accessToken` property to your generic `T`.
+This is an utility type for the actions where the authentication is required. This type simply includes `accessToken` property to your reqeust data type.
 
 **Example**
 
