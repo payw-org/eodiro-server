@@ -391,3 +391,9 @@ export class SqlBInstance<T = any> {
 export default function SqlB<T = any>(): SqlBInstance<T> {
   return new SqlBInstance<T>()
 }
+
+// Utility function that escapes any value
+// using node mysql's escape method
+SqlB.escape = (value: any) => {
+  return mysql.createConnection({}).escape(value)
+}
