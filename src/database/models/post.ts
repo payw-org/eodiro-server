@@ -320,3 +320,8 @@ export type PostType = {
   uploaded_at: string
   edited_at: string
 }
+
+export type CommentCount = {
+  comment_count: number
+}
+export type PostTypeWithCommentCount = PostType & CommentCount

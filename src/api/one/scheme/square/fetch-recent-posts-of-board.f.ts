@@ -2,6 +2,7 @@ import { postAttrs, PostType } from '@/database/models/post'
 import Db from '@/db'
 import SqlB from '@/modules/sqlb'
 import { ArrayUtil } from '@/modules/utils/array-util'
+import _ from 'lodash'
 import { FetchRecentPostsOfBoard } from './fetch-recent-posts-of-board'
 
 export async function fetchRecentPostsOfBoard(
@@ -9,36 +10,32 @@ export async function fetchRecentPostsOfBoard(
 ): Promise<FetchRecentPostsOfBoard['payload']> {
   const { boardID, mostRecentPostID, noBody } = data
 
-  let fields = ArrayUtil.replace<string>(
-    postAttrs,
-    'body',
-    'substring(body, 1, 100) as body'
-  )
+  // Fetch all columns if no columns specified
+  const columns = data.columns || postAttrs
 
   if (noBody) {
-    fields = ArrayUtil.remove<string>(fields, 'body')
+    _.pullAllWith(columns, ['body'], _.isEqual)
+  } else {
+    ArrayUtil.replace(columns, 'body', 'substring(body, 1, 100) as body')
   }
 
   const query = SqlB()
     .select(
-      ...fields,
+      ...columns,
       SqlB()
         .select('count(*)')
         .from('comment')
         .where('comment.post_id = post.id')
         .as('comment_count')
-        .build()
     )
     .from('post')
-    .where('id > ?')
+    .where(SqlB<PostType>().equal('board_id', boardID))
+    .and()
+    .raw('id > ?')
     .order('id', 'DESC')
     .build()
   const values = [mostRecentPostID]
-  const [err, results] = await Db.query(query, values)
+  const [, results] = await Db.query(query, values)
 
-  if (err) {
-    return undefined
-  }
-
-  return results as PostType[]
+  return results as FetchRecentPostsOfBoard['payload']
 }
