@@ -4,7 +4,7 @@ import { PrimaryAIAttribute } from '../utils/model-attributes'
 
 class Board extends Model {}
 
-export const board = createGetModelFunction(
+export const getBoard = createGetModelFunction(
   Board,
   'board',
   {
@@ -17,6 +17,7 @@ export const board = createGetModelFunction(
   {
     indexes: [
       {
+        unique: true,
         fields: ['board_name'],
       },
     ],
