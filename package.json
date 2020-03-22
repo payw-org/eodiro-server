@@ -32,7 +32,8 @@
     "checkout-latest": "git reset --hard && git checkout $(git describe --tags `git rev-list --tags --max-count=1`)",
     "update": "git reset --hard && git fetch --prune && npm run checkout-latest && npm install && npm run pm2-reboot",
     "cdn:dev": "npm run ts-node:dev -- src/cdn/serve.ts",
-    "cdn": "node --harmony build/src/cdn/serve.js"
+    "cdn": "node --harmony build/src/cdn/serve.js",
+    "pm2:cdn": "pm2 start npm --name 'eodiro-cdn' -- run 'cdn'"
   },
   "_moduleAliases": {
     "@": "build"
