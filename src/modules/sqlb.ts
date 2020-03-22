@@ -234,6 +234,11 @@ export class SqlBInstance<T = any> {
     return this
   }
 
+  in(attr: keyof T, values: SqlBValue[]): SqlBInstance<T> {
+    this.append(`${attr} IN (${values.join(', ')})`)
+    return this
+  }
+
   equal(attr: keyof T, value: SqlBValue): SqlBInstance<T> {
     this.append(`${attr} = ${this.convert(value)}`)
 

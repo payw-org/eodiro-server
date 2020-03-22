@@ -13,6 +13,14 @@ export const getFile = createGetModelFunction(
       type: DataTypes.STRING(40),
       allowNull: false,
     },
+    file_name: {
+      type: DataTypes.STRING(300),
+      allowNull: false,
+    },
+    mime: {
+      type: DataTypes.STRING(50),
+      allowNull: false,
+    },
   },
   {
     indexes: [
@@ -23,3 +31,10 @@ export const getFile = createGetModelFunction(
     ],
   }
 )
+
+export type FileType = {
+  id: number
+  uuid: string
+  file_name: string
+  mime: string
+}

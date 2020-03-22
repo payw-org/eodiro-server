@@ -5,6 +5,7 @@ editPost({
   postId: 108,
   title: 'what',
   body: 'hello',
+  fileIds: [],
 }).then((payload) => {
   console.log(payload)
 })

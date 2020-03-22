@@ -6,11 +6,13 @@ export enum TableNames {
   comment = 'comment',
   coverage_major = 'coverage_major',
   coverage_major_lecture = 'coverage_major_lecture',
+  file = 'file',
   inquiry = 'inquiry',
   lecture = 'lecture',
   pending_user = 'pending_user',
   period = 'period',
   post = 'post',
+  post_file = 'post_file',
   refresh_token = 'refresh_token',
   user = 'user',
 }

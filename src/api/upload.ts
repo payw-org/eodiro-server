@@ -45,6 +45,7 @@ router.post('/upload', async (req, res) => {
       }
 
       if (!available) {
+        console.log(mimeType)
         res.status(200).json({
           err: 'Unsupported MIME Type',
         })

@@ -1,4 +1,5 @@
 import { getPost, PostType } from '@/database/models/post'
+import { PostFileType } from '@/database/models/post_file'
 import { query, QueryTypes } from '@/database/query'
 import Auth from '@/modules/auth'
 import SqlB from '@/modules/sqlb'
@@ -54,6 +55,32 @@ export default async function(
       plain: true,
     }
   )
+
+  if (data.fileIds) {
+    // Delete all connected entries in post_file
+    // and insert again
+    await query(
+      SqlB<PostFileType>()
+        .delete()
+        .from('post_file')
+        .where()
+        .equal('post_id', data.postId)
+    )
+
+    if (data.fileIds.length > 0) {
+      await query(
+        SqlB<PostFileType>().insertBulk(
+          'post_file',
+          data.fileIds.map((fileId) => {
+            return {
+              post_id: data.postId,
+              file_id: fileId,
+            }
+          })
+        )
+      )
+    }
+  }
 
   return {
     err: null,

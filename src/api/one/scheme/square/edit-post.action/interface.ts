@@ -7,6 +7,7 @@ export interface Interface {
     postId: number
     title: string
     body: string
+    fileIds: number[]
   }
   payload: {
     err: OneApiError | UploadPost['payload']['err']

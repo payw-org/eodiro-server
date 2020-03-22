@@ -12,7 +12,7 @@ export const cafeteriaMenu = createGetModelFunction(
       primaryKey: true,
     },
     served_at: {
-      type: DataTypes.DATE,
+      type: DataTypes.DATEONLY,
       primaryKey: true,
     },
     data: {

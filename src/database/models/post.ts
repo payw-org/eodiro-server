@@ -305,7 +305,7 @@ export const getPost = createGetModelFunction(Post, 'post', {
   },
   edited_at: {
     type: DataTypes.DATE,
-    allowNull: false,
+    allowNull: true,
   },
 })
 
