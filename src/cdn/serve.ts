@@ -1,21 +1,15 @@
 import config from '@/config'
 import { isDev } from '@/modules/utils/is-dev'
-import appRoot from 'app-root-path'
 import chalk from 'chalk'
 import http from 'http'
-import os from 'os'
-import path from 'path'
 import handler from 'serve-handler'
+import { getStoragePath } from './get-storage-path'
 
-const homeDir = os.homedir()
-
-const publicDir = isDev()
-  ? appRoot.resolve('/storage')
-  : path.resolve(homeDir, config.PUBLIC_DIR)
+const publicDir = getStoragePath()
 
 const server = http.createServer((request, response) => {
   return handler(request, response, {
-    directoryListing: false,
+    directoryListing: true,
     public: publicDir,
   })
 })
