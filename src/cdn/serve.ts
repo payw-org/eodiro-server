@@ -9,7 +9,7 @@ const publicDir = getStoragePath()
 
 const server = http.createServer((request, response) => {
   return handler(request, response, {
-    directoryListing: true,
+    directoryListing: false,
     public: publicDir,
   })
 })
