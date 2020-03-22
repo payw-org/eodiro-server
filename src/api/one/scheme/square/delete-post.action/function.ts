@@ -38,16 +38,18 @@ export default async function(
   )
 
   //  Delete file entries from db
-  await query(
-    SqlB<FileType>()
-      .delete()
-      .from(TableNames.file)
-      .where()
-      .in(
-        'id',
-        postFiles.map((postFile) => postFile.file_id)
-      )
-  )
+  if (postFiles.length > 0) {
+    await query(
+      SqlB<FileType>()
+        .delete()
+        .from(TableNames.file)
+        .where()
+        .in(
+          'id',
+          postFiles.map((postFile) => postFile.file_id)
+        )
+    )
+  }
 
   // Delete the post
   await query(
