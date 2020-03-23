@@ -343,16 +343,14 @@ export class SqlBInstance<T = any> {
   insert(
     schema: string,
     items: {
-      [K in keyof T]?: string | number | null | undefined
+      [K in keyof T]?: T[K]
     },
     ignore?: boolean
   ): SqlBInstance<T> {
     const targetsQuery = Object.keys(items).join(', ')
-    const values = Object.values(items as Record<string, number | string>).map(
-      (val) => {
-        return this.convert(val)
-      }
-    )
+    const values = Object.values(items).map((val) => {
+      return this.convert(val as any)
+    })
     const valuesQuery = values.join(', ')
 
     this.append(
@@ -368,7 +366,7 @@ export class SqlBInstance<T = any> {
   insertBulk(
     schema: string,
     items: {
-      [K in keyof T]?: string | number | null | undefined
+      [K in keyof T]?: T[K]
     }[],
     ignore?: boolean
   ): SqlBInstance<T> {
@@ -398,7 +396,7 @@ export class SqlBInstance<T = any> {
   update(
     schema: string,
     items: {
-      [K in keyof T]?: string | number | null | undefined
+      [K in keyof T]?: T[K]
     }
   ): SqlBInstance<T> {
     const setQuery = Object.keys(items)
