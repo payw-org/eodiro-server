@@ -11,6 +11,7 @@ import { v4 as uuidv4 } from 'uuid'
 
 const router = express.Router()
 const upload = multer().array('file')
+const publicContentUrl = 'public-user-content'
 
 router.post('/upload', async (req, res) => {
   // TODO: check referer
@@ -58,9 +59,14 @@ router.post('/upload', async (req, res) => {
         return
       }
 
+      // Check directory existence
+      if (!fs.existsSync(`${storagePath}/${publicContentUrl}`)) {
+        fs.mkdirSync(`${storagePath}/${publicContentUrl}`)
+      }
+
       // Create a uuid directory
       try {
-        fs.mkdirSync(`${storagePath}/${uuid}`)
+        fs.mkdirSync(`${storagePath}/${publicContentUrl}/${uuid}`)
       } catch (error) {
         res.sendStatus(500)
         return
@@ -68,8 +74,12 @@ router.post('/upload', async (req, res) => {
 
       // Save file
       try {
-        fs.writeFileSync(`${storagePath}/${uuid}/${originalName}`, buffer)
+        fs.writeFileSync(
+          `${storagePath}/${publicContentUrl}/${uuid}/${originalName}`,
+          buffer
+        )
       } catch (error) {
+        console.log(error)
         res.sendStatus(500)
         return
       }
@@ -88,14 +98,18 @@ router.post('/upload', async (req, res) => {
 
       if (files.length === 1) {
         res.status(200).json({
-          path: `/${uuid}/${originalName}`,
+          path: `/${publicContentUrl}/${uuid}/${encodeURIComponent(
+            originalName
+          )}`,
           fileId: insertId,
         })
         return
       } else {
         result.push({
           index: i,
-          path: `/${uuid}/${originalName}`,
+          path: `/${publicContentUrl}/${uuid}/${encodeURIComponent(
+            originalName
+          )}`,
           fileId: insertId,
         })
       }
