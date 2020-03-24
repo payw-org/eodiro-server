@@ -70,11 +70,7 @@ export async function getPostById(
   const postFiles = await query<PostFileType & FileType>(
     SqlB()
       .select('*')
-      .from(
-        SqlB()
-          .join('file', 'post_file')
-          .on('file.id = post_file.file_id')
-      )
+      .from(SqlB().join('file', 'post_file').on('file.id = post_file.file_id'))
       .where(SqlB().equal('post_id', data.postId)),
     {
       type: QueryTypes.SELECT,
@@ -87,7 +83,9 @@ export async function getPostById(
     payload.files = postFiles.map((postFile) => {
       return {
         fileId: postFile.file_id,
-        path: `/${postFile.uuid}/${postFile.file_name}`,
+        path: `/public-user-content/${postFile.uuid}/${encodeURIComponent(
+          postFile.file_name
+        )}`,
         mimeType: postFile.mime,
         name: postFile.file_name,
       }
