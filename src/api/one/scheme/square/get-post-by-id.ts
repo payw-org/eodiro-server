@@ -1,14 +1,21 @@
 import { PostType } from '../../../../database/models/post'
-import { OneApiError, RequireAuth } from '../types/utils'
+import { AuthRequired, OneApiError } from '../types/utils'
 
 export interface GetPostById {
   action: 'getPostById'
-  data: RequireAuth<{
-    postID: number
+  data: AuthRequired<{
+    postId: number
     edit?: boolean
   }>
   payload: {
     err: OneApiError
-    data: PostType
+    data: PostType & {
+      files?: {
+        mimeType: string
+        name: string
+        fileId: number
+        path: string
+      }[]
+    }
   }
 }

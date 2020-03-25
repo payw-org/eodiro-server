@@ -1,11 +1,19 @@
 import { BoardType } from '@/database/models/board'
 import Db from '@/db'
 import SqlB from '@/modules/sqlb'
+import { OneApiError } from '../../types/utils'
 import { Interface } from './interface'
 
 export default async function(
   data: Interface['data']
 ): Promise<Interface['payload']> {
+  if (!data.boardName) {
+    return {
+      err: OneApiError.BAD_REQUEST,
+      data: null,
+    }
+  }
+
   const q = SqlB<BoardType>()
     .select('*')
     .from('board')

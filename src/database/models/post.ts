@@ -305,7 +305,7 @@ export const getPost = createGetModelFunction(Post, 'post', {
   },
   edited_at: {
     type: DataTypes.DATE,
-    allowNull: false,
+    allowNull: true,
   },
 })
 
@@ -320,3 +320,8 @@ export type PostType = {
   uploaded_at: string
   edited_at: string
 }
+
+export type CommentCount = {
+  comment_count: number
+}
+export type PostTypeWithCommentCount = PostType & CommentCount

@@ -1,4 +1,7 @@
-import { PostType } from '../../../../database/models/post'
+import {
+  PostType,
+  PostTypeWithCommentCount,
+} from '../../../../database/models/post'
 
 /**
  * Fetch recetly updated new posts
@@ -9,6 +12,7 @@ export interface FetchRecentPostsOfBoard {
     boardID: number
     mostRecentPostID: number
     noBody?: boolean
+    columns?: (keyof PostType)[]
   }
-  payload: PostType[]
+  payload: PostTypeWithCommentCount[]
 }

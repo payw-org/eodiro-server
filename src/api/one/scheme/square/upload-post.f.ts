@@ -1,6 +1,7 @@
 import { PostType } from '@/database/models/post'
+import { PostFileType } from '@/database/models/post_file'
 import { getUser } from '@/database/models/user'
-import Db, { MysqlInsertOrUpdateResult } from '@/db'
+import { query, QueryTypes } from '@/database/query'
 import Auth from '@/modules/auth'
 import SqlB from '@/modules/sqlb'
 import Time from '@/modules/time'
@@ -51,16 +52,26 @@ export async function uploadPost(
     })
     .build()
 
-  const [err, results] = await Db.query<MysqlInsertOrUpdateResult>(insertQuery)
+  const [insertId] = await query(insertQuery, {
+    type: QueryTypes.INSERT,
+  })
 
-  if (err) {
-    return {
-      err: OneApiError.INTERNAL_SERVER_ERROR,
-    }
+  if (data.fileIds && data.fileIds.length > 0) {
+    await query(
+      SqlB<PostFileType>().insertBulk(
+        'post_file',
+        data.fileIds.map((fileId) => {
+          return {
+            post_id: insertId,
+            file_id: fileId,
+          }
+        })
+      )
+    )
   }
 
   return {
     err: null,
-    data: results.insertId,
+    data: insertId,
   }
 }

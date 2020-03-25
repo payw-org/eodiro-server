@@ -2,6 +2,7 @@ import Config from '@/config'
 import { CafeteriaMenuType } from '@/database/models/cafeteria_menu'
 import Db from '@/db'
 import convertCampusName from '@/modules/convert-campus-name'
+import EodiroMailer from '@/modules/eodiro-mailer'
 import SqlB from '@/modules/sqlb'
 import { CCMS } from '@payw/cau-cafeteria-menus-scraper'
 
@@ -36,24 +37,31 @@ CafeteriaMenusSeeder.seed = async (): Promise<void> => {
     })
   })
 
-  const [err] = await Db.query(
-    SqlB()
-      .delete()
-      .from('cafeteria_menu')
-      .where(
-        daysList
-          .map((day) => {
-            return `campus = '${convertCampusName(
-              menus.campus
-            )}' AND served_at = '${day}'`
-          })
-          .join(' OR ')
-      )
-      .build()
-  )
+  const query = SqlB()
+    .delete()
+    .from('cafeteria_menu')
+    .where(
+      daysList
+        .map((day) => {
+          return `campus = '${convertCampusName(
+            menus.campus
+          )}' AND served_at = '${day}'`
+        })
+        .join(' OR ')
+    )
+    .build()
+  const [err] = await Db.query(query)
 
   if (err) {
     console.log(`🌱 Seeding failed`)
+    EodiroMailer.sendMail({
+      subject: 'Failed to seed cafeteria menus',
+      to: 'contact@payw.org',
+      html: `
+query: ${query}
+err: ${err}
+`,
+    })
     return
   }
 

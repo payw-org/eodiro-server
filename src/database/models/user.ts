@@ -308,4 +308,5 @@ export type UserType = {
   registered_at: string
 }
 
-export type UserTypePasswordOmitted = Omit<UserType, 'password'>
+export type UserTypePasswordOmitted = Omit<UserType, 'password'> // @deprecated use `UserTypeSafe` instead
+export type UserTypeSafe = Omit<UserType, 'password'>

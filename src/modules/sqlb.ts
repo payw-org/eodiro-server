@@ -1,3 +1,8 @@
+/**
+ * SqlB - Simple query builder
+ * Copyright 2020 jhaemin
+ */
+
 import { TableNames } from '@/database/table-names'
 import mysql from 'mysql'
 import sqlFormatter from 'sql-formatter'
@@ -20,11 +25,17 @@ export class SqlBInstance<T = any> {
   }
 
   /**
-   * Append
+   * Append query with a space before
    */
   private append(appendingQuery: string): void {
     this.space()
-    this.q = this.q.concat(appendingQuery)
+    this.concat(appendingQuery)
+  }
+  /**
+   * Concatenate string without a space
+   */
+  private concat(str: string): void {
+    this.q = this.q.concat(str)
   }
 
   private wrap(text: string, wrapper: 'singleQuote' | 'parentheses'): string {
@@ -96,15 +107,51 @@ export class SqlBInstance<T = any> {
     return this
   }
 
-  select(...what: Array<keyof T | '*'>): SqlBInstance<T> {
+  /**
+   * Select columns from table. If you specify a generic schema type,
+   * it only allows the keys of the given type.
+   * Use
+   * @param what Array of strings or SqlB instances. Empty will select all.
+   */
+  select(...what: Array<keyof T | '*' | SqlBInstance>): SqlBInstance<T> {
     if (what.length === 0) {
       what = ['*']
     }
 
-    const attrs = what.join(', ')
+    const attrs = what
+      .map((col) => {
+        if (col instanceof SqlBInstance) {
+          return col.build()
+        } else {
+          return col
+        }
+      })
+      .join(', ')
 
     this.append(`SELECT ${attrs}`)
 
+    return this
+  }
+  /**
+   * Don't use this method alone.
+   * Run `select()` or `selectAny()` first.
+   */
+  alsoSelect(...what: Array<keyof T | '*' | SqlBInstance>): SqlBInstance<T> {
+    this.concat(',')
+    this.select(...what)
+    return this
+  }
+  selectAny(...what: string[]): SqlBInstance<T> {
+    this.append(`SELECT ${what.join(', ')}`)
+    return this
+  }
+  /**
+   * Don't use this method alone.
+   * Run `select()` or `selectAny()` first.
+   */
+  alsoSelectAny(...what: string[]): SqlBInstance<T> {
+    this.concat(',')
+    this.selectAny(...what)
     return this
   }
 
@@ -184,6 +231,11 @@ export class SqlBInstance<T = any> {
       this.append(`ON`)
     }
 
+    return this
+  }
+
+  in(attr: keyof T, values: SqlBValue[]): SqlBInstance<T> {
+    this.append(`${attr} IN (${values.join(', ')})`)
     return this
   }
 
@@ -291,16 +343,14 @@ export class SqlBInstance<T = any> {
   insert(
     schema: string,
     items: {
-      [K in keyof T]?: string | number | null | undefined
+      [K in keyof T]?: T[K]
     },
     ignore?: boolean
   ): SqlBInstance<T> {
     const targetsQuery = Object.keys(items).join(', ')
-    const values = Object.values(items as Record<string, number | string>).map(
-      (val) => {
-        return this.convert(val)
-      }
-    )
+    const values = Object.values(items).map((val) => {
+      return this.convert(val as any)
+    })
     const valuesQuery = values.join(', ')
 
     this.append(
@@ -316,7 +366,7 @@ export class SqlBInstance<T = any> {
   insertBulk(
     schema: string,
     items: {
-      [K in keyof T]?: string | number | null | undefined
+      [K in keyof T]?: T[K]
     }[],
     ignore?: boolean
   ): SqlBInstance<T> {
@@ -346,7 +396,7 @@ export class SqlBInstance<T = any> {
   update(
     schema: string,
     items: {
-      [K in keyof T]?: string | number | null | undefined
+      [K in keyof T]?: T[K]
     }
   ): SqlBInstance<T> {
     const setQuery = Object.keys(items)
@@ -375,19 +425,35 @@ export class SqlBInstance<T = any> {
     return this
   }
 
-  and(sql?: SqlBInstance<T>): SqlBInstance<T> {
+  and(sql?: string | SqlBInstance<T>): SqlBInstance<T> {
     this.append(`AND`)
-    if (sql instanceof SqlBInstance) this.append(sql.build())
+    if (sql) {
+      if (sql instanceof SqlBInstance) {
+        sql = sql.build()
+      }
+      this.append(sql)
+    }
     return this
   }
 
-  or(sql?: SqlBInstance<T>): SqlBInstance<T> {
+  or(sql?: string | SqlBInstance<T>): SqlBInstance<T> {
     this.append(`OR`)
-    if (sql instanceof SqlBInstance) this.append(sql.build())
+    if (sql) {
+      if (sql instanceof SqlBInstance) {
+        sql = sql.build()
+      }
+      this.append(sql)
+    }
     return this
   }
 }
 
 export default function SqlB<T = any>(): SqlBInstance<T> {
   return new SqlBInstance<T>()
+}
+
+// Utility function that escapes any value
+// using node mysql's escape method
+SqlB.escape = (value: any) => {
+  return mysql.createConnection({}).escape(value)
 }
