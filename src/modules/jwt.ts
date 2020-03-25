@@ -5,6 +5,8 @@ import {
   Jwt,
   JwtToken,
   RefreshToken,
+  RefreshTokenOption,
+  TokenOption,
   Tokens,
 } from 'jwt-token'
 
@@ -14,14 +16,6 @@ export interface Payload {
 }
 
 export default class EodiroJwt {
-  private static async getRefreshTokenFromDb(userId: number) {
-    const RefreshTokenTable = await refreshTokenTable()
-    const row = await RefreshTokenTable.findWithUserId(userId)
-    if (row === false || row === undefined) {
-      return undefined
-    }
-    return row
-  }
   private static RefreshTokenOption = {
     secret: config.REFRESH_TOKEN_SECRET,
     expire: config.REFRESH_TOKEN_EXPIRE,
@@ -35,13 +29,27 @@ export default class EodiroJwt {
     secret: config.ACCESS_TOKEN_SECRET,
     expire: config.ACCESS_TOKEN_EXPIRE,
   }
-  static async getTokenOrCreate(payload: Payload): Promise<Tokens<Payload>> {
+
+  private static async getRefreshTokenFromDb(userId: number) {
+    const RefreshTokenTable = await refreshTokenTable()
+    const row = await RefreshTokenTable.findWithUserId(userId)
+    if (row === false || row === undefined) {
+      return undefined
+    }
+    return row
+  }
+
+  static async getTokenOrCreate(
+    payload: Payload,
+    refreshTokenOption: RefreshTokenOption<Payload> = this.RefreshTokenOption,
+    accessTokenOption: TokenOption<Payload> = this.AccessTokenOption
+  ): Promise<Tokens<Payload>> {
     return Jwt.getTokenOrCreateTokens(
       payload,
-      this.RefreshTokenOption,
+      refreshTokenOption,
       {
         payload,
-        ...this.AccessTokenOption,
+        ...accessTokenOption,
       },
       async (_): Promise<string | undefined> => {
         const row = await this.getRefreshTokenFromDb(payload.userId)
@@ -58,13 +66,16 @@ export default class EodiroJwt {
     )
   }
 
-  static async verify(token: string): Promise<Payload | false> {
+  static async verify(
+    token: string,
+    accessTokenOption: TokenOption<Payload> = this.AccessTokenOption
+  ): Promise<Payload | false> {
     let result = {} as Payload
     try {
       result = await Jwt.verifyAccessToken<Payload>(
         {
           token,
-          ...this.AccessTokenOption,
+          ...accessTokenOption,
         } as DecodeTokenOption,
         async (accessToken: JwtToken<Payload>): Promise<number> => {
           const row = await this.getRefreshTokenFromDb(
@@ -79,11 +90,15 @@ export default class EodiroJwt {
     return result
   }
 
-  static async refresh(token: string): Promise<Tokens<Payload>> {
+  static async refresh(
+    token: string,
+    refreshTokenOption: RefreshTokenOption<Payload> = this.RefreshTokenOption,
+    accessTokenOption: TokenOption<Payload> = this.AccessTokenOption
+  ): Promise<Tokens<Payload>> {
     const result = Jwt.refresh(
       token,
-      this.RefreshTokenOption,
-      this.AccessTokenOption,
+      refreshTokenOption,
+      accessTokenOption,
       async (refreshToken: RefreshToken<Payload>) => {
         const row = await this.getRefreshTokenFromDb(
           refreshToken.decoded.payload.userId
