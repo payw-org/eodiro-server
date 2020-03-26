@@ -5,7 +5,7 @@ import Db from '@/db'
 import SqlB from '@/modules/sqlb'
 import { RefinedLectures } from '@payw/cau-timetable-scraper-types'
 
-export default async function(lectures: RefinedLectures): Promise<void> {
+export default async function (lectures: RefinedLectures): Promise<void> {
   console.log('🌱 Seeding lectures')
   const sqlB = SqlB()
 
@@ -22,10 +22,7 @@ export default async function(lectures: RefinedLectures): Promise<void> {
   const dbCoverageMajorLectures: CoverageMajorLectureType[] = []
 
   const [err, results] = await Db.query<{ maxID: number }[]>(
-    SqlB()
-      .select('max(id) as maxID')
-      .from('lecture')
-      .build()
+    SqlB().select('max(id) as maxID').from('lecture').build()
   )
 
   if (err) {
@@ -136,9 +133,7 @@ export default async function(lectures: RefinedLectures): Promise<void> {
 
   console.log('Inserting coverage major lecture relations...')
   const [insertRelationsErr] = await Db.query(
-    SqlB()
-      .insertBulk(`coverage_major_lecture`, dbCoverageMajorLectures)
-      .build()
+    SqlB().insertBulk(`coverage_major_lecture`, dbCoverageMajorLectures).build()
   )
   if (insertRelationsErr) {
     console.log('Failed to insert relations')

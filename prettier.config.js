@@ -9,4 +9,4 @@ module.exports = {
   htmlWhitespaceSensitivity: 'ignore',
   quoteProps: 'preserve',
   trailingComma: 'es5',
-};
+}
