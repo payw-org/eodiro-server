@@ -91,7 +91,7 @@ export default class EodiroBot {
     new CronJob(
       cronTime,
       async () => {
-        const lectures = await CTTS(
+        const { lectures } = await CTTS(
           {
             id: Config.CAU_ID,
             pw: Config.CAU_PW,
