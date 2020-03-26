@@ -13,6 +13,7 @@
     "ts-node:dev": "cross-env NODE_ENV=development ts-node -r tsconfig-paths/register",
     "seed-lectures": "ts-node -r tsconfig-paths/register src/direct/seed-lectures.ts",
     "test": "mocha -r ts-node/register -r tsconfig-paths/register ./**/*.spec.ts",
+    "file-test:dev": "cross-env NODE_ENV=development mocha -r ts-node/register -r tsconfig-paths/register",
     "file-test": "mocha -r ts-node/register -r tsconfig-paths/register",
     "refresh-db": "node src/dev/before-dev/refresh-db.js",
     "symlink": "node --harmony src/dev/symlink.js",
