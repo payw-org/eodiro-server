@@ -7,14 +7,17 @@ export const coverageMajor = createGetModelFunction(
   CoverageMajor,
   'coverage_major',
   {
+    coverage_college: {
+      type: DataTypes.STRING(50),
+      allowNull: true,
+    },
     name: {
       type: DataTypes.STRING(50),
       allowNull: false,
       primaryKey: true,
     },
-    coverage_college: {
-      type: DataTypes.STRING(50),
-      allowNull: true,
+    code: {
+      type: DataTypes.STRING(20),
     },
   }
 )
