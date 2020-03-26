@@ -1,6 +1,5 @@
 import SqlB from '@/modules/sqlb'
 import { expect } from 'chai'
-import { describe, it } from 'mocha'
 
 describe('Test SqlB', () => {
   const sqlB = SqlB()
@@ -81,13 +80,9 @@ describe('Test SqlB', () => {
   })
 
   it('Delete', () => {
-    expect(
-      sqlB
-        .delete()
-        .from('post')
-        .where('id = ?')
-        .build()
-    ).to.equal('DELETE FROM post WHERE id = ?')
+    expect(sqlB.delete().from('post').where('id = ?').build()).to.equal(
+      'DELETE FROM post WHERE id = ?'
+    )
   })
 })
 
