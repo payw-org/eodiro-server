@@ -3,7 +3,7 @@ import { LectureType } from '@/database/models/lecture'
 import { PeriodType } from '@/database/models/period'
 import Db from '@/db'
 import SqlB from '@/modules/sqlb'
-import { RefinedLectures } from '@payw/cau-timetable-scraper/build/src/types'
+import { RefinedLectures } from '@payw/cau-timetable-scraper-types'
 
 export default async function(lectures: RefinedLectures): Promise<void> {
   console.log('🌱 Seeding lectures')
