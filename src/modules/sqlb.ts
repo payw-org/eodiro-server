@@ -177,6 +177,11 @@ export class SqlBInstance<T = any> {
     return this
   }
 
+  /**
+   * Wrap whole query in SqlBInstance and append alias.
+   *
+   * `(query_until_now) AS alias`
+   */
   as(alias: string): SqlBInstance<T> {
     this.q = this.wrap(this.q, 'parentheses')
     this.append(`AS ${alias}`)
@@ -184,6 +189,11 @@ export class SqlBInstance<T = any> {
     return this
   }
 
+  /**
+   * `FROM target`
+   *
+   * Pass nothing only appends `FROM` statement
+   */
   from(): SqlBInstance<T>
   from(target: string): SqlBInstance<T>
   from(target: TableNames): SqlBInstance<T>
@@ -200,6 +210,11 @@ export class SqlBInstance<T = any> {
     return this
   }
 
+  /**
+   * `WHERE conditions`
+   *
+   * Pass nothing only appends `WHERE` statement
+   */
   where(): SqlBInstance<T>
   where(conditions: string): SqlBInstance<T>
   where(conditions: SqlBInstance<T>): SqlBInstance<T>
@@ -215,6 +230,9 @@ export class SqlBInstance<T = any> {
     return this
   }
 
+  /**
+   * `schema1 JOIN schema2`
+   */
   join(
     schema1: TableNames | string,
     schema2: TableNames | string
@@ -224,6 +242,9 @@ export class SqlBInstance<T = any> {
     return this
   }
 
+  /**
+   * `ON condition`
+   */
   on(condition?: string): SqlBInstance<T> {
     if (condition) {
       this.append(`ON ${condition}`)
