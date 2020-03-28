@@ -25,4 +25,5 @@ export const coverageMajor = createGetModelFunction(
 export type CoverageMajorType = {
   name: string
   coverage_college: string
+  code: string
 }
