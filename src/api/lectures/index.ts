@@ -1,3 +1,4 @@
+import { TableNames } from '@/database/table-names'
 import Db from '@/db'
 import SqlB from '@/modules/sqlb'
 import express from 'express'
@@ -31,11 +32,13 @@ router.get('/lectures/:year/:semester/:campus/list', async (req, res) => {
   const offset = parseInt(req.query?.offset) || 0
 
   const query = SqlB()
-    .select(...lectureAttrs)
-    .from('lecture')
+    .select(`${TableNames.lecture}.*, major.code AS major_code`)
+    .from()
+    .join(TableNames.lecture, `${TableNames.coverage_major} major`, 'left')
+    .on(`${TableNames.lecture}.major = major.name`)
     .where(`year=? AND semester=? AND campus=?`)
     .multiOrder([
-      ['name', 'ASC'],
+      ['lecture.name', 'ASC'],
       ['professor', 'ASC'],
       ['schedule', 'ASC'],
     ])
@@ -61,21 +64,25 @@ router.get('/lectures/:year/:semester/:campus/search', async (req, res) => {
 
   const [err, results] = await Db.query(
     SqlB()
-      .select(...lectureAttrs)
-      .from('lecture')
+      .select(`${TableNames.lecture}.*, major.code AS major_code`)
+      .from()
+      .join(TableNames.lecture, `${TableNames.coverage_major} major`, 'left')
+      .on(`${TableNames.lecture}.major = major.name`)
       .where(`year=? AND semester=? AND campus=?`)
       .and()
       .like('college', `%${searchKeyword}%`)
       .or()
       .like('major', `%${searchKeyword}%`)
       .or()
-      .like('name', `%${searchKeyword}%`)
+      .like('lecture.name', `%${searchKeyword}%`)
+      .or()
+      .like('lecture.code', `%${searchKeyword}%`)
       .or()
       .like('schedule', `%${searchKeyword}%`)
       .or()
       .like('professor', `%${searchKeyword}%`)
       .multiOrder([
-        ['name', 'ASC'],
+        ['lecture.name', 'ASC'],
         ['professor', 'ASC'],
         ['schedule', 'ASC'],
       ])
