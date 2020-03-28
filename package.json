@@ -11,7 +11,6 @@
     "sync-db:dev": "cross-env NODE_ENV=development ts-node -r tsconfig-paths/register src/database/sync.ts",
     "ts-node:prod": "ts-node -r tsconfig-paths/register",
     "ts-node:dev": "cross-env NODE_ENV=development ts-node -r tsconfig-paths/register",
-    "seed-lectures": "ts-node -r tsconfig-paths/register src/direct/seed-lectures.ts",
     "test": "mocha -r ts-node/register -r tsconfig-paths/register ./**/*.spec.ts",
     "file-test:dev": "cross-env NODE_ENV=development mocha -r ts-node/register -r tsconfig-paths/register",
     "file-test": "mocha -r ts-node/register -r tsconfig-paths/register",
