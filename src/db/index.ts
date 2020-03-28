@@ -1,5 +1,6 @@
 import DbConnector from '@/modules/db-connector'
 import { SqlBInstance } from '@/modules/sqlb'
+import chalk from 'chalk'
 import { FieldInfo, MysqlError } from 'mysql'
 
 export type MysqlResult = any[] | Record<string, any>
@@ -42,6 +43,12 @@ export default class Db {
       // Build SqlB
       if (query instanceof SqlBInstance) {
         query = query.build()
+      }
+
+      if (query.length === 0) {
+        console.log(`[ ${chalk.green('DB query')} ] SQL is empty`)
+        resolve([null, null, null])
+        return
       }
 
       conn.query(query, values, (err, results, fields) => {
