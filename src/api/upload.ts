@@ -53,7 +53,7 @@ router.post('/upload', async (req, res) => {
         return
       }
 
-      if (file.size > 1024 * 1024 * 4) {
+      if (file.size > 1024 * 1024 * 3) {
         res.status(200).json({
           err: 'File Too Large',
         })
