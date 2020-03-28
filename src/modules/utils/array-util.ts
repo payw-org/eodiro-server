@@ -16,4 +16,8 @@ export class ArrayUtil {
   static has<T = any>(arr: T[], value: T): boolean {
     return arr.indexOf(value) !== -1
   }
+
+  static diff<T = any>(arr1: T[], arr2: T[]): T[] {
+    return arr1.filter((x) => !arr2.includes(x))
+  }
 }
