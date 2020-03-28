@@ -235,9 +235,12 @@ export class SqlBInstance<T = any> {
    */
   join(
     schema1: TableNames | string,
-    schema2: TableNames | string
+    schema2: TableNames | string,
+    outer?: 'left' | 'right'
   ): SqlBInstance<T> {
-    this.append(`${schema1} JOIN ${schema2}`)
+    this.append(
+      `${schema1}${outer ? ` ${outer.toUpperCase()}` : ''} JOIN ${schema2}`
+    )
 
     return this
   }
