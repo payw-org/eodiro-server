@@ -362,7 +362,7 @@ export class SqlBInstance<T = any> {
   }
 
   insert(
-    schema: string,
+    schema: TableNames,
     items: {
       [K in keyof T]?: T[K]
     },

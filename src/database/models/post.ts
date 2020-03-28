@@ -4,6 +4,7 @@ import Time from '@/modules/time'
 import { DataTypes, Model } from 'sequelize'
 import { createGetModelFunction } from '../create-model-function'
 import { query, QueryTypes } from '../query'
+import { TableNames } from '../table-names'
 import { CommentType } from './comment'
 import { getUser } from './user'
 
@@ -173,7 +174,7 @@ class Post extends Model {
     }
 
     const query = SqlB()
-      .insert('post', {
+      .insert(TableNames.post, {
         title: undefined,
         body: undefined,
         user_id: undefined,

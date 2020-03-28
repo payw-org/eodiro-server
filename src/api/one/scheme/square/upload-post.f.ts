@@ -43,7 +43,7 @@ export async function uploadPost(
   }
 
   const insertQuery = SqlB<PostType>()
-    .insert('post', {
+    .insert(TableNames.post, {
       board_id: data.boardID,
       title,
       body,
