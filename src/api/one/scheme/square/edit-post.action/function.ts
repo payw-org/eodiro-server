@@ -7,7 +7,7 @@ import Time from '@/modules/time'
 import { OneApiError } from '../../types/utils'
 import { Interface } from './interface'
 
-export default async function(
+export default async function (
   data: Interface['data']
 ): Promise<Interface['payload']> {
   const authPayload = await Auth.isSignedUser(data.accessToken)
@@ -69,7 +69,7 @@ export default async function(
 
     if (data.fileIds.length > 0) {
       await query(
-        SqlB<PostFileType>().insertBulk(
+        SqlB<PostFileType>().bulkInsert(
           'post_file',
           data.fileIds.map((fileId) => {
             return {

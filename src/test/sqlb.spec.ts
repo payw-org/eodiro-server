@@ -44,7 +44,7 @@ describe('Test SqlB', () => {
   it('Bulk insert', () => {
     expect(
       sqlB
-        .insertBulk('lecture', [
+        .bulkInsert('lecture', [
           {
             year: 2011,
             semester: '1',

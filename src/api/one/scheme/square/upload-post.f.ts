@@ -58,7 +58,7 @@ export async function uploadPost(
 
   if (data.fileIds && data.fileIds.length > 0) {
     await query(
-      SqlB<PostFileType>().insertBulk(
+      SqlB<PostFileType>().bulkInsert(
         'post_file',
         data.fileIds.map((fileId) => {
           return {
