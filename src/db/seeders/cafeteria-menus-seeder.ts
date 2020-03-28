@@ -1,5 +1,6 @@
 import Config from '@/config'
 import { CafeteriaMenuType } from '@/database/models/cafeteria_menu'
+import { TableNames } from '@/database/table-names'
 import Db from '@/db'
 import convertCampusName from '@/modules/convert-campus-name'
 import EodiroMailer from '@/modules/eodiro-mailer'
@@ -66,7 +67,7 @@ err: ${err}
   }
 
   const [err2] = await Db.query(
-    SqlB().bulkInsert('cafeteria_menu', dbCafeteriaMenus).build()
+    SqlB().bulkInsert(TableNames.cafeteria_menu, dbCafeteriaMenus).build()
   )
 
   if (err2) {
