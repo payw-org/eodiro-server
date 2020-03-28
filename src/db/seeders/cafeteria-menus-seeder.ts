@@ -66,9 +66,7 @@ err: ${err}
   }
 
   const [err2] = await Db.query(
-    SqlB()
-      .insertBulk('cafeteria_menu', dbCafeteriaMenus)
-      .build()
+    SqlB().bulkInsert('cafeteria_menu', dbCafeteriaMenus).build()
   )
 
   if (err2) {

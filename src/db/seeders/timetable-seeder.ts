@@ -94,7 +94,7 @@ export default async function (lectures: RefinedLectures): Promise<void> {
   }
 
   await Db.query(
-    sqlB.insertBulk(`coverage_major`, coverageMajors, true).build()
+    sqlB.bulkInsert(`coverage_major`, coverageMajors, true).build()
   )
 
   // Delete all lectures before rewrite
@@ -113,7 +113,7 @@ export default async function (lectures: RefinedLectures): Promise<void> {
 
   console.log('Inserting lectures...')
   const [insertLecturesErr] = await Db.query(
-    sqlB.insertBulk(`lecture`, dbLectures).build()
+    sqlB.bulkInsert(`lecture`, dbLectures).build()
   )
   if (insertLecturesErr) {
     console.error('Failed to insert lectures')
@@ -123,7 +123,7 @@ export default async function (lectures: RefinedLectures): Promise<void> {
 
   console.log('Inserting periods...')
   const [insertPeriodsErr] = await Db.query(
-    sqlB.insertBulk(`period`, dbPeriods).build()
+    sqlB.bulkInsert(`period`, dbPeriods).build()
   )
   if (insertPeriodsErr) {
     console.error('Failed to insert periods')
@@ -133,7 +133,7 @@ export default async function (lectures: RefinedLectures): Promise<void> {
 
   console.log('Inserting coverage major lecture relations...')
   const [insertRelationsErr] = await Db.query(
-    SqlB().insertBulk(`coverage_major_lecture`, dbCoverageMajorLectures).build()
+    SqlB().bulkInsert(`coverage_major_lecture`, dbCoverageMajorLectures).build()
   )
   if (insertRelationsErr) {
     console.log('Failed to insert relations')

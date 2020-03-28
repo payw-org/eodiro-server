@@ -384,7 +384,7 @@ export class SqlBInstance<T = any> {
     return this
   }
 
-  insertBulk(
+  bulkInsert(
     schema: string,
     items: {
       [K in keyof T]?: T[K]
