@@ -2,6 +2,7 @@ import { getStoragePath } from '@/cdn/get-storage-path'
 import { availableMimeTypes } from '@/config/available-mime-types'
 import { FileType } from '@/database/models/file'
 import { query, QueryTypes } from '@/database/query'
+import { TableNames } from '@/database/table-names'
 import SqlB from '@/modules/sqlb'
 import express from 'express'
 import fs from 'fs'
@@ -86,7 +87,7 @@ router.post('/upload', async (req, res) => {
 
       // Record to DB
       const [insertId] = await query(
-        SqlB<FileType>().insert('file', {
+        SqlB<FileType>().insert(TableNames.file, {
           uuid,
           file_name: originalName,
           mime: mimeType,

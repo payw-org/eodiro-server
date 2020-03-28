@@ -3,6 +3,7 @@ import SqlB from '@/modules/sqlb'
 import Time from '@/modules/time'
 import { DataTypes, Model } from 'sequelize'
 import { createGetModelFunction } from '../create-model-function'
+import { TableNames } from '../table-names'
 import { PrimaryAIAttribute } from '../utils/model-attributes'
 
 export interface InquiryNew {
@@ -47,7 +48,7 @@ export class Inquiry extends Model {
       return false
     }
     const query = SqlB()
-      .insert('inquiry', {
+      .insert(TableNames.inquiry, {
         email: undefined,
         user_id: undefined,
         title: undefined,

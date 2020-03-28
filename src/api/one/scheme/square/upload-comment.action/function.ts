@@ -8,7 +8,7 @@ import SqlB from '@/modules/sqlb'
 import Time from '@/modules/time'
 import { Interface } from './interface'
 
-export default async function(
+export default async function (
   data: Interface['data']
 ): Promise<Interface['payload']> {
   const authPayload = await Auth.isSignedUser(data.accessToken)
@@ -46,7 +46,7 @@ export default async function(
   }
 
   const query = SqlB<CommentType>()
-    .insert('comment', {
+    .insert(TableNames.comment, {
       user_id: userInfo.id,
       random_nickname: userInfo.random_nickname,
       post_id: data.postId,
