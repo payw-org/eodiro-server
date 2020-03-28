@@ -1,6 +1,7 @@
 import { CoverageMajorLectureType } from '@/database/models/coverage_major_lecture'
 import { LectureType } from '@/database/models/lecture'
 import { PeriodType } from '@/database/models/period'
+import { TableNames } from '@/database/table-names'
 import Db from '@/db'
 import SqlB from '@/modules/sqlb'
 import { RefinedLectures } from '@payw/cau-timetable-scraper-types'
@@ -94,7 +95,7 @@ export default async function (lectures: RefinedLectures): Promise<void> {
   }
 
   await Db.query(
-    sqlB.bulkInsert(`coverage_major`, coverageMajors, true).build()
+    sqlB.bulkInsert(TableNames.coverage_major, coverageMajors, true).build()
   )
 
   // Delete all lectures before rewrite
@@ -113,7 +114,7 @@ export default async function (lectures: RefinedLectures): Promise<void> {
 
   console.log('Inserting lectures...')
   const [insertLecturesErr] = await Db.query(
-    sqlB.bulkInsert(`lecture`, dbLectures).build()
+    sqlB.bulkInsert(TableNames.lecture, dbLectures).build()
   )
   if (insertLecturesErr) {
     console.error('Failed to insert lectures')
@@ -123,7 +124,7 @@ export default async function (lectures: RefinedLectures): Promise<void> {
 
   console.log('Inserting periods...')
   const [insertPeriodsErr] = await Db.query(
-    sqlB.bulkInsert(`period`, dbPeriods).build()
+    sqlB.bulkInsert(TableNames.period, dbPeriods).build()
   )
   if (insertPeriodsErr) {
     console.error('Failed to insert periods')
@@ -133,7 +134,9 @@ export default async function (lectures: RefinedLectures): Promise<void> {
 
   console.log('Inserting coverage major lecture relations...')
   const [insertRelationsErr] = await Db.query(
-    SqlB().bulkInsert(`coverage_major_lecture`, dbCoverageMajorLectures).build()
+    SqlB()
+      .bulkInsert(TableNames.coverage_major_lecture, dbCoverageMajorLectures)
+      .build()
   )
   if (insertRelationsErr) {
     console.log('Failed to insert relations')

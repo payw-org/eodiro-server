@@ -1,3 +1,4 @@
+import { TableNames } from '@/database/table-names'
 import SqlB from '@/modules/sqlb'
 import { expect } from 'chai'
 
@@ -44,7 +45,7 @@ describe('Test SqlB', () => {
   it('Bulk insert', () => {
     expect(
       sqlB
-        .bulkInsert('lecture', [
+        .bulkInsert(TableNames.lecture, [
           {
             year: 2011,
             semester: '1',

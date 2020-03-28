@@ -2,6 +2,7 @@ import { PostType } from '@/database/models/post'
 import { PostFileType } from '@/database/models/post_file'
 import { getUser } from '@/database/models/user'
 import { query, QueryTypes } from '@/database/query'
+import { TableNames } from '@/database/table-names'
 import Auth from '@/modules/auth'
 import SqlB from '@/modules/sqlb'
 import Time from '@/modules/time'
@@ -59,7 +60,7 @@ export async function uploadPost(
   if (data.fileIds && data.fileIds.length > 0) {
     await query(
       SqlB<PostFileType>().bulkInsert(
-        'post_file',
+        TableNames.post_file,
         data.fileIds.map((fileId) => {
           return {
             post_id: insertId,

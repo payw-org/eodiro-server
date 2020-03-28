@@ -1,6 +1,7 @@
 import { getPost, PostType } from '@/database/models/post'
 import { PostFileType } from '@/database/models/post_file'
 import { query, QueryTypes } from '@/database/query'
+import { TableNames } from '@/database/table-names'
 import Auth from '@/modules/auth'
 import SqlB from '@/modules/sqlb'
 import Time from '@/modules/time'
@@ -62,7 +63,7 @@ export default async function (
     await query(
       SqlB<PostFileType>()
         .delete()
-        .from('post_file')
+        .from(TableNames.post_file)
         .where()
         .equal('post_id', data.postId)
     )
@@ -70,7 +71,7 @@ export default async function (
     if (data.fileIds.length > 0) {
       await query(
         SqlB<PostFileType>().bulkInsert(
-          'post_file',
+          TableNames.post_file,
           data.fileIds.map((fileId) => {
             return {
               post_id: data.postId,
