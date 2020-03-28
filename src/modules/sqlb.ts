@@ -361,12 +361,27 @@ export class SqlBInstance<T = any> {
     return this
   }
 
+  private onDuplicateKeyUpdate(
+    items: {
+      [K in keyof T]?: T[K]
+    }
+  ) {
+    this.append('ON DUPLICATE KEY UPDATE')
+    this.append(
+      Object.keys(items)
+        .map((key) => {
+          return `${key} = VALUES(${key})`
+        })
+        .join(', ')
+    )
+  }
+
   insert(
     schema: TableNames,
     items: {
       [K in keyof T]?: T[K]
     },
-    ignore?: boolean
+    dupStrategy?: 'ignore' | 'update'
   ): SqlBInstance<T> {
     const targetsQuery = Object.keys(items).join(', ')
     const values = Object.values(items).map((val) => {
@@ -375,11 +390,17 @@ export class SqlBInstance<T = any> {
     const valuesQuery = values.join(', ')
 
     this.append(
-      `INSERT${ignore ? ' IGNORE' : ''} INTO ${schema} ${this.wrap(
+      `INSERT${
+        dupStrategy === 'ignore' ? ' IGNORE' : ''
+      } INTO ${schema} ${this.wrap(
         targetsQuery,
         'parentheses'
       )} VALUES${this.wrap(valuesQuery, 'parentheses')}`
     )
+
+    if (dupStrategy === 'update') {
+      this.onDuplicateKeyUpdate(items)
+    }
 
     return this
   }
@@ -389,11 +410,17 @@ export class SqlBInstance<T = any> {
     items: {
       [K in keyof T]?: T[K]
     }[],
-    ignore?: boolean
+    dupStrategy?: 'ignore' | 'update'
   ): SqlBInstance<T> {
-    // Analyze first element
-    this.append(`INSERT${ignore ? ' IGNORE' : ''} INTO ${schema}`)
+    if (items.length === 0) {
+      return this
+    }
 
+    this.append(
+      `INSERT${dupStrategy === 'ignore' ? ' IGNORE' : ''} INTO ${schema}`
+    )
+
+    // Analyze first element
     const firstItem = items[0]
     const keys = Object.keys(firstItem)
 
@@ -410,6 +437,10 @@ export class SqlBInstance<T = any> {
         })
         .join(', ')
     )
+
+    if (dupStrategy === 'update') {
+      this.onDuplicateKeyUpdate(items[0])
+    }
 
     return this
   }
