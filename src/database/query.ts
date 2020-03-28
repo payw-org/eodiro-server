@@ -89,7 +89,7 @@ export function query(
   options?: QueryOptions | QueryOptionsWithType<QueryTypes.RAW>
 ): Promise<[unknown[], unknown]>
 
-export async function query(sql: any, options: any): Promise<any> {
+export async function query(sql: any, options?: any): Promise<any> {
   if (sql instanceof SqlBInstance) {
     sql = sql.build()
   }
