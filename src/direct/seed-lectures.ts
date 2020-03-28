@@ -1,5 +1,6 @@
 import { boot } from '@/boot'
 import Config from '@/config'
+import collegesMajorsSeeder from '@/db/seeders/colleges-majors-seeder'
 import timetableSeeder from '@/db/seeders/timetable-seeder'
 import argv from '@/dev/argv'
 import getSemester from '@/modules/get-semester'
@@ -15,7 +16,8 @@ async function main(): Promise<void> {
     year: string
     semester: string
     s: string
-    file: string
+    collegesFile: string
+    lecturesFile: string
   }>()
 
   await boot({
@@ -31,13 +33,9 @@ async function main(): Promise<void> {
     `[ ${chalk.blue('seeding')} ] seeding lectures: ${year}, ${semester}`
   )
 
-  let lectures
-
-  if (args.file) {
-    lectures = JSON.parse(fs.readFileSync(args.file, 'utf8'))
-    console.log(lectures)
-  } else {
-    lectures = await CTTS(
+  if (!args.collegesFile && !args.lecturesFile) {
+    console.log('Scraping from server')
+    const { colleges, lectures } = await CTTS(
       {
         id: Config.CAU_ID,
         pw: Config.CAU_PW,
@@ -48,13 +46,31 @@ async function main(): Promise<void> {
       }
     )
 
+    const timestamp = new Date().getTime()
+
     fs.writeFileSync(
-      `data/lectures-${year}-${semester}.json`,
+      `data/colleges-${timestamp}.json`,
+      JSON.stringify(colleges, null, 2)
+    )
+    fs.writeFileSync(
+      `data/lectures-${year}-${semester}-${timestamp}.json`,
       JSON.stringify(lectures, null, 2)
     )
-  }
 
-  await timetableSeeder(lectures)
+    await collegesMajorsSeeder(colleges)
+    await timetableSeeder(lectures)
+  } else {
+    if (args.collegesFile) {
+      console.log('Colleges file is given')
+      const colleges = JSON.parse(fs.readFileSync(args.collegesFile, 'utf8'))
+      await collegesMajorsSeeder(colleges)
+    }
+    if (args.lecturesFile) {
+      console.log('Lectures file is given')
+      const lectures = JSON.parse(fs.readFileSync(args.lecturesFile, 'utf8'))
+      await timetableSeeder(lectures)
+    }
+  }
 
   console.log(`[ ${chalk.blue('seeding')} ] Done seeding lectures`)
 }

@@ -17,7 +17,6 @@ export default async function (lectures: RefinedLectures): Promise<void> {
   }
 
   // Update college coverage data
-  const coverageMajors = []
   const dbLectures: LectureType[] = []
   const dbPeriods: PeriodType[] = []
   const dbCoverageMajorLectures: CoverageMajorLectureType[] = []
@@ -69,21 +68,6 @@ export default async function (lectures: RefinedLectures): Promise<void> {
       })
     }
 
-    // Multiple coverages for a single lecture
-    for (let j = 0; j < lecture.coverages.length; j += 1) {
-      const coverage = lecture.coverages[j]
-      if (
-        coverageMajors.findIndex((item) => {
-          return item?.name === coverage.major
-        }) === -1
-      ) {
-        coverageMajors.push({
-          name: coverage.major,
-          coverage_college: coverage.college,
-        })
-      }
-    }
-
     for (let j = 0; j < lecture.coverages.length; j += 1) {
       const coverage = lecture.coverages[j]
 
@@ -93,10 +77,6 @@ export default async function (lectures: RefinedLectures): Promise<void> {
       })
     }
   }
-
-  await Db.query(
-    sqlB.bulkInsert(TableNames.coverage_major, coverageMajors, true).build()
-  )
 
   // Delete all lectures before rewrite
   const year = firstLecture.year
