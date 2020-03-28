@@ -1,3 +1,4 @@
+import { CoverageMajorType } from '@/database/models/coverage_major'
 import { TableNames } from '@/database/table-names'
 import SqlB from '@/modules/sqlb'
 import { expect } from 'chai'
@@ -29,7 +30,7 @@ describe('Test SqlB', () => {
   it('Insert with 5 placeholders', () => {
     expect(
       sqlB
-        .insert('post', {
+        .insert(TableNames.post, {
           title: undefined,
           body: undefined,
           user_id: undefined,
@@ -39,6 +40,42 @@ describe('Test SqlB', () => {
         .build()
     ).to.equal(
       'INSERT INTO post (title, body, user_id, uploaded_at, random_nickname) VALUES(?, ?, ?, ?, ?)'
+    )
+  })
+
+  it('Insert with ignore strategy', () => {
+    expect(
+      SqlB<CoverageMajorType>()
+        .insert(
+          TableNames.coverage_major,
+          {
+            name: 'what',
+            coverage_college: 'hello',
+            code: 'lecture code',
+          },
+          'ignore'
+        )
+        .build()
+    ).to.equal(
+      "INSERT IGNORE INTO coverage_major (name, coverage_college, code) VALUES('what', 'hello', 'lecture code')"
+    )
+  })
+
+  it('Insert with update strategy', () => {
+    expect(
+      SqlB<CoverageMajorType>()
+        .insert(
+          TableNames.coverage_major,
+          {
+            name: 'what',
+            coverage_college: 'hello',
+            code: 'lecture code',
+          },
+          'update'
+        )
+        .build()
+    ).to.equal(
+      "INSERT INTO coverage_major (name, coverage_college, code) VALUES('what', 'hello', 'lecture code') ON DUPLICATE KEY UPDATE name = VALUES(name), coverage_college = VALUES(coverage_college), code = VALUES(code)"
     )
   })
 
@@ -62,6 +99,60 @@ describe('Test SqlB', () => {
         .build()
     ).to.equal(
       `INSERT INTO lecture (year, semester, grade, code) VALUES (2011, '1', 3, '9999-01'), (2012, '2', 4, '9999-02')`
+    )
+  })
+
+  it('Bulk insert with ignore strategy', () => {
+    expect(
+      sqlB
+        .bulkInsert(
+          TableNames.lecture,
+          [
+            {
+              year: 2011,
+              semester: '1',
+              grade: 3,
+              code: '9999-01',
+            },
+            {
+              year: 2012,
+              semester: '2',
+              grade: 4,
+              code: '9999-02',
+            },
+          ],
+          'ignore'
+        )
+        .build()
+    ).to.equal(
+      `INSERT IGNORE INTO lecture (year, semester, grade, code) VALUES (2011, '1', 3, '9999-01'), (2012, '2', 4, '9999-02')`
+    )
+  })
+
+  it('Bulk insert with update strategy', () => {
+    expect(
+      sqlB
+        .bulkInsert(
+          TableNames.lecture,
+          [
+            {
+              year: 2011,
+              semester: '1',
+              grade: 3,
+              code: '9999-01',
+            },
+            {
+              year: 2012,
+              semester: '2',
+              grade: 4,
+              code: '9999-02',
+            },
+          ],
+          'update'
+        )
+        .build()
+    ).to.equal(
+      `INSERT INTO lecture (year, semester, grade, code) VALUES (2011, '1', 3, '9999-01'), (2012, '2', 4, '9999-02') ON DUPLICATE KEY UPDATE year = VALUES(year), semester = VALUES(semester), grade = VALUES(grade), code = VALUES(code)`
     )
   })
 
