@@ -25,6 +25,7 @@ router.post('/upload', async (req, res) => {
     const files = Array.from(req.files as Express.Multer.File[])
     const result = [] as {
       index: number
+      err: string
       path: string
       fileId: number
     }[]
@@ -38,6 +39,10 @@ router.post('/upload', async (req, res) => {
       const buffer = file.buffer
 
       let available = false
+      let errored = false
+      let errMsg = ''
+      let dateDirectory = ''
+      let insertId: number
 
       for (let i = 0; i < availableMimeTypes.length; i += 1) {
         const availableMime = availableMimeTypes[i]
@@ -51,62 +56,62 @@ router.post('/upload', async (req, res) => {
         res.status(200).json({
           err: 'Unsupported MIME Type',
         })
+        result
         return
-      }
+        errored = true
+        errMsg = 'Unsupported MIME Type'
+      } else if (file.size > 1024 * 1024 * 3) {
+        errored = true
+        errMsg = 'File Too Large'
+      } else {
+        // Check directory existence
+        if (!fs.existsSync(`${storagePath}/${publicContentUrl}`)) {
+          fs.mkdirSync(`${storagePath}/${publicContentUrl}`)
+        }
 
-      if (file.size > 1024 * 1024 * 3) {
-        res.status(200).json({
-          err: 'File Too Large',
-        })
-        return
-      }
+        const today = dayjs()
+        dateDirectory = today.format('YYYYMMDD')
 
-      // Check directory existence
-      if (!fs.existsSync(`${storagePath}/${publicContentUrl}`)) {
-        fs.mkdirSync(`${storagePath}/${publicContentUrl}`)
-      }
+        if (
+          !fs.existsSync(`${storagePath}/${publicContentUrl}/${dateDirectory}`)
+        ) {
+          fs.mkdirSync(`${storagePath}/${publicContentUrl}/${dateDirectory}`)
+        }
 
-      const today = dayjs()
-      const dateDirectory = today.format('YYYYMMDD')
+        // Create a uuid directory
+        try {
+          fs.mkdirSync(
+            `${storagePath}/${publicContentUrl}/${dateDirectory}/${uuid}`
+          )
+        } catch (error) {
+          res.sendStatus(500)
+          return
+        }
 
-      if (
-        !fs.existsSync(`${storagePath}/${publicContentUrl}/${dateDirectory}`)
-      ) {
-        fs.mkdirSync(`${storagePath}/${publicContentUrl}/${dateDirectory}`)
-      }
+        // Save file
+        try {
+          fs.writeFileSync(
+            `${storagePath}/${publicContentUrl}/${dateDirectory}/${uuid}/${originalName}`,
+            buffer
+          )
+        } catch (error) {
+          console.log(error)
+          res.sendStatus(500)
+          return
+        }
 
-      // Create a uuid directory
-      try {
-        fs.mkdirSync(
-          `${storagePath}/${publicContentUrl}/${dateDirectory}/${uuid}`
+        // Record to DB
+        const insertResult = await eodiroQuery(
+          SqlB<FileType>().insert(TableNames.file, {
+            uuid,
+            file_name: originalName,
+            mime: mimeType,
+            uploaded_at: today.format('YYYY-MM-DD HH:mm:ss'),
+          }),
+          EodiroQueryType.INSERT
         )
-      } catch (error) {
-        res.sendStatus(500)
-        return
+        insertId = insertResult.insertId
       }
-
-      // Save file
-      try {
-        fs.writeFileSync(
-          `${storagePath}/${publicContentUrl}/${dateDirectory}/${uuid}/${originalName}`,
-          buffer
-        )
-      } catch (error) {
-        console.log(error)
-        res.sendStatus(500)
-        return
-      }
-
-      // Record to DB
-      const { insertId } = await eodiroQuery(
-        SqlB<FileType>().insert(TableNames.file, {
-          uuid,
-          file_name: originalName,
-          mime: mimeType,
-          uploaded_at: today.format('YYYY-MM-DD HH:mm:ss'),
-        }),
-        EodiroQueryType.INSERT
-      )
 
       result.push({
         index: i,
@@ -114,6 +119,7 @@ router.post('/upload', async (req, res) => {
           originalName
         )}`,
         fileId: insertId,
+        err: errored ? errMsg : null,
       })
     }
 
