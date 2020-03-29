@@ -370,16 +370,16 @@ export class SqlBInstance<T = any> {
     return this
   }
 
-  private onDuplicateKeyUpdate(
-    items: {
-      [K in keyof T]?: T[K]
+  private onDuplicateKeyUpdate(attributes: (keyof T)[]) {
+    if (attributes.length === 0) {
+      return
     }
-  ) {
+
     this.append('ON DUPLICATE KEY UPDATE')
     this.append(
-      Object.keys(items)
-        .map((key) => {
-          return `${key} = VALUES(${key})`
+      attributes
+        .map((attr) => {
+          return `${attr} = VALUES(${attr})`
         })
         .join(', ')
     )
@@ -390,7 +390,13 @@ export class SqlBInstance<T = any> {
     items: {
       [K in keyof T]?: T[K]
     },
-    dupStrategy?: 'ignore' | 'update'
+    dupStrategy?:
+      | 'ignore'
+      | 'update'
+      | {
+          strategy: 'update'
+          attributes: (keyof T)[]
+        }
   ): SqlBInstance<T> {
     const targetsQuery = Object.keys(items).join(', ')
     const values = Object.values(items).map((val) => {
@@ -400,15 +406,24 @@ export class SqlBInstance<T = any> {
 
     this.append(
       `INSERT${
-        dupStrategy === 'ignore' ? ' IGNORE' : ''
+        typeof dupStrategy === 'string' && dupStrategy === 'ignore'
+          ? ' IGNORE'
+          : ''
       } INTO ${schema} ${this.wrap(
         targetsQuery,
         'parentheses'
       )} VALUES${this.wrap(valuesQuery, 'parentheses')}`
     )
 
-    if (dupStrategy === 'update') {
-      this.onDuplicateKeyUpdate(items)
+    if (
+      (typeof dupStrategy === 'string' && dupStrategy === 'update') ||
+      (typeof dupStrategy === 'object' && dupStrategy?.strategy === 'update')
+    ) {
+      this.onDuplicateKeyUpdate(
+        typeof dupStrategy === 'object'
+          ? dupStrategy.attributes
+          : (Object.keys(items) as (keyof T)[])
+      )
     }
 
     return this
@@ -419,14 +434,24 @@ export class SqlBInstance<T = any> {
     items: {
       [K in keyof T]?: T[K]
     }[],
-    dupStrategy?: 'ignore' | 'update'
+    dupStrategy?:
+      | 'ignore'
+      | 'update'
+      | {
+          strategy: 'update'
+          attributes: (keyof T)[]
+        }
   ): SqlBInstance<T> {
     if (items.length === 0) {
       return this
     }
 
     this.append(
-      `INSERT${dupStrategy === 'ignore' ? ' IGNORE' : ''} INTO ${schema}`
+      `INSERT${
+        typeof dupStrategy === 'string' && dupStrategy === 'ignore'
+          ? ' IGNORE'
+          : ''
+      } INTO ${schema}`
     )
 
     // Analyze first element
@@ -447,13 +472,23 @@ export class SqlBInstance<T = any> {
         .join(', ')
     )
 
-    if (dupStrategy === 'update') {
-      this.onDuplicateKeyUpdate(items[0])
+    if (
+      (typeof dupStrategy === 'string' && dupStrategy === 'update') ||
+      (typeof dupStrategy === 'object' && dupStrategy?.strategy === 'update')
+    ) {
+      this.onDuplicateKeyUpdate(
+        typeof dupStrategy === 'object'
+          ? dupStrategy.attributes
+          : (Object.keys(items) as (keyof T)[])
+      )
     }
 
     return this
   }
 
+  /**
+   * `UPDATE schema SET attribute = 'value', ...`
+   */
   update(
     schema: string,
     items: {
