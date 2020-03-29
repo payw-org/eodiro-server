@@ -21,6 +21,10 @@ export const getFile = createGetModelFunction(
       type: DataTypes.STRING(50),
       allowNull: false,
     },
+    uploaded_at: {
+      type: DataTypes.DATE,
+      allowNull: false,
+    },
   },
   {
     indexes: [
@@ -37,4 +41,5 @@ export type FileType = {
   uuid: string
   file_name: string
   mime: string
+  uploaded_at: string
 }

@@ -1,9 +1,10 @@
 import { getStoragePath } from '@/cdn/get-storage-path'
 import { availableMimeTypes } from '@/config/available-mime-types'
+import { eodiroQuery, EodiroQueryType } from '@/database/eodiro-query'
 import { FileType } from '@/database/models/file'
-import { query, QueryTypes } from '@/database/query'
 import { TableNames } from '@/database/table-names'
 import SqlB from '@/modules/sqlb'
+import dayjs from 'dayjs'
 import express from 'express'
 import fs from 'fs'
 import mime from 'mime'
@@ -65,9 +66,20 @@ router.post('/upload', async (req, res) => {
         fs.mkdirSync(`${storagePath}/${publicContentUrl}`)
       }
 
+      const today = dayjs()
+      const dateDirectory = today.format('YYYYMMDD')
+
+      if (
+        !fs.existsSync(`${storagePath}/${publicContentUrl}/${dateDirectory}`)
+      ) {
+        fs.mkdirSync(`${storagePath}/${publicContentUrl}/${dateDirectory}`)
+      }
+
       // Create a uuid directory
       try {
-        fs.mkdirSync(`${storagePath}/${publicContentUrl}/${uuid}`)
+        fs.mkdirSync(
+          `${storagePath}/${publicContentUrl}/${dateDirectory}/${uuid}`
+        )
       } catch (error) {
         res.sendStatus(500)
         return
@@ -76,7 +88,7 @@ router.post('/upload', async (req, res) => {
       // Save file
       try {
         fs.writeFileSync(
-          `${storagePath}/${publicContentUrl}/${uuid}/${originalName}`,
+          `${storagePath}/${publicContentUrl}/${dateDirectory}/${uuid}/${originalName}`,
           buffer
         )
       } catch (error) {
@@ -86,20 +98,19 @@ router.post('/upload', async (req, res) => {
       }
 
       // Record to DB
-      const [insertId] = await query(
+      const { insertId } = await eodiroQuery(
         SqlB<FileType>().insert(TableNames.file, {
           uuid,
           file_name: originalName,
           mime: mimeType,
+          uploaded_at: today.format('YYYY-MM-DD HH:mm:ss'),
         }),
-        {
-          type: QueryTypes.INSERT,
-        }
+        EodiroQueryType.INSERT
       )
 
       if (files.length === 1) {
         res.status(200).json({
-          path: `/${publicContentUrl}/${uuid}/${encodeURIComponent(
+          path: `/${publicContentUrl}/${dateDirectory}/${uuid}/${encodeURIComponent(
             originalName
           )}`,
           fileId: insertId,
@@ -108,7 +119,7 @@ router.post('/upload', async (req, res) => {
       } else {
         result.push({
           index: i,
-          path: `/${publicContentUrl}/${uuid}/${encodeURIComponent(
+          path: `/${publicContentUrl}/${dateDirectory}/${uuid}/${encodeURIComponent(
             originalName
           )}`,
           fileId: insertId,
