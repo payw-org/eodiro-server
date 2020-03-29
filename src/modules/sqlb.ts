@@ -133,6 +133,9 @@ export class SqlBInstance<T = any> {
     return this
   }
   /**
+   * Don't know why this method is created.
+   * Can't find any use cases.
+   *
    * Don't use this method alone.
    * Run `select()` or `selectAny()` first.
    */
@@ -146,6 +149,9 @@ export class SqlBInstance<T = any> {
     return this
   }
   /**
+   * Don't know why this method is created.
+   * Can't find any use cases.
+   *
    * Don't use this method alone.
    * Run `select()` or `selectAny()` first.
    */
