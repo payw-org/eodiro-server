@@ -296,14 +296,6 @@ export const getPost = createGetModelFunction(Post, 'post', {
     type: DataTypes.STRING(30),
     allowNull: false,
   },
-  likes: {
-    type: DataTypes.INTEGER,
-    defaultValue: 0,
-  },
-  auto_saved: {
-    type: DataTypes.BOOLEAN,
-    defaultValue: 0,
-  },
   uploaded_at: {
     type: DataTypes.DATE,
     allowNull: false,
@@ -321,8 +313,6 @@ export type PostType = {
   body: string
   user_id: number
   random_nickname: string
-  likes: number
-  auto_saved: 0 | 1
   uploaded_at: string
   edited_at: string
 }
