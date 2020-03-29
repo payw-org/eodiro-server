@@ -479,7 +479,7 @@ export class SqlBInstance<T = any> {
       this.onDuplicateKeyUpdate(
         typeof dupStrategy === 'object'
           ? dupStrategy.attributes
-          : (Object.keys(items) as (keyof T)[])
+          : (Object.keys(items[0]) as (keyof T)[])
       )
     }
 
