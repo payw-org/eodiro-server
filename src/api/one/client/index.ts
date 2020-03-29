@@ -10,6 +10,7 @@ import {
   GetComments,
   GetPostById,
   GetUserId,
+  SavePost,
   UploadComment,
   UploadPost,
 } from '../scheme'
@@ -52,6 +53,10 @@ export async function oneAPIClient(
   host: string,
   request: Omit<GetUserId, 'payload'>
 ): Promise<GetUserId['payload']>
+export async function oneAPIClient(
+  host: string,
+  request: Omit<SavePost, 'payload'>
+): Promise<SavePost['payload']>
 export async function oneAPIClient(
   host: string,
   request: Omit<UploadComment, 'payload'>

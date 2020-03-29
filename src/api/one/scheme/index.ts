@@ -37,6 +37,9 @@ export type GetBoardId = GetBoardIdRaw & { action: 'getBoardId' }
 import { Interface as GetCommentsRaw } from './square/get-comments.action/interface'
 export type GetComments = GetCommentsRaw & { action: 'getComments' }
 
+import { Interface as SavePostRaw } from './square/save-post.action/interface'
+export type SavePost = SavePostRaw & { action: 'savePost' }
+
 import { Interface as UploadCommentRaw } from './square/upload-comment.action/interface'
 export type UploadComment = UploadCommentRaw & { action: 'uploadComment' }
 
@@ -51,4 +54,5 @@ export type APIScheme =
   | EditPost
   | GetBoardId
   | GetComments
+  | SavePost
   | UploadComment

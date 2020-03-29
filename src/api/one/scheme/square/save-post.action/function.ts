@@ -1,0 +1,88 @@
+import { eodiroQuery, EodiroQueryType } from '@/database/eodiro-query'
+import { PostType } from '@/database/models/post'
+import { getUser } from '@/database/models/user'
+import { TableNames } from '@/database/table-names'
+import Auth from '@/modules/auth'
+import SqlB from '@/modules/sqlb'
+import Time from '@/modules/time'
+import { OneApiError } from '../../types/utils'
+import { Interface } from './interface'
+
+/**
+ * Save post
+ */
+export default async function (
+  data: Interface['data']
+): Promise<Interface['payload']> {
+  const authPayload = await Auth.isSignedUser(data.accessToken)
+  if (!authPayload) {
+    return {
+      err: OneApiError.UNAUTHORIZED,
+    }
+  }
+
+  // Request update without the post ID
+  if (data.update && !data.postId) {
+    return {
+      err: OneApiError.BAD_REQUEST,
+    }
+  }
+
+  const title = data.title.trim()
+  if (title.length === 0) {
+    return {
+      err: 'No Title',
+    }
+  }
+
+  const body = data.body.trim()
+  if (body.length === 0) {
+    return {
+      err: 'No Body',
+    }
+  }
+
+  const User = await getUser()
+  const userInfo = await User.findAtId(authPayload.userId)
+
+  if (!userInfo) {
+    return {
+      err: OneApiError.UNAUTHORIZED,
+    }
+  }
+
+  let query: string
+
+  // Distinct query based on the option
+  if (data.update) {
+    // Update (edit)
+    query = SqlB<PostType>()
+      .update('post', {
+        title,
+        body,
+        edited_at: Time.getCurrTime(),
+      })
+      .where()
+      .equal('id', data.postId)
+      .build()
+  } else {
+    // Insert (upload)
+    query = SqlB<PostType>()
+      .insert(TableNames.post, {
+        board_id: data.boardId,
+        title,
+        body,
+        user_id: authPayload.userId,
+        uploaded_at: Time.getCurrTime(),
+        random_nickname: userInfo.random_nickname,
+      })
+      .build()
+  }
+
+  const { insertId } = await eodiroQuery(query, EodiroQueryType.NOT_SELECT)
+
+  return {
+    err: null,
+    data: insertId,
+  }
+}
