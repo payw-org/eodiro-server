@@ -8,6 +8,7 @@ export const coverageMajorLecture = createGetModelFunction(
   'coverage_major_lecture',
   {
     lecture_id: {
+      primaryKey: true,
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
@@ -18,6 +19,7 @@ export const coverageMajorLecture = createGetModelFunction(
       onUpdate: 'cascade',
     },
     coverage_major: {
+      primaryKey: true,
       type: DataTypes.STRING(50),
       allowNull: false,
       references: {

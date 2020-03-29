@@ -1,12 +1,11 @@
 import { DataTypes, Model } from 'sequelize'
 import { createGetModelFunction } from '../create-model-function'
-import { PrimaryAIAttribute } from '../utils/model-attributes'
 
 class PostFile extends Model {}
 
 export const getPostFile = createGetModelFunction(PostFile, 'post_file', {
-  id: PrimaryAIAttribute,
   post_id: {
+    primaryKey: true,
     type: DataTypes.INTEGER,
     allowNull: false,
     references: {
@@ -17,6 +16,7 @@ export const getPostFile = createGetModelFunction(PostFile, 'post_file', {
     onUpdate: 'cascade',
   },
   file_id: {
+    primaryKey: true,
     type: DataTypes.INTEGER,
     allowNull: false,
     references: {
@@ -29,7 +29,6 @@ export const getPostFile = createGetModelFunction(PostFile, 'post_file', {
 })
 
 export type PostFileType = {
-  id: number
   post_id: number
   file_id: number
 }
