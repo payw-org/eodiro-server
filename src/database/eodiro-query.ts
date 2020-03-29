@@ -2,7 +2,7 @@ import DbConnector from '@/modules/db-connector'
 import { SqlBInstance } from '@/modules/sqlb'
 import chalk from 'chalk'
 
-type MysqlInsertUpdateDeleteResult = {
+type MysqlNotSelectResult = {
   fieldCount: number
   affectedRows: number
   insertId: number
@@ -15,9 +15,11 @@ type MysqlInsertUpdateDeleteResult = {
 
 export enum EodiroQueryType {
   SELECT = 'select',
+  SELECT_ONE = 'selectOne',
   INSERT = 'insert',
   UPDATE = 'update',
   DELETE = 'delete',
+  NOT_SELECT = 'notSelect',
 }
 
 export async function eodiroQuery<T extends Record<string, any>>(
@@ -25,8 +27,12 @@ export async function eodiroQuery<T extends Record<string, any>>(
     | string
     | SqlBInstance
     | { query: string | SqlBInstance; values: unknown[] | unknown },
-  type: EodiroQueryType.INSERT | EodiroQueryType.UPDATE | EodiroQueryType.DELETE
-): Promise<MysqlInsertUpdateDeleteResult>
+  type:
+    | EodiroQueryType.INSERT
+    | EodiroQueryType.UPDATE
+    | EodiroQueryType.DELETE
+    | EodiroQueryType.NOT_SELECT
+): Promise<MysqlNotSelectResult>
 export async function eodiroQuery<T extends Record<string, any>>(
   sql:
     | string
@@ -34,6 +40,16 @@ export async function eodiroQuery<T extends Record<string, any>>(
     | { query: string | SqlBInstance; values: unknown[] | unknown },
   type: EodiroQueryType.SELECT
 ): Promise<T[]>
+/**
+ * Return a single item. `null` if not exists.
+ */
+export async function eodiroQuery<T extends Record<string, any>>(
+  sql:
+    | string
+    | SqlBInstance
+    | { query: string | SqlBInstance; values: unknown[] | unknown },
+  type: EodiroQueryType.SELECT_ONE
+): Promise<T | null>
 export async function eodiroQuery<T extends Record<string, any>>(
   sql:
     | string
@@ -44,8 +60,9 @@ export async function eodiroQuery<T extends Record<string, any>>(
   sql:
     | string
     | SqlBInstance
-    | { query: string | SqlBInstance; values: unknown[] | unknown }
-): Promise<T[] | MysqlInsertUpdateDeleteResult> {
+    | { query: string | SqlBInstance; values: unknown[] | unknown },
+  type?: EodiroQueryType
+): Promise<T[] | MysqlNotSelectResult> {
   return new Promise(async (resolve) => {
     const conn = await DbConnector.getConnection()
 
@@ -78,7 +95,18 @@ export async function eodiroQuery<T extends Record<string, any>>(
         throw err
       }
 
+      if (type === EodiroQueryType.SELECT_ONE) {
+        if (results.length === 0) {
+          resolve(null)
+          return
+        } else {
+          resolve(results[0])
+          return
+        }
+      }
+
       resolve(results)
+      return
     })
   })
 }
