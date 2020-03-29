@@ -1,5 +1,6 @@
 import { eodiroQuery, EodiroQueryType } from '@/database/eodiro-query'
 import { PostType } from '@/database/models/post'
+import { PostFileType } from '@/database/models/post_file'
 import { getUser } from '@/database/models/user'
 import { TableNames } from '@/database/table-names'
 import Auth from '@/modules/auth'
@@ -79,7 +80,33 @@ export default async function (
       .build()
   }
 
+  // TIPS: insertId is unavailable when update
   const { insertId } = await eodiroQuery(query, EodiroQueryType.NOT_SELECT)
+
+  // Delete all the previously linked files on update
+  if (data.update) {
+    await eodiroQuery(
+      SqlB<PostFileType>()
+        .delete()
+        .from(TableNames.post_file)
+        .where()
+        .equal('post_id', data.postId)
+    )
+  }
+
+  if (data.fileIds && data.fileIds.length > 0) {
+    await eodiroQuery(
+      SqlB<PostFileType>().bulkInsert(
+        TableNames.post_file,
+        data.fileIds.map((fileId) => {
+          return {
+            post_id: insertId || data.postId,
+            file_id: fileId,
+          }
+        })
+      )
+    )
+  }
 
   return {
     err: null,

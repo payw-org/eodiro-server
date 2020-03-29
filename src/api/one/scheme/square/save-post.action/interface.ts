@@ -6,6 +6,7 @@ export interface Interface {
     boardId: number
     title: string
     body: string
+    fileIds: number[]
     update?: boolean
     postId?: number
   }
