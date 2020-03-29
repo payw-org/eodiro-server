@@ -119,6 +119,6 @@ export default class EodiroBot {
   }
 
   private garbageCollect(): void {
-    new CronJob('* * * * *', garbageCollectFiles, null, true, Config.TIME_ZONE)
+    new CronJob('30 * * * *', garbageCollectFiles, null, true, Config.TIME_ZONE)
   }
 }
