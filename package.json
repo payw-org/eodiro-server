@@ -89,6 +89,7 @@
     "@types/node": "^13.9.3",
     "@types/nodemailer": "^6.4.0",
     "@types/prettier": "^1.19.1",
+    "@types/rimraf": "^3.0.0",
     "@types/serve-handler": "^6.1.0",
     "@types/uuid": "^7.0.2",
     "@types/validator": "^12.0.1",
