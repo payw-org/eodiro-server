@@ -76,6 +76,10 @@ export default class DbConnector {
     return this.connection
   }
 
+  /**
+   * Get connection synchronously if you're sure
+   * that the connection is successfully established
+   */
   static getConnConfident(): mysql.Connection {
     return this.connection || mysql.createConnection({})
   }
