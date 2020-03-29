@@ -42,6 +42,8 @@ export const garbageCollectFiles = async () => {
   )
   const postFileUuids = selectPostFile.map((result) => result.uuid)
 
+  // Delete the files which are not connected to any posts
+  // and are aged over three hours
   const now = dayjs()
   const lostRefs = fileDirsWithUploadDate.filter(
     (fileWithDate) =>
