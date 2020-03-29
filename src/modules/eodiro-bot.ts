@@ -7,9 +7,8 @@ import { CTTS } from '@payw/cau-timetable-scraper'
 import chalk from 'chalk'
 import { CronJob } from 'cron'
 import dayjs from 'dayjs'
-import fs from 'fs'
+import { garbageCollectFiles } from './eodiro-bot/garbage-collect-files'
 import getSemester from './get-semester'
-import SqlB from './sqlb'
 
 const log = console.log
 
@@ -29,7 +28,7 @@ export default class EodiroBot {
     this.updateRandomNickname()
     // this.scrapeLectures()
     this.scrapeCafeteriaMenus()
-    // this.garbageCollectFiles()
+    this.garbageCollect()
   }
 
   /**
@@ -119,38 +118,7 @@ export default class EodiroBot {
     )
   }
 
-  private garbageCollectFiles(): void {
-    const storagePath =
-      process.env.NODE_ENV === 'development'
-        ? Config.STORAGE_PATH_DEV
-        : Config.STORAGE_PATH
-    fs.readdir(storagePath, (err, files) => {
-      if (err) {
-        console.error(err)
-        return
-      }
-
-      const sqlb = SqlB()
-
-      files.forEach((file) => {
-        const fileName = file.split('.')[0]
-        const query = sqlb
-          .select()
-          .from('file')
-          .where(`file_name = '${fileName}'`)
-          .build()
-
-        Db.query(query).then(([err, results]) => {
-          if (results.length === 0) {
-            console.log('file not exist')
-            fs.unlink(`${storagePath}/${file}`, (err) => {
-              if (err) {
-                throw err
-              }
-            })
-          }
-        })
-      })
-    })
+  private garbageCollect(): void {
+    new CronJob('* * * * *', garbageCollectFiles, null, true, Config.TIME_ZONE)
   }
 }

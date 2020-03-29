@@ -1,10 +1,11 @@
+import { eodiroQuery, EodiroQueryType } from '@/database/eodiro-query'
 import { FileType } from '@/database/models/file'
 import { getPost, PostType } from '@/database/models/post'
 import { PostFileType } from '@/database/models/post_file'
-import { query, QueryTypes } from '@/database/query'
 import Db from '@/db'
 import Auth from '@/modules/auth'
 import SqlB from '@/modules/sqlb'
+import dayjs from 'dayjs'
 import { OneAPIData, OneApiError, OneAPIPayload } from '../types/utils'
 import { GetPostById } from './get-post-by-id'
 
@@ -67,14 +68,12 @@ export async function getPostById(
   }
 
   // Join file and post_file
-  const postFiles = await query<PostFileType & FileType>(
+  const postFiles = await eodiroQuery<PostFileType & FileType>(
     SqlB()
       .select('*')
       .from(SqlB().join('file', 'post_file').on('file.id = post_file.file_id'))
       .where(SqlB().equal('post_id', data.postId)),
-    {
-      type: QueryTypes.SELECT,
-    }
+    EodiroQueryType.SELECT
   )
 
   const payload: GetPostById['payload']['data'] = postItem
@@ -83,9 +82,9 @@ export async function getPostById(
     payload.files = postFiles.map((postFile) => {
       return {
         fileId: postFile.file_id,
-        path: `/public-user-content/${postFile.uuid}/${encodeURIComponent(
-          postFile.file_name
-        )}`,
+        path: `/public-user-content/${dayjs(postFile.uploaded_at).format(
+          'YYYYMMDD'
+        )}/${postFile.uuid}/${encodeURIComponent(postFile.file_name)}`,
         mimeType: postFile.mime,
         name: postFile.file_name,
       }

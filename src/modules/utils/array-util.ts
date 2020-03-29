@@ -17,6 +17,21 @@ export class ArrayUtil {
     return arr.indexOf(value) !== -1
   }
 
+  static intersect<T = any>(arr1: T[], arr2: T[]): T[] {
+    return arr1.filter((x) => arr2.includes(x))
+  }
+
+  /**
+   * `arr1 - arr2`
+   *
+   * Return an array of different elements between two arrays.
+   *
+   * For example,
+   *
+   * `[1, 2] - [1] = [2]`
+   *
+   * `[1] - [1, 2] = []`
+   */
   static diff<T = any>(arr1: T[], arr2: T[]): T[] {
     return arr1.filter((x) => !arr2.includes(x))
   }
