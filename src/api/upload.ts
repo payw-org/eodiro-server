@@ -7,7 +7,6 @@ import SqlB from '@/modules/sqlb'
 import dayjs from 'dayjs'
 import express from 'express'
 import fs from 'fs'
-import mime from 'mime'
 import multer from 'multer'
 import { v4 as uuidv4 } from 'uuid'
 
@@ -18,6 +17,8 @@ const publicContentUrl = 'public-user-content'
 router.post('/upload', async (req, res) => {
   // TODO: check referer
   // allow only the request from https://eodiro.com in production mode
+  // also verify access token
+
   upload(req, res, async (err) => {
     const storagePath = getStoragePath()
 
@@ -34,7 +35,6 @@ router.post('/upload', async (req, res) => {
       const uuid = uuidv4()
       // TODO: validate mimetype also on the server side
       const mimeType = file.mimetype
-      const fileExtension = mime.getExtension(mimeType)
       const buffer = file.buffer
 
       let available = false
@@ -108,23 +108,13 @@ router.post('/upload', async (req, res) => {
         EodiroQueryType.INSERT
       )
 
-      if (files.length === 1) {
-        res.status(200).json({
-          path: `/${publicContentUrl}/${dateDirectory}/${uuid}/${encodeURIComponent(
-            originalName
-          )}`,
-          fileId: insertId,
-        })
-        return
-      } else {
-        result.push({
-          index: i,
-          path: `/${publicContentUrl}/${dateDirectory}/${uuid}/${encodeURIComponent(
-            originalName
-          )}`,
-          fileId: insertId,
-        })
-      }
+      result.push({
+        index: i,
+        path: `/${publicContentUrl}/${dateDirectory}/${uuid}/${encodeURIComponent(
+          originalName
+        )}`,
+        fileId: insertId,
+      })
     }
 
     res.status(200).json({
