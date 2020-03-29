@@ -7,8 +7,6 @@ import fs from 'fs'
 import glob from 'glob'
 import path from 'path'
 import util from 'util'
-import DbConnector from '../db-connector'
-import { cleanEmptyDirectoriesRecursively } from '../fs/clean-empty-directories-recursively'
 import SqlB from '../sqlb'
 
 const globSync = util.promisify(glob)
@@ -51,10 +49,4 @@ export const garbageCollectFiles = async () => {
     // Delete from file system
     fs.rmdirSync(dir, { recursive: true })
   }
-
-  // Clear empty directories
-  cleanEmptyDirectoriesRecursively(squarePublicPath + '/public-user-content')
-
-  // Close the DB connection
-  DbConnector.getConnConfident().end()
 }
