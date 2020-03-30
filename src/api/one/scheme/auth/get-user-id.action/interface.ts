@@ -1,6 +1,6 @@
 import { OneAPIError } from '../../types/utils'
 
-export interface Interface {
+export interface Action {
   data: {
     accessToken: string
   }

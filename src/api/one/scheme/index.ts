@@ -19,28 +19,31 @@ import { GetPostById } from './square/get-post-by-id'
 export { GetPostById } from './square/get-post-by-id'
 import { UploadPost } from './square/upload-post'
 export { UploadPost } from './square/upload-post'
-import { Interface as GetUserIdRaw } from './auth/get-user-id.action/interface'
+import { Action as GetUserIdRaw } from './auth/get-user-id.action/interface'
 export type GetUserId = GetUserIdRaw & { action: 'getUserId' }
 
-import { Interface as DeleteCommentRaw } from './square/delete-comment.action/interface'
+import { Action as GetMyPostsRaw } from './my/get-my-posts.action/interface'
+export type GetMyPosts = GetMyPostsRaw & { action: 'getMyPosts' }
+
+import { Action as DeleteCommentRaw } from './square/delete-comment.action/interface'
 export type DeleteComment = DeleteCommentRaw & { action: 'deleteComment' }
 
-import { Interface as DeletePostRaw } from './square/delete-post.action/interface'
+import { Action as DeletePostRaw } from './square/delete-post.action/interface'
 export type DeletePost = DeletePostRaw & { action: 'deletePost' }
 
-import { Interface as EditPostRaw } from './square/edit-post.action/interface'
+import { Action as EditPostRaw } from './square/edit-post.action/interface'
 export type EditPost = EditPostRaw & { action: 'editPost' }
 
-import { Interface as GetBoardIdRaw } from './square/get-board-id.action/interface'
+import { Action as GetBoardIdRaw } from './square/get-board-id.action/interface'
 export type GetBoardId = GetBoardIdRaw & { action: 'getBoardId' }
 
-import { Interface as GetCommentsRaw } from './square/get-comments.action/interface'
+import { Action as GetCommentsRaw } from './square/get-comments.action/interface'
 export type GetComments = GetCommentsRaw & { action: 'getComments' }
 
-import { Interface as SavePostRaw } from './square/save-post.action/interface'
+import { Action as SavePostRaw } from './square/save-post.action/interface'
 export type SavePost = SavePostRaw & { action: 'savePost' }
 
-import { Interface as UploadCommentRaw } from './square/upload-comment.action/interface'
+import { Action as UploadCommentRaw } from './square/upload-comment.action/interface'
 export type UploadComment = UploadCommentRaw & { action: 'uploadComment' }
 
 export type APIScheme =
@@ -49,6 +52,7 @@ export type APIScheme =
   | GetPostById
   | UploadPost
   | GetUserId
+  | GetMyPosts
   | DeleteComment
   | DeletePost
   | EditPost

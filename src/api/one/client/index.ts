@@ -8,6 +8,7 @@ import {
   FetchRecentPostsOfBoard,
   GetBoardId,
   GetComments,
+  GetMyPosts,
   GetPostById,
   GetUserId,
   SavePost,
@@ -45,6 +46,10 @@ export async function oneAPIClient(
   host: string,
   request: Omit<GetComments, 'payload'>
 ): Promise<GetComments['payload']>
+export async function oneAPIClient(
+  host: string,
+  request: Omit<GetMyPosts, 'payload'>
+): Promise<GetMyPosts['payload']>
 export async function oneAPIClient(
   host: string,
   request: Omit<GetPostById, 'payload'>
