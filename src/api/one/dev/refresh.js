@@ -99,7 +99,7 @@ export type ${name} = ${name}Raw & { action: '${camelCase(name)}' }
 
 ${interfaceImports}
 
-export type APIScheme = ${legacyFTSFiles
+export type OneApiAction = ${legacyFTSFiles
       .map((file) => getPascalName(file))
       .concat(interfacesNames)
       .join(' | ')}
@@ -130,14 +130,14 @@ ${functionExports}
   const allInterfacesNames = legacyFTSFiles
     .map((file) => getPascalName(file))
     .concat(interfacesNames) // Combine legacy interface names and new interface.ts
-  // !!! Insert 'APIScheme' at the beginning for regular expression matching
+  // !!! Insert 'OneApiAction' at the beginning for regular expression matching
   const clientImportStatements = `import {${[
-    'APIScheme',
+    'OneApiAction',
     ...allInterfacesNames.sort(),
   ].join(',')}} from '../scheme'`
   let clientSource = fs.readFileSync('client/index.ts', 'utf8')
   clientSource = clientSource.replace(
-    /import {[\s]*?APIScheme[\s\S]*?} from '\.\.\/scheme'/g,
+    /import {[\s]*?OneApiAction[\s\S]*?} from '\.\.\/scheme'/g,
     clientImportStatements
   )
   const clientSourceSplitted = clientSource.split('\n')

@@ -2,11 +2,11 @@ import { CommentType } from '@/database/models/comment'
 import Db from '@/db'
 import Auth from '@/modules/auth'
 import SqlB from '@/modules/sqlb'
-import { Interface } from './interface'
+import { Action } from './interface'
 
-export default async function(
-  data: Interface['data']
-): Promise<Interface['payload']> {
+export default async function (
+  data: Action['data']
+): Promise<Action['payload']> {
   const authPayload = await Auth.isSignedUser(data.accessToken)
   if (!authPayload)
     return {

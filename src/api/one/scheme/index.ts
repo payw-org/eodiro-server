@@ -46,7 +46,7 @@ export type SavePost = SavePostRaw & { action: 'savePost' }
 import { Action as UploadCommentRaw } from './square/upload-comment.action/interface'
 export type UploadComment = UploadCommentRaw & { action: 'uploadComment' }
 
-export type APIScheme =
+export type OneApiAction =
   | FetchPostsOfBoard
   | FetchRecentPostsOfBoard
   | GetPostById

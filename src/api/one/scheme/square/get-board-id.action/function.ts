@@ -2,11 +2,11 @@ import { BoardType } from '@/database/models/board'
 import Db from '@/db'
 import SqlB from '@/modules/sqlb'
 import { OneApiError } from '../../types/utils'
-import { Interface } from './interface'
+import { Action } from './interface'
 
-export default async function(
-  data: Interface['data']
-): Promise<Interface['payload']> {
+export default async function (
+  data: Action['data']
+): Promise<Action['payload']> {
   if (!data.boardName) {
     return {
       err: OneApiError.BAD_REQUEST,

@@ -4,11 +4,11 @@ import Db from '@/db'
 import Auth from '@/modules/auth'
 import SqlB from '@/modules/sqlb'
 import { OneApiError } from '../../types/utils'
-import { Interface } from './interface'
+import { Action } from './interface'
 
 export default async function (
-  data: Interface['data']
-): Promise<Interface['payload']> {
+  data: Action['data']
+): Promise<Action['payload']> {
   const authPayload = await Auth.isSignedUser(data.accessToken)
   if (!authPayload) {
     return {

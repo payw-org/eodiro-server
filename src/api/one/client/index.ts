@@ -1,6 +1,5 @@
 import axios from 'axios'
 import {
-  APIScheme,
   DeleteComment,
   DeletePost,
   EditPost,
@@ -11,6 +10,7 @@ import {
   GetMyPosts,
   GetPostById,
   GetUserId,
+  OneApiAction,
   SavePost,
   UploadComment,
   UploadPost,
@@ -71,7 +71,7 @@ export async function oneAPIClient(
   request: Omit<UploadPost, 'payload'>
 ): Promise<UploadPost['payload']>
 // ** AUTOMATICALLY GENERATED FUNCTION OVERLOADINGS, DO NOT MODIFY HERE MANUALLY **
-export async function oneAPIClient<T extends APIScheme>(
+export async function oneAPIClient<T extends OneApiAction>(
   host: string,
   request: Omit<T, 'payload'>
 ): Promise<OneAPIPayload<T>> {
