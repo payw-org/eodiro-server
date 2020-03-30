@@ -33,7 +33,8 @@
     "update": "git reset --hard && git fetch --prune && npm run checkout-latest && npm install && npm run pm2-reboot",
     "cdn:dev": "npm run ts-node:dev -- src/cdn/serve.ts",
     "cdn": "node --harmony build/src/cdn/serve.js",
-    "pm2:cdn": "pm2 start npm --name 'eodiro-cdn' -- run 'cdn'"
+    "pm2:cdn": "pm2 start npm --name 'eodiro-cdn' -- run 'cdn'",
+    "deploy-one-api": "npm run --prefix src/api/one refresh && npm run build && npm run --prefix src/api/one copy-packagejson && npm run --prefix build/src deploy"
   },
   "_moduleAliases": {
     "@": "build"
