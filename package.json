@@ -41,7 +41,9 @@
     "cdn:dev": "npm run ts-node:dev -- src/cdn/serve.ts",
     "cdn": "node --harmony build/src/cdn/serve.js",
     "pm2:cdn": "pm2 start npm --name 'eodiro-cdn' -- run 'cdn'",
-    "deploy-one-api": "npm run --prefix src/api/one refresh && npm run build && npm run --prefix src/api/one copy-packagejson && npm run --prefix build/src deploy"
+
+    "one-api:refresh": "npm run --prefix src/api/one refresh",
+    "one-api:deploy": "npm run one-api:refresh && npm run build && npm run --prefix src/api/one copy-packagejson && npm run --prefix build/src deploy"
   },
   "_moduleAliases": {
     "@": "build"
