@@ -1,9 +1,9 @@
 import Auth from '@/modules/auth'
-import { Interface } from './interface'
+import { Action } from './interface'
 
-export default async function(
-  data: Interface['data']
-): Promise<Interface['payload']> {
+export default async function (
+  data: Action['data']
+): Promise<Action['payload']> {
   const authPayload = await Auth.isSignedUser(data.accessToken)
 
   if (!authPayload) {
