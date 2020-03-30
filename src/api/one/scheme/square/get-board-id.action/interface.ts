@@ -1,6 +1,6 @@
 import { OneApiError } from '../../types/utils'
 
-export interface Interface {
+export interface Action {
   data: {
     boardName: string
   }

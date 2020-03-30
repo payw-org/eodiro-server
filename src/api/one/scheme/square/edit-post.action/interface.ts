@@ -1,7 +1,7 @@
 import { OneApiError } from '../../types/utils'
 import { UploadPost } from '../upload-post'
 
-export interface Interface {
+export interface Action {
   data: {
     accessToken: string
     postId: number

@@ -65,7 +65,7 @@ function exportFunction(fTSPath) {
     const name = pascalCase(/([a-z-]*)\.action\/interface.ts$/g.exec(path)[1])
     interfacesNames.push(name)
     const pathWithoutExt = path.replace(/\.ts$/g, '')
-    const stmt = `import { Interface as ${name}Raw } from '${pathWithoutExt}'
+    const stmt = `import { Action as ${name}Raw } from '${pathWithoutExt}'
 export type ${name} = ${name}Raw & { action: '${camelCase(name)}' }
 `
     importStmts.push(stmt)

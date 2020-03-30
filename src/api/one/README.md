@@ -25,7 +25,7 @@ Then you have to create two files [`interface.ts`](#interface), [`function.ts`](
 It exports an interface with the name `Interface`.
 
 ```ts
-export interface Interface {
+export interface Action {
   data: {} // Request data
   payload: {
     err: OneApiError // additional err types using union type
@@ -57,18 +57,26 @@ After created new actions or modified the existing ones, you have to refresh the
 npm run refresh
 ```
 
-It automatically generates named imports and exports. It also adds several universal interface properties and creates union types.
+It automatically generates named imports and exports while adding or creatting several universal interface properties and union types.
+
+### Refresh inside the root project
+
+Also we provide an alias script for refreshing that runs in the project's root directory.
+
+```zsh
+npm run one-api:refresh
+```
 
 ## Types
 
 ### `OneApiError`
 
-This is Enum consists of some general errors. By default, you should set the payload's error type with it and furthermore extend using union types.
+This is an Enum consisting of some general errors. By default, you should set the payload's error type with it and furthermore extend using union types.
 
 **Example**
 
 ```ts
-export interface Interface {
+export interface Action {
   payload: {
     err: OneApiError | 'No Title' | ...
   }
@@ -82,7 +90,7 @@ This is an utility type for the actions where the authentication is required. Th
 **Example**
 
 ```ts
-export interface Interface {
+export interface Action {
   data: AuthRequired<{
     title: string
     body: string
@@ -93,7 +101,7 @@ export interface Interface {
 It is same as
 
 ```ts
-export interface Interface {
+export interface Action {
   data: AuthRequired<{
     accessToken: string
     title: string
