@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "copy-packagejson": "node copy-packagejson.js",
-    "refresh": "node dev/refresh"
+    "refresh": "node dev/refresh",
+    "deploy": "npm publish --access public"
   },
   "files": ["api/one/client", "api/one/scheme", "database/models", "index.d.ts"],
   "author": "PAYW",
