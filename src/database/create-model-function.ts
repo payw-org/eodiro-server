@@ -9,7 +9,7 @@ export const createGetModelFunction = <T extends typeof ExtendedModel>(
   modelAttributes: ModelAttributes,
   initOptions?: Omit<InitOptions, 'modelName' | 'sequelize'>
 ) => {
-  return async function() {
+  return async function () {
     if (modelClass.options) {
       return modelClass
     } else {
