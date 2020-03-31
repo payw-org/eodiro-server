@@ -548,6 +548,11 @@ export default function SqlB<T = any>(): SqlBInstance<T> {
   return new SqlBInstance<T>()
 }
 
+/**
+ * SqlB function alias
+ */
+export const Q = SqlB
+
 // Utility function that escapes any value
 // using node mysql's escape method
 SqlB.escape = (value: any) => {
