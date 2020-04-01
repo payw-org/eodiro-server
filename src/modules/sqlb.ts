@@ -265,6 +265,11 @@ export class SqlBInstance<T = any> {
   }
 
   in(attr: keyof T, values: SqlBValue[]): SqlBInstance<T> {
+    if (!values || values.length === 0) {
+      throw new Error(
+        'You are using `IN` statement without passing any sequence of values. It may lead to unexpected situations like deleting whole rows.'
+      )
+    }
     this.append(`${attr} IN (${values.join(', ')})`)
     return this
   }
