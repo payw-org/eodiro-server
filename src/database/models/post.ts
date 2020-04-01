@@ -31,7 +31,7 @@ export const postAttrs = [
   'edited_at',
 ]
 
-class Post extends Model {
+export class Post extends Model {
   /**
    * Return posts equal or smaller than the given post id with the number of given amount
    */
