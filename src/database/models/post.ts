@@ -26,7 +26,6 @@ export const postAttrs = [
   'body',
   'user_id',
   'random_nickname',
-  'likes',
   'uploaded_at',
   'edited_at',
 ]
