@@ -1,6 +1,6 @@
 {
   "name": "@payw/eodiro-one-api",
-  "version": "1.5.3",
+  "version": "1.6.1",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -8,7 +8,12 @@
     "refresh": "node dev/refresh",
     "deploy": "npm publish --access public"
   },
-  "files": ["api/one/client", "api/one/scheme", "database/models", "index.d.ts"],
+  "files": [
+    "api/one/client",
+    "api/one/scheme",
+    "database/models",
+    "index.d.ts"
+  ],
   "author": "PAYW",
   "license": "MIT"
 }

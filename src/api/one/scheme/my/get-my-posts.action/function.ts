@@ -24,7 +24,7 @@ const func: OneApiFunction<Action> = async (data) => {
 
   return {
     err: null,
-    posts,
+    data: posts,
   }
 }
 
