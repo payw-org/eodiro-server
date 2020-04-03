@@ -1,9 +1,9 @@
 import { DataTypes, Model } from 'sequelize'
-import { createGetModelFunction } from '../create-model-function'
+import { createGetModelFuncAfterInit } from '../create-get-model-func-after-init'
 
 class CoverageMajor extends Model {}
 
-export const coverageMajor = createGetModelFunction(
+export const coverageMajor = createGetModelFuncAfterInit(
   CoverageMajor,
   'coverage_major',
   {

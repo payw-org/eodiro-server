@@ -3,7 +3,7 @@ import { Database } from './index'
 
 class ExtendedModel extends Model {}
 
-export const createGetModelFunction = <T extends typeof ExtendedModel>(
+export const createGetModelFuncAfterInit = <T extends typeof ExtendedModel>(
   modelClass: T,
   modelName: string,
   modelAttributes: ModelAttributes,

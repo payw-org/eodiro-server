@@ -1,10 +1,10 @@
 import { DataTypes, Model } from 'sequelize'
-import { createGetModelFunction } from '../create-model-function'
+import { createGetModelFuncAfterInit } from '../create-get-model-func-after-init'
 import { PrimaryAIAttribute } from '../utils/model-attributes'
 
 class Board extends Model {}
 
-export const getBoard = createGetModelFunction(
+export const getBoard = createGetModelFuncAfterInit(
   Board,
   'board',
   {
