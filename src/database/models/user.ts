@@ -5,7 +5,7 @@ import rng from '@/modules/random-name-generator'
 import SqlB from '@/modules/sqlb'
 import Time from '@/modules/time'
 import { DataTypes, Model } from 'sequelize'
-import { createGetModelFuncAfterInit } from '../create-get-model-func-after-init'
+import { createInitModel } from '../create-init-model'
 import { TableNames } from '../table-names'
 
 class User extends Model {
@@ -259,7 +259,7 @@ class User extends Model {
   }
 }
 
-export const getUser = createGetModelFuncAfterInit(
+export const getUser = createInitModel(
   User,
   'user',
   {

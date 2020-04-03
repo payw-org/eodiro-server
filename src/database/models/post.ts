@@ -2,7 +2,7 @@ import Db from '@/db'
 import SqlB from '@/modules/sqlb'
 import Time from '@/modules/time'
 import { DataTypes, Model } from 'sequelize'
-import { createGetModelFuncAfterInit } from '../create-get-model-func-after-init'
+import { createInitModel } from '../create-init-model'
 import { query, QueryTypes } from '../query'
 import { TableNames } from '../table-names'
 import { CommentType } from './comment'
@@ -256,7 +256,7 @@ export class Post extends Model {
   }
 }
 
-export const getPost = createGetModelFuncAfterInit(Post, 'post', {
+export const getPost = createInitModel(Post, 'post', {
   id: {
     type: DataTypes.INTEGER,
     primaryKey: true,

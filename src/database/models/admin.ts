@@ -1,6 +1,6 @@
 import Db from '@/db'
 import { DataTypes, Model } from 'sequelize'
-import { createGetModelFuncAfterInit } from '../create-get-model-func-after-init'
+import { createInitModel } from '../create-init-model'
 
 class Admin extends Model {
   static async isAdmin(userId: number): Promise<boolean> {
@@ -18,7 +18,7 @@ class Admin extends Model {
   }
 }
 
-export const admin = createGetModelFuncAfterInit(Admin, 'admin', {
+export const admin = createInitModel(Admin, 'admin', {
   user_id: {
     type: DataTypes.INTEGER,
     allowNull: false,

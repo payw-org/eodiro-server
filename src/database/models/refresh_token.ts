@@ -2,7 +2,7 @@ import Db, { MysqlResult } from '@/db'
 import { Payload } from '@/modules/jwt'
 import { RefreshToken as JwtRefreshToken } from '@/modules/jwt/tokens'
 import { DataTypes, Model } from 'sequelize'
-import { createGetModelFuncAfterInit } from '../create-get-model-func-after-init'
+import { createInitModel } from '../create-init-model'
 
 class RefreshToken extends Model {
   static async findWithUserId(
@@ -88,30 +88,26 @@ class RefreshToken extends Model {
   }
 }
 
-export const refreshToken = createGetModelFuncAfterInit(
-  RefreshToken,
-  'refresh_token',
-  {
-    user_id: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
-      references: {
-        model: 'user',
-        key: 'id',
-      },
-      onDelete: 'cascade',
-      onUpdate: 'cascade',
+export const refreshToken = createInitModel(RefreshToken, 'refresh_token', {
+  user_id: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    references: {
+      model: 'user',
+      key: 'id',
     },
-    token: {
-      type: DataTypes.STRING(500),
-      allowNull: true,
-    },
-    manually_changed_at: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
-    },
-  }
-)
+    onDelete: 'cascade',
+    onUpdate: 'cascade',
+  },
+  token: {
+    type: DataTypes.STRING(500),
+    allowNull: true,
+  },
+  manually_changed_at: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+  },
+})
 
 export type RefreshTokenType = {
   user_id: number

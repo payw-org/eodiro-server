@@ -1,9 +1,9 @@
 import { DataTypes, Model } from 'sequelize'
-import { createGetModelFuncAfterInit } from '../create-get-model-func-after-init'
+import { createInitModel } from '../create-init-model'
 
 class PostFile extends Model {}
 
-export const getPostFile = createGetModelFuncAfterInit(PostFile, 'post_file', {
+export const getPostFile = createInitModel(PostFile, 'post_file', {
   post_id: {
     primaryKey: true,
     type: DataTypes.INTEGER,
