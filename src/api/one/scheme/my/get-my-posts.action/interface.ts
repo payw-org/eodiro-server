@@ -1,5 +1,5 @@
-import { BoardType } from '@/database/models/board'
-import { PostType } from '@/database/models/post'
+import { BoardType } from '../../../../../database/models/board'
+import { PostType } from '../../../../../database/models/post'
 import { AuthRequired, OneApiError } from '../../types/utils'
 
 export interface Action {
@@ -11,6 +11,6 @@ export interface Action {
   }>
   payload: {
     err: OneApiError
-    posts?: (PostType & BoardType)[]
+    data?: (PostType & BoardType)[]
   }
 }
