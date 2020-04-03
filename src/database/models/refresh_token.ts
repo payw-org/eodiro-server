@@ -2,7 +2,7 @@ import Db, { MysqlResult } from '@/db'
 import { Payload } from '@/modules/jwt'
 import { RefreshToken as JwtRefreshToken } from '@/modules/jwt/tokens'
 import { DataTypes, Model } from 'sequelize'
-import { createGetModelFunction } from '../create-model-function'
+import { createGetModelFuncAfterInit } from '../create-get-model-func-after-init'
 
 class RefreshToken extends Model {
   static async findWithUserId(
@@ -88,7 +88,7 @@ class RefreshToken extends Model {
   }
 }
 
-export const refreshToken = createGetModelFunction(
+export const refreshToken = createGetModelFuncAfterInit(
   RefreshToken,
   'refresh_token',
   {
