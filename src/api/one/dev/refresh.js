@@ -5,6 +5,7 @@ const globAsync = util.promisify(glob)
 const path = require('path')
 const prettier = require('prettier')
 const prettierRC = require('../../../../prettier.config')
+prettierRC['parser'] = 'typescript'
 const { pascalCase, camelCase } = require('change-case')
 
 const msg = `
