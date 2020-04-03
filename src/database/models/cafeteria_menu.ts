@@ -1,26 +1,22 @@
 import { DataTypes, Model } from 'sequelize'
-import { createGetModelFuncAfterInit } from '../create-get-model-func-after-init'
+import { createInitModel } from '../create-init-model'
 
 class CafeteriaMenu extends Model {}
 
-export const cafeteriaMenu = createGetModelFuncAfterInit(
-  CafeteriaMenu,
-  'cafeteria_menu',
-  {
-    campus: {
-      type: DataTypes.CHAR(2),
-      primaryKey: true,
-    },
-    served_at: {
-      type: DataTypes.DATEONLY,
-      primaryKey: true,
-    },
-    data: {
-      type: DataTypes.JSON,
-      allowNull: true,
-    },
-  }
-)
+export const cafeteriaMenu = createInitModel(CafeteriaMenu, 'cafeteria_menu', {
+  campus: {
+    type: DataTypes.CHAR(2),
+    primaryKey: true,
+  },
+  served_at: {
+    type: DataTypes.DATEONLY,
+    primaryKey: true,
+  },
+  data: {
+    type: DataTypes.JSON,
+    allowNull: true,
+  },
+})
 
 export type CafeteriaMenuType = {
   campus: string

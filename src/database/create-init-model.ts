@@ -3,7 +3,14 @@ import { Database } from './index'
 
 class ExtendedModel extends Model {}
 
-export const createGetModelFuncAfterInit = <T extends typeof ExtendedModel>(
+/**
+ * Return the Model class after the initialization
+ * @param modelClass A model class that extends Sequelize Model
+ * @param modelName Table name
+ * @param modelAttributes Table attributes
+ * @param initOptions
+ */
+export const createInitModel = <T extends typeof ExtendedModel>(
   modelClass: T,
   modelName: string,
   modelAttributes: ModelAttributes,

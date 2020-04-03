@@ -1,10 +1,10 @@
 import { DataTypes, Model } from 'sequelize'
-import { createGetModelFuncAfterInit } from '../create-get-model-func-after-init'
+import { createInitModel } from '../create-init-model'
 import { PrimaryAIAttribute } from '../utils/model-attributes'
 
 class PendingUser extends Model {}
 
-export const pendingUser = createGetModelFuncAfterInit(
+export const pendingUser = createInitModel(
   PendingUser,
   'pending_user',
   {

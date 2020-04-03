@@ -1,9 +1,12 @@
 import { DataTypes, Model } from 'sequelize'
-import { createGetModelFuncAfterInit } from '../create-get-model-func-after-init'
+import { createInitModel } from '../create-init-model'
 
 export class PostLike extends Model {}
 
-export const initPostLike = createGetModelFuncAfterInit(PostLike, 'post_like', {
+/**
+ * Return `PostLike` model after init
+ */
+export const initPostLike = createInitModel(PostLike, 'post_like', {
   user_id: {
     primaryKey: true,
     type: DataTypes.INTEGER,
