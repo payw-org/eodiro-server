@@ -1,3 +1,6 @@
+/**
+ * @deprecated Use TableInfo object in each model
+ */
 export enum TableNames {
   admin = 'admin',
   board = 'board',
