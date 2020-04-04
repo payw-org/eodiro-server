@@ -1,10 +1,10 @@
 import { DataTypes, Model } from 'sequelize'
-import { createInitModel } from '../create-init-model'
+import { createInitModelFunction } from '../create-init-model'
 import { PrimaryAIAttribute } from '../utils/model-attributes'
 
 class File extends Model {}
 
-export const getFile = createInitModel(
+export const getFile = createInitModelFunction(
   File,
   'file',
   {

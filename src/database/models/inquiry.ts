@@ -2,7 +2,7 @@ import Db, { MysqlInsertOrUpdateResult } from '@/db'
 import SqlB from '@/modules/sqlb'
 import Time from '@/modules/time'
 import { DataTypes, Model } from 'sequelize'
-import { createInitModel } from '../create-init-model'
+import { createInitModelFunction } from '../create-init-model'
 import { TableNames } from '../table-names'
 import { PrimaryAIAttribute } from '../utils/model-attributes'
 
@@ -146,7 +146,7 @@ export class Inquiry extends Model {
   }
 }
 
-export const inquiry = createInitModel(Inquiry, 'inquiry', {
+export const inquiry = createInitModelFunction(Inquiry, 'inquiry', {
   id: PrimaryAIAttribute,
   email: {
     type: DataTypes.STRING(320),

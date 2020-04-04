@@ -1,9 +1,9 @@
 import { DataTypes, Model } from 'sequelize'
-import { createInitModel } from '../create-init-model'
+import { createInitModelFunction } from '../create-init-model'
 
 class CoverageMajorLecture extends Model {}
 
-export const coverageMajorLecture = createInitModel(
+export const coverageMajorLecture = createInitModelFunction(
   CoverageMajorLecture,
   'coverage_major_lecture',
   {

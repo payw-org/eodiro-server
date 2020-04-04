@@ -10,7 +10,7 @@ class ExtendedModel extends Model {}
  * @param modelAttributes Table attributes
  * @param initOptions
  */
-export const createInitModel = <T extends typeof ExtendedModel>(
+export const createInitModelFunction = <T extends typeof ExtendedModel>(
   modelClass: T,
   modelName: string,
   modelAttributes: ModelAttributes,

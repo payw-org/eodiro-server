@@ -3,7 +3,7 @@ import Auth from '@/modules/auth'
 import SqlB from '@/modules/sqlb'
 import Time from '@/modules/time'
 import { DataTypes, Model } from 'sequelize'
-import { createInitModel } from '../create-init-model'
+import { createInitModelFunction } from '../create-init-model'
 import { TableNames } from '../table-names'
 
 class ChangePassword extends Model {
@@ -84,7 +84,7 @@ class ChangePassword extends Model {
   }
 }
 
-export const changePassword = createInitModel(
+export const changePassword = createInitModelFunction(
   ChangePassword,
   'change_password',
   {

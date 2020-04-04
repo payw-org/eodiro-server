@@ -1,7 +1,7 @@
 import Db from '@/db'
 import Time from '@/modules/time'
 import { DataTypes, Model } from 'sequelize'
-import { createInitModel } from '../create-init-model'
+import { createInitModelFunction } from '../create-init-model'
 import { PrimaryAIAttribute } from '../utils/model-attributes'
 import { getUser } from './user'
 
@@ -50,7 +50,7 @@ class Comment extends Model {
   }
 }
 
-export const comment = createInitModel(Comment, 'comment', {
+export const comment = createInitModelFunction(Comment, 'comment', {
   id: PrimaryAIAttribute,
   body: {
     type: DataTypes.TEXT,
