@@ -13,6 +13,7 @@ import { pendingUser } from './models/pending_user'
 import { period } from './models/period'
 import { getPost } from './models/post'
 import { getPostFile } from './models/post_file'
+import { initPostLike } from './models/post_like'
 import { refreshToken } from './models/refresh_token'
 import { getUser } from './models/user'
 
@@ -32,6 +33,7 @@ async function sync(): Promise<void> {
   await (await getBoard()).sync(alter)
   await (await getPost()).sync(alter)
   await (await getPostFile()).sync(alter)
+  await (await initPostLike()).sync(alter)
   await (await comment()).sync(alter)
   await (await cafeteriaMenu()).sync(alter)
   await (await coverageMajor()).sync(alter)

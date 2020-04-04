@@ -1,22 +1,26 @@
 import { DataTypes, Model } from 'sequelize'
-import { createInitModel } from '../create-init-model'
+import { createInitModelFunction } from '../create-init-model'
 
 class CoverageMajor extends Model {}
 
-export const coverageMajor = createInitModel(CoverageMajor, 'coverage_major', {
-  coverage_college: {
-    type: DataTypes.STRING(50),
-    allowNull: true,
-  },
-  name: {
-    type: DataTypes.STRING(50),
-    allowNull: false,
-    primaryKey: true,
-  },
-  code: {
-    type: DataTypes.STRING(20),
-  },
-})
+export const coverageMajor = createInitModelFunction(
+  CoverageMajor,
+  'coverage_major',
+  {
+    coverage_college: {
+      type: DataTypes.STRING(50),
+      allowNull: true,
+    },
+    name: {
+      type: DataTypes.STRING(50),
+      allowNull: false,
+      primaryKey: true,
+    },
+    code: {
+      type: DataTypes.STRING(20),
+    },
+  }
+)
 
 export type CoverageMajorType = {
   name: string

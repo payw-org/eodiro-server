@@ -1,18 +1,39 @@
 import { DataTypes, Model } from 'sequelize'
-import { createInitModel } from '../create-init-model'
+import { createInitModelFunction } from '../create-init-model'
+import { TableInfo } from '../types'
 
 export class PostLike extends Model {}
 
 /**
- * Return `PostLike` model after init
+ * Init `PostLike` model then return it
  */
-export const initPostLike = createInitModel(PostLike, 'post_like', {
+export const initPostLike = createInitModelFunction(PostLike, 'post_like', {
   user_id: {
     primaryKey: true,
     type: DataTypes.INTEGER,
+    references: {
+      model: 'user',
+      key: 'id',
+    },
+    onDelete: 'cascade',
+    onUpdate: 'cascade',
   },
   post_id: {
     primaryKey: true,
     type: DataTypes.INTEGER,
+    references: {
+      model: 'post',
+      key: 'id',
+    },
+    onDelete: 'cascade',
+    onUpdate: 'cascade',
   },
 })
+
+export const $PostLike: TableInfo = {
+  tableName: 'post_like',
+  attrs: {
+    user_id: 'user_id',
+    post_id: 'post_id',
+  },
+}
