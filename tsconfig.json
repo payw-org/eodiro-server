@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "declaration": false,
+    "declaration": true,
     "moduleResolution": "node",
     "target": "ES2018",
     "allowJs": true,
@@ -10,8 +10,9 @@
     "resolveJsonModule": true,
     "baseUrl": "./",
     "paths": {
-      "@/*": ["src/*"],
+      "@/*": ["src/*"]
     },
+    "plugins": [{ "transform": "@zerollup/ts-transform-paths" }],
     "lib": ["ES2020.String", "DOM"]
   },
   "include": ["src/**/*"],
