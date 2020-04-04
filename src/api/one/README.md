@@ -13,10 +13,11 @@ Actions are placed under `src/api/one/scheme`.
 You can create an action by creating a folder which name is in a form of `[action-name].action`. Subdirectories don't matter.
 
 For example,
- - `scheme/square/get-posts.action`
- - `scheme/square/upload-post.action`
- - `scheme/square/comments/get-comments.action`
- - `scheme/cafeteria/get-today-meals.action`
+
+- `scheme/square/get-posts.action`
+- `scheme/square/upload-post.action`
+- `scheme/square/comments/get-comments.action`
+- `scheme/cafeteria/get-today-meals.action`
 
 Then you have to create two files [`interface.ts`](#interface), [`function.ts`](#function).
 
@@ -34,14 +35,16 @@ export interface Action {
 }
 ```
 
-> You have to import other types only within `eodiro-one-api` using **_relative path_**.
+> ~~You have to import other types only within `eodiro-one-api` using **_relative path_**.~~ Now supports absolute paths like `@/database/...` and the compiler converts them to relative paths.
 
 ### Function
 
 It exports a default async function where it gets request data as an argument and returns the payload.
 
 ```ts
-export default async function(data: Interface['data']): Promise<Interface['payload']> {
+export default async function (
+  data: Interface['data']
+): Promise<Interface['payload']> {
   // do something
   // ...
 
