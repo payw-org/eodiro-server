@@ -25,7 +25,7 @@
     "pm2:restart": "if pm2 show eodiro-api2 ; then pm2 restart eodiro-api2 ; else echo 'No PM2 instance for eodiro API 2' ; fi",
     "pm2:stop": "if pm2 show eodiro-api2 ; then pm2 stop eodiro-api2 ; else echo 'No PM2 instance for eodiro API 2' ; fi",
     "pm2:delete": "if pm2 show eodiro-api2 ; then pm2 delete eodiro-api2 ; else echo 'No PM2 instance for eodiro API 2' ; fi",
-    "pm2:reboot": "npm run build && npm run pm2:stop && npm run pm2:delete && npm run pm2:start",
+    "pm2:reboot": "npm install && npm run build && npm run pm2:stop && npm run pm2:delete && npm run pm2:start",
     "clear": "rimraf build/*",
     "checkout-latest": "git reset --hard && git checkout $(git describe --tags `git rev-list --tags --max-count=1`)",
     "update": "git reset --hard && git fetch --prune && npm run checkout-latest && npm install && npm run pm2:reboot",
