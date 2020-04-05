@@ -15,10 +15,6 @@ const upload = multer().array('file')
 const publicContentUrl = 'public-user-content'
 
 router.post('/upload', async (req, res) => {
-  // TODO: check referer
-  // allow only the request from https://eodiro.com in production mode
-  // also verify access token
-
   upload(req, res, async (err) => {
     const storagePath = getStoragePath()
 
