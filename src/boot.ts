@@ -1,6 +1,5 @@
 import bodyParser from 'body-parser'
 import chalk from 'chalk'
-import cors from 'cors'
 import express from 'express'
 import http from 'http'
 import api from './api'
@@ -28,8 +27,6 @@ export async function boot(options: {
 
   // Create Express app
   const app = express()
-
-  app.use(cors())
 
   // Use middlewares
   app.use(bodyParser.urlencoded({ extended: true }))
