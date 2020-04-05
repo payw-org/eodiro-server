@@ -30,7 +30,11 @@ export async function boot(options: {
   const app = express()
 
   // Use middlewares
-  app.use(cors())
+  app.use(
+    cors({
+      origin: ['https://eodiro.com', 'http://localhost:3020'],
+    })
+  )
   app.use(bodyParser.urlencoded({ extended: true }))
   app.use(bodyParser.json())
   app.use(api)
