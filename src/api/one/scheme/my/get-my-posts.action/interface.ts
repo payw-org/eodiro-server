@@ -6,7 +6,7 @@ export interface Action {
   data: AuthRequired<{
     /** @default 0 */
     lastPostId?: number
-    /** @default 20 */
+    /** @default Infinity */
     amount?: number
   }>
   payload: {
