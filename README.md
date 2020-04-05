@@ -23,6 +23,18 @@
 
 Node.js running on NGINX using reverse proxy.
 
+### SSL
+
+- Letsencrypt and Certbot python plugin
+
+### Resolve 413 Request Entity Too Large
+
+```nginx
+server {
+    client_max_body_size 100M;
+}
+```
+
 ## Database
 
 It uses MySQL internally as its database.
