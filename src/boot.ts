@@ -1,5 +1,6 @@
 import bodyParser from 'body-parser'
 import chalk from 'chalk'
+import cors from 'cors'
 import express from 'express'
 import http from 'http'
 import api from './api'
@@ -28,10 +29,17 @@ export async function boot(options: {
   // Create Express app
   const app = express()
 
-  app.options('/*', (req, res, next) => {
-    res.header('Access-Control-Allow-Origin', '*')
-    next()
-  })
+  app.use(
+    cors({
+      origin: [
+        'http://localhost:4020',
+        'http://localhost:3020',
+        'https://api2.eodiro.com',
+        'https://eodiro.com',
+      ],
+      credentials: true,
+    })
+  )
 
   // Use middlewares
   app.use(bodyParser.urlencoded({ extended: true }))
