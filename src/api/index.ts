@@ -34,7 +34,14 @@ router.post('/one', async (req, res) => {
     data,
   })
 
-  return res.json(payload)
+  if (!payload) {
+    res.json({
+      err: 'No Action Found',
+    })
+    return
+  }
+
+  res.json(payload)
 })
 
 router.use('/pepero-square', peperoSquareRouter)
