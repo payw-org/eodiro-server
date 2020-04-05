@@ -335,8 +335,14 @@ export class SqlBInstance<T = any> {
   }
 
   /** attr < value */
-  less(attr: keyof T, value: SqlBValue): SqlBInstance<T> {
+  less(attr: string, value: SqlBValue): SqlBInstance<T> {
     this.append(`${attr} < ${this.convert(value)}`)
+    return this
+  }
+  /** AND attr < value */
+  andLess(attr: string, value: SqlBValue): SqlBInstance {
+    this.and()
+    this.less(attr, value)
     return this
   }
 
