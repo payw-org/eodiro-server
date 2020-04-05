@@ -29,7 +29,7 @@ export async function boot(options: {
   // Create Express app
   const app = express()
 
-  app.use(cors)
+  app.use(cors())
 
   // Use middlewares
   app.use(bodyParser.json({ limit: '50mb' }))
