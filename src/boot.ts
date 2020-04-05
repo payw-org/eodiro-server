@@ -37,13 +37,6 @@ export async function boot(options: {
         'https://api2.eodiro.com',
         'https://eodiro.com',
       ],
-      allowedHeaders: [
-        'Accept',
-        'Authorization',
-        'Content-Type',
-        'AccessToken',
-      ],
-      credentials: true,
     })
   )
 
