@@ -31,6 +31,18 @@ export const postAttrs = [
 ]
 
 export class Post extends Model {
+  static tableName = 'post'
+  static attrs = {
+    id: 'id',
+    board_id: 'board_id',
+    title: 'title',
+    body: 'body',
+    user_id: 'user_id',
+    random_nickname: 'random_nickname',
+    uploaded_at: 'uploaded_at',
+    edited_at: 'edited_at',
+  }
+
   /**
    * Return posts equal or smaller than the given post id with the number of given amount
    */
