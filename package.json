@@ -35,9 +35,6 @@
     "one-api:refresh": "npm run --prefix src/api/one refresh",
     "one-api:deploy": "npm run one-api:refresh && npm run build && npm run --prefix src/api/one copy-packagejson && npm run --prefix build/src deploy"
   },
-  "_moduleAliases": {
-    "@": "build"
-  },
   "dependencies": {
     "@payw/cau-cafeteria-menus-scraper": "^2.1.3",
     "@payw/cau-timetable-scraper": "^2.1.1",
