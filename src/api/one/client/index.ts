@@ -82,50 +82,42 @@ export async function oneAPIClient<T extends OneApiAction>(
     delete request.data['accessToken']
   }
 
-  try {
-    const { data }: { data: OneAPIPayload<T> } = await axios({
-      url: `${host}/one`,
-      method: 'POST',
-      data: request,
-      headers: {
-        accessToken: accessToken || '',
-      },
-    })
+  const { data }: { data: OneAPIPayload<T> } = await axios({
+    url: `${host}/one`,
+    method: 'POST',
+    data: request,
+    headers: {
+      accessToken: accessToken || '',
+    },
+  })
 
-    if ('err' in data) {
-      const oneApiErr = data['err'] as OneApiError
+  if ('err' in data) {
+    const oneApiErr = data['err'] as OneApiError
 
-      if (typeof window !== 'undefined') {
-        let msg = ''
-        switch (oneApiErr) {
-          case OneApiError.BAD_REQUEST:
-            msg = '잘못된 요청입니다.'
-            break
-          case OneApiError.FORBIDDEN:
-            msg = '금지된 요청입니다.'
-            break
-          case OneApiError.UNAUTHORIZED:
-            msg = '로그인 정보가 없습니다.'
-            break
-          case OneApiError.INTERNAL_SERVER_ERROR:
-            msg = '서버에 문제가 발생했습니다.'
-            break
-          default:
-            break
-        }
+    if (typeof window !== 'undefined') {
+      let msg = ''
+      switch (oneApiErr) {
+        case OneApiError.BAD_REQUEST:
+          msg = '잘못된 요청입니다.'
+          break
+        case OneApiError.FORBIDDEN:
+          msg = '금지된 요청입니다.'
+          break
+        case OneApiError.UNAUTHORIZED:
+          msg = '로그인 정보가 없습니다.'
+          break
+        case OneApiError.INTERNAL_SERVER_ERROR:
+          msg = '서버에 문제가 발생했습니다.'
+          break
+        default:
+          break
+      }
 
-        if (msg) {
-          window.alert(msg)
-        }
+      if (msg) {
+        window.alert(msg)
       }
     }
-
-    return data
-  } catch (err) {
-    try {
-      window.alert(`[One API] 서버와 연결할 수 없습니다. ${err}`)
-      console.log(err)
-    } catch (error) {}
-    throw new Error(err)
   }
+
+  return data
 }
