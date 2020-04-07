@@ -15,7 +15,11 @@ router.post('/sign-in', async (req, res) => {
       isAdmin: await Admin.isAdmin(userId),
     }
     const tokens = await Jwt.getTokenOrCreate(payload)
-    res.json(tokens)
+
+    res.json({
+      accessToken: tokens.accessToken.token,
+      refreshToken: tokens.refreshToken.token,
+    })
   } else {
     res.json(false)
   }
