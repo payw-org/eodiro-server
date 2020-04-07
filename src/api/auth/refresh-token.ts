@@ -9,7 +9,10 @@ const router = express.Router()
 router.post('/refresh-token', async (req, res) => {
   try {
     const tokens = await Jwt.refresh(req.headers.refreshtoken as string)
-    res.send(tokens)
+    res.send({
+      accessToken: tokens.accessToken.token,
+      refreshToken: tokens.refreshToken.token,
+    })
   } catch (err) {
     res.sendStatus(401)
   }
