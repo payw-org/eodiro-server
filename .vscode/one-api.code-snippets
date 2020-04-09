@@ -1,0 +1,50 @@
+{
+  "One API Interface": {
+    "scope": "typescript",
+    "prefix": "act-int",
+    "body": [
+      "import { OneApiError } from '@/api/one/scheme/types/utils'",
+      "",
+      "export interface Action {",
+      "  data: {",
+      "    $1",
+      "  }",
+      "  payload: {",
+      "    err: OneApiError",
+      "    data: $2",
+      "  }",
+      "}"
+    ]
+  },
+  "One API Interface Auth Required": {
+    "scope": "typescript",
+    "prefix": "act-auth-int",
+    "body": [
+      "import { AuthRequired, OneApiError } from '@/api/one/scheme/types/utils'",
+      "",
+      "export interface Action {",
+      "  data: AuthRequired<{",
+      "    $1",
+      "  }>",
+      "  payload: {",
+      "    err: OneApiError",
+      "    data: $2",
+      "  }",
+      "}"
+    ]
+  },
+  "One API Function": {
+    "scope": "typescript",
+    "prefix": "act-func",
+    "body": [
+      "import { OneApiFunction } from '@/api/one/scheme/types/utils",
+      "import { Action } from './interface'",
+      "",
+      "const func: OneApiFunction<Action> = async (data) => {",
+      "  $0",
+      "}",
+      "",
+      "export default func"
+    ]
+  }
+}
