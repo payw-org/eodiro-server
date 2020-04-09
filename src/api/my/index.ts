@@ -23,8 +23,8 @@ router.get('/my/information', async (req, res) => {
 router.get('/my/posts', async (req, res) => {
   const accessToken = req.headers.accesstoken as string
   const payload = await Auth.isSignedUser(accessToken)
-  const amount = req.query.amount || 10
-  const offset = req.query.offset || 0
+  const amount = Number(req.query.amount || 10)
+  const offset = Number(req.query.offset || 0)
 
   if (!payload) {
     res.sendStatus(401)

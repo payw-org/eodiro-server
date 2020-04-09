@@ -42,8 +42,8 @@ router.get('/inquiry', async (req, res) => {
     res.sendStatus(401)
     return
   }
-  const amount = parseInt(req.query?.offset, 10) || 20
-  const offset = parseInt(req.query?.offset, 10) || 0
+  const amount = parseInt(req.query?.offset as string, 10) || 20
+  const offset = parseInt(req.query?.offset as string, 10) || 0
   const Inquiry = await inquiry()
   let inquiries: InquiryType[] | false
   if (payload.isAdmin) {
