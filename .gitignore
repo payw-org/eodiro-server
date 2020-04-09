@@ -5,6 +5,7 @@ build
 .env
 .vscode/*
 !.vscode/settings.json
+!.vscode/*.code-snippets
 .idea
 **/config/index.ts
 /storage
