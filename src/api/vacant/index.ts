@@ -10,10 +10,10 @@ router.get('/vacant/:year/:semester/:campus/buildings', async (req, res) => {
   const now = dayjs()
 
   // Queries
-  const hour = parseInt(req.query?.hour) || now.hour()
-  const minute = parseInt(req.query?.minute) || now.minute()
+  const hour = parseInt(req.query?.hour as string) || now.hour()
+  const minute = parseInt(req.query?.minute as string) || now.minute()
   const today = dayIndexToString(now.day())
-  const day = req.query?.day || today
+  const day = (req.query?.day as string) || today
 
   // Params
   const year = req.params?.year
@@ -82,9 +82,7 @@ router.get('/vacant/:year/:semester/:campus/buildings', async (req, res) => {
       SqlB()
         .select('building', 'room')
         .from(
-          SqlB()
-            .join('lecture', 'period')
-            .on('lecture.id = period.lecture_id')
+          SqlB().join('lecture', 'period').on('lecture.id = period.lecture_id')
         )
         .where()
         .equal('year', year)
@@ -148,7 +146,7 @@ router.get(
 
     // Queries
     const today = dayIndexToString(now.day())
-    const day = req.query?.day || today
+    const day = (req.query?.day as string) || today
 
     // Params
     const year = req.params?.year

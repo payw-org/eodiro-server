@@ -28,8 +28,8 @@ router.get('/lectures/:year/:semester/:campus/list', async (req, res) => {
   const year = parseInt(req.params?.year)
   const semester = req.params?.semester
   const campus = req.params?.campus
-  const amount = parseInt(req.query?.amount) || 20
-  const offset = parseInt(req.query?.offset) || 0
+  const amount = parseInt(req.query?.amount as string) || 20
+  const offset = parseInt(req.query?.offset as string) || 0
 
   const query = SqlB()
     .select(`${TableNames.lecture}.*, major.code AS major_code`)
@@ -59,8 +59,8 @@ router.get('/lectures/:year/:semester/:campus/search', async (req, res) => {
   const semester = req.params?.semester
   const campus = req.params?.campus
   const searchKeyword = req.query?.q
-  const amount = parseInt(req.query?.amount) || 20
-  const offset = parseInt(req.query?.offset) || 0
+  const amount = parseInt(req.query?.amount as string) || 20
+  const offset = parseInt(req.query?.offset as string) || 0
 
   const [err, results] = await Db.query(
     SqlB()

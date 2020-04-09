@@ -7,12 +7,8 @@ const router = express.Router()
 
 // Get posts data
 router.get('/posts', async (req, res) => {
-  const { quantity } = req.query
-  let { from } = req.query
-
-  if (from === undefined) {
-    from = 0
-  }
+  const quantity = Number(req.query.quantity || 0)
+  const from = Number(req.query.quantity || 0)
 
   const Post = await getPost()
   const posts = await Post.getPosts(Number(from), Number(quantity))
