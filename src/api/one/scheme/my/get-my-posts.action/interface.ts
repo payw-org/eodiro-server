@@ -1,6 +1,6 @@
+import { AuthRequired, OneApiError } from '@/api/one/scheme/types/utils'
 import { BoardType } from '@/database/models/board'
 import { PostType } from '@/database/models/post'
-import { AuthRequired, OneApiError } from '../../types/utils'
 
 export interface Action {
   data: AuthRequired<{
