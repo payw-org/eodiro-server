@@ -1,6 +1,8 @@
+import { LectureType } from '@/database/models/lecture'
+import { PeriodType } from '@/database/models/period'
 import Db from '@/db'
 import dayIndexToString from '@/modules/day-index-to-string'
-import SqlB from '@/modules/sqlb'
+import { Q } from '@/modules/sqlb'
 import dayjs from 'dayjs'
 import express from 'express'
 
@@ -21,18 +23,16 @@ router.get('/vacant/:year/:semester/:campus/buildings', async (req, res) => {
   const campus = req.params?.campus
 
   // Find total classrooms number
-  const q1 = SqlB()
+  const q1 = Q()
     .select('building as building_number', 'count(building) as total')
     .from(
-      SqlB()
+      Q()
         .select('distinct *')
         .from(
-          SqlB()
+          Q()
             .select('building', 'room')
             .from(
-              SqlB()
-                .join('lecture', 'period')
-                .on('lecture.id = period.lecture_id')
+              Q().join('lecture', 'period').on('lecture.id = period.lecture_id')
             )
             .where()
             .equal('year', year)
@@ -76,13 +76,13 @@ router.get('/vacant/:year/:semester/:campus/buildings', async (req, res) => {
   }
 
   // Find in-class classrooms number
-  const q2 = SqlB()
+  const q2 = Q()
     .select('building as building_number', 'count(building) as in_class_count')
     .from(
-      SqlB()
+      Q()
         .select('building', 'room')
         .from(
-          SqlB().join('lecture', 'period').on('lecture.id = period.lecture_id')
+          Q().join('lecture', 'period').on('lecture.id = period.lecture_id')
         )
         .where()
         .equal('year', year)
@@ -92,7 +92,7 @@ router.get('/vacant/:year/:semester/:campus/buildings', async (req, res) => {
         .andNotEqual('building', '')
         .andNotEqual('room', '')
         .and(
-          SqlB()
+          Q()
             .less('start_h', hour)
             .or()
             .equalOrLess('start_h', hour)
@@ -101,7 +101,7 @@ router.get('/vacant/:year/:semester/:campus/buildings', async (req, res) => {
             .bind()
         )
         .and(
-          SqlB()
+          Q()
             .more('end_h', hour)
             .or()
             .equalOrMore('end_h', hour)
@@ -154,23 +154,22 @@ router.get(
     const campus = req.params?.campus
     const building = req.params?.building
 
-    const q1 = SqlB()
+    const q1 = Q()
       .select('*')
       .from(
-        SqlB()
+        Q()
           .select('*')
           .from(
-            SqlB()
-              .join('lecture', 'period')
-              .on('lecture.id = period.lecture_id')
+            Q().join('lecture', 'period').on('lecture.id = period.lecture_id')
           )
           .where(
-            SqlB()
+            Q<LectureType & PeriodType>()
               .equal('year', year)
               .andEqual('semester', semester)
               .andEqual('campus', campus)
               .andEqual('building', building)
               .andEqual('day', day)
+              .andIsNotNull('room')
           )
           .order('room', 'asc')
           .bind('t1')
@@ -182,6 +181,8 @@ router.get(
       ])
       .build()
     const [err1, results1] = await Db.query(q1)
+
+    console.log(results1)
 
     if (err1) {
       res.sendStatus(500)
