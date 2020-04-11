@@ -274,19 +274,52 @@ export class SqlBInstance<T = any> {
     return this
   }
 
+  isNull(attr: keyof T): SqlBInstance<T> {
+    this.append(`${attr} IS NULL`)
+    return this
+  }
+  andIsNull(attr: keyof T): SqlBInstance<T> {
+    this.and()
+    this.append(`${attr} IS NULL`)
+    return this
+  }
+  orIsNull(attr: keyof T): SqlBInstance<T> {
+    this.or()
+    this.append(`${attr} IS NULL`)
+    return this
+  }
+  isNotNull(attr: keyof T): SqlBInstance<T> {
+    this.append(`${attr} IS NOT NULL`)
+    return this
+  }
+  andIsNotNull(attr: keyof T): SqlBInstance<T> {
+    this.and()
+    this.append(`${attr} IS NOT NULL`)
+    return this
+  }
+  orIsNotNull(attr: keyof T): SqlBInstance<T> {
+    this.or()
+    this.append(`${attr} IS NOT NULL`)
+    return this
+  }
+
+  /**
+   * > NOTE: To check `NULL`, use `isNull()`
+   */
   equal(attr: keyof T, value: SqlBValue): SqlBInstance<T> {
     this.append(`${attr} = ${this.convert(value)}`)
-
     return this
   }
 
   andEqual(attr: keyof T, value: SqlBValue): SqlBInstance<T> {
     this.and()
     this.equal(attr, value)
-
     return this
   }
 
+  /**
+   * > NOTE: To check `NULL`, use `isNotNull()`
+   */
   notEqual(attr: keyof T, value: SqlBValue): SqlBInstance<T> {
     this.append(`${attr} != ${this.convert(value)}`)
     return this
