@@ -1,4 +1,4 @@
-import { CommentType } from '@/database/models/comment'
+import { CommentAttrs } from '@/database/models/comment'
 import Db from '@/db'
 import Auth from '@/modules/auth'
 import SqlB from '@/modules/sqlb'
@@ -14,7 +14,7 @@ export default async function (
       data: null,
     }
 
-  const query = SqlB<CommentType>()
+  const query = SqlB<CommentAttrs>()
     .select('*')
     .from('comment')
     .where()
@@ -24,7 +24,7 @@ export default async function (
     .limit(data.amount)
     .build()
 
-  const [err, results] = await Db.query<CommentType[]>(query)
+  const [err, results] = await Db.query<CommentAttrs[]>(query)
 
   if (err) {
     return {

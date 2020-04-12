@@ -1,4 +1,4 @@
-import { CommentType } from '../../../../../database/models/comment'
+import { CommentAttrs } from '../../../../../database/models/comment'
 import { OneAPIError } from '../../types/utils'
 
 export interface Action {
@@ -10,6 +10,6 @@ export interface Action {
   }
   payload: {
     err: OneAPIError<void>
-    data: CommentType[]
+    data: CommentAttrs[]
   }
 }

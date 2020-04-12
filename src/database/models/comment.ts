@@ -10,7 +10,26 @@ export interface NewComment {
   body: string
 }
 
-class Comment extends Model {
+export type CommentAttrs = {
+  id: number
+  body: string
+  uploaded_at: string
+  user_id: number
+  post_id: number
+  random_nickname: string
+}
+
+export class Comment extends Model {
+  static tableName = 'comment'
+  static attrs = {
+    id: 'id',
+    body: 'body',
+    uploaded_at: 'uploaded_at',
+    user_id: 'user_id',
+    post_id: 'post_id',
+    random_nickname: 'random_nickname',
+  }
+
   static isValidBody(body: string): boolean {
     return body.length > 0
   }
@@ -70,10 +89,6 @@ export const comment = createInitModelFunction(Comment, 'comment', {
     onDelete: 'cascade',
     onUpdate: 'cascade',
   },
-  likes: {
-    type: DataTypes.MEDIUMINT,
-    defaultValue: 0,
-  },
   post_id: {
     type: DataTypes.INTEGER,
     allowNull: false,
@@ -89,13 +104,3 @@ export const comment = createInitModelFunction(Comment, 'comment', {
     allowNull: false,
   },
 })
-
-export type CommentType = {
-  id: number
-  body: string
-  uploaded_at: string
-  user_id: number
-  likes: number
-  post_id: number
-  random_nickname: string
-}
