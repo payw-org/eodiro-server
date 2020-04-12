@@ -39,15 +39,21 @@ export async function getPostById(
     PostAttrs & PostLikeAttrs & { likes: number }
   >(
     Q<PostAttrs & PostLikeAttrs>()
-      .select('*')
-      .alsoSelectAny('count(*) as likes')
+      .select(
+        '*',
+        Q()
+          .select('count(*) as likes')
+          .from(PostLike.tableName)
+          .where()
+          .equal(PostLike.attrs.post_id, postId)
+      )
       .from()
       .join(Post.tableName, PostLike.tableName)
       .on(
         `${Post.tableName}.${Post.attrs.id} = ${PostLike.tableName}.${PostLike.attrs.post_id}`
       )
       .where()
-      .equal('post_id', postId)
+      .equal(Post.attrs.id, postId)
   )
 
   if (result.length === 0) {
