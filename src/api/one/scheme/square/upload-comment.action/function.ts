@@ -1,4 +1,4 @@
-import { CommentType } from '@/database/models/comment'
+import { CommentAttrs } from '@/database/models/comment'
 import { PostAttrs } from '@/database/models/post'
 import { getUser } from '@/database/models/user'
 import { TableNames } from '@/database/table-names'
@@ -45,7 +45,7 @@ export default async function (
     }
   }
 
-  const query = SqlB<CommentType>()
+  const query = SqlB<CommentAttrs>()
     .insert(TableNames.comment, {
       user_id: userInfo.id,
       random_nickname: userInfo.random_nickname,

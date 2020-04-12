@@ -6,7 +6,7 @@ import { createInitModelFunction } from '../create-init-model'
 import { eodiroQuery, EodiroQueryType } from '../eodiro-query'
 import { query, QueryTypes } from '../query'
 import { TableNames } from '../table-names'
-import { CommentType } from './comment'
+import { CommentAttrs } from './comment'
 import { PostLike, PostLikeAttrs } from './post_like'
 import { getUser } from './user'
 
@@ -202,7 +202,7 @@ export class Post extends Model {
     postId: number,
     fromId = 0,
     quantity = 20
-  ): Promise<CommentType[] | false> {
+  ): Promise<CommentAttrs[] | false> {
     if (typeof postId !== 'number') {
       console.error('Wrong postId data')
       return false
@@ -224,7 +224,7 @@ export class Post extends Model {
       return false
     }
 
-    return results as CommentType[]
+    return results as CommentAttrs[]
   }
 
   static isValidTitle(title: string): boolean {

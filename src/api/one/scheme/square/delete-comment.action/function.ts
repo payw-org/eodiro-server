@@ -1,4 +1,4 @@
-import { CommentType } from '@/database/models/comment'
+import { CommentAttrs } from '@/database/models/comment'
 import { getUser } from '@/database/models/user'
 import Db from '@/db'
 import Auth from '@/modules/auth'
@@ -19,8 +19,8 @@ export default async function (
   const User = await getUser()
   const userInfo = await User.findAtId(authPayload.userId)
 
-  const [, results] = await Db.query<CommentType[]>(
-    SqlB<CommentType>()
+  const [, results] = await Db.query<CommentAttrs[]>(
+    SqlB<CommentAttrs>()
       .select('user_id')
       .from('comment')
       .where()
@@ -42,7 +42,7 @@ export default async function (
   }
 
   await Db.query(
-    SqlB<CommentType>()
+    SqlB<CommentAttrs>()
       .delete()
       .from('comment')
       .where()
