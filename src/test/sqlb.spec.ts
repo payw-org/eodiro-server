@@ -1,17 +1,15 @@
 import { CoverageMajorType } from '@/database/models/coverage_major'
 import { TableNames } from '@/database/table-names'
-import SqlB from '@/modules/sqlb'
+import { Q } from '@/modules/sqlb'
 import { expect } from 'chai'
 
 describe('Test SqlB', () => {
-  const sqlB = SqlB()
-
   it('Select posts using subquery, as, order, limit', () => {
     expect(
-      sqlB
+      Q()
         .select(
           '*',
-          SqlB()
+          Q()
             .select('count(*)')
             .from('comment')
             .where('comment.post_id = post.id')
@@ -29,7 +27,7 @@ describe('Test SqlB', () => {
 
   it('Insert with 5 placeholders', () => {
     expect(
-      sqlB
+      Q()
         .insert(TableNames.post, {
           title: undefined,
           body: undefined,
@@ -45,7 +43,7 @@ describe('Test SqlB', () => {
 
   it('Insert with ignore strategy', () => {
     expect(
-      SqlB<CoverageMajorType>()
+      Q<CoverageMajorType>()
         .insert(
           TableNames.coverage_major,
           {
@@ -63,7 +61,7 @@ describe('Test SqlB', () => {
 
   it('Insert with update strategy', () => {
     expect(
-      SqlB<CoverageMajorType>()
+      Q<CoverageMajorType>()
         .insert(
           TableNames.coverage_major,
           {
@@ -81,7 +79,7 @@ describe('Test SqlB', () => {
 
   it('Bulk insert', () => {
     expect(
-      sqlB
+      Q()
         .bulkInsert(TableNames.lecture, [
           {
             year: 2011,
@@ -104,7 +102,7 @@ describe('Test SqlB', () => {
 
   it('Bulk insert with ignore strategy', () => {
     expect(
-      sqlB
+      Q()
         .bulkInsert(
           TableNames.lecture,
           [
@@ -131,7 +129,7 @@ describe('Test SqlB', () => {
 
   it('Bulk insert with update strategy', () => {
     expect(
-      sqlB
+      Q()
         .bulkInsert(
           TableNames.lecture,
           [
@@ -158,7 +156,7 @@ describe('Test SqlB', () => {
 
   it('Update with 1 placeholder, 1 string and 1 number', () => {
     expect(
-      sqlB
+      Q()
         .update('post', {
           title: undefined,
           body: 'hello',
@@ -172,7 +170,7 @@ describe('Test SqlB', () => {
   })
 
   it('Delete', () => {
-    expect(sqlB.delete().from('post').where('id = ?').build()).to.equal(
+    expect(Q().delete().from('post').where('id = ?').build()).to.equal(
       'DELETE FROM post WHERE id = ?'
     )
   })
@@ -180,11 +178,11 @@ describe('Test SqlB', () => {
 
 describe('Test SQL Injections', () => {
   it('Prevent sign in bypass', () => {
-    const sql = SqlB()
+    const sql = Q()
       .select('*')
       .from('users')
       .where(
-        SqlB()
+        Q()
           .equal('username', 'admin')
           .andEqual('password', `password' OR 1=1 --`)
       )
