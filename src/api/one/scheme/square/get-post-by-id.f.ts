@@ -52,9 +52,6 @@ export async function getPostById(
     PostAttrs & PostLikeAttrs & { likes: number }
   >(q)
 
-  console.log(q.format().build())
-  console.log(result)
-
   if (result.length === 0) {
     return {
       err: OneApiError.NO_CONTENT,
