@@ -1,4 +1,4 @@
-import { postAttrs, PostType } from '@/database/models/post'
+import { postAttrs, PostAttrs } from '@/database/models/post'
 import Db from '@/db'
 import SqlB from '@/modules/sqlb'
 import { ArrayUtil } from '@/modules/utils/array-util'
@@ -29,7 +29,7 @@ export async function fetchRecentPostsOfBoard(
         .as('comment_count')
     )
     .from('post')
-    .where(SqlB<PostType>().equal('board_id', boardID))
+    .where(SqlB<PostAttrs>().equal('board_id', boardID))
     .and()
     .raw('id > ?')
     .order('id', 'DESC')

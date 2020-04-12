@@ -1,5 +1,5 @@
 import { eodiroQuery, EodiroQueryType } from '@/database/eodiro-query'
-import { PostType } from '@/database/models/post'
+import { PostAttrs } from '@/database/models/post'
 import { PostFileType } from '@/database/models/post_file'
 import { getUser } from '@/database/models/user'
 import { TableNames } from '@/database/table-names'
@@ -57,7 +57,7 @@ export default async function (
   // Distinct query based on the option
   if (data.update) {
     // Update (edit)
-    query = SqlB<PostType>()
+    query = SqlB<PostAttrs>()
       .update('post', {
         title,
         body,
@@ -68,7 +68,7 @@ export default async function (
       .build()
   } else {
     // Insert (upload)
-    query = SqlB<PostType>()
+    query = SqlB<PostAttrs>()
       .insert(TableNames.post, {
         board_id: data.boardId,
         title,

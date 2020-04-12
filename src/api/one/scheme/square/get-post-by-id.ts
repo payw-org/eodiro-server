@@ -1,4 +1,4 @@
-import { PostType } from '../../../../database/models/post'
+import { PostAttrs } from '../../../../database/models/post'
 import { AuthRequired, OneApiError } from '../types/utils'
 
 export interface GetPostById {
@@ -9,13 +9,15 @@ export interface GetPostById {
   }>
   payload: {
     err: OneApiError
-    data: PostType & {
+    data: PostAttrs & {
       files?: {
         mimeType: string
         name: string
         fileId: number
         path: string
       }[]
+    } & {
+      likes: number
     }
   }
 }

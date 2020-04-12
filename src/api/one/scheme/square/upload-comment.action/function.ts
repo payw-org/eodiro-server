@@ -1,5 +1,5 @@
 import { CommentType } from '@/database/models/comment'
-import { PostType } from '@/database/models/post'
+import { PostAttrs } from '@/database/models/post'
 import { getUser } from '@/database/models/user'
 import { TableNames } from '@/database/table-names'
 import Db from '@/db'
@@ -25,7 +25,7 @@ export default async function (
 
   // Check if the post exist
   const [, posts] = await Db.query(
-    SqlB<PostType>()
+    SqlB<PostAttrs>()
       .select('*')
       .from(TableNames.post)
       .where()

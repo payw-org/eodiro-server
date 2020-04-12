@@ -1,6 +1,6 @@
 import { AuthRequired, OneApiError } from '@/api/one/scheme/types/utils'
 import { BoardType } from '@/database/models/board'
-import { PostType } from '@/database/models/post'
+import { PostAttrs } from '@/database/models/post'
 
 export interface Action {
   data: AuthRequired<{
@@ -11,6 +11,6 @@ export interface Action {
   }>
   payload: {
     err: OneApiError
-    data?: (PostType & BoardType)[]
+    data?: (PostAttrs & BoardType)[]
   }
 }

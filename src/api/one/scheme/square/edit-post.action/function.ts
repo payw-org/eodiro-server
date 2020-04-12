@@ -1,4 +1,4 @@
-import { getPost, PostType } from '@/database/models/post'
+import { initPost, PostAttrs } from '@/database/models/post'
 import { PostFileType } from '@/database/models/post_file'
 import { query, QueryTypes } from '@/database/query'
 import { TableNames } from '@/database/table-names'
@@ -19,7 +19,7 @@ export default async function (
     }
   }
 
-  const Post = await getPost()
+  const Post = await initPost()
   const yourPost = await Post.isOwnedBy(data.postId, authPayload.userId)
 
   if (!yourPost) {
@@ -43,7 +43,7 @@ export default async function (
   }
 
   await query(
-    SqlB<PostType>()
+    SqlB<PostAttrs>()
       .update('post', {
         title,
         body,

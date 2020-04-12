@@ -1,4 +1,4 @@
-import { PostType } from '@/database/models/post'
+import { PostAttrs } from '@/database/models/post'
 import { PostFileType } from '@/database/models/post_file'
 import { getUser } from '@/database/models/user'
 import { query, QueryTypes } from '@/database/query'
@@ -42,7 +42,7 @@ export async function uploadPost(
     }
   }
 
-  const insertQuery = SqlB<PostType>()
+  const insertQuery = SqlB<PostAttrs>()
     .insert(TableNames.post, {
       board_id: data.boardID,
       title,

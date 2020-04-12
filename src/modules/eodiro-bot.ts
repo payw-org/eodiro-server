@@ -1,5 +1,5 @@
 import Config from '@/config'
-import { getUser, UserType } from '@/database/models/user'
+import { getUser, UserAttrs } from '@/database/models/user'
 import Db from '@/db'
 import CafeteriaMenusSeeder from '@/db/seeders/cafeteria-menus-seeder'
 import timetableSeeder from '@/db/seeders/timetable-seeder'
@@ -53,7 +53,7 @@ export default class EodiroBot {
         return
       }
 
-      ;(results as Array<UserType>).forEach(async (row) => {
+      ;(results as Array<UserAttrs>).forEach(async (row) => {
         const registeredAt = dayjs(row.registered_at)
         const now = dayjs()
         const timeDiffMs = now.diff(registeredAt)

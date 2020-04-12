@@ -1,11 +1,11 @@
 import { expect } from 'chai'
 import { Database } from '..'
-import { getPost } from '../models/post'
+import { initPost } from '../models/post'
 
 let Post
 
 before(async () => {
-  Post = await getPost()
+  Post = await initPost()
 })
 
 describe('Test Post Model', () => {
