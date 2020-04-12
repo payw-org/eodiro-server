@@ -97,6 +97,11 @@ export class SqlBInstance<T = any> {
     return this
   }
 
+  /**
+   * `(...) alias`
+   *
+   * Wrap the whole query currently built with braces.
+   */
   bind(alias?: string): SqlBInstance<T> {
     this.q = `(${this.q})`
 
