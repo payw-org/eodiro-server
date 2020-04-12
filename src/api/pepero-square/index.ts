@@ -1,5 +1,5 @@
 import { comment } from '@/database/models/comment'
-import { getPost, PostNew, PostUpdate } from '@/database/models/post'
+import { initPost, PostNew, PostUpdate } from '@/database/models/post'
 import Auth from '@/modules/auth'
 import express from 'express'
 
@@ -10,7 +10,7 @@ router.get('/posts', async (req, res) => {
   const quantity = Number(req.query.quantity || 0)
   const from = Number(req.query.quantity || 0)
 
-  const Post = await getPost()
+  const Post = await initPost()
   const posts = await Post.getPosts(Number(from), Number(quantity))
 
   if (posts) {
@@ -29,7 +29,7 @@ router.get('/posts/recent', async (req, res) => {
     return
   }
 
-  const Post = await getPost()
+  const Post = await initPost()
   const posts = await Post.getRecentPosts(Number(from))
 
   if (posts) {
@@ -50,7 +50,7 @@ router.get('/post', async (req, res) => {
   }
 
   const { postId } = req.query
-  const Post = await getPost()
+  const Post = await initPost()
   const postItem = await Post.getFromId(Number(postId))
 
   if (postItem) {
@@ -72,7 +72,7 @@ router.post('/post', async (req, res) => {
 
   // Validate post content
   const postData: PostNew = req.body
-  const Post = await getPost()
+  const Post = await initPost()
   const postId = await Post.upload(payload.userId, postData)
 
   if (postId) {
@@ -94,7 +94,7 @@ router.patch('/posts', async (req, res) => {
 
   const refinedData: PostUpdate = req.body
   const userId = undefined
-  const Post = await getPost()
+  const Post = await initPost()
   const isOwnedByUser = await Post.isOwnedBy(refinedData.postId, userId)
 
   if (!isOwnedByUser) {
@@ -124,7 +124,7 @@ router.delete('/posts', async (req, res) => {
   // Could not delete post without sign in
   // If signed in, check the post ownership
   const userId = undefined
-  const Post = await getPost()
+  const Post = await initPost()
   if (
     !(await Auth.isSignedUser(req.headers.accesstoken as string)) ||
     !(await Post.isOwnedBy(postId, userId))
@@ -153,7 +153,7 @@ router.get('/post/comments', async (req, res) => {
   }
 
   const { postId, fromId } = req.query
-  const Post = await getPost()
+  const Post = await initPost()
   const comments = await Post.getCommentsOf(Number(postId), Number(fromId))
 
   if (!comments) {

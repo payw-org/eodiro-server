@@ -1,4 +1,4 @@
-import { getPost, PostType } from '@/database/models/post'
+import { initPost, PostAttrs } from '@/database/models/post'
 import { query, QueryTypes } from '@/database/query'
 import Auth from '@/modules/auth'
 import SqlB from '@/modules/sqlb'
@@ -15,7 +15,7 @@ export default async function (
     }
   }
 
-  const Post = await getPost()
+  const Post = await initPost()
   if (!(await Post.isOwnedBy(data.postId, authPayload.userId))) {
     return {
       err: OneApiError.FORBIDDEN,
@@ -24,7 +24,7 @@ export default async function (
 
   // Delete the post
   await query(
-    SqlB<PostType>().delete().from('post').where().equal('id', data.postId),
+    SqlB<PostAttrs>().delete().from('post').where().equal('id', data.postId),
     {
       type: QueryTypes.DELETE,
     }

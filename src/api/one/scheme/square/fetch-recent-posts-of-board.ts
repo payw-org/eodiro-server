@@ -1,6 +1,6 @@
 import {
-  PostType,
-  PostTypeWithCommentCount,
+  PostAttrs,
+  PostAttrsWithCommentCount,
 } from '../../../../database/models/post'
 
 /**
@@ -12,7 +12,7 @@ export interface FetchRecentPostsOfBoard {
     boardID: number
     mostRecentPostID: number
     noBody?: boolean
-    columns?: (keyof PostType)[]
+    columns?: (keyof PostAttrs)[]
   }
-  payload: PostTypeWithCommentCount[]
+  payload: PostAttrsWithCommentCount[]
 }

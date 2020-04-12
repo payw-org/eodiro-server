@@ -1,12 +1,17 @@
 import { eodiroQuery, EodiroQueryType } from '@/database/eodiro-query'
 import { FileType } from '@/database/models/file'
-import { getPost, PostType } from '@/database/models/post'
+import { initPost, Post, PostAttrs } from '@/database/models/post'
 import { PostFileType } from '@/database/models/post_file'
-import Db from '@/db'
+import { PostLike, PostLikeAttrs } from '@/database/models/post_like'
 import Auth from '@/modules/auth'
-import SqlB from '@/modules/sqlb'
+import SqlB, { Q } from '@/modules/sqlb'
 import dayjs from 'dayjs'
-import { OneAPIData, OneApiError, OneAPIPayload } from '../types/utils'
+import {
+  OneAPIData,
+  OneApiError,
+  OneAPIPayload,
+  OneApiPayloadData,
+} from '../types/utils'
 import { GetPostById } from './get-post-by-id'
 
 export async function getPostById(
@@ -30,34 +35,33 @@ export async function getPostById(
     }
   }
 
-  const selectPostSql = SqlB<PostType>()
-    .select('*')
-    .from('post')
-    .where()
-    .equal('id', postId)
-    .build()
+  const result = await eodiroQuery<
+    PostAttrs & PostLikeAttrs & { likes: number }
+  >(
+    Q<PostAttrs & PostLikeAttrs>()
+      .select('*')
+      .alsoSelectAny('count(*) as likes')
+      .from()
+      .join(Post.tableName, PostLike.tableName)
+      .on(
+        `${Post.tableName}.${Post.attrs.id} = ${PostLike.tableName}.${PostLike.attrs.post_id}`
+      )
+      .where()
+      .equal('post_id', postId)
+  )
 
-  const [err, results] = await Db.query<PostType[]>(selectPostSql)
-
-  if (err) {
-    return {
-      err: OneApiError.INTERNAL_SERVER_ERROR,
-      data: null,
-    }
-  }
-
-  if (results.length === 0) {
+  if (result.length === 0) {
     return {
       err: OneApiError.NO_CONTENT,
       data: null,
     }
   }
 
-  const postItem = results[0]
+  const postItem = result[0] as OneApiPayloadData<GetPostById>
 
   // Check authority when request with edit mode
   if (data.edit === true) {
-    const Post = await getPost()
+    const Post = await initPost()
     const isYourPost = await Post.isOwnedBy(data.postId, authPayload.userId)
     if (!isYourPost) {
       return {
@@ -76,10 +80,8 @@ export async function getPostById(
     EodiroQueryType.SELECT
   )
 
-  const payload: GetPostById['payload']['data'] = postItem
-
   if (postFiles.length > 0) {
-    payload.files = postFiles.map((postFile) => {
+    postItem.files = postFiles.map((postFile) => {
       return {
         fileId: postFile.file_id,
         path: `/public-user-content/${dayjs(postFile.uploaded_at).format(
@@ -93,6 +95,6 @@ export async function getPostById(
 
   return {
     err: null,
-    data: results[0],
+    data: postItem,
   }
 }

@@ -1,4 +1,4 @@
-import { PostType } from '@/database/models/post'
+import { PostAttrs } from '@/database/models/post'
 import { getUser } from '@/database/models/user'
 import Db from '@/db'
 import Auth from '@/modules/auth'
@@ -39,7 +39,7 @@ router.get('/my/posts', async (req, res) => {
     .order('id', 'desc')
     .limit(amount, offset)
     .build()
-  const [err, results] = await Db.query<PostType[]>(query)
+  const [err, results] = await Db.query<PostAttrs[]>(query)
   if (err) {
     res.sendStatus(500)
     return

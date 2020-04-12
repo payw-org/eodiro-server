@@ -1,4 +1,4 @@
-import { postAttrs, PostType } from '@/database/models/post'
+import { Post, PostAttrs } from '@/database/models/post'
 import Db from '@/db'
 import SqlB from '@/modules/sqlb'
 import { ArrayUtil } from '@/modules/utils/array-util'
@@ -13,7 +13,7 @@ export async function fetchPostsOfBoard(
   const { noBody } = data
 
   // Fetch all columns if no columns specified
-  const columns = data.columns || postAttrs
+  const columns = data.columns || Object.keys(Post.attrs)
 
   if (noBody) {
     _.pullAllWith(columns, ['body'], _.isEqual)
@@ -21,7 +21,7 @@ export async function fetchPostsOfBoard(
     ArrayUtil.replace(columns, 'body', 'substring(body, 1, 100) as body')
   }
 
-  const sqlBInstance = SqlB<PostType>()
+  const sqlBInstance = SqlB<PostAttrs>()
     .selectAny(
       ...columns,
       SqlB()
