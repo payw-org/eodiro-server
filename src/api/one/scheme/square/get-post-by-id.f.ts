@@ -35,27 +35,25 @@ export async function getPostById(
     }
   }
 
+  const q = Q<PostAttrs & PostLikeAttrs>()
+    .select(
+      '*',
+      Q()
+        .select('count(*)')
+        .from(PostLike.tableName)
+        .where()
+        .equal(PostLike.attrs.post_id, postId)
+        .as('likes')
+    )
+    .from(Post.tableName)
+    .where()
+    .equal(Post.attrs.id, postId)
   const result = await eodiroQuery<
     PostAttrs & PostLikeAttrs & { likes: number }
-  >(
-    Q<PostAttrs & PostLikeAttrs>()
-      .select(
-        '*',
-        Q()
-          .select('count(*)')
-          .from(PostLike.tableName)
-          .where()
-          .equal(PostLike.attrs.post_id, postId)
-          .bind('likes')
-      )
-      .from()
-      .join(Post.tableName, PostLike.tableName)
-      .on(
-        `${Post.tableName}.${Post.attrs.id} = ${PostLike.tableName}.${PostLike.attrs.post_id}`
-      )
-      .where()
-      .equal(Post.attrs.id, postId)
-  )
+  >(q)
+
+  console.log(q.format().build())
+  console.log(result)
 
   if (result.length === 0) {
     return {
