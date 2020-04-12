@@ -1,6 +1,11 @@
 import { DataTypes, Model } from 'sequelize'
 import { createInitModelFunction } from '../create-init-model'
 
+export type PostLikeAttrs = {
+  user_id: number
+  post_id: number
+}
+
 export class PostLike extends Model {
   static tableName = 'post_like'
   static attrs = {

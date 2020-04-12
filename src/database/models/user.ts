@@ -8,7 +8,29 @@ import { DataTypes, Model } from 'sequelize'
 import { createInitModelFunction } from '../create-init-model'
 import { TableNames } from '../table-names'
 
-class User extends Model {
+export type UserAttrs = {
+  id: number
+  portal_id: string
+  password: string
+  nickname: string
+  random_nickname: string
+  registered_at: string
+}
+
+export type UserAttrsPasswordOmitted = Omit<UserAttrs, 'password'> // @deprecated use `UserAttrSafe` instead
+export type UserAttrsSafe = Omit<UserAttrs, 'password'>
+
+export class User extends Model {
+  static tableName = 'user'
+  static attrs = {
+    id: 'id',
+    portal_id: 'portal_id',
+    password: 'password',
+    nickname: 'nickname',
+    random_nickname: 'random_nickname',
+    registered_at: 'registered_at',
+  }
+
   /**
    * Get user information using portal email id.
    *
@@ -19,21 +41,21 @@ class User extends Model {
   static async findWithPortalId(
     portalId: string,
     passwordIncluded?: true
-  ): Promise<UserType | false>
+  ): Promise<UserAttrs | false>
   static async findWithPortalId(
     portalId: string,
     passwordIncluded = false
-  ): Promise<UserType | UserTypePasswordOmitted | false> {
+  ): Promise<UserAttrs | UserAttrsPasswordOmitted | false> {
     portalId = portalId.trim()
 
     if (!portalId.includes('@')) {
       portalId += '@cau.ac.kr'
     }
 
-    const selection: ('*' | keyof UserType)[] = passwordIncluded
+    const selection: ('*' | keyof UserAttrs)[] = passwordIncluded
       ? ['*']
       : ['id', 'nickname', 'portal_id', 'random_nickname', 'registered_at']
-    const query = SqlB<UserType>()
+    const query = SqlB<UserAttrs>()
       .select(...selection)
       .from(TableNames.user)
       .where()
@@ -53,20 +75,20 @@ class User extends Model {
     const user = results[0]
 
     if (passwordIncluded) {
-      return user as UserType
+      return user as UserAttrs
     } else {
-      return user as UserTypePasswordOmitted
+      return user as UserAttrsPasswordOmitted
     }
   }
 
-  static async findAtId(id: number): Promise<UserTypePasswordOmitted> {
-    const query = SqlB<UserType>()
+  static async findAtId(id: number): Promise<UserAttrsPasswordOmitted> {
+    const query = SqlB<UserAttrs>()
       .select('id', 'nickname', 'portal_id', 'random_nickname', 'registered_at')
       .from('user')
       .where(SqlB().equal('id', undefined))
       .build()
 
-    const [, results] = await Db.query<UserTypePasswordOmitted[]>(query, id)
+    const [, results] = await Db.query<UserAttrsPasswordOmitted[]>(query, id)
 
     const user = results[0]
 
@@ -76,7 +98,7 @@ class User extends Model {
   static async findWithAttrFromAll(
     attrName: 'portal_id' | 'nickname',
     value: string
-  ): Promise<UserType | false> {
+  ): Promise<UserAttrs | false> {
     if (attrName !== 'portal_id' && attrName !== 'nickname') {
       return undefined
     }
@@ -107,7 +129,7 @@ class User extends Model {
     return results[0]
   }
 
-  static async findWithToken(token: string): Promise<UserType | false> {
+  static async findWithToken(token: string): Promise<UserAttrs | false> {
     const query = `
       select *
       from pending_user
@@ -206,7 +228,7 @@ class User extends Model {
       return
     }
 
-    results.forEach((user: UserType) => {
+    results.forEach((user: UserAttrs) => {
       const query = `
         update user
         set random_nickname = ?
@@ -298,15 +320,3 @@ export const getUser = createInitModelFunction(
     ],
   }
 )
-
-export type UserType = {
-  id: number
-  portal_id: string
-  password: string
-  nickname: string
-  random_nickname: string
-  registered_at: string
-}
-
-export type UserTypePasswordOmitted = Omit<UserType, 'password'> // @deprecated use `UserTypeSafe` instead
-export type UserTypeSafe = Omit<UserType, 'password'>

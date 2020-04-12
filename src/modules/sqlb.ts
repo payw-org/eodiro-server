@@ -108,9 +108,11 @@ export class SqlBInstance<T = any> {
   }
 
   /**
+   * `SELECT`
+   *
    * Select columns from table. If you specify a generic schema type,
    * it only allows the keys of the given type.
-   * Use
+   * Use `alsoSelectAny` for more flexible selection.
    * @param what Array of strings or SqlB instances. Empty will select all.
    */
   select(...what: Array<keyof T | '*' | SqlBInstance>): SqlBInstance<T> {
@@ -133,15 +135,21 @@ export class SqlBInstance<T = any> {
     return this
   }
   /**
-   * Don't know why this method is created.
-   * Can't find any use cases.
-   *
    * Don't use this method alone.
    * Run `select()` or `selectAny()` first.
    */
   alsoSelect(...what: Array<keyof T | '*' | SqlBInstance>): SqlBInstance<T> {
-    this.concat(',')
-    this.select(...what)
+    this.concat(', ')
+    const attrs = what
+      .map((col) => {
+        if (col instanceof SqlBInstance) {
+          return col.build()
+        } else {
+          return col
+        }
+      })
+      .join(', ')
+    this.append(attrs)
     return this
   }
   selectAny(...what: string[]): SqlBInstance<T> {
@@ -156,8 +164,8 @@ export class SqlBInstance<T = any> {
    * Run `select()` or `selectAny()` first.
    */
   alsoSelectAny(...what: string[]): SqlBInstance<T> {
-    this.concat(',')
-    this.selectAny(...what)
+    this.concat(', ')
+    this.append(what.join(', '))
     return this
   }
 
@@ -430,7 +438,7 @@ export class SqlBInstance<T = any> {
   }
 
   insert(
-    schema: TableNames,
+    schema: string,
     items: {
       [K in keyof T]?: T[K]
     },

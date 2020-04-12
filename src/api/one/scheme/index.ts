@@ -40,6 +40,15 @@ export type GetBoardId = GetBoardIdRaw & { action: 'getBoardId' }
 import { Action as GetCommentsRaw } from './square/get-comments.action/interface'
 export type GetComments = GetCommentsRaw & { action: 'getComments' }
 
+import { Action as GetPostLikesRaw } from './square/like/get-post-likes.action/interface'
+export type GetPostLikes = GetPostLikesRaw & { action: 'getPostLikes' }
+
+import { Action as IsPostLikedRaw } from './square/like/is-post-liked.action/interface'
+export type IsPostLiked = IsPostLikedRaw & { action: 'isPostLiked' }
+
+import { Action as LikePostRaw } from './square/like/like-post.action/interface'
+export type LikePost = LikePostRaw & { action: 'likePost' }
+
 import { Action as SavePostRaw } from './square/save-post.action/interface'
 export type SavePost = SavePostRaw & { action: 'savePost' }
 
@@ -58,5 +67,8 @@ export type OneApiAction =
   | EditPost
   | GetBoardId
   | GetComments
+  | GetPostLikes
+  | IsPostLiked
+  | LikePost
   | SavePost
   | UploadComment
