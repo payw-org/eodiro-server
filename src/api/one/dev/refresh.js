@@ -138,7 +138,7 @@ ${functionExports}
   ].join(',')}} from '../scheme'`
   let clientSource = fs.readFileSync('client/index.ts', 'utf8')
   clientSource = clientSource.replace(
-    /import {[\s]*?OneApiAction[\s\S]*?} from '\.\.\/scheme'/g,
+    /import {[\s\S]*?OneApiAction[\s\S]*?} from '\.\.\/scheme'/g,
     clientImportStatements
   )
   const clientSourceSplitted = clientSource.split('\n')
