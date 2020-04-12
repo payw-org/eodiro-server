@@ -1,3 +1,4 @@
+import { Payload as AuthPayload } from '@/modules/jwt'
 import { OneApiAction } from '..'
 
 /**
@@ -12,16 +13,42 @@ export type AuthRequired<T> = T & {
  */
 interface OneApiActionSkeleton {
   data: unknown
-  payload: unknown
+  payload: {
+    err: OneApiError
+    data?: any
+  }
 }
 
-export type OneApiData<T extends OneApiActionSkeleton> = T['data']
-export type OneApiPayload<T extends OneApiActionSkeleton> = T['payload']
+/**
+ * Request data type
+ */
+export type OneApiData<
+  T extends OneApiActionSkeleton
+> = T['data'] extends AuthRequired<T['data']>
+  ? Omit<T['data'], 'accessToken'> & { authPayload: AuthPayload }
+  : T['data']
 
+/**
+ * Response payload
+ */
+export type OneApiPayload<T extends OneApiActionSkeleton> = T['payload']
+/**
+ * Response payload's data (optional)
+ */
+export type OneApiPayloadData<T extends OneApiActionSkeleton> = OneApiPayload<
+  T
+>['data']
+
+/**
+ * One API function
+ */
 export type OneApiFunction<T extends OneApiActionSkeleton> = (
   data: OneApiData<T>
 ) => Promise<OneApiPayload<T>>
 
+/**
+ * One API errors enum
+ */
 export enum OneApiError {
   UNAUTHORIZED = 'Unauthorized',
   BAD_REQUEST = 'Bad Request',

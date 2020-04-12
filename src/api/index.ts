@@ -6,8 +6,10 @@ import myRouter from '@/api/my'
 import peperoSquareRouter from '@/api/pepero-square'
 import uploadRouter from '@/api/upload'
 import vacantRouter from '@/api/vacant'
+import Auth from '@/modules/auth'
 import express from 'express'
 import { oneAPI } from './one'
+import { OneApiError } from './one/scheme/types/utils'
 
 const router = express.Router()
 
@@ -19,14 +21,27 @@ eodiro API 2
 </pre>`)
 })
 
-// Experimental
 // Single end point for all APIs
 router.post('/one', async (req, res) => {
   const { action, data } = req.body
-  const { accesstoken } = req.headers
+  const { accesstoken: accessToken } = req.headers
 
-  if (accesstoken) {
-    data.accessToken = accesstoken
+  // If requested with an access token, verify firstly,
+  // then pass auth payload to all of the actions universally
+  if (accessToken) {
+    const authPayload = await Auth.isSignedUser(accessToken as string)
+
+    if (!authPayload) {
+      res.json({
+        err: OneApiError.UNAUTHORIZED,
+      })
+      return
+    }
+
+    data.authPayload = authPayload
+
+    /** @deprecated For older One APIs */
+    data.accessToken = accessToken
   }
 
   const payload = await oneAPI({
