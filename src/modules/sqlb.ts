@@ -318,12 +318,12 @@ export class SqlBInstance<T = any> {
   /**
    * > NOTE: To check `NULL`, use `isNull()`
    */
-  equal(attr: keyof T, value: SqlBValue): SqlBInstance<T> {
+  equal(attr: string, value: SqlBValue): SqlBInstance<T> {
     this.append(`${attr} = ${this.convert(value)}`)
     return this
   }
 
-  andEqual(attr: keyof T, value: SqlBValue): SqlBInstance<T> {
+  andEqual(attr: string, value: SqlBValue): SqlBInstance<T> {
     this.and()
     this.equal(attr, value)
     return this
@@ -332,48 +332,48 @@ export class SqlBInstance<T = any> {
   /**
    * > NOTE: To check `NULL`, use `isNotNull()`
    */
-  notEqual(attr: keyof T, value: SqlBValue): SqlBInstance<T> {
+  notEqual(attr: string, value: SqlBValue): SqlBInstance<T> {
     this.append(`${attr} != ${this.convert(value)}`)
     return this
   }
 
-  andNotEqual(attr: keyof T, value: SqlBValue): SqlBInstance<T> {
+  andNotEqual(attr: string, value: SqlBValue): SqlBInstance<T> {
     this.and()
     this.notEqual(attr, value)
     return this
   }
 
   /** attr >= value */
-  equalOrMore(attr: keyof T, value: SqlBValue): SqlBInstance<T> {
+  equalOrMore(attr: string, value: SqlBValue): SqlBInstance<T> {
     this.append(`${attr} >= ${this.convert(value)}`)
     return this
   }
   /** AND attr >= value */
-  andEqualOrMore(attr: keyof T, value: SqlBValue): SqlBInstance<T> {
+  andEqualOrMore(attr: string, value: SqlBValue): SqlBInstance<T> {
     this.and()
     this.equalOrMore(attr, value)
     return this
   }
 
   /** attr <= value */
-  equalOrLess(attr: keyof T, value: SqlBValue): SqlBInstance<T> {
+  equalOrLess(attr: string, value: SqlBValue): SqlBInstance<T> {
     this.append(`${attr} <= ${this.convert(value)}`)
     return this
   }
   /** AND attr <= value */
-  andEqualOrLess(attr: keyof T, value: SqlBValue): SqlBInstance<T> {
+  andEqualOrLess(attr: string, value: SqlBValue): SqlBInstance<T> {
     this.and()
     this.equalOrLess(attr, value)
     return this
   }
 
   /** attr > value */
-  more(attr: keyof T, value: SqlBValue): SqlBInstance<T> {
+  more(attr: string, value: SqlBValue): SqlBInstance<T> {
     this.append(`${attr} > ${this.convert(value)}`)
     return this
   }
   /** AND attr > value */
-  andMore(attr: keyof T, value: SqlBValue): SqlBInstance<T> {
+  andMore(attr: string, value: SqlBValue): SqlBInstance<T> {
     this.and()
     this.more(attr, value)
     return this
