@@ -182,8 +182,6 @@ router.get(
       .build()
     const [err1, results1] = await Db.query(q1)
 
-    console.log(results1)
-
     if (err1) {
       res.sendStatus(500)
       return

@@ -51,8 +51,6 @@ const func: OneApiFunction<Action> = async (data) => {
     .where()
     .equal(Post.attrs.board_id, boardId)
 
-  console.log(q.format().build())
-
   if (fromId) {
     q.and(`id < ${SqlB.escape(fromId)}`)
   }
@@ -60,8 +58,6 @@ const func: OneApiFunction<Action> = async (data) => {
   q.order('id', 'desc').limit(amount)
 
   const result = await eodiroQuery(q.build())
-
-  console.log(result)
 
   return {
     err: null,
