@@ -4,13 +4,13 @@ import {
   DeleteComment,
   DeletePost,
   EditPost,
-  FetchRecentPostsOfBoard,
   GetBoardId,
   GetComments,
   GetMyPosts,
   GetPostById,
   GetPostLikes,
   GetPostsOfBoard,
+  GetRecentPostsOfBoard,
   GetUserId,
   IsPostLiked,
   LikePost,
@@ -35,10 +35,6 @@ export async function oneAPIClient(
 ): Promise<EditPost['payload']>
 export async function oneAPIClient(
   host: string,
-  request: Omit<FetchRecentPostsOfBoard, 'payload'>
-): Promise<FetchRecentPostsOfBoard['payload']>
-export async function oneAPIClient(
-  host: string,
   request: Omit<GetBoardId, 'payload'>
 ): Promise<GetBoardId['payload']>
 export async function oneAPIClient(
@@ -61,6 +57,10 @@ export async function oneAPIClient(
   host: string,
   request: Omit<GetPostsOfBoard, 'payload'>
 ): Promise<GetPostsOfBoard['payload']>
+export async function oneAPIClient(
+  host: string,
+  request: Omit<GetRecentPostsOfBoard, 'payload'>
+): Promise<GetRecentPostsOfBoard['payload']>
 export async function oneAPIClient(
   host: string,
   request: Omit<GetUserId, 'payload'>

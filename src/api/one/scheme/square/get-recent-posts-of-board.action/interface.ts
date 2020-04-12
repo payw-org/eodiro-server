@@ -1,11 +1,13 @@
 import { OneApiError } from '@/api/one/scheme/types/utils'
 import { PostAttrs } from '@/database/models/post'
 
+/**
+ * Fetch recetly updated new posts
+ */
 export interface Action {
   data: {
     boardId: number
-    lastPostId?: number
-    amount?: number
+    mostRecentPostId: number
     noBody?: boolean
     columns?: (keyof PostAttrs)[]
   }
