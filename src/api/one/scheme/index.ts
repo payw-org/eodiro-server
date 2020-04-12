@@ -11,8 +11,6 @@
  * please update the source "dev/refresh.js".
  */
 
-import { FetchPostsOfBoard } from './square/fetch-posts-of-board'
-export { FetchPostsOfBoard } from './square/fetch-posts-of-board'
 import { FetchRecentPostsOfBoard } from './square/fetch-recent-posts-of-board'
 export { FetchRecentPostsOfBoard } from './square/fetch-recent-posts-of-board'
 import { GetPostById } from './square/get-post-by-id'
@@ -40,6 +38,9 @@ export type GetBoardId = GetBoardIdRaw & { action: 'getBoardId' }
 import { Action as GetCommentsRaw } from './square/get-comments.action/interface'
 export type GetComments = GetCommentsRaw & { action: 'getComments' }
 
+import { Action as GetPostsOfBoardRaw } from './square/get-posts-of-board.action/interface'
+export type GetPostsOfBoard = GetPostsOfBoardRaw & { action: 'getPostsOfBoard' }
+
 import { Action as GetPostLikesRaw } from './square/like/get-post-likes.action/interface'
 export type GetPostLikes = GetPostLikesRaw & { action: 'getPostLikes' }
 
@@ -56,7 +57,6 @@ import { Action as UploadCommentRaw } from './square/upload-comment.action/inter
 export type UploadComment = UploadCommentRaw & { action: 'uploadComment' }
 
 export type OneApiAction =
-  | FetchPostsOfBoard
   | FetchRecentPostsOfBoard
   | GetPostById
   | UploadPost
@@ -67,6 +67,7 @@ export type OneApiAction =
   | EditPost
   | GetBoardId
   | GetComments
+  | GetPostsOfBoard
   | GetPostLikes
   | IsPostLiked
   | LikePost
