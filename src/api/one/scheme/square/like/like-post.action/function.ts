@@ -3,7 +3,6 @@ import { Post } from '@/database/models/post'
 import { Action } from './interface'
 
 const func: OneApiFunction<Action> = async (data) => {
-  console.log(data)
   const { authPayload } = data
 
   const { postId } = data
