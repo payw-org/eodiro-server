@@ -78,12 +78,11 @@ export class SqlBInstance<T = any> {
 
   build(terminate = false): string {
     const built = terminate ? this.q.trim().concat(';') : this.q.trim()
-    this.q = ''
     return built
   }
 
   /**
-   * Format the output. Use this after `build()`.
+   * Format the output. Use this before `build()`.
    */
   format(): SqlBInstance<T> {
     this.q = sqlFormatter.format(this.q)
