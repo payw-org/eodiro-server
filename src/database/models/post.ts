@@ -1,11 +1,13 @@
 import Db from '@/db'
-import SqlB from '@/modules/sqlb'
+import SqlB, { Q } from '@/modules/sqlb'
 import Time from '@/modules/time'
 import { DataTypes, Model } from 'sequelize'
 import { createInitModelFunction } from '../create-init-model'
+import { eodiroQuery, EodiroQueryType } from '../eodiro-query'
 import { query, QueryTypes } from '../query'
 import { TableNames } from '../table-names'
 import { CommentType } from './comment'
+import { PostLike, PostLikeAttrs } from './post_like'
 import { getUser } from './user'
 
 export interface PostNew {
@@ -19,6 +21,9 @@ export interface PostUpdate {
   body: string
 }
 
+/**
+ * @deprecated Use `Object.keys()`
+ */
 export const postAttrs = [
   'id',
   'board_id',
@@ -29,6 +34,22 @@ export const postAttrs = [
   'uploaded_at',
   'edited_at',
 ]
+
+export type PostAttrs = {
+  id: number
+  board_id: number
+  title: string
+  body: string
+  user_id: number
+  random_nickname: string
+  uploaded_at: string
+  edited_at: string
+}
+
+export type CommentCount = {
+  comment_count: number
+}
+export type PostAttrsWithCommentCount = PostAttrs & CommentCount
 
 export class Post extends Model {
   static tableName = 'post'
@@ -43,13 +64,59 @@ export class Post extends Model {
     edited_at: 'edited_at',
   }
 
+  static async isLikedBy(postId: number, userId: number) {
+    const result = await eodiroQuery(
+      Q<PostLikeAttrs>()
+        .select('*')
+        .from(PostLike.tableName)
+        .where()
+        .equal('post_id', postId)
+        .andEqual('user_id', userId)
+    )
+
+    return result.length > 0
+  }
+
+  static async like(postId: number, userId: number) {
+    await eodiroQuery(
+      Q<PostLikeAttrs>().insert(PostLike.tableName, {
+        user_id: userId,
+        post_id: postId,
+      }),
+      EodiroQueryType.INSERT
+    )
+  }
+
+  static async unlike(postId: number, userId: number) {
+    await eodiroQuery(
+      Q<PostLikeAttrs>()
+        .delete()
+        .from(PostLike.tableName)
+        .where()
+        .equal('post_id', postId)
+        .andEqual('user_id', userId)
+    )
+  }
+
+  static async getLikes(postId: number) {
+    const result = await eodiroQuery<PostAttrs>(
+      Q<PostLikeAttrs>()
+        .select('*')
+        .from(PostLike.tableName)
+        .where()
+        .equal('post_id', postId)
+    )
+
+    return result.length
+  }
+
   /**
    * Return posts equal or smaller than the given post id with the number of given amount
    */
   static async getPosts(
     fromId?: number,
     quantity = 20
-  ): Promise<PostType[] | false> {
+  ): Promise<PostAttrs[] | false> {
     if (!quantity) {
       quantity = 20
     }
@@ -79,10 +146,10 @@ export class Post extends Model {
       return false
     }
 
-    return results as PostType[]
+    return results as PostAttrs[]
   }
 
-  static async getRecentPosts(fromId: number): Promise<PostType[] | false> {
+  static async getRecentPosts(fromId: number): Promise<PostAttrs[] | false> {
     const query = SqlB()
       .select(
         ...postAttrs,
@@ -104,13 +171,13 @@ export class Post extends Model {
       return false
     }
 
-    return results as PostType[]
+    return results as PostAttrs[]
   }
 
   /**
    * Returns a single post item
    */
-  static async getFromId(postId: number): Promise<PostType | false> {
+  static async getFromId(postId: number): Promise<PostAttrs | false> {
     const query = `
       select * from post
       where id = ?
@@ -251,8 +318,8 @@ export class Post extends Model {
   }
 
   static async isOwnedBy(postId: number, userId: number): Promise<boolean> {
-    const result = await query<PostType>(
-      SqlB<PostType>()
+    const result = await query<PostAttrs>(
+      SqlB<PostAttrs>()
         .select('*')
         .from('post')
         .where()
@@ -268,7 +335,7 @@ export class Post extends Model {
   }
 }
 
-export const getPost = createInitModelFunction(Post, 'post', {
+export const initPost = createInitModelFunction(Post, 'post', {
   id: {
     type: DataTypes.INTEGER,
     primaryKey: true,
@@ -315,20 +382,8 @@ export const getPost = createInitModelFunction(Post, 'post', {
     type: DataTypes.DATE,
     allowNull: true,
   },
+  is_deleted: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: 0,
+  },
 })
-
-export type PostType = {
-  id: number
-  board_id: number
-  title: string
-  body: string
-  user_id: number
-  random_nickname: string
-  uploaded_at: string
-  edited_at: string
-}
-
-export type CommentCount = {
-  comment_count: number
-}
-export type PostTypeWithCommentCount = PostType & CommentCount

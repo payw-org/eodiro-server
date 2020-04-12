@@ -1,5 +1,6 @@
 import axios from 'axios'
 import {
+  OneApiAction,
   DeleteComment,
   DeletePost,
   EditPost,
@@ -9,8 +10,10 @@ import {
   GetComments,
   GetMyPosts,
   GetPostById,
+  GetPostLikes,
   GetUserId,
-  OneApiAction,
+  IsPostLiked,
+  LikePost,
   SavePost,
   UploadComment,
   UploadPost,
@@ -56,8 +59,20 @@ export async function oneAPIClient(
 ): Promise<GetPostById['payload']>
 export async function oneAPIClient(
   host: string,
+  request: Omit<GetPostLikes, 'payload'>
+): Promise<GetPostLikes['payload']>
+export async function oneAPIClient(
+  host: string,
   request: Omit<GetUserId, 'payload'>
 ): Promise<GetUserId['payload']>
+export async function oneAPIClient(
+  host: string,
+  request: Omit<IsPostLiked, 'payload'>
+): Promise<IsPostLiked['payload']>
+export async function oneAPIClient(
+  host: string,
+  request: Omit<LikePost, 'payload'>
+): Promise<LikePost['payload']>
 export async function oneAPIClient(
   host: string,
   request: Omit<SavePost, 'payload'>
