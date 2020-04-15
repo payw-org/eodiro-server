@@ -1,0 +1,15 @@
+type Post {
+  postId: Int!
+  boardId: Int!
+  title: String!
+  body: String!
+  userId: Int!
+  randomNickname: String!
+  uploadedAt: String!
+  editedAt: String!
+}
+
+type Query {
+  post(postId: Int): Post
+  posts(userId: Int): [Post]!
+}
