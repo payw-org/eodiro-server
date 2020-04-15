@@ -1,0 +1,17 @@
+schema: ./src/graphql/**/*.graphql
+overwrite: true
+generates:
+  ./src/graphql/types/index.d.ts:
+    config:
+      contextType: @/graphql/types/context#GraphQLContext
+      mappers:
+        User: @prisma/client#User
+        Post: @prisma/client#Post
+    plugins:
+      - typescript
+      - typescript-resolvers
+hooks:
+  afterAllFileWrite:
+    - node src/graphql/utils/remove-duplicate-types.js
+    - prettier --write
+    - eslint --fix

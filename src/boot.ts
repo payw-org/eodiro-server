@@ -1,3 +1,6 @@
+import { schema } from '@/graphql'
+import { PrismaClient } from '@prisma/client'
+import { ApolloServer } from 'apollo-server-express'
 import bodyParser from 'body-parser'
 import chalk from 'chalk'
 import cors from 'cors'
@@ -16,7 +19,7 @@ export async function boot(options: {
   mail?: boolean
   bot?: boolean
   listen?: boolean
-}): Promise<http.Server> {
+}): Promise<http.Server | null> {
   const { db = false, mail = false, bot = false, listen = true } = options
 
   if (process.env.NODE_ENV === 'development') {
@@ -46,7 +49,7 @@ export async function boot(options: {
           'error'
         )} ] stop the application due to db connection failure`
       )
-      return
+      return null
     }
   } else {
     log(`[ ${chalk.green('DB')} ] skip db connection`)
@@ -62,7 +65,7 @@ export async function boot(options: {
           'error'
         )} ] stop the application due to email server connection failure`
       )
-      return
+      return null
     }
   } else {
     log(`[ ${chalk.yellow('email')} ] skip connection`)
@@ -78,12 +81,24 @@ export async function boot(options: {
 
   // Open the gate
   if (listen) {
+    // Create an apollo server
+    const apolloServer = new ApolloServer({
+      schema,
+      context: (req) => ({
+        ...req,
+        prisma: new PrismaClient(),
+      }),
+    })
+    apolloServer.applyMiddleware({ app })
+
     const port =
       process.env.NODE_ENV === 'development' ? Config.DEV_PORT : Config.PORT
-    const server = app.listen(port, () => {
+    const expressServer = app.listen(port, () => {
       log(`[ ${chalk.magenta('server')} ] listening on port ${port}`)
     })
 
-    return server
+    return expressServer
+  } else {
+    return null
   }
 }
