@@ -1,0 +1,196 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Admin {
+  user_id Int  @id
+  User    User @relation(fields: [user_id], references: [userId])
+}
+
+model Board {
+  boardId   Int    @default(autoincrement()) @id
+  boardName String @default("") @unique
+  Post      Post[]
+}
+
+model CafeteriaMenu {
+  campus   String
+  data     String?
+  servedAt DateTime
+
+  @@id([campus, servedAt])
+}
+
+model ChangePassword {
+  requestedAt DateTime
+  token       String
+  userId      Int      @id
+  User        User     @relation(fields: [userId], references: [userId])
+
+  @@index([token], name: "change_password_token")
+}
+
+model Comment {
+  body           String
+  commentId      Int      @default(autoincrement()) @id
+  postId         Int
+  randomNickname String   @default("")
+  uploadedAt     DateTime
+  userId         Int
+  Post           Post     @relation(fields: [postId], references: [postId])
+  User           User     @relation(fields: [userId], references: [userId])
+
+  @@index([postId], name: "post_id")
+  @@index([userId], name: "user_id")
+}
+
+model CoverageMajor {
+  code            String?
+  coverageCollege String?
+  name            String  @id
+}
+
+model CoverageMajorLecture {
+  coverageMajor          String @default("")
+  coverageMajorLectureId Int    @default(autoincrement()) @id
+  lectureId              Int
+}
+
+model File {
+  fileId     Int        @default(autoincrement()) @id
+  fileName   String     @default("")
+  mime       String
+  uploadedAt DateTime
+  uuid       String     @unique
+  PostFile   PostFile[]
+}
+
+model Inquiry {
+  answer     String?
+  answeredAt DateTime?
+  body       String
+  email      String?
+  inquiryId  Int       @default(autoincrement()) @id
+  title      String
+  uploadedAt DateTime
+  userId     Int?
+  User       User?     @relation(fields: [userId], references: [userId])
+
+  @@index([userId], name: "user_id")
+}
+
+model Lecture {
+  building  Int?
+  campus    String?
+  code      String?
+  college   String?
+  course    String?
+  credit    Int?
+  grade     Int?
+  lectureId Int      @default(autoincrement()) @id
+  major     String?
+  name      String?
+  note      String?
+  professor String?
+  room      String?
+  schedule  String?
+  section   String?
+  semester  String?
+  year      Int?
+  Period    Period[]
+}
+
+model PendingUser {
+  nickname       String
+  password       String
+  pendingUserId  Int      @default(autoincrement()) @id
+  portalId       String   @default("")
+  randomNickname String   @default("")
+  registeredAt   DateTime
+  token          String
+
+  @@index([token], name: "pending_user_token")
+}
+
+model Period {
+  day       String
+  endH      Int
+  endM      Int
+  lectureId Int
+  startH    Int
+  startM    Int
+  Lecture   Lecture @relation(fields: [lectureId], references: [lectureId])
+
+  @@id([lectureId, day, startH, startM, endH, endM])
+}
+
+model Post {
+  boardId        Int
+  body           String
+  editedAt       DateTime?
+  isDeleted      Boolean?   @default(false)
+  postId         Int        @default(autoincrement()) @id
+  randomNickname String     @default("")
+  title          String
+  uploadedAt     DateTime
+  userId         Int
+  Board          Board      @relation(fields: [boardId], references: [boardId])
+  User           User       @relation(fields: [userId], references: [userId])
+  Comment        Comment[]
+  PostFile       PostFile[]
+  PostLike       PostLike[]
+
+  @@index([boardId], name: "board_id")
+  @@index([userId], name: "user_id")
+}
+
+model PostFile {
+  fileId Int
+  postId Int
+  File   File @relation(fields: [fileId], references: [fileId])
+  Post   Post @relation(fields: [postId], references: [postId])
+
+  @@id([postId, fileId])
+  @@index([fileId], name: "fk_post_file_file_id")
+}
+
+model PostLike {
+  postId Int
+  userId Int
+  Post   Post @relation(fields: [postId], references: [postId])
+  User   User @relation(fields: [userId], references: [userId])
+
+  @@id([userId, postId])
+  @@index([postId], name: "post_id")
+}
+
+model RefreshToken {
+  manuallyChangedAt Int?
+  refreshTokenId    Int     @default(autoincrement()) @id
+  token             String?
+  userId            Int?
+  User              User?   @relation(fields: [userId], references: [userId])
+
+  @@index([userId], name: "user_id")
+}
+
+model User {
+  nickname       String           @unique
+  password       String
+  portalId       String           @default("") @unique
+  randomNickname String           @default("")
+  registeredAt   DateTime
+  userId         Int              @default(autoincrement()) @id
+  Admin          Admin[]
+  ChangePassword ChangePassword[]
+  Comment        Comment[]
+  Inquiry        Inquiry[]
+  posts          Post[]
+  PostLike       PostLike[]
+  RefreshToken   RefreshToken[]
+}
