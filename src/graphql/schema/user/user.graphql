@@ -1,0 +1,14 @@
+type User {
+  userId: Int!
+  portalId: String!
+  password: String!
+  nickname: String!
+  randomNickname: String!
+  registeredAt: String!
+  posts: [Post]
+}
+
+type Query {
+  users: [User!]!
+  user(userId: Int): User
+}
