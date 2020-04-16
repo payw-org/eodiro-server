@@ -35,8 +35,9 @@
     "pm2:cdn": "pm2 start npm --name 'eodiro-cdn' -- run 'cdn'",
     "one-api:refresh": "npm run --prefix src/api/one refresh",
     "one-api:deploy": "npm run one-api:refresh && npm run build && npm run --prefix src/api/one copy-packagejson && npm run --prefix build/src deploy",
-    "prisma:introspect": "prisma introspect",
+    "prisma:introspect": "prisma introspect && node prisma/utils/rename-relations.js",
     "prisma:generate": "prisma generate",
+    "prisma:all": "npm run prisma:introspect && npm run prisma:generate",
     "graphql:codegen": "graphql-codegen",
     "graphql:codegen:watch": "graphql-codegen --watch"
   },
@@ -61,6 +62,7 @@
     "mysql2": "^2.1.0",
     "niceware": "^2.0.0",
     "nodemailer": "^6.4.6",
+    "pluralize": "^8.0.0",
     "sequelize": "^6.0.0-beta.5",
     "serve-handler": "^6.1.2",
     "sql-formatter": "^2.3.3",
