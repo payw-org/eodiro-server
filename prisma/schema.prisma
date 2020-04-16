@@ -9,13 +9,13 @@ datasource db {
 
 model Admin {
   user_id Int  @id
-  User    User @relation(fields: [user_id], references: [userId])
+  user    User @relation(fields: [user_id], references: [userId])
 }
 
 model Board {
   boardId   Int    @default(autoincrement()) @id
   boardName String @default("") @unique
-  Post      Post[]
+  posts     Post[]
 }
 
 model CafeteriaMenu {
@@ -30,7 +30,7 @@ model ChangePassword {
   requestedAt DateTime
   token       String
   userId      Int      @id
-  User        User     @relation(fields: [userId], references: [userId])
+  user        User     @relation(fields: [userId], references: [userId])
 
   @@index([token], name: "change_password_token")
 }
@@ -42,8 +42,8 @@ model Comment {
   randomNickname String   @default("")
   uploadedAt     DateTime
   userId         Int
-  Post           Post     @relation(fields: [postId], references: [postId])
-  User           User     @relation(fields: [userId], references: [userId])
+  post           Post     @relation(fields: [postId], references: [postId])
+  user           User     @relation(fields: [userId], references: [userId])
 
   @@index([postId], name: "post_id")
   @@index([userId], name: "user_id")
@@ -67,7 +67,7 @@ model File {
   mime       String
   uploadedAt DateTime
   uuid       String     @unique
-  PostFile   PostFile[]
+  postFiles  PostFile[]
 }
 
 model Inquiry {
@@ -79,7 +79,7 @@ model Inquiry {
   title      String
   uploadedAt DateTime
   userId     Int?
-  User       User?     @relation(fields: [userId], references: [userId])
+  user       User?     @relation(fields: [userId], references: [userId])
 
   @@index([userId], name: "user_id")
 }
@@ -102,7 +102,7 @@ model Lecture {
   section   String?
   semester  String?
   year      Int?
-  Period    Period[]
+  periods   Period[]
 }
 
 model PendingUser {
@@ -124,7 +124,7 @@ model Period {
   lectureId Int
   startH    Int
   startM    Int
-  Lecture   Lecture @relation(fields: [lectureId], references: [lectureId])
+  lecture   Lecture @relation(fields: [lectureId], references: [lectureId])
 
   @@id([lectureId, day, startH, startM, endH, endM])
 }
@@ -139,11 +139,11 @@ model Post {
   title          String
   uploadedAt     DateTime
   userId         Int
-  Board          Board      @relation(fields: [boardId], references: [boardId])
-  User           User       @relation(fields: [userId], references: [userId])
-  Comment        Comment[]
-  PostFile       PostFile[]
-  PostLike       PostLike[]
+  board          Board      @relation(fields: [boardId], references: [boardId])
+  user           User       @relation(fields: [userId], references: [userId])
+  comments       Comment[]
+  postFiles      PostFile[]
+  postLikes      PostLike[]
 
   @@index([boardId], name: "board_id")
   @@index([userId], name: "user_id")
@@ -152,8 +152,8 @@ model Post {
 model PostFile {
   fileId Int
   postId Int
-  File   File @relation(fields: [fileId], references: [fileId])
-  Post   Post @relation(fields: [postId], references: [postId])
+  file   File @relation(fields: [fileId], references: [fileId])
+  post   Post @relation(fields: [postId], references: [postId])
 
   @@id([postId, fileId])
   @@index([fileId], name: "fk_post_file_file_id")
@@ -162,8 +162,8 @@ model PostFile {
 model PostLike {
   postId Int
   userId Int
-  Post   Post @relation(fields: [postId], references: [postId])
-  User   User @relation(fields: [userId], references: [userId])
+  post   Post @relation(fields: [postId], references: [postId])
+  user   User @relation(fields: [userId], references: [userId])
 
   @@id([userId, postId])
   @@index([postId], name: "post_id")
@@ -174,23 +174,23 @@ model RefreshToken {
   refreshTokenId    Int     @default(autoincrement()) @id
   token             String?
   userId            Int?
-  User              User?   @relation(fields: [userId], references: [userId])
+  user              User?   @relation(fields: [userId], references: [userId])
 
   @@index([userId], name: "user_id")
 }
 
 model User {
-  nickname       String           @unique
-  password       String
-  portalId       String           @default("") @unique
-  randomNickname String           @default("")
-  registeredAt   DateTime
-  userId         Int              @default(autoincrement()) @id
-  Admin          Admin[]
-  ChangePassword ChangePassword[]
-  Comment        Comment[]
-  Inquiry        Inquiry[]
-  posts          Post[]
-  PostLike       PostLike[]
-  RefreshToken   RefreshToken[]
+  nickname        String           @unique
+  password        String
+  portalId        String           @default("") @unique
+  randomNickname  String           @default("")
+  registeredAt    DateTime
+  userId          Int              @default(autoincrement()) @id
+  admins          Admin[]
+  changePasswords ChangePassword[]
+  comments        Comment[]
+  inquiries       Inquiry[]
+  posts           Post[]
+  postLikes       PostLike[]
+  refreshTokens   RefreshToken[]
 }
