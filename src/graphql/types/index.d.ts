@@ -30,15 +30,11 @@ export type Query = {
 }
 
 export type QueryPostArgs = {
-  postId?: Maybe<Scalars['Int']>
-}
-
-export type QueryPostsArgs = {
-  userId?: Maybe<Scalars['Int']>
+  id?: Maybe<Scalars['Int']>
 }
 
 export type QueryUserArgs = {
-  userId?: Maybe<Scalars['Int']>
+  id?: Maybe<Scalars['Int']>
 }
 
 export type ResolverTypeWrapper<T> = Promise<T> | T
@@ -149,24 +145,39 @@ export type DirectiveResolverFn<
 
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = {
-  String: ResolverTypeWrapper<Scalars['String']>
-  Boolean: ResolverTypeWrapper<Scalars['Boolean']>
-  PostLike: ResolverTypeWrapper<PostLike>
+  Query: ResolverTypeWrapper<{}>
   Int: ResolverTypeWrapper<Scalars['Int']>
   Post: ResolverTypeWrapper<Post>
-  Query: ResolverTypeWrapper<{}>
+  String: ResolverTypeWrapper<Scalars['String']>
   User: ResolverTypeWrapper<User>
+  Boolean: ResolverTypeWrapper<Scalars['Boolean']>
+  PostLike: ResolverTypeWrapper<PostLike>
 }
 
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = {
-  String: Scalars['String']
-  Boolean: Scalars['Boolean']
-  PostLike: PostLike
+  Query: {}
   Int: Scalars['Int']
   Post: Post
-  Query: {}
+  String: Scalars['String']
   User: User
+  Boolean: Scalars['Boolean']
+  PostLike: PostLike
+}
+
+export type PostResolvers<
+  ContextType = GraphQLContext,
+  ParentType extends ResolversParentTypes['Post'] = ResolversParentTypes['Post']
+> = {
+  id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
+  boardId?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
+  title?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+  body?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+  userId?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
+  randomNickname?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+  uploadedAt?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+  editedAt?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+  __isTypeOf?: isTypeOfResolverFn<ParentType>
 }
 
 export type PostLikeResolvers<
@@ -175,21 +186,6 @@ export type PostLikeResolvers<
 > = {
   userId?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>
   postId?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>
-  __isTypeOf?: isTypeOfResolverFn<ParentType>
-}
-
-export type PostResolvers<
-  ContextType = GraphQLContext,
-  ParentType extends ResolversParentTypes['Post'] = ResolversParentTypes['Post']
-> = {
-  postId?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
-  boardId?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
-  title?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-  body?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-  userId?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
-  randomNickname?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-  uploadedAt?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-  editedAt?: Resolver<ResolversTypes['String'], ParentType, ContextType>
   __isTypeOf?: isTypeOfResolverFn<ParentType>
 }
 
@@ -206,8 +202,7 @@ export type QueryResolvers<
   posts?: Resolver<
     Array<Maybe<ResolversTypes['Post']>>,
     ParentType,
-    ContextType,
-    RequireFields<QueryPostsArgs, never>
+    ContextType
   >
   user?: Resolver<
     Maybe<ResolversTypes['User']>,
@@ -222,7 +217,7 @@ export type UserResolvers<
   ContextType = GraphQLContext,
   ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']
 > = {
-  userId?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
+  id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
   portalId?: Resolver<ResolversTypes['String'], ParentType, ContextType>
   password?: Resolver<ResolversTypes['String'], ParentType, ContextType>
   nickname?: Resolver<ResolversTypes['String'], ParentType, ContextType>
@@ -237,8 +232,8 @@ export type UserResolvers<
 }
 
 export type Resolvers<ContextType = GraphQLContext> = {
-  PostLike?: PostLikeResolvers<ContextType>
   Post?: PostResolvers<ContextType>
+  PostLike?: PostLikeResolvers<ContextType>
   Query?: QueryResolvers<ContextType>
   User?: UserResolvers<ContextType>
 }

@@ -1,0 +1,20 @@
+{
+  "GraphQL TypeDef and Resolvers": {
+    "scope": "typescript",
+    "prefix": "gql",
+    "body": [
+      "import { gql } from 'apollo-server-express'",
+      "import { Resolvers } from '../types'",
+      "",
+      "export const typeDef = gql`",
+      "  $1",
+      "`",
+      "",
+      "export const resolvers: Resolvers = {",
+      "  Query: {",
+      "    $2",
+      "  }",
+      "}"
+    ]
+  }
+}

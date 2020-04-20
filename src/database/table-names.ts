@@ -1,5 +1,5 @@
 /**
- * @deprecated Use TableInfo object in each model
+ * @deprecated Use `tableName` property in each Sequelize model
  */
 export enum TableNames {
   admin = 'admin',
