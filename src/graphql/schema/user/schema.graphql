@@ -1,5 +1,5 @@
 type User {
-  userId: Int!
+  id: Int!
   portalId: String!
   password: String!
   nickname: String!
@@ -10,5 +10,5 @@ type User {
 
 type Query {
   users: [User!]!
-  user(userId: Int): User
+  user(id: Int): User
 }

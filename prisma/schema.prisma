@@ -8,184 +8,213 @@ datasource db {
 }
 
 model Admin {
-  user_id Int  @id
-  user    User @relation(fields: [user_id], references: [userId])
+  userId Int  @id @map("user_id")
+  user   User @relation(fields: [userId], references: [id])
+
+  @@map("admin")
 }
 
 model Board {
-  boardId   Int    @default(autoincrement()) @id
-  boardName String @default("") @unique
+  boardName String @map("board_name") @unique
+  id        Int    @default(autoincrement()) @id
   posts     Post[]
+
+  @@map("board")
 }
 
 model CafeteriaMenu {
   campus   String
   data     String?
-  servedAt DateTime
+  servedAt DateTime @map("served_at")
 
   @@id([campus, servedAt])
+  @@map("cafeteria_menu")
 }
 
 model ChangePassword {
-  requestedAt DateTime
+  requestedAt DateTime @map("requested_at")
   token       String
-  userId      Int      @id
-  user        User     @relation(fields: [userId], references: [userId])
+  userId      Int      @id @map("user_id")
+  user        User     @relation(fields: [userId], references: [id])
 
   @@index([token], name: "change_password_token")
+  @@map("change_password")
 }
 
 model Comment {
   body           String
-  commentId      Int      @default(autoincrement()) @id
-  postId         Int
-  randomNickname String   @default("")
-  uploadedAt     DateTime
-  userId         Int
-  post           Post     @relation(fields: [postId], references: [postId])
-  user           User     @relation(fields: [userId], references: [userId])
+  id             Int      @default(autoincrement()) @id
+  postId         Int      @map("post_id")
+  randomNickname String   @map("random_nickname")
+  uploadedAt     DateTime @map("uploaded_at")
+  userId         Int      @map("user_id")
+  post           Post     @relation(fields: [postId], references: [id])
+  user           User     @relation(fields: [userId], references: [id])
 
   @@index([postId], name: "post_id")
   @@index([userId], name: "user_id")
+  @@map("comment")
 }
 
 model CoverageMajor {
-  code            String?
-  coverageCollege String?
-  name            String  @id
+  code                  String?
+  coverageCollege       String?                @map("coverage_college")
+  name                  String                 @id
+  coverageMajorLectures CoverageMajorLecture[]
+
+  @@map("coverage_major")
 }
 
 model CoverageMajorLecture {
-  coverageMajor          String @default("")
-  coverageMajorLectureId Int    @default(autoincrement()) @id
-  lectureId              Int
+  id            Int           @default(autoincrement()) @id
+  lectureId     Int           @map("lecture_id")
+  majorName     String        @map("major_name")
+  lecture       Lecture       @relation(fields: [lectureId], references: [id])
+  coverageMajor CoverageMajor @relation(fields: [majorName], references: [name])
+
+  @@index([majorName], name: "coverage_major_lecture_major_name_foreign_idx")
+  @@index([lectureId], name: "lecture_id")
+  @@map("coverage_major_lecture")
 }
 
 model File {
-  fileId     Int        @default(autoincrement()) @id
-  fileName   String     @default("")
+  fileName   String     @map("file_name")
+  id         Int        @default(autoincrement()) @id
   mime       String
-  uploadedAt DateTime
+  uploadedAt DateTime   @map("uploaded_at")
   uuid       String     @unique
   postFiles  PostFile[]
+
+  @@map("file")
 }
 
 model Inquiry {
   answer     String?
-  answeredAt DateTime?
+  answeredAt DateTime? @map("answered_at")
   body       String
   email      String?
-  inquiryId  Int       @default(autoincrement()) @id
+  id         Int       @default(autoincrement()) @id
   title      String
-  uploadedAt DateTime
-  userId     Int?
-  user       User?     @relation(fields: [userId], references: [userId])
+  uploadedAt DateTime  @map("uploaded_at")
+  userId     Int?      @map("user_id")
+  user       User?     @relation(fields: [userId], references: [id])
 
   @@index([userId], name: "user_id")
+  @@map("inquiry")
 }
 
 model Lecture {
-  building  Int?
-  campus    String?
-  code      String?
-  college   String?
-  course    String?
-  credit    Int?
-  grade     Int?
-  lectureId Int      @default(autoincrement()) @id
-  major     String?
-  name      String?
-  note      String?
-  professor String?
-  room      String?
-  schedule  String?
-  section   String?
-  semester  String?
-  year      Int?
-  periods   Period[]
+  building              Int?
+  campus                String?
+  code                  String?
+  college               String?
+  course                String?
+  credit                Int?
+  grade                 Int?
+  id                    Int                    @default(autoincrement()) @id
+  major                 String?
+  name                  String?
+  note                  String?
+  professor             String?
+  room                  String?
+  schedule              String?
+  section               String?
+  semester              String?
+  year                  Int?
+  coverageMajorLectures CoverageMajorLecture[]
+  periods               Period[]
+
+  @@map("lecture")
 }
 
 model PendingUser {
+  id             Int      @default(autoincrement()) @id
   nickname       String
   password       String
-  pendingUserId  Int      @default(autoincrement()) @id
-  portalId       String   @default("")
-  randomNickname String   @default("")
-  registeredAt   DateTime
+  portalId       String   @map("portal_id")
+  randomNickname String   @map("random_nickname")
+  registeredAt   DateTime @map("registered_at")
   token          String
 
   @@index([token], name: "pending_user_token")
+  @@map("pending_user")
 }
 
 model Period {
   day       String
-  endH      Int
-  endM      Int
-  lectureId Int
-  startH    Int
-  startM    Int
-  lecture   Lecture @relation(fields: [lectureId], references: [lectureId])
+  endH      Int     @map("end_h")
+  endM      Int     @map("end_m")
+  lectureId Int     @map("lecture_id")
+  startH    Int     @map("start_h")
+  startM    Int     @map("start_m")
+  lecture   Lecture @relation(fields: [lectureId], references: [id])
 
   @@id([lectureId, day, startH, startM, endH, endM])
+  @@map("period")
 }
 
 model Post {
-  boardId        Int
+  boardId        Int        @map("board_id")
   body           String
-  editedAt       DateTime?
-  isDeleted      Boolean?   @default(false)
-  postId         Int        @default(autoincrement()) @id
-  randomNickname String     @default("")
+  editedAt       DateTime?  @map("edited_at")
+  id             Int        @default(autoincrement()) @id
+  isDeleted      Boolean?   @default(false) @map("is_deleted")
+  randomNickname String     @map("random_nickname")
   title          String
-  uploadedAt     DateTime
-  userId         Int
-  board          Board      @relation(fields: [boardId], references: [boardId])
-  user           User       @relation(fields: [userId], references: [userId])
+  uploadedAt     DateTime   @map("uploaded_at")
+  userId         Int        @map("user_id")
+  board          Board      @relation(fields: [boardId], references: [id])
+  user           User       @relation(fields: [userId], references: [id])
   comments       Comment[]
   postFiles      PostFile[]
   postLikes      PostLike[]
 
   @@index([boardId], name: "board_id")
   @@index([userId], name: "user_id")
+  @@map("post")
 }
 
 model PostFile {
-  fileId Int
-  postId Int
-  file   File @relation(fields: [fileId], references: [fileId])
-  post   Post @relation(fields: [postId], references: [postId])
+  fileId Int  @map("file_id")
+  id     Int  @default(autoincrement()) @id
+  postId Int  @map("post_id")
+  file   File @relation(fields: [fileId], references: [id])
+  post   Post @relation(fields: [postId], references: [id])
 
-  @@id([postId, fileId])
-  @@index([fileId], name: "fk_post_file_file_id")
+  @@index([fileId], name: "file_id")
+  @@index([postId], name: "post_id")
+  @@map("post_file")
 }
 
 model PostLike {
-  postId Int
-  userId Int
-  post   Post @relation(fields: [postId], references: [postId])
-  user   User @relation(fields: [userId], references: [userId])
+  postId Int  @map("post_id")
+  userId Int  @map("user_id")
+  post   Post @relation(fields: [postId], references: [id])
+  user   User @relation(fields: [userId], references: [id])
 
   @@id([userId, postId])
   @@index([postId], name: "post_id")
+  @@map("post_like")
 }
 
 model RefreshToken {
-  manuallyChangedAt Int?
-  refreshTokenId    Int     @default(autoincrement()) @id
+  id                Int     @default(autoincrement()) @id
+  manuallyChangedAt Int?    @map("manually_changed_at")
   token             String?
-  userId            Int?
-  user              User?   @relation(fields: [userId], references: [userId])
+  userId            Int?    @map("user_id")
+  user              User?   @relation(fields: [userId], references: [id])
 
   @@index([userId], name: "user_id")
+  @@map("refresh_token")
 }
 
 model User {
-  nickname        String           @unique
+  id              Int              @default(autoincrement()) @id
+  nickname        String
   password        String
-  portalId        String           @default("") @unique
-  randomNickname  String           @default("")
-  registeredAt    DateTime
-  userId          Int              @default(autoincrement()) @id
+  portalId        String           @map("portal_id")
+  randomNickname  String           @map("random_nickname")
+  registeredAt    DateTime         @map("registered_at")
   admins          Admin[]
   changePasswords ChangePassword[]
   comments        Comment[]
@@ -193,4 +222,7 @@ model User {
   posts           Post[]
   postLikes       PostLike[]
   refreshTokens   RefreshToken[]
+
+  @@index([portalId], name: "user_portal_id")
+  @@map("user")
 }

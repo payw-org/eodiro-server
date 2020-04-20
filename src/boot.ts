@@ -82,12 +82,10 @@ export async function boot(options: {
   // Open the gate
   if (listen) {
     // Create an apollo server
+    const prisma = new PrismaClient()
     const apolloServer = new ApolloServer({
       schema,
-      context: (req) => ({
-        ...req,
-        prisma: new PrismaClient(),
-      }),
+      context: () => ({ prisma }),
     })
     apolloServer.applyMiddleware({ app })
 

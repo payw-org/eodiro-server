@@ -5,26 +5,26 @@ export default {
     users: (root, args, ctx) => {
       return ctx.prisma.user.findMany({
         orderBy: {
-          userId: 'desc',
+          id: 'desc',
         },
         include: {
           posts: {
             orderBy: {
-              postId: 'desc',
+              id: 'desc',
             },
           },
         },
       })
     },
-    user: (root, { userId }, ctx) => {
+    user: (root, { id }, ctx) => {
       return ctx.prisma.user.findOne({
         where: {
-          userId,
+          id,
         },
         include: {
           posts: {
             orderBy: {
-              postId: 'desc',
+              id: 'desc',
             },
           },
         },

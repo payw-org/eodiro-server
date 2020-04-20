@@ -1,9 +1,12 @@
+/**
+ * @deprecated
+ */
+
 const fs = require('fs')
 const pluralize = require('pluralize')
-const appRoot = require('app-root-path')
 const { camelCase } = require('change-case')
 
-const prismaSchemaPath = appRoot.resolve('/prisma/schema.prisma')
+const { prismaSchemaPath } = require('./prisma-schema-path')
 // Read Prisma schema file
 const prismaSchema = fs.readFileSync(prismaSchemaPath, 'utf8')
 
