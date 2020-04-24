@@ -1,4 +1,6 @@
 import { DataTypes, Model } from 'sequelize'
+
+import { PrimaryAIAttribute } from '../utils/model-attributes'
 import { createInitModelFunction } from '../create-init-model'
 
 class CoverageMajorLecture extends Model {}
@@ -7,8 +9,8 @@ export const coverageMajorLecture = createInitModelFunction(
   CoverageMajorLecture,
   'coverage_major_lecture',
   {
+    id: PrimaryAIAttribute,
     lecture_id: {
-      primaryKey: true,
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
@@ -19,7 +21,6 @@ export const coverageMajorLecture = createInitModelFunction(
       onUpdate: 'cascade',
     },
     coverage_major: {
-      primaryKey: true,
       type: DataTypes.STRING(50),
       allowNull: false,
       references: {
@@ -29,6 +30,18 @@ export const coverageMajorLecture = createInitModelFunction(
       onDelete: 'cascade',
       onUpdate: 'cascade',
     },
+  },
+  {
+    indexes: [
+      {
+        unique: false,
+        fields: ['lecture_id'],
+      },
+      {
+        unique: false,
+        fields: ['coverage_major'],
+      },
+    ],
   }
 )
 
