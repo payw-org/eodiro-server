@@ -1,14 +1,13 @@
 import { CoverageMajorLectureType } from '@/database/models/coverage_major_lecture'
+import Db from '@/db'
 import { LectureType } from '@/database/models/lecture'
 import { PeriodType } from '@/database/models/period'
-import { TableNames } from '@/database/table-names'
-import Db from '@/db'
-import SqlB from '@/modules/sqlb'
+import { Q } from '@/modules/sqlb'
 import { RefinedLectures } from '@payw/cau-timetable-scraper-types'
+import { TableNames } from '@/database/table-names'
 
 export default async function (lectures: RefinedLectures): Promise<void> {
   console.log('🌱 Seeding lectures')
-  const sqlB = SqlB()
 
   const firstLecture = lectures[0]
   if (!firstLecture) {
@@ -22,7 +21,7 @@ export default async function (lectures: RefinedLectures): Promise<void> {
   const dbCoverageMajorLectures: CoverageMajorLectureType[] = []
 
   const [err, results] = await Db.query<{ maxID: number }[]>(
-    SqlB().select('max(id) as maxID').from('lecture').build()
+    Q().select('max(id) as maxID').from('lecture').build()
   )
 
   if (err) {
@@ -94,7 +93,7 @@ export default async function (lectures: RefinedLectures): Promise<void> {
 
   console.log('Inserting lectures...')
   const [insertLecturesErr] = await Db.query(
-    sqlB.bulkInsert(TableNames.lecture, dbLectures).build()
+    Q().bulkInsert(TableNames.lecture, dbLectures).build()
   )
   if (insertLecturesErr) {
     console.error('Failed to insert lectures')
@@ -104,7 +103,7 @@ export default async function (lectures: RefinedLectures): Promise<void> {
 
   console.log('Inserting periods...')
   const [insertPeriodsErr] = await Db.query(
-    sqlB.bulkInsert(TableNames.period, dbPeriods).build()
+    Q().bulkInsert(TableNames.period, dbPeriods).build()
   )
   if (insertPeriodsErr) {
     console.error('Failed to insert periods')
@@ -114,7 +113,7 @@ export default async function (lectures: RefinedLectures): Promise<void> {
 
   console.log('Inserting coverage major lecture relations...')
   const [insertRelationsErr] = await Db.query(
-    SqlB()
+    Q()
       .bulkInsert(TableNames.coverage_major_lecture, dbCoverageMajorLectures)
       .build()
   )
