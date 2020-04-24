@@ -14,6 +14,7 @@ module.exports = {
     node: true,
   },
   rules: {
+    'no-extra-semi': 'off',
     'space-before-function-paren': [
       'error',
       {
