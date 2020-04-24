@@ -1,14 +1,15 @@
-import Config from '@/config'
-import { getUser, UserAttrs } from '@/database/models/user'
-import Db from '@/db'
-import CafeteriaMenusSeeder from '@/db/seeders/cafeteria-menus-seeder'
-import timetableSeeder from '@/db/seeders/timetable-seeder'
+import { UserAttrs, getUser } from '@/database/models/user'
+
 import { CTTS } from '@payw/cau-timetable-scraper'
-import chalk from 'chalk'
+import CafeteriaMenusSeeder from '@/db/seeders/cafeteria-menus-seeder'
+import Config from '@/config'
 import { CronJob } from 'cron'
+import Db from '@/db'
+import chalk from 'chalk'
 import dayjs from 'dayjs'
 import { garbageCollectFiles } from './eodiro-bot/garbage-collect-files'
 import getSemester from './get-semester'
+import timetableSeeder from '@/db/seeders/timetable-seeder'
 
 const log = console.log
 
