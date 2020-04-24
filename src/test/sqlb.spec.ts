@@ -1,9 +1,16 @@
 import { CoverageMajorType } from '@/database/models/coverage_major'
-import { TableNames } from '@/database/table-names'
 import { Q } from '@/modules/sqlb'
+import { TableNames } from '@/database/table-names'
 import { expect } from 'chai'
 
 describe('Test SqlB', () => {
+  it('SqlB instance should be empty after build', () => {
+    const q = Q()
+    q.select().from('user').build()
+
+    expect(q.select().from('post').build(true)).to.equal('SELECT * FROM post;')
+  })
+
   it('Select posts using subquery, as, order, limit', () => {
     expect(
       Q()
