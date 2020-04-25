@@ -25,7 +25,7 @@ Node.js running on NGINX using reverse proxy.
 
 ### SSL
 
-- Letsencrypt and Certbot python plugin
+Letsencrypt and Certbot python plugin
 
 ### Resolve 413 Request Entity Too Large
 
@@ -34,6 +34,10 @@ server {
     client_max_body_size 100M;
 }
 ```
+
+### Don't forget
+
+- to set timezone correctly for both system and database
 
 ## Database
 
