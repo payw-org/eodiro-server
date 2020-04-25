@@ -1,8 +1,8 @@
+import Db from '@/db'
 import { LectureType } from '@/database/models/lecture'
 import { PeriodType } from '@/database/models/period'
-import Db from '@/db'
-import dayIndexToString from '@/modules/day-index-to-string'
 import { Q } from '@/modules/sqlb'
+import dayIndexToString from '@/modules/day-index-to-string'
 import dayjs from 'dayjs'
 import express from 'express'
 
