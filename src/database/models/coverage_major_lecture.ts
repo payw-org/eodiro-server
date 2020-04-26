@@ -2,6 +2,7 @@ import { DataTypes, Model } from 'sequelize'
 
 import { PrimaryAIAttribute } from '../utils/model-attributes'
 import { createInitModelFunction } from '../create-init-model'
+import { PrimaryAIAttribute } from '../utils/model-attributes'
 
 class CoverageMajorLecture extends Model {}
 
@@ -47,5 +48,5 @@ export const coverageMajorLecture = createInitModelFunction(
 
 export type CoverageMajorLectureType = {
   lecture_id: number
-  coverage_major: string
+  major_name: string
 }
