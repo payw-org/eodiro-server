@@ -11,7 +11,7 @@
     "sync-db:dev": "cross-env NODE_ENV=development ts-node -r tsconfig-paths/register src/database/sync.ts",
     "ts-node:prod": "ts-node -r tsconfig-paths/register",
     "ts-node:dev": "cross-env NODE_ENV=development ts-node -r tsconfig-paths/register",
-    "test": "mocha -r ts-node/register -r tsconfig-paths/register ./**/*.spec.ts",
+    "test": "mocha -r ts-node/register -r tsconfig-paths/register \"./{,!(node_modules)/**}/*.spec.ts\"",
     "file-test:dev": "cross-env NODE_ENV=development mocha -r ts-node/register -r tsconfig-paths/register",
     "file-test": "mocha -r ts-node/register -r tsconfig-paths/register",
     "dev": "npm-run-all --parallel dev-ts type-check:watch codegen:watch",
