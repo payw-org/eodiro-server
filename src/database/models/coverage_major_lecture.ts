@@ -2,7 +2,6 @@ import { DataTypes, Model } from 'sequelize'
 
 import { PrimaryAIAttribute } from '../utils/model-attributes'
 import { createInitModelFunction } from '../create-init-model'
-import { PrimaryAIAttribute } from '../utils/model-attributes'
 
 class CoverageMajorLecture extends Model {}
 
