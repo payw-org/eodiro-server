@@ -2,19 +2,16 @@ import { QueryResolvers } from '@/graphql/types'
 
 export default {
   Query: {
-    post: (root, { postId }, ctx) =>
+    post: (root, { id }, ctx) =>
       ctx.prisma.post.findOne({
         where: {
-          postId,
+          id,
         },
       }),
-    posts: (root, { userId }, ctx) =>
+    posts: (root, args, ctx) =>
       ctx.prisma.post.findMany({
-        where: {
-          userId,
-        },
         orderBy: {
-          postId: 'desc',
+          id: 'desc',
         },
       }),
   } as QueryResolvers,

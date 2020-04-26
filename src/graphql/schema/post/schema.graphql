@@ -1,5 +1,5 @@
 type Post {
-  postId: Int!
+  id: Int!
   boardId: Int!
   title: String!
   body: String!
@@ -10,6 +10,6 @@ type Post {
 }
 
 type Query {
-  post(postId: Int): Post
-  posts(userId: Int): [Post]!
+  post(id: Int): Post
+  posts: [Post]!
 }
