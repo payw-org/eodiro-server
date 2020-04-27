@@ -1,6 +1,6 @@
 import Config from '@/config'
-import chalk from 'chalk'
 import NodeMailer from 'nodemailer'
+import chalk from 'chalk'
 
 const log = console.log
 

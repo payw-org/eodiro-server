@@ -5,10 +5,11 @@ import CafeteriaMenusSeeder from '@/db/seeders/cafeteria-menus-seeder'
 import Config from '@/config'
 import { CronJob } from 'cron'
 import Db from '@/db'
+import EodiroMailer from '../eodiro-mailer'
 import chalk from 'chalk'
 import dayjs from 'dayjs'
-import { garbageCollectFiles } from './eodiro-bot/garbage-collect-files'
-import getSemester from './get-semester'
+import { garbageCollectFiles } from './garbage-collect-files'
+import getSemester from '../get-semester'
 import timetableSeeder from '@/db/seeders/timetable-seeder'
 
 const log = console.log
@@ -113,7 +114,12 @@ export default class EodiroBot {
     new CronJob(
       '0 3 * * *',
       CafeteriaMenusSeeder.seed,
-      null,
+      async () => {
+        EodiroMailer.sendMail({
+          subject: '[eodiro Bot] Scraped cafeteria menus',
+          to: 'contact@payw.org',
+        })
+      },
       true,
       Config.TIME_ZONE
     )
