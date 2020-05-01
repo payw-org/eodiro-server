@@ -6,6 +6,7 @@ import Config from '@/config'
 import { CronJob } from 'cron'
 import Db from '@/db'
 import EodiroMailer from '../eodiro-mailer'
+import { cauNoticeRssFeed } from './cau-notice-rss-feed'
 import chalk from 'chalk'
 import dayjs from 'dayjs'
 import { garbageCollectFiles } from './garbage-collect-files'
@@ -31,6 +32,11 @@ export default class EodiroBot {
     // this.scrapeLectures()
     this.scrapeCafeteriaMenus()
     this.garbageCollect()
+    this.cauNoticeRssFeed()
+  }
+
+  private cauNoticeRssFeed() {
+    cauNoticeRssFeed()
   }
 
   /**
