@@ -1,7 +1,7 @@
 {
   "One API Interface": {
     "scope": "typescript",
-    "prefix": "act-int",
+    "prefix": "oneact",
     "body": [
       "import { OneApiError } from '@/api/one/scheme/types/utils'",
       "",
@@ -18,7 +18,7 @@
   },
   "One API Interface Auth Required": {
     "scope": "typescript",
-    "prefix": "act-auth-int",
+    "prefix": "oneactauth",
     "body": [
       "import { AuthRequired, OneApiError } from '@/api/one/scheme/types/utils'",
       "",
@@ -35,7 +35,7 @@
   },
   "One API Function": {
     "scope": "typescript",
-    "prefix": "act-func",
+    "prefix": "onefunc",
     "body": [
       "import { OneApiFunction } from '@/api/one/scheme/types/utils'",
       "import { Action } from './interface'",

@@ -23,7 +23,7 @@ Then you have to create two files [`interface.ts`](#interface), [`function.ts`](
 
 ### Interface
 
-It exports an interface with the name `Interface`.
+It exports an interface with the name `Action`.
 
 ```ts
 export interface Action {
