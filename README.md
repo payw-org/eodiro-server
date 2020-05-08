@@ -13,7 +13,7 @@
     <img alt="npm" src="https://img.shields.io/npm/v/@payw/eodiro-one-api?label=one-api">
   </a>
   <a href="https://github.com/nodejs/node/blob/master/doc/changelogs/CHANGELOG_V13.md#13.10.1">
-    <img alt="npm" src="https://img.shields.io/badge/node-v14.0.0-brightgreen">
+    <img alt="npm" src="https://img.shields.io/badge/node-v13.13.0-brightgreen">
   </a>
 </p>
 
