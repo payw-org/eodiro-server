@@ -1,16 +1,26 @@
 node_modules
 dist
 build
-.DS_Store
 .env
+
+# macOS
+.DS_Store
+
+# VSCode
 .vscode/*
 !.vscode/settings.json
 !.vscode/*.code-snippets
+
+# JetBrains
 .idea
-**/config/index.ts
-/storage
-data
-generated
 
 # Symlinks
 src/api/eodiro-one-api/db-schema
+
+# eodiro specific
+.eodiro/*
+!.eodiro/README.md
+/storage
+/data
+**/config/index.ts
+generated
