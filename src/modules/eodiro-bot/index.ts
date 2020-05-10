@@ -1,12 +1,14 @@
+import * as Subscribers from '@/modules/cau-notice-watcher/subscribers'
+
 import { UserAttrs, getUser } from '@/database/models/user'
 
 import { CTTS } from '@payw/cau-timetable-scraper'
 import CafeteriaMenusSeeder from '@/db/seeders/cafeteria-menus-seeder'
+import { CauNoticeWatcher } from '../cau-notice-watcher'
 import Config from '@/config'
 import { CronJob } from 'cron'
 import Db from '@/db'
 import EodiroMailer from '../eodiro-mailer'
-import { cauNoticeRssFeed } from './cau-notice-rss-feed'
 import chalk from 'chalk'
 import dayjs from 'dayjs'
 import { garbageCollectFiles } from './garbage-collect-files'
@@ -32,11 +34,13 @@ export default class EodiroBot {
     // this.scrapeLectures()
     this.scrapeCafeteriaMenus()
     this.garbageCollect()
-    this.cauNoticeRssFeed()
+    this.cauNotice()
   }
 
-  private cauNoticeRssFeed() {
-    cauNoticeRssFeed()
+  private cauNotice() {
+    const feed = new CauNoticeWatcher()
+    feed.subscribe(Subscribers.cau)
+    feed.watch()
   }
 
   /**

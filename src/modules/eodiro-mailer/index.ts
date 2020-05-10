@@ -5,6 +5,10 @@ import chalk from 'chalk'
 const log = console.log
 
 interface MailOption {
+  /**
+   * "name" \<id@domain.com\>
+   */
+  from?: string
   subject: string
   to: string
   html?: string
@@ -40,10 +44,8 @@ export default class EodiroMailer {
   // TODO: Asynchronous
   static sendMail(options: MailOption): void {
     this.transporter.sendMail({
-      from: '"어디로" <contact@payw.org>',
-      subject: options.subject,
-      to: options.to,
-      html: options.html,
+      from: '"어디로" <support@eodiro.com>',
+      ...options,
     })
   }
 }
