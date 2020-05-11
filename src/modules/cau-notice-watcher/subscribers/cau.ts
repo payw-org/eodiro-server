@@ -1,7 +1,7 @@
 import { Subscriber } from '..'
 
 export const cau: Subscriber = {
-  id: 'cau',
+  key: 'cau',
   link: 'https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100#page1',
   noticeItemSelector: '.typeNoti',
   titleBuilder: (noticeElm) => {

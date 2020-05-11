@@ -18,7 +18,7 @@ export type FeedOptions = {
 }
 
 export interface Subscriber {
-  id: string
+  key: string
   link: string
   noticeItemSelector: string
   titleBuilder: TitleBuilder
@@ -70,11 +70,11 @@ export class CauNoticeWatcher {
   }
 
   private getLastNotice(subscriber: Subscriber) {
-    return this.lastNotice[subscriber.id]
+    return this.lastNotice[subscriber.key]
   }
 
   private updateLastNotice(subscriber: Subscriber, title: string) {
-    this.lastNotice[subscriber.id] = title
+    this.lastNotice[subscriber.key] = title
   }
 
   public subscribe(subscriber: Subscriber) {
@@ -95,6 +95,21 @@ export class CauNoticeWatcher {
     this.watch()
   }
 
+  // Send an Email to all subscribed users
+  private sendMail(subject: string, body: string) {
+    // TODO: Fetch email addresses from DB
+    const emailAddrs = ['io@jhaemin.com']
+
+    for (const address of emailAddrs) {
+      EodiroMailer.sendMail({
+        from: '"어디로 알림" <notification@eodiro.com>',
+        to: address,
+        subject,
+        html: body,
+      })
+    }
+  }
+
   private async processSubscriber(subscriber: Subscriber) {
     const notices = Array.from(await this.visit(1, subscriber))
 
@@ -105,11 +120,7 @@ export class CauNoticeWatcher {
     const lastNoticeIndex = notices.indexOf(this.getLastNotice(subscriber))
     if (lastNoticeIndex !== -1) {
       for (let i = lastNoticeIndex - 1; i >= 0; i--) {
-        EodiroMailer.sendMail({
-          from: '"어디로 알림" <notification@eodiro.com>',
-          to: 'io@jhaemin.com',
-          subject: notices[i],
-        })
+        this.sendMail(notices[i], subscriber.link)
       }
     }
 
