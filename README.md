@@ -1,5 +1,5 @@
-<h1 align="center">eodiro API 2</h1>
-<p align="center">The next generation API server for <a href="https://eodiro.com"><b>eodiro</b></a></p>
+<h1 align="center">eodiro 🌏 server</h1>
+<p align="center">A Node.js server application that powers the <b><a href="https://github.com/paywteam/eodiro">eodiro</a></b></p>
 
 <p align="center">
   <img src="https://img.shields.io/github/license/paywteam/eodiro-api2" />
@@ -13,21 +13,25 @@
     <img alt="npm" src="https://img.shields.io/npm/v/@payw/eodiro-one-api?label=one-api">
   </a>
   <a href="https://github.com/nodejs/node/blob/master/doc/changelogs/CHANGELOG_V13.md#13.10.1">
-    <img alt="npm" src="https://img.shields.io/badge/node-v13.13.0-brightgreen">
+    <img alt="npm" src="https://img.shields.io/badge/node-v13.14.0-brightgreen">
   </a>
 </p>
 
 ---
 
-## Server
+## Spec
 
 Node.js running on NGINX using reverse proxy.
 
-### SSL
+### NGINX
+
+**SSL**
 
 Letsencrypt and Certbot python plugin
 
-### Resolve 413 Request Entity Too Large
+[Configuration](https://gist.github.com/jhaemin/218cc4f45c28062c3f3c6b96347a401a)
+
+**Resolve 413 Request Entity Too Large**
 
 ```nginx
 server {
@@ -35,37 +39,36 @@ server {
 }
 ```
 
-### Don't forget
+**Don't forget**
 
 - to set timezone correctly for both system and database
 
-## Database
+### Database
 
 It uses MySQL internally as its database.
 
-## Build
-
-- Babel
-  - Entire project
-- TSC
-  - One API
+[Installation](https://gist.github.com/jhaemin/651e335525f002011bd90d75f0e49c8e)
 
 ---
 
-## API References
+## 📚 API References
 
-**[One API](#One-API)**
-
-**Legacy APIs**
+**REST API (Legacy)**
 
 - [Common](#Common)
 - [Lectures](#Lectures)
 - [Vacant](#Vacant)
 - [Cafeteria](#Cafeteria)
 
+**[One API (Deprecated in favor of GraphQL)](#One-API)**
+
+**GraphQL (WIP)**
+
 ---
 
 ## One API
+
+> Deprecated in favor of GraphQL which means there will be no more updates and all of the features provided by the One API will be replaced by GraphQL in the near future.
 
 Introducing a new way to create APIs on server side and to use them on client side.
 
@@ -134,7 +137,7 @@ We share some specific types across the APIs.
 ### Get Lectures
 
 <pre>
-<b>GET</b>  https://api2.eodiro.com/lectures/<b>:year</b>/<b>:semester</b>/<b>:campus</b>/list
+<b>[ GET ]</b>  https://api2.eodiro.com/lectures/<b>:year</b>/<b>:semester</b>/<b>:campus</b>/list
 </pre>
 
 **Params**
@@ -155,7 +158,7 @@ We share some specific types across the APIs.
 ### Search Lectures
 
 <pre>
-<b>GET</b>  https://api2.eodiro.com/lectures/<b>:year</b>/<b>:semester</b>/<b>:campus</b>/search
+<b>[ GET ]</b>  https://api2.eodiro.com/lectures/<b>:year</b>/<b>:semester</b>/<b>:campus</b>/search
 </pre>
 
 **Params**
@@ -184,7 +187,7 @@ We share some specific types across the APIs.
 ### Get Buildings Vacant
 
 <pre>
-<b>GET</b>  https://api2.eodiro.com/vacant/<b>:year</b>/<b>:semester</b>/<b>:campus</b>/buildings
+<b>[ GET ]</b>  https://api2.eodiro.com/vacant/<b>:year</b>/<b>:semester</b>/<b>:campus</b>/buildings
 </pre>
 
 **Params**
@@ -206,7 +209,7 @@ We share some specific types across the APIs.
 ### Get Classrooms
 
 <pre>
-<b>GET</b>  https://api2.eodiro.com/vacant/<b>:year</b>/<b>:semester</b>/<b>:campus</b>/buildings/<b>:building</b>/classrooms
+<b>[ GET ]</b>  https://api2.eodiro.com/vacant/<b>:year</b>/<b>:semester</b>/<b>:campus</b>/buildings/<b>:building</b>/classrooms
 </pre>
 
 **Params**
@@ -229,7 +232,7 @@ We share some specific types across the APIs.
 ### Get Menus
 
 <pre>
-<b>GET</b>  https://api2.eodiro.com/cafeteria/<b>:servedAt</b>/<b>:campus</b>/menus
+<b>[ GET ]</b>  https://api2.eodiro.com/cafeteria/<b>:servedAt</b>/<b>:campus</b>/menus
 </pre>
 
 **Params**
@@ -244,3 +247,27 @@ We share some specific types across the APIs.
 | Code | Description              |
 | ---- | ------------------------ |
 | 204  | No menus data on the day |
+
+## LICENSE
+
+MIT License
+
+Copyright (c) 2020 PAYW
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
