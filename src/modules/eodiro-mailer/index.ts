@@ -41,9 +41,8 @@ export default class EodiroMailer {
     })
   }
 
-  // TODO: Asynchronous
-  static sendMail(options: MailOption): void {
-    this.transporter.sendMail({
+  static async sendMail(options: MailOption): Promise<any> {
+    return await this.transporter.sendMail({
       from: '"어디로" <support@eodiro.com>',
       ...options,
     })
