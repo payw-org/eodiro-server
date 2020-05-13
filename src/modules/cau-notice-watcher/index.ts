@@ -18,6 +18,7 @@ export type FeedOptions = {
 }
 
 export interface Subscriber {
+  name: string
   key: string
   link: string
   noticeItemSelector: string
@@ -96,18 +97,18 @@ export class CauNoticeWatcher {
   }
 
   // Send an Email to all subscribed users
-  private sendMail(subject: string, body: string) {
+  private sendMail(subject: string, body: string, subscriber: Subscriber) {
     // TODO: Fetch email addresses from DB
     const emailAddrs = ['io@jhaemin.com']
 
-    for (const address of emailAddrs) {
-      EodiroMailer.sendMail({
-        from: '"어디로 알림" <notification@eodiro.com>',
+    return emailAddrs.map((address) => {
+      return EodiroMailer.sendMail({
+        from: `"[어디로 알림] ${subscriber.name}" <notification@eodiro.com>`,
         to: address,
         subject,
         html: body,
       })
-    }
+    })
   }
 
   private async processSubscriber(subscriber: Subscriber) {
@@ -120,7 +121,9 @@ export class CauNoticeWatcher {
     const lastNoticeIndex = notices.indexOf(this.getLastNotice(subscriber))
     if (lastNoticeIndex !== -1) {
       for (let i = lastNoticeIndex - 1; i >= 0; i--) {
-        this.sendMail(notices[i], subscriber.link)
+        await Promise.all(
+          this.sendMail(notices[i], subscriber.link, subscriber)
+        )
       }
     }
 
