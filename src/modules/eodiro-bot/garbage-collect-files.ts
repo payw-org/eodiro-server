@@ -1,15 +1,16 @@
-import { getStoragePath } from '@/cdn/get-storage-path'
-import { eodiroQuery, EodiroQueryType } from '@/database/eodiro-query'
+import { EodiroQueryType, eodiroQuery } from '@/database/eodiro-query'
+
 import { FileType } from '@/database/models/file'
 import { PostFileType } from '@/database/models/post_file'
+import SqlB from '../sqlb'
 import { TableNames } from '@/database/table-names'
+import _ from 'lodash'
 import dayjs from 'dayjs'
 import fs from 'fs'
+import { getStoragePath } from '@/cdn/get-storage-path'
 import glob from 'glob'
-import _ from 'lodash'
 import path from 'path'
 import util from 'util'
-import SqlB from '../sqlb'
 
 const globSync = util.promisify(glob)
 
@@ -28,7 +29,7 @@ export const garbageCollectFiles = async () => {
     return {
       fileDir: fileDir,
       uuid: fileUuid,
-      uploadedAt: dayjs(_.find(dbFiles, { uuid: fileUuid }).uploaded_at),
+      uploadedAt: dayjs(_.find(dbFiles, { uuid: fileUuid })?.uploaded_at),
     }
   })
 
