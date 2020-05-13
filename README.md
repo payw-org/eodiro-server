@@ -19,7 +19,7 @@
 
 ---
 
-## Spec
+## 📦 Spec
 
 Node.js running on NGINX using reverse proxy.
 
