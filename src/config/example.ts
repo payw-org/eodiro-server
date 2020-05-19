@@ -8,6 +8,10 @@ export default {
   PORT: 0,
   DEV_PORT: 0,
 
+  // Push Notifications
+  PUSH_API_URL: '',
+  TEST_EXPO_PUSH_TOKEN: '',
+
   // DB
   DB_HOST: '',
   DB_USER: '',
