@@ -1,7 +1,9 @@
 import Browser from 'zombie'
 import EodiroMailer from '../eodiro-mailer'
 import { JSDOM as JsDom } from 'jsdom'
+import Push from '../push'
 import appRoot from 'app-root-path'
+import config from '@/config'
 import fs from 'fs'
 import wait from '../wait'
 
@@ -96,9 +98,12 @@ export class CauNoticeWatcher {
     this.watch()
   }
 
-  // Send an Email to all subscribed users
+  /**
+   * Send an Email to all subscribed users
+   *
+   * @deprecated Send App push instead
+   */
   private sendMail(subject: string, body: string, subscriber: Subscriber) {
-    // TODO: Fetch email addresses from DB
     const emailAddrs = ['io@jhaemin.com']
 
     return emailAddrs.map((address) => {
@@ -119,11 +124,14 @@ export class CauNoticeWatcher {
     }
 
     const lastNoticeIndex = notices.indexOf(this.getLastNotice(subscriber))
+
     if (lastNoticeIndex !== -1) {
       for (let i = lastNoticeIndex - 1; i >= 0; i--) {
-        await Promise.all(
-          this.sendMail(notices[i], subscriber.link, subscriber)
-        )
+        await Push.notify({
+          to: config.TEST_EXPO_PUSH_TOKEN,
+          title: `새로운 ${subscriber.name} 공지사항이 올라왔습니다.`,
+          body: notices[i],
+        })
       }
     }
 
