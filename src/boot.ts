@@ -1,16 +1,16 @@
-import { schema } from '@/graphql'
-import { PrismaClient } from '@prisma/client'
 import { ApolloServer } from 'apollo-server-express'
+import Config from './config'
+import DbConnector from './modules/db-connector'
+import EodiroBot from './modules/eodiro-bot'
+import EodiroMailer from './modules/eodiro-mailer'
+import { PrismaClient } from '@prisma/client'
+import api from './api'
 import bodyParser from 'body-parser'
 import chalk from 'chalk'
 import cors from 'cors'
 import express from 'express'
 import http from 'http'
-import api from './api'
-import Config from './config'
-import DbConnector from './modules/db-connector'
-import EodiroBot from './modules/eodiro-bot'
-import EodiroMailer from './modules/eodiro-mailer'
+import { schema } from '@/graphql'
 
 const log = console.log
 
