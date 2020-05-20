@@ -116,6 +116,7 @@ export class CauNoticeWatcher {
   }
 
   private async processSubscriber(subscriber: Subscriber) {
+    // Create a browser instance before processing
     this.browser = new Browser()
 
     const notices = Array.from(await this.visit(1, subscriber))
@@ -139,6 +140,7 @@ export class CauNoticeWatcher {
     this.updateLastNotice(subscriber, notices[0])
     this.writeLastNoticeFile()
 
+    // Destroy and clean the browser instance after processed
     this.browser.destroy()
     this.browser = null
   }
