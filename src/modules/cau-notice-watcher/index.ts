@@ -48,7 +48,6 @@ export class CauNoticeWatcher {
     }
 
     this.feedOptions = feedOptions
-    this.browser = new Browser()
     this.lastNotice = this.loadLastNoticeFile()
   }
 
@@ -117,6 +116,8 @@ export class CauNoticeWatcher {
   }
 
   private async processSubscriber(subscriber: Subscriber) {
+    this.browser = new Browser()
+
     const notices = Array.from(await this.visit(1, subscriber))
 
     if (notices.length === 0) {
@@ -137,6 +138,9 @@ export class CauNoticeWatcher {
 
     this.updateLastNotice(subscriber, notices[0])
     this.writeLastNoticeFile()
+
+    this.browser.destroy()
+    this.browser = null
   }
 
   private async visit(
