@@ -46,27 +46,34 @@ const processedSchema = prismaSchema.replace(blockRegExp, (model) => {
       break
     }
 
+    // Match to `name name` or `name name[]`
     const relationRegExp = /^(\S*)( +)(\1)(\[\])?/g
     let newLine = l
 
-    if (l.match(relationRegExp)) {
+    if (l.match(relationRegExp) || l.includes('@relation')) {
       // Relations
 
-      newLine = l.replace(
-        relationRegExp,
-        (match, prop, spaces, relation, arrNotation) => {
-          // p1 and p3 is the same
-          const camel = camelCase(prop)
-          const pascal = pascalCase(prop)
+      const splitted = l.split(' ').filter((s) => s.length > 0)
 
-          return (
-            (arrNotation ? pluralize(camel) : camel) +
-            spaces +
-            pascal +
-            (arrNotation || '')
-          )
+      const attributeName = splitted[0]
+      const type = splitted[1]
+
+      if (type.includes('[]')) {
+        // Should pluralize
+        splitted[0] = pluralize(camelCase(attributeName))
+        splitted[1] = pascalCase(type) + '[]'
+      } else {
+        splitted[0] = camelCase(attributeName)
+
+        if (type.includes('?')) {
+          // Optional
+          splitted[1] = pascalCase(type) + '?'
+        } else {
+          splitted[1] = pascalCase(type)
         }
-      )
+      }
+
+      newLine = splitted.join(' ')
     } else {
       // General model properties
 
