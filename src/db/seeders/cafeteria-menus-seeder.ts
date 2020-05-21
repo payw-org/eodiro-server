@@ -1,11 +1,11 @@
-import Config from '@/config'
+import { CCMS } from '@payw/cau-cafeteria-menus-scraper'
 import { CafeteriaMenuType } from '@/database/models/cafeteria_menu'
-import { TableNames } from '@/database/table-names'
+import Config from '@/config'
 import Db from '@/db'
-import convertCampusName from '@/modules/convert-campus-name'
 import EodiroMailer from '@/modules/eodiro-mailer'
 import SqlB from '@/modules/sqlb'
-import { CCMS } from '@payw/cau-cafeteria-menus-scraper'
+import { TableNames } from '@/database/table-names'
+import convertCampusName from '@/modules/convert-campus-name'
 
 const CafeteriaMenusSeeder = (): void => {
   return
@@ -76,6 +76,13 @@ err: ${err}
   }
 
   console.log(`🌱 Successfully seeded 5 days of cafeteria menus`)
+
+  // Send an email after complete
+  EodiroMailer.sendMail({
+    subject: '[eodiro Bot] Scraped cafeteria menus',
+    to: 'io@jhaemin.com',
+    html: JSON.stringify(dbCafeteriaMenus),
+  })
 }
 
 export default CafeteriaMenusSeeder
