@@ -89,7 +89,15 @@ export default class EodiroBot {
     const User = await getUser()
     const cronTime = '0 0 * * *'
     const timeZone = 'Asia/Seoul'
-    new CronJob(cronTime, User.updateRandomNickname, null, true, timeZone)
+    new CronJob(
+      cronTime,
+      () => {
+        User.updateRandomNickname()
+      },
+      null,
+      true,
+      timeZone
+    )
   }
 
   private scrapeLectures(): void {
@@ -123,7 +131,9 @@ export default class EodiroBot {
   private scrapeCafeteriaMenus(): void {
     new CronJob(
       '0 3 * * *',
-      CafeteriaMenusSeeder.seed,
+      () => {
+        CafeteriaMenusSeeder.seed()
+      },
       async () => {
         EodiroMailer.sendMail({
           subject: '[eodiro Bot] Scraped cafeteria menus',
@@ -136,6 +146,14 @@ export default class EodiroBot {
   }
 
   private garbageCollect(): void {
-    new CronJob('30 * * * *', garbageCollectFiles, null, true, Config.TIME_ZONE)
+    new CronJob(
+      '30 * * * *',
+      () => {
+        garbageCollectFiles()
+      },
+      null,
+      true,
+      Config.TIME_ZONE
+    )
   }
 }
