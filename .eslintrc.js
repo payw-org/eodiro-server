@@ -41,6 +41,7 @@ module.exports = {
       },
     ],
     '@typescript-eslint/no-explicit-any': [0],
-    '@typescript-eslint/camelcase': [1],
+    // Remove the rule after completely migrated to Prisma
+    '@typescript-eslint/camelcase': [0],
   },
 }
