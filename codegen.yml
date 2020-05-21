@@ -3,10 +3,10 @@ overwrite: true
 generates:
   ./src/graphql/types/index.d.ts:
     config:
-      contextType: @/graphql/types/context#GraphQLContext
+      contextType: '@/graphql/types/context#GraphQLContext'
       mappers:
-        User: @prisma/client#User
-        Post: @prisma/client#Post
+        User: '@prisma/client#User'
+        Post: '@prisma/client#Post'
     plugins:
       - typescript
       - typescript-resolvers
