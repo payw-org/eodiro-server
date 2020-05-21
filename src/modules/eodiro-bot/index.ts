@@ -8,7 +8,6 @@ import { CauNoticeWatcher } from '../cau-notice-watcher'
 import Config from '@/config'
 import { CronJob } from 'cron'
 import Db from '@/db'
-import EodiroMailer from '../eodiro-mailer'
 import chalk from 'chalk'
 import dayjs from 'dayjs'
 import { garbageCollectFiles } from './garbage-collect-files'
@@ -134,12 +133,7 @@ export default class EodiroBot {
       () => {
         CafeteriaMenusSeeder.seed()
       },
-      async () => {
-        EodiroMailer.sendMail({
-          subject: '[eodiro Bot] Scraped cafeteria menus',
-          to: 'contact@payw.org',
-        })
-      },
+      null,
       true,
       Config.TIME_ZONE
     )
