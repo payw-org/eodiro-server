@@ -6,7 +6,7 @@ import { comment } from './models/comment'
 import { coverageMajor } from './models/coverage_major'
 import { coverageMajorLecture } from './models/coverage_major_lecture'
 import { getBoard } from './models/board'
-import { getDevices } from './models/devices'
+import { getDevice } from './models/device'
 import { getFile } from './models/file'
 import { getPostFile } from './models/post_file'
 import { getUser } from './models/user'
@@ -42,7 +42,7 @@ async function sync(): Promise<void> {
   await (await period()).sync(alter)
   await (await coverageMajorLecture()).sync(alter)
   await (await inquiry()).sync(alter)
-  await (await getDevices()).sync(alter)
+  await (await getDevice()).sync(alter)
 
   await (await Database.getSequelize()).close()
 }

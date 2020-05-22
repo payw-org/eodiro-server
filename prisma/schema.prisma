@@ -77,7 +77,7 @@ model CoverageMajorLecture {
   @@map("coverage_major_lecture")
 }
 
-model Devices {
+model Device {
   deviceId  String @map("device_id")
   id        Int    @default(autoincrement()) @id
   pushToken String @map("push_token")
@@ -85,7 +85,7 @@ model Devices {
   user      User?  @relation(fields: [userId], references: [id])
 
   @@index([userId], name: "user_id")
-  @@map("devices")
+  @@map("device")
 }
 
 model File {
@@ -229,7 +229,7 @@ model User {
   admins          Admin[]
   changePasswords ChangePassword[]
   comments        Comment[]
-  devices         Devices[]
+  devices         Device[]
   inquiries       Inquiry[]
   posts           Post[]
   postLikes       PostLike[]
