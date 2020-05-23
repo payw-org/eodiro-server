@@ -1,11 +1,13 @@
 import axios from 'axios'
 import {
   OneApiAction,
+  AddDevice,
   DeleteComment,
   DeletePost,
   EditPost,
   GetBoardId,
   GetComments,
+  GetDevices,
   GetMyPosts,
   GetPostById,
   GetPostLikes,
@@ -21,6 +23,10 @@ import {
 import { OneApiError, OneAPIPayload } from '../scheme/types/utils'
 
 // ** AUTOMATICALLY GENERATED FUNCTION OVERLOADINGS, DO NOT MODIFY HERE MANUALLY **
+export async function oneAPIClient(
+  host: string,
+  request: Omit<AddDevice, 'payload'>
+): Promise<AddDevice['payload']>
 export async function oneAPIClient(
   host: string,
   request: Omit<DeleteComment, 'payload'>
@@ -41,6 +47,10 @@ export async function oneAPIClient(
   host: string,
   request: Omit<GetComments, 'payload'>
 ): Promise<GetComments['payload']>
+export async function oneAPIClient(
+  host: string,
+  request: Omit<GetDevices, 'payload'>
+): Promise<GetDevices['payload']>
 export async function oneAPIClient(
   host: string,
   request: Omit<GetMyPosts, 'payload'>

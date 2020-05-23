@@ -78,11 +78,12 @@ model CoverageMajorLecture {
 }
 
 model Device {
-  deviceId  String @map("device_id")
-  id        Int    @default(autoincrement()) @id
-  pushToken String @map("push_token")
-  userId    Int?   @map("user_id")
-  user      User?  @relation(fields: [userId], references: [id])
+  deviceId     String   @map("device_id") @unique
+  id           Int      @default(autoincrement()) @id
+  pushToken    String   @map("push_token")
+  registeredAt DateTime @map("registered_at")
+  userId       Int      @map("user_id")
+  user         User     @relation(fields: [userId], references: [id])
 
   @@index([userId], name: "user_id")
   @@map("device")

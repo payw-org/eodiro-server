@@ -18,6 +18,12 @@ export { UploadPost } from './square/upload-post'
 import { Action as GetUserIdRaw } from './auth/get-user-id.action/interface'
 export type GetUserId = GetUserIdRaw & { action: 'getUserId' }
 
+import { Action as AddDeviceRaw } from './device/add-device.action/interface'
+export type AddDevice = AddDeviceRaw & { action: 'addDevice' }
+
+import { Action as GetDevicesRaw } from './device/get-devices.action/interface'
+export type GetDevices = GetDevicesRaw & { action: 'getDevices' }
+
 import { Action as GetMyPostsRaw } from './my/get-my-posts.action/interface'
 export type GetMyPosts = GetMyPostsRaw & { action: 'getMyPosts' }
 
@@ -63,6 +69,8 @@ export type OneApiAction =
   | GetPostById
   | UploadPost
   | GetUserId
+  | AddDevice
+  | GetDevices
   | GetMyPosts
   | DeleteComment
   | DeletePost

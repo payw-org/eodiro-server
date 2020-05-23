@@ -15,6 +15,25 @@ export type Scalars = {
   Float: number
 }
 
+export type Device = {
+  __typename?: 'Device'
+  id: Scalars['Int']
+  userId: Scalars['Int']
+  deviceId: Scalars['String']
+  pushToken: Scalars['String']
+}
+
+export type Mutation = {
+  __typename?: 'Mutation'
+  addDevice?: Maybe<Device>
+}
+
+export type MutationAddDeviceArgs = {
+  userId?: Maybe<Scalars['Int']>
+  deviceId?: Maybe<Scalars['String']>
+  pushToken?: Maybe<Scalars['String']>
+}
+
 export type PostLike = {
   __typename?: 'PostLike'
   userId?: Maybe<Scalars['Int']>
@@ -23,10 +42,15 @@ export type PostLike = {
 
 export type Query = {
   __typename?: 'Query'
+  device?: Maybe<Device>
   post?: Maybe<Post>
   posts: Array<Maybe<Post>>
   user?: Maybe<User>
   users: Array<User>
+}
+
+export type QueryDeviceArgs = {
+  userId?: Maybe<Scalars['Int']>
 }
 
 export type QueryPostArgs = {
@@ -147,9 +171,11 @@ export type DirectiveResolverFn<
 export type ResolversTypes = {
   Query: ResolverTypeWrapper<{}>
   Int: ResolverTypeWrapper<Scalars['Int']>
-  Post: ResolverTypeWrapper<Post>
+  Device: ResolverTypeWrapper<Device>
   String: ResolverTypeWrapper<Scalars['String']>
+  Post: ResolverTypeWrapper<Post>
   User: ResolverTypeWrapper<User>
+  Mutation: ResolverTypeWrapper<{}>
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>
   PostLike: ResolverTypeWrapper<PostLike>
 }
@@ -158,11 +184,36 @@ export type ResolversTypes = {
 export type ResolversParentTypes = {
   Query: {}
   Int: Scalars['Int']
-  Post: Post
+  Device: Device
   String: Scalars['String']
+  Post: Post
   User: User
+  Mutation: {}
   Boolean: Scalars['Boolean']
   PostLike: PostLike
+}
+
+export type DeviceResolvers<
+  ContextType = GraphQLContext,
+  ParentType extends ResolversParentTypes['Device'] = ResolversParentTypes['Device']
+> = {
+  id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
+  userId?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
+  deviceId?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+  pushToken?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+  __isTypeOf?: isTypeOfResolverFn<ParentType>
+}
+
+export type MutationResolvers<
+  ContextType = GraphQLContext,
+  ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']
+> = {
+  addDevice?: Resolver<
+    Maybe<ResolversTypes['Device']>,
+    ParentType,
+    ContextType,
+    RequireFields<MutationAddDeviceArgs, never>
+  >
 }
 
 export type PostResolvers<
@@ -193,6 +244,12 @@ export type QueryResolvers<
   ContextType = GraphQLContext,
   ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']
 > = {
+  device?: Resolver<
+    Maybe<ResolversTypes['Device']>,
+    ParentType,
+    ContextType,
+    RequireFields<QueryDeviceArgs, never>
+  >
   post?: Resolver<
     Maybe<ResolversTypes['Post']>,
     ParentType,
@@ -232,6 +289,8 @@ export type UserResolvers<
 }
 
 export type Resolvers<ContextType = GraphQLContext> = {
+  Device?: DeviceResolvers<ContextType>
+  Mutation?: MutationResolvers<ContextType>
   Post?: PostResolvers<ContextType>
   PostLike?: PostLikeResolvers<ContextType>
   Query?: QueryResolvers<ContextType>

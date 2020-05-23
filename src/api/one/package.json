@@ -1,11 +1,12 @@
 {
   "name": "@payw/eodiro-one-api",
-  "version": "1.8.2",
+  "version": "1.9.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "copy-packagejson": "node copy-packagejson.js",
-    "refresh": "node dev/refresh",
+    "copy-packagejson": "node scripts/copy-packagejson.js",
+    "refresh": "node scripts/refresh",
+    "versioning": "",
     "deploy": "npm publish --access public"
   },
   "files": [
