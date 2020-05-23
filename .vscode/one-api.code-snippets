@@ -1,7 +1,7 @@
 {
   "One API Interface": {
     "scope": "typescript",
-    "prefix": "oneact",
+    "prefix": "oneint",
     "body": [
       "import { OneApiError } from '@/api/one/scheme/types/utils'",
       "",
@@ -18,7 +18,7 @@
   },
   "One API Interface Auth Required": {
     "scope": "typescript",
-    "prefix": "oneactauth",
+    "prefix": "oneintauth",
     "body": [
       "import { AuthRequired, OneApiError } from '@/api/one/scheme/types/utils'",
       "",
