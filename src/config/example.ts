@@ -22,7 +22,7 @@ export default {
   // Email
   MAIL_SERVICE: '',
   MAIL_HOST: '',
-  MAIL_PORT: '',
+  MAIL_PORT: 0,
   MAIL_USERNAME: '',
   MAIL_PASSWORD: '',
 
