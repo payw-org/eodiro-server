@@ -1,7 +1,8 @@
+import { FieldInfo, MysqlError } from 'mysql'
+
 import DbConnector from '@/modules/db-connector'
 import { SqlBInstance } from '@/modules/sqlb'
 import chalk from 'chalk'
-import { FieldInfo, MysqlError } from 'mysql'
 
 export type MysqlResult = any[] | Record<string, any>
 export type MysqlInsertOrUpdateResult = {
