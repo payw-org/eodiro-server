@@ -18,7 +18,7 @@ export default class EodiroMailer {
   private static transporter = NodeMailer.createTransport({
     service: Config.MAIL_SERVICE,
     host: Config.MAIL_HOST,
-    port: parseInt(Config.MAIL_PORT),
+    port: Config.MAIL_PORT,
     secure: true,
     auth: {
       user: Config.MAIL_USERNAME,
