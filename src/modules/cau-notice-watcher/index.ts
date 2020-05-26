@@ -5,7 +5,6 @@ import Push from '../push'
 import appRoot from 'app-root-path'
 import config from '@/config'
 import fs from 'fs'
-import wait from '../wait'
 
 export type TitleBuilder = (
   /** A single notice item */ noticeItemElement: HTMLElement | Element
