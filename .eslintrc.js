@@ -1,6 +1,7 @@
 module.exports = {
   parser: '@typescript-eslint/parser',
   extends: [
+    'eslint:recommended',
     'plugin:@typescript-eslint/eslint-recommended',
     'plugin:@typescript-eslint/recommended',
     'plugin:prettier/recommended',
@@ -14,7 +15,8 @@ module.exports = {
     node: true,
   },
   rules: {
-    'no-extra-semi': 'off',
+    'no-extra-semi': [0],
+    'no-async-promise-executor': [0],
     'space-before-function-paren': [
       'error',
       {
@@ -43,5 +45,6 @@ module.exports = {
     '@typescript-eslint/no-explicit-any': [0],
     // Remove the rule after completely migrated to Prisma
     '@typescript-eslint/camelcase': [0],
+    '@typescript-eslint/no-extra-semi': [0],
   },
 }
