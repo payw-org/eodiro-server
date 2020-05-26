@@ -22,7 +22,7 @@ export enum EodiroQueryType {
   NOT_SELECT = 'notSelect',
 }
 
-export async function eodiroQuery<T extends Record<string, any>>(
+export async function eodiroQuery<T extends Record<string, unknown>>(
   sql:
     | string
     | SqlBInstance
@@ -33,7 +33,7 @@ export async function eodiroQuery<T extends Record<string, any>>(
     | EodiroQueryType.DELETE
     | EodiroQueryType.NOT_SELECT
 ): Promise<MysqlNotSelectResult>
-export async function eodiroQuery<T extends Record<string, any>>(
+export async function eodiroQuery<T extends Record<string, unknown>>(
   sql:
     | string
     | SqlBInstance
@@ -43,20 +43,20 @@ export async function eodiroQuery<T extends Record<string, any>>(
 /**
  * Return a single item. `null` if not exists.
  */
-export async function eodiroQuery<T extends Record<string, any>>(
+export async function eodiroQuery<T extends Record<string, unknown>>(
   sql:
     | string
     | SqlBInstance
     | { query: string | SqlBInstance; values: unknown[] | unknown },
   type: EodiroQueryType.SELECT_ONE
 ): Promise<T | null>
-export async function eodiroQuery<T extends Record<string, any>>(
+export async function eodiroQuery<T extends Record<string, unknown>>(
   sql:
     | string
     | SqlBInstance
     | { query: string | SqlBInstance; values: unknown[] | unknown }
 ): Promise<T[]>
-export async function eodiroQuery<T extends Record<string, any>>(
+export async function eodiroQuery<T extends Record<string, unknown>>(
   sql:
     | string
     | SqlBInstance
