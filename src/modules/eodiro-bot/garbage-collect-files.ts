@@ -14,7 +14,7 @@ import util from 'util'
 
 const globSync = util.promisify(glob)
 
-export const garbageCollectFiles = async () => {
+export const garbageCollectFiles = async (): Promise<void> => {
   const squarePublicPath = getStoragePath() + '/public-user-content'
 
   const fileDirs = await globSync(squarePublicPath + '/*/*')
