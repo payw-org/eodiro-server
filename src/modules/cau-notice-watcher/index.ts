@@ -1,9 +1,10 @@
-import Browser from 'zombie'
+import puppeteer, { Page } from 'puppeteer'
+
 import EodiroMailer from '../eodiro-mailer'
-import { JSDOM as JsDom } from 'jsdom'
-import Push from '../push'
+import { JSDOM } from 'jsdom'
+import { PendingXHR } from 'pending-xhr-puppeteer'
 import appRoot from 'app-root-path'
-import config from '@/config'
+import chalk from 'chalk'
 import fs from 'fs'
 
 export type TitleBuilder = (
@@ -19,9 +20,12 @@ export type FeedOptions = {
 }
 
 export interface Subscriber {
+  /** Notice name which will be displayed on the end users */
   name: string
+  /** Unique key(id) for differentiating each subscriber */
   key: string
-  link: string
+  url: string
+  /** A CSS selector of */
   noticeItemSelector: string
   titleBuilder: TitleBuilder
 }
@@ -33,8 +37,6 @@ const lastNoticeFilePath = appRoot.resolve('/.eodiro/last_notice.json')
 export class CauNoticeWatcher {
   private feedOptions: FeedOptions
   private subscribers: Subscriber[] = []
-  private shouldStop = false
-  private browser: any
   private lastNotice: LastNotice
 
   constructor(feedOptions?: FeedOptions) {
@@ -50,6 +52,22 @@ export class CauNoticeWatcher {
     this.lastNotice = this.loadLastNoticeFile()
   }
 
+  public subscribe(subscriber: Subscriber): void {
+    for (const registeredSubscriber of this.subscribers) {
+      if (registeredSubscriber.key === subscriber.key) {
+        throw new Error(
+          `${chalk.blueBright(
+            '[Notice Watcher]'
+          )} Duplicate subscriber key detected: ${subscriber.key}`
+        )
+      }
+    }
+    this.subscribers.push(subscriber)
+  }
+
+  /**
+   * Get the `last_notice.json` dump file from '.eodiro' directory
+   */
   private loadLastNoticeFile() {
     let lastNotice: LastNotice
 
@@ -78,18 +96,24 @@ export class CauNoticeWatcher {
     this.lastNotice[subscriber.key] = title
   }
 
-  public subscribe(subscriber: Subscriber): void {
-    this.subscribers.push(subscriber)
-  }
-
   public async run(): Promise<void> {
-    if (this.shouldStop) {
-      return
-    }
+    const browser = await puppeteer.launch()
+    const page = await browser.newPage()
+
+    page.setMaxListeners(Infinity)
+
+    page.setViewport({
+      width: 1280,
+      height: 800,
+    })
 
     for (const subscriber of this.subscribers) {
-      await this.processSubscriber(subscriber)
+      await this.processSubscriber(page, subscriber)
     }
+
+    // Dispose the page and the browser
+    await page.close()
+    await browser.close()
   }
 
   /**
@@ -110,11 +134,8 @@ export class CauNoticeWatcher {
     })
   }
 
-  private async processSubscriber(subscriber: Subscriber) {
-    // Create a browser instance before processing
-    this.browser = new Browser()
-
-    const notices = Array.from(await this.visit(1, subscriber))
+  private async processSubscriber(page: Page, subscriber: Subscriber) {
+    const notices = Array.from(await this.visit(page, subscriber))
 
     if (notices.length === 0) {
       return
@@ -122,48 +143,47 @@ export class CauNoticeWatcher {
 
     const lastNoticeIndex = notices.indexOf(this.getLastNotice(subscriber))
 
-    if (lastNoticeIndex !== -1) {
-      for (let i = lastNoticeIndex - 1; i >= 0; i--) {
-        await Push.notify({
-          to: config.TEST_EXPO_PUSH_TOKEN,
-          title: `새로운 ${subscriber.name} 공지사항이 올라왔습니다.`,
-          body: notices[i],
-        })
-      }
+    for (
+      let i = lastNoticeIndex !== -1 ? lastNoticeIndex - 1 : notices.length - 1;
+      i >= 0;
+      i--
+    ) {
+      console.log(`새로운 ${subscriber.name} 공지사항이 올라왔습니다.`)
+      console.log(notices[i])
+      // await Push.notify({
+      //   to: config.TEST_EXPO_PUSH_TOKEN,
+      //   title: `새로운 ${subscriber.name} 공지사항이 올라왔습니다.`,
+      //   body: notices[i],
+      // })
     }
 
     this.updateLastNotice(subscriber, notices[0])
     this.writeLastNoticeFile()
-
-    // Destroy and clean the browser instance after processed
-    this.browser.destroy()
-    this.browser = null
   }
 
   private async visit(
-    page: number,
-    subscriber: Subscriber
+    page: Page,
+    subscriber: Subscriber,
+    pageNumber?: number
   ): Promise<Set<string>> {
-    return new Promise((resolve) => {
-      const notices: Set<string> = new Set()
+    const pendingXHR = new PendingXHR(page)
 
-      this.browser.visit(subscriber.link, null, () => {
-        const body = new JsDom(this.browser.html(subscriber.noticeItemSelector))
-          .window.document.body
-        const noticeElms = body.querySelectorAll(subscriber.noticeItemSelector)
+    await page.goto(subscriber.url)
+    await pendingXHR.waitForAllXhrFinished()
+    await page.waitForSelector(subscriber.noticeItemSelector)
 
-        for (const noticeElm of Array.from(noticeElms)) {
-          const title = subscriber.titleBuilder(noticeElm) || ''
+    const bodyHtml = await page.$eval('body', (body) => body.innerHTML)
 
-          notices.add(title)
-        }
+    const body = new JSDOM(bodyHtml).window.document.body
 
-        resolve(notices)
-      })
-    })
-  }
+    const notices: Set<string> = new Set()
+    const noticeElms = body.querySelectorAll(subscriber.noticeItemSelector)
 
-  public stop(): void {
-    this.shouldStop = true
+    for (const noticeElm of Array.from(noticeElms)) {
+      const title = subscriber.titleBuilder(noticeElm)
+      notices.add(title)
+    }
+
+    return notices
   }
 }
