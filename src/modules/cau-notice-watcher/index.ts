@@ -79,11 +79,11 @@ export class CauNoticeWatcher {
     this.lastNotice[subscriber.key] = title
   }
 
-  public subscribe(subscriber: Subscriber) {
+  public subscribe(subscriber: Subscriber): void {
     this.subscribers.push(subscriber)
   }
 
-  public async watch() {
+  public async run(): Promise<void> {
     if (this.shouldStop) {
       return
     }
@@ -91,10 +91,6 @@ export class CauNoticeWatcher {
     for (const subscriber of this.subscribers) {
       await this.processSubscriber(subscriber)
     }
-
-    // Recursive function call after the interval
-    await wait(this.feedOptions.interval * 60 * 1000)
-    this.watch()
   }
 
   /**
@@ -168,7 +164,7 @@ export class CauNoticeWatcher {
     })
   }
 
-  public stop() {
+  public stop(): void {
     this.shouldStop = true
   }
 }
