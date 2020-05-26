@@ -43,7 +43,7 @@ export default class EodiroBot {
 
     // Run the watcher every 10 minutes
     new CronJob(
-      '*/10 * * * *',
+      '*/15 * * * *',
       () => {
         feed.run()
       },
