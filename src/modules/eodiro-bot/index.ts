@@ -10,6 +10,7 @@ import { CronJob } from 'cron'
 import Db from '@/db'
 import chalk from 'chalk'
 import dayjs from 'dayjs'
+import { eodiroQuery } from '@/database/eodiro-query'
 import { garbageCollectFiles } from './garbage-collect-files'
 import getSemester from '../get-semester'
 import timetableSeeder from '@/db/seeders/timetable-seeder'
@@ -39,7 +40,17 @@ export default class EodiroBot {
   private cauNotice() {
     const feed = new CauNoticeWatcher()
     feed.subscribe(Subscribers.cau)
-    feed.watch()
+
+    // Run the watcher every 10 minutes
+    new CronJob(
+      '*/10 * * * *',
+      () => {
+        feed.run()
+      },
+      null,
+      true,
+      Config.TIME_ZONE
+    )
   }
 
   /**
@@ -47,41 +58,37 @@ export default class EodiroBot {
    * and eliminates rows which are expired
    */
   private clearPendingUsers(): void {
-    const patrolTime = 1000 * 60 * 30
-    setInterval(async () => {
-      const query = `
-        select *
-        from pending_user
-      `
-      const [err, results] = await Db.query(query)
+    new CronJob(
+      '*/30 * * * *',
+      async () => {
+        const query = `
+      select *
+      from pending_user
+    `
+        const results = await eodiroQuery<UserAttrs>(query)
 
-      if (err) {
-        console.error(err.message)
-        return
-      }
+        results.forEach(async (row) => {
+          const registeredAt = dayjs(row.registered_at)
+          const now = dayjs()
+          const timeDiffMs = now.diff(registeredAt)
+          const timeDiffMin = timeDiffMs / 1000 / 60
 
-      if (!results) {
-        return
-      }
-
-      ;(results as Array<UserAttrs>).forEach(async (row) => {
-        const registeredAt = dayjs(row.registered_at)
-        const now = dayjs()
-        const timeDiffMs = now.diff(registeredAt)
-        const timeDiffMin = timeDiffMs / 1000 / 60
-
-        // If over 30 minutes after sending a verfication email
-        // remove from the pending_user table
-        if (timeDiffMin > 30) {
-          const sql = `
-            delete from pending_user
-            where id = ?
-          `
-          const values = [row.id]
-          await Db.query(sql, values)
-        }
-      })
-    }, patrolTime)
+          // If over 30 minutes after sending a verfication email
+          // remove from the pending_user table
+          if (timeDiffMin > 30) {
+            const sql = `
+          delete from pending_user
+          where id = ?
+        `
+            const values = [row.id]
+            await Db.query(sql, values)
+          }
+        })
+      },
+      null,
+      true,
+      Config.TIME_ZONE
+    )
   }
 
   private async updateRandomNickname(): Promise<void> {
