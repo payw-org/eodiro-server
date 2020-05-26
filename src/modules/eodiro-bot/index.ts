@@ -7,12 +7,12 @@ import CafeteriaMenusSeeder from '@/db/seeders/cafeteria-menus-seeder'
 import { CauNoticeWatcher } from '../cau-notice-watcher'
 import Config from '@/config'
 import { CronJob } from 'cron'
-import Db from '@/db'
 import chalk from 'chalk'
 import dayjs from 'dayjs'
 import { eodiroQuery } from '@/database/eodiro-query'
 import { garbageCollectFiles } from './garbage-collect-files'
 import getSemester from '../get-semester'
+import prisma from '../prisma'
 import timetableSeeder from '@/db/seeders/timetable-seeder'
 
 const log = console.log
@@ -76,12 +76,11 @@ export default class EodiroBot {
           // If over 30 minutes after sending a verfication email
           // remove from the pending_user table
           if (timeDiffMin > 30) {
-            const sql = `
-          delete from pending_user
-          where id = ?
-        `
-            const values = [row.id]
-            await Db.query(sql, values)
+            await prisma.pendingUser.delete({
+              where: {
+                id: row.id,
+              },
+            })
           }
         })
       },
