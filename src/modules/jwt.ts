@@ -1,5 +1,3 @@
-import config from '@/config'
-import { refreshToken as refreshTokenTable } from '@/database/models/refresh_token'
 import {
   DecodeTokenOption,
   Jwt,
@@ -9,6 +7,9 @@ import {
   TokenOption,
   Tokens,
 } from 'jwt-token'
+
+import config from '@/config'
+import { refreshToken as refreshTokenTable } from '@/database/models/refresh_token'
 
 export interface Payload {
   userId: number
@@ -51,7 +52,7 @@ export default class EodiroJwt {
         payload,
         ...accessTokenOption,
       },
-      async (_): Promise<string | undefined> => {
+      async (): Promise<string | undefined> => {
         const row = await this.getRefreshTokenFromDb(payload.userId)
         return row === undefined ? undefined : row.token
       },
