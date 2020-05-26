@@ -181,7 +181,7 @@ const adjs = [
   '순수한',
   '초록색',
   '파란색',
-  '씩씩한'
+  '씩씩한',
 ]
 
 const nouns = [
@@ -404,7 +404,7 @@ const nouns = [
   '바지',
   '지팡이',
   '곰팡이',
-  '솜방망이'
+  '솜방망이',
 ]
 
 function getRandomInt(min: number, max: number): number {
@@ -413,7 +413,7 @@ function getRandomInt(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min + 1)) + min
 }
 
-export default function(): string {
+export default function (): string {
   const adjIndex = getRandomInt(0, adjs.length - 1)
   const nounIndex = getRandomInt(0, nouns.length - 1)
 
