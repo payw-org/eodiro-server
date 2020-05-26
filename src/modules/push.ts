@@ -1,4 +1,5 @@
-import Axios from 'axios'
+import Axios, { AxiosResponse } from 'axios'
+
 import Config from '@/config'
 
 type PushInformation = {
@@ -8,7 +9,7 @@ type PushInformation = {
   to: string
   title: string
   body: string
-  data?: object
+  data?: Record<string, unknown>
   sound?: 'default'
   /**
    * @default true
@@ -39,7 +40,7 @@ export default class Push {
     }
   }
 
-  static async notify(payload: PushPayload) {
+  static async notify(payload: PushPayload): Promise<AxiosResponse> {
     this.initPayload(payload)
 
     const response = await Axios({
