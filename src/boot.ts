@@ -1,26 +1,28 @@
-import { ApolloServer } from 'apollo-server-express'
 import Config from './config'
 import DbConnector from './modules/db-connector'
 import EodiroBot from './modules/eodiro-bot'
 import EodiroMailer from './modules/eodiro-mailer'
-import { PrismaClient } from '@prisma/client'
 import api from './api'
 import bodyParser from 'body-parser'
 import chalk from 'chalk'
 import cors from 'cors'
 import express from 'express'
 import http from 'http'
-import { schema } from '@/graphql'
 
 const log = console.log
+
+type QuitFunction = () => void
 
 export async function boot(options: {
   db?: boolean
   mail?: boolean
   bot?: boolean
+  /**
+   * Whether to open the port
+   */
   listen?: boolean
-}): Promise<http.Server | null> {
-  const { db = false, mail = false, bot = false, listen = true } = options
+}): Promise<QuitFunction> {
+  const { db = false, mail = false, bot = false, listen = false } = options
 
   if (process.env.NODE_ENV === 'development') {
     log(`[ ${chalk.gray('mode')} ] ${chalk.blueBright('development')} mode`)
@@ -79,15 +81,17 @@ export async function boot(options: {
     log(`[ ${chalk.blue('eodiro bot')} ] not running`)
   }
 
+  let server: http.Server = undefined
+
   // Open the gate
   if (listen) {
     // Create an apollo server
-    const prisma = new PrismaClient()
-    const apolloServer = new ApolloServer({
-      schema,
-      context: () => ({ prisma }),
-    })
-    apolloServer.applyMiddleware({ app })
+    // const prisma = new PrismaClient()
+    // const apolloServer = new ApolloServer({
+    //   schema,
+    //   context: () => ({ prisma }),
+    // })
+    // apolloServer.applyMiddleware({ app })
 
     const port =
       process.env.NODE_ENV === 'development' ? Config.DEV_PORT : Config.PORT
@@ -95,8 +99,15 @@ export async function boot(options: {
       log(`[ ${chalk.magenta('server')} ] listening on port ${port}`)
     })
 
-    return expressServer
-  } else {
-    return null
+    server = expressServer
   }
+
+  function quit() {
+    DbConnector.getConnConfident().destroy()
+    if (server) {
+      server.close()
+    }
+  }
+
+  return quit
 }
