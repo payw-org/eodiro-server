@@ -1,6 +1,5 @@
 import Config from './config'
 import DbConnector from './modules/db-connector'
-import EodiroBot from './modules/eodiro-bot'
 import EodiroMailer from './modules/eodiro-mailer'
 import api from './api'
 import bodyParser from 'body-parser'
