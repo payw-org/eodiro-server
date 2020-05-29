@@ -5,6 +5,7 @@ import Db from '@/db'
 import EodiroMailer from '@/modules/eodiro-mailer'
 import SqlB from '@/modules/sqlb'
 import { TableNames } from '@/database/table-names'
+import { boot } from '@/boot'
 import convertCampusName from '@/modules/convert-campus-name'
 
 const CafeteriaMenusSeeder = (): void => {
@@ -15,6 +16,7 @@ const CafeteriaMenusSeeder = (): void => {
  * Seed 5 days of cafeteria menus starting from today
  */
 CafeteriaMenusSeeder.seed = async (): Promise<void> => {
+  const quit = await boot({ db: true })
   try {
     console.log(`🌱 Seeding cafeteria menus...`)
 
@@ -92,6 +94,8 @@ err: ${err.message}
       to: 'io@jhaemin.com',
     })
   }
+
+  quit()
 }
 
 export default CafeteriaMenusSeeder
