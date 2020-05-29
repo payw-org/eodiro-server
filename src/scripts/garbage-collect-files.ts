@@ -5,6 +5,7 @@ import { PostFileType } from '@/database/models/post_file'
 import SqlB from '@/modules/sqlb'
 import { TableNames } from '@/database/table-names'
 import _ from 'lodash'
+import { boot } from '@/boot'
 import dayjs from 'dayjs'
 import fs from 'fs'
 import { getStoragePath } from '@/cdn/get-storage-path'
@@ -15,6 +16,8 @@ import util from 'util'
 const globSync = util.promisify(glob)
 
 export const run = async (): Promise<void> => {
+  const quit = await boot({ db: true })
+
   const squarePublicPath = getStoragePath() + '/public-user-content'
 
   const fileDirs = await globSync(squarePublicPath + '/*/*')
@@ -61,6 +64,8 @@ export const run = async (): Promise<void> => {
     // Delete from file system
     fs.rmdirSync(ref.fileDir, { recursive: true })
   }
+
+  quit()
 }
 
 run()
