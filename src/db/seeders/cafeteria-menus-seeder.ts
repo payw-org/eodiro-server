@@ -62,7 +62,7 @@ CafeteriaMenusSeeder.seed = async (): Promise<void> => {
         to: 'contact@payw.org',
         html: `
 query: ${query}
-err: ${err}
+err: ${err.message}
 `,
       })
       return
@@ -80,14 +80,14 @@ err: ${err}
     console.log(`🌱 Successfully seeded 5 days of cafeteria menus`)
 
     // Send an email after complete
-    EodiroMailer.sendMail({
-      subject: '[eodiro Bot] Scraped cafeteria menus',
-      to: 'io@jhaemin.com',
-      html: JSON.stringify(dbCafeteriaMenus),
-    })
+    // await EodiroMailer.sendMail({
+    //   subject: '[eodiro Bot] Scraped cafeteria menus',
+    //   to: 'io@jhaemin.com',
+    //   html: JSON.stringify(dbCafeteriaMenus),
+    // })
   } catch (error) {
     // Send an email when failed
-    EodiroMailer.sendMail({
+    await EodiroMailer.sendMail({
       subject: '[eodiro Bot] Failed to scrape cafeteria menus',
       to: 'io@jhaemin.com',
     })
