@@ -10,7 +10,6 @@ import { CronJob } from 'cron'
 import chalk from 'chalk'
 import dayjs from 'dayjs'
 import { eodiroQuery } from '@/database/eodiro-query'
-import { garbageCollectFiles } from './garbage-collect-files'
 import getSemester from '../get-semester'
 import prisma from '../prisma'
 import timetableSeeder from '@/db/seeders/timetable-seeder'
@@ -153,7 +152,6 @@ export default class EodiroBot {
       '*/1 * * * *',
       () => {
         console.log('garbage collect files')
-        garbageCollectFiles()
       },
       null,
       true,

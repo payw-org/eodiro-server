@@ -2,7 +2,7 @@ import { EodiroQueryType, eodiroQuery } from '@/database/eodiro-query'
 
 import { FileType } from '@/database/models/file'
 import { PostFileType } from '@/database/models/post_file'
-import SqlB from '../sqlb'
+import SqlB from '@/modules/sqlb'
 import { TableNames } from '@/database/table-names'
 import _ from 'lodash'
 import dayjs from 'dayjs'
@@ -14,7 +14,7 @@ import util from 'util'
 
 const globSync = util.promisify(glob)
 
-export const garbageCollectFiles = async (): Promise<void> => {
+export const run = async (): Promise<void> => {
   const squarePublicPath = getStoragePath() + '/public-user-content'
 
   const fileDirs = await globSync(squarePublicPath + '/*/*')
@@ -62,3 +62,5 @@ export const garbageCollectFiles = async (): Promise<void> => {
     fs.rmdirSync(ref.fileDir, { recursive: true })
   }
 }
+
+run()
