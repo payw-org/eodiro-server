@@ -1,10 +1,11 @@
-import { boot } from '@/boot'
 import Db, { MysqlInsertOrUpdateResult } from '@/db'
+
 import SqlB from '@/modules/sqlb'
-;(async (): Promise<void> => {
+;
+import { boot } from '@/boot'
+(async (): Promise<void> => {
   await boot({
     mail: false,
-    bot: false,
   })
   const [, results] = await Db.query<MysqlInsertOrUpdateResult>(
     SqlB()

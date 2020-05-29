@@ -15,13 +15,12 @@ type QuitFunction = () => void
 export async function boot(options: {
   db?: boolean
   mail?: boolean
-  bot?: boolean
   /**
    * Whether to open the port
    */
   listen?: boolean
 }): Promise<QuitFunction> {
-  const { db = false, mail = false, bot = false, listen = false } = options
+  const { db = false, mail = false, listen = false } = options
 
   if (process.env.NODE_ENV === 'development') {
     log(`[ ${chalk.gray('mode')} ] ${chalk.blueBright('development')} mode`)
