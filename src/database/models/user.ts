@@ -1,12 +1,13 @@
-import Db, { MysqlInsertOrUpdateResult } from '@/db'
 import Auth, { SignUpInfo } from '@/modules/auth'
-import EodiroMailer from '@/modules/eodiro-mailer'
-import rng from '@/modules/random-name-generator'
-import SqlB from '@/modules/sqlb'
-import Time from '@/modules/time'
 import { DataTypes, Model } from 'sequelize'
-import { createInitModelFunction } from '../create-init-model'
+import Db, { MysqlInsertOrUpdateResult } from '@/db'
+
+import EodiroMailer from '@/modules/eodiro-mailer'
+import SqlB from '@/modules/sqlb'
 import { TableNames } from '../table-names'
+import Time from '@/modules/time'
+import { createInitModelFunction } from '../create-init-model'
+import rng from '@/modules/random-name-generator'
 
 export type UserAttrs = {
   id: number
@@ -239,7 +240,7 @@ export class User extends Model {
     })
 
     // TODO: send email from the bot
-    EodiroMailer.sendMail({
+    await EodiroMailer.sendMail({
       to: 'contact@payw.org',
       subject: 'Updating user random nickname',
     })
