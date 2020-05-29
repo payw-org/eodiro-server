@@ -29,23 +29,24 @@ export default class EodiroBot {
 
     log(`[ ${chalk.blueBright('eodiro bot')} ] running`)
 
-    this.clearPendingUsers()
-    this.updateRandomNickname()
+    // this.clearPendingUsers()
+    // this.updateRandomNickname()
     // this.scrapeLectures()
-    this.scrapeCafeteriaMenus()
-    this.garbageCollect()
-    this.cauNotice()
+    // this.scrapeCafeteriaMenus()
+    // this.garbageCollect()
+    // this.cauNotice()
   }
 
   private cauNotice() {
     const feed = new CauNoticeWatcher()
     feed.subscribe(Subscribers.cau)
+    feed.subscribe(Subscribers.cse)
 
     // Run the watcher every 10 minutes
     new CronJob(
       '*/15 * * * *',
-      () => {
-        feed.run()
+      async () => {
+        await feed.run()
       },
       null,
       true,
@@ -135,7 +136,8 @@ export default class EodiroBot {
 
   private scrapeCafeteriaMenus(): void {
     new CronJob(
-      '0 3 * * *',
+      // '0 3 * * *',
+      '*/1 * * * *',
       () => {
         CafeteriaMenusSeeder.seed()
       },
@@ -147,8 +149,10 @@ export default class EodiroBot {
 
   private garbageCollect(): void {
     new CronJob(
-      '30 * * * *',
+      // '30 * * * *',
+      '*/1 * * * *',
       () => {
+        console.log('garbage collect files')
         garbageCollectFiles()
       },
       null,

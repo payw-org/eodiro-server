@@ -73,14 +73,6 @@ export async function boot(options: {
     log(`[ ${chalk.yellow('email')} ] skip connection`)
   }
 
-  if (bot) {
-    // Run eodiro bot
-    const eodiroBot = new EodiroBot()
-    eodiroBot.run()
-  } else {
-    log(`[ ${chalk.blue('eodiro bot')} ] not running`)
-  }
-
   let server: http.Server = undefined
 
   // Open the gate
