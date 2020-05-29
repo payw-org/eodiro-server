@@ -1,6 +1,6 @@
 {
   "name": "eodiro-server",
-  "version": "2.0.1",
+  "version": "2.1.0",
   "client-version": "3.7.x",
   "main": "src/main.ts",
   "repository": "https://github.com/paywteam/eodiro-server.git",
