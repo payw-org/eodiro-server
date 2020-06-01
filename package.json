@@ -3,7 +3,7 @@
   "version": "2.1.0",
   "client-version": "3.7.x",
   "main": "src/main.ts",
-  "repository": "https://github.com/paywteam/eodiro-server.git",
+  "repository": "https://github.com/payw-org/eodiro-server.git",
   "author": "PAYW",
   "license": "MIT",
   "scripts": {
