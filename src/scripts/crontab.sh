@@ -4,6 +4,9 @@
 # update random nicknames at 00:00
 0 0 * * * NODE_ENV=production /home/ubuntu/.nvm/versions/node/v13.14.0/bin/node /home/ubuntu/eodiro/server/build/src/scripts/update-random-nicknames
 
+# check notice every 15 minutes
+*/15 * * * *NODE_ENV=production /home/ubuntu/.nvm/versions/node/v13.14.0/bin/node /home/ubuntu/eodiro/server/build/src/scripts/check-notice
+
 # seed cafeteria menus at 03:00 everyday
 0 3 * * * NODE_ENV=production /home/ubuntu/.nvm/versions/node/v13.14.0/bin/node /home/ubuntu/eodiro/server/build/src/scripts/seed-cafeteria-menus
 
