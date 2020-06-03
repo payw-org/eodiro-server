@@ -82,16 +82,16 @@ err: ${err.message}
     console.log(`🌱 Successfully seeded 5 days of cafeteria menus`)
 
     // Send an email after complete
-    // await EodiroMailer.sendMail({
-    //   subject: '[eodiro Bot] Scraped cafeteria menus',
-    //   to: 'io@jhaemin.com',
-    //   html: JSON.stringify(dbCafeteriaMenus),
-    // })
+    await EodiroMailer.sendMail({
+      subject: '[eodiro] Scraped cafeteria menus',
+      to: 'contact@payw.org',
+      html: JSON.stringify(dbCafeteriaMenus, null, 2),
+    })
   } catch (error) {
     // Send an email when failed
     await EodiroMailer.sendMail({
-      subject: '[eodiro Bot] Failed to scrape cafeteria menus',
-      to: 'io@jhaemin.com',
+      subject: '[eodiro] Failed to scrape cafeteria menus',
+      to: 'contact@payw.org',
     })
   }
 
