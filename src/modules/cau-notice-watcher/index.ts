@@ -148,13 +148,18 @@ export class CauNoticeWatcher {
       i >= 0;
       i--
     ) {
-      console.log(`새로운 ${subscriber.name} 공지사항이 올라왔습니다.`)
-      console.log(notices[i])
+      // console.log(`새로운 ${subscriber.name} 공지사항이 올라왔습니다.`)
+      // console.log(notices[i])
       // await Push.notify({
       //   to: config.TEST_EXPO_PUSH_TOKEN,
       //   title: `새로운 ${subscriber.name} 공지사항이 올라왔습니다.`,
       //   body: notices[i],
       // })
+      this.sendMail(
+        `새로운 ${subscriber.name} 공지사항이 올라왔습니다.`,
+        subscriber.url,
+        subscriber
+      )
     }
 
     this.updateLastNotice(subscriber, notices[0])
