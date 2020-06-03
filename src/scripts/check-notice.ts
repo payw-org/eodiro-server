@@ -1,7 +1,6 @@
 import * as Subscribers from '@/modules/cau-notice-watcher/subscribers'
 
 import { CauNoticeWatcher } from '@/modules/cau-notice-watcher'
-import EodiroMailer from '@/modules/eodiro-mailer'
 import { boot } from '@/boot'
 
 async function run() {
@@ -17,11 +16,11 @@ async function run() {
 
   await feed.run()
 
-  await EodiroMailer.sendMail({
-    to: 'contact@payw.org',
-    subject: '[eodiro] Checked CAU notice',
-    html: '',
-  })
+  // await EodiroMailer.sendMail({
+  //   to: 'contact@payw.org',
+  //   subject: '[eodiro] Checked CAU notice',
+  //   html: '',
+  // })
 
   quit()
 }
