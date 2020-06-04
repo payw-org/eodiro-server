@@ -1,12 +1,14 @@
 import { Payload as AuthPayload } from '@/modules/jwt'
 import { OneApiAction } from '..'
 
+export type OnlyAuth = {
+  accessToken: string
+}
+
 /**
  * Where the API requires the authentication
  */
-export type AuthRequired<T> = T & {
-  accessToken: string
-}
+export type AuthRequired<T> = T & OnlyAuth
 
 /**
  * The basic form of One API action's interface
@@ -14,7 +16,7 @@ export type AuthRequired<T> = T & {
 interface OneApiActionSkeleton {
   data: unknown
   payload: {
-    err: OneApiError
+    err: OneApiError | unknown
     data?: any
   }
 }

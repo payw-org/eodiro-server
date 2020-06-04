@@ -12,6 +12,7 @@ async function run() {
   const feed = new CauNoticeWatcher()
 
   feed.subscribe(Subscribers.cau)
+  feed.subscribe(Subscribers.dormitoryBlueMir)
   feed.subscribe(Subscribers.cse)
 
   await feed.run()

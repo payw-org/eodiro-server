@@ -27,6 +27,21 @@ export type GetDevices = GetDevicesRaw & { action: 'getDevices' }
 import { Action as GetMyPostsRaw } from './my/get-my-posts.action/interface'
 export type GetMyPosts = GetMyPostsRaw & { action: 'getMyPosts' }
 
+import { Action as GetMySubscriptionsRaw } from './notice/get-my-subscriptions.action/interface'
+export type GetMySubscriptions = GetMySubscriptionsRaw & {
+  action: 'getMySubscriptions'
+}
+
+import { Action as GetNoticeCatalogRaw } from './notice/get-notice-catalog.action/interface'
+export type GetNoticeCatalog = GetNoticeCatalogRaw & {
+  action: 'getNoticeCatalog'
+}
+
+import { Action as UpdateNoticeSubscriptionRaw } from './notice/update-notice-subscription.action/interface'
+export type UpdateNoticeSubscription = UpdateNoticeSubscriptionRaw & {
+  action: 'updateNoticeSubscription'
+}
+
 import { Action as DeleteCommentRaw } from './square/delete-comment.action/interface'
 export type DeleteComment = DeleteCommentRaw & { action: 'deleteComment' }
 
@@ -72,6 +87,9 @@ export type OneApiAction =
   | AddDevice
   | GetDevices
   | GetMyPosts
+  | GetMySubscriptions
+  | GetNoticeCatalog
+  | UpdateNoticeSubscription
   | DeleteComment
   | DeletePost
   | EditPost

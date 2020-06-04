@@ -6,8 +6,13 @@ import { PendingXHR } from 'pending-xhr-puppeteer'
 import appRoot from 'app-root-path'
 import chalk from 'chalk'
 import fs from 'fs'
+import { isDev } from '../utils/is-dev'
 
 export type TitleBuilder = (
+  /** A single notice item */ noticeItemElement: HTMLElement | Element
+) => string
+
+export type UrlBuilder = (
   /** A single notice item */ noticeItemElement: HTMLElement | Element
 ) => string
 
@@ -28,9 +33,16 @@ export interface Subscriber {
   /** A CSS selector of */
   noticeItemSelector: string
   titleBuilder: TitleBuilder
+  urlBuilder?: UrlBuilder
 }
 
-export type LastNotice = Record<string, string>
+export type LastNotice = Record<
+  string,
+  {
+    displayName: string
+    title: string
+  }
+>
 
 const lastNoticeFilePath = appRoot.resolve('/.eodiro/last_notice.json')
 
@@ -63,12 +75,19 @@ export class CauNoticeWatcher {
       }
     }
     this.subscribers.push(subscriber)
+
+    if (!this.lastNotice[subscriber.key]) {
+      this.lastNotice[subscriber.key] = {
+        displayName: subscriber.name,
+        title: '',
+      }
+    }
   }
 
   /**
-   * Get the `last_notice.json` dump file from '.eodiro' directory
+   * Get the `last_notice.json` file inside '.eodiro' directory
    */
-  private loadLastNoticeFile() {
+  public loadLastNoticeFile(): LastNotice {
     let lastNotice: LastNotice
 
     if (!fs.existsSync(lastNoticeFilePath)) {
@@ -88,12 +107,15 @@ export class CauNoticeWatcher {
     )
   }
 
-  private getLastNotice(subscriber: Subscriber) {
-    return this.lastNotice[subscriber.key]
+  private getLastNoticeTitle(subscriber: Subscriber) {
+    return this.lastNotice[subscriber.key].title
   }
 
   private updateLastNotice(subscriber: Subscriber, title: string) {
-    this.lastNotice[subscriber.key] = title
+    this.lastNotice[subscriber.key] = {
+      displayName: subscriber.name,
+      title,
+    }
   }
 
   public async run(): Promise<void> {
@@ -141,25 +163,34 @@ export class CauNoticeWatcher {
       return
     }
 
-    const lastNoticeIndex = notices.indexOf(this.getLastNotice(subscriber))
+    const lastNoticeIndex = notices.indexOf(this.getLastNoticeTitle(subscriber))
 
-    for (
-      let i = lastNoticeIndex !== -1 ? lastNoticeIndex - 1 : notices.length - 1;
-      i >= 0;
-      i--
-    ) {
-      // console.log(`새로운 ${subscriber.name} 공지사항이 올라왔습니다.`)
-      // console.log(notices[i])
-      // await Push.notify({
-      //   to: config.TEST_EXPO_PUSH_TOKEN,
-      //   title: `새로운 ${subscriber.name} 공지사항이 올라왔습니다.`,
-      //   body: notices[i],
-      // })
-      this.sendMail(
-        `새로운 ${subscriber.name} 공지사항이 올라왔습니다.`,
-        subscriber.url,
-        subscriber
-      )
+    if (lastNoticeIndex > 0) {
+      for (let i = lastNoticeIndex - 1; i >= 0; i--) {
+        if (isDev()) {
+          console.log(`새로운 ${subscriber.name} 공지사항이 올라왔습니다.`)
+          console.log(notices[i])
+        }
+
+        // Push Notifications
+        // await Push.notify({
+        //   to: config.TEST_EXPO_PUSH_TOKEN,
+        //   title: `새로운 ${subscriber.name} 공지사항이 올라왔습니다.`,
+        //   body: notices[i],
+        // })
+
+        if (!isDev()) {
+          this.sendMail(
+            `새로운 ${subscriber.name} 공지사항이 올라왔습니다.`,
+            subscriber.url,
+            subscriber
+          )
+        }
+      }
+    } else {
+      if (isDev()) {
+        console.log(`${subscriber.name}: there is no new notice`)
+      }
     }
 
     this.updateLastNotice(subscriber, notices[0])
