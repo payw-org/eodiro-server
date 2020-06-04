@@ -1,15 +1,15 @@
+import Auth from '@/modules/auth'
+import { OneApiError } from './one/scheme/types/utils'
 import authRouter from '@/api/auth'
 import cafeteriaRouter from '@/api/cafeteria'
+import express from 'express'
 import inquiryRouter from '@/api/inquiry'
 import lecturesRouter from '@/api/lectures'
 import myRouter from '@/api/my'
+import { oneAPI } from './one'
 import peperoSquareRouter from '@/api/pepero-square'
 import uploadRouter from '@/api/upload'
 import vacantRouter from '@/api/vacant'
-import Auth from '@/modules/auth'
-import express from 'express'
-import { oneAPI } from './one'
-import { OneApiError } from './one/scheme/types/utils'
 
 const router = express.Router()
 
@@ -23,7 +23,7 @@ eodiro API 2
 
 // Single end point for all APIs
 router.post('/one', async (req, res) => {
-  const { action, data } = req.body
+  const { action, data = {} } = req.body
   const { accesstoken: accessToken } = req.headers
 
   // If requested with an access token, verify firstly,
