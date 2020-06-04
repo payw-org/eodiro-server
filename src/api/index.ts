@@ -24,11 +24,12 @@ eodiro API 2
 // Single end point for all APIs
 router.post('/one', async (req, res) => {
   const { action, data = {} } = req.body
-  const { accesstoken: accessToken } = req.headers
 
   // If requested with an access token, verify firstly,
   // then pass auth payload to all of the actions universally
-  if (accessToken) {
+  if ('accesstoken' in req.headers) {
+    const accessToken = req.headers.accesstoken
+
     const authPayload = await Auth.isSignedUser(accessToken as string)
 
     if (!authPayload) {
