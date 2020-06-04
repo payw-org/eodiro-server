@@ -8,6 +8,7 @@ import { coverageMajorLecture } from './models/coverage_major_lecture'
 import { getBoard } from './models/board'
 import { getDevice } from './models/device'
 import { getFile } from './models/file'
+import { getNoticeNotificationsSubscription } from './models/notice_notifications_subscription'
 import { getPostFile } from './models/post_file'
 import { getUser } from './models/user'
 import { initPost } from './models/post'
@@ -43,6 +44,7 @@ async function sync(): Promise<void> {
   await (await coverageMajorLecture()).sync(alter)
   await (await inquiry()).sync(alter)
   await (await getDevice()).sync(alter)
+  await (await getNoticeNotificationsSubscription()).sync(alter)
 
   await (await Database.getSequelize()).close()
 }

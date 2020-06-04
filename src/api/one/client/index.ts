@@ -1,4 +1,3 @@
-import axios from 'axios'
 import {
   OneApiAction,
   AddDevice,
@@ -9,6 +8,8 @@ import {
   GetComments,
   GetDevices,
   GetMyPosts,
+  GetMySubscriptions,
+  GetNoticeCatalog,
   GetPostById,
   GetPostLikes,
   GetPostsOfBoard,
@@ -17,10 +18,13 @@ import {
   IsPostLiked,
   LikePost,
   SavePost,
+  UpdateNoticeSubscription,
   UploadComment,
   UploadPost,
 } from '../scheme'
-import { OneApiError, OneAPIPayload } from '../scheme/types/utils'
+import { OneAPIPayload, OneApiError } from '../scheme/types/utils'
+
+import axios from 'axios'
 
 // ** AUTOMATICALLY GENERATED FUNCTION OVERLOADINGS, DO NOT MODIFY HERE MANUALLY **
 export async function oneAPIClient(
@@ -57,6 +61,14 @@ export async function oneAPIClient(
 ): Promise<GetMyPosts['payload']>
 export async function oneAPIClient(
   host: string,
+  request: Omit<GetMySubscriptions, 'payload'>
+): Promise<GetMySubscriptions['payload']>
+export async function oneAPIClient(
+  host: string,
+  request: Omit<GetNoticeCatalog, 'payload'>
+): Promise<GetNoticeCatalog['payload']>
+export async function oneAPIClient(
+  host: string,
   request: Omit<GetPostById, 'payload'>
 ): Promise<GetPostById['payload']>
 export async function oneAPIClient(
@@ -89,6 +101,10 @@ export async function oneAPIClient(
 ): Promise<SavePost['payload']>
 export async function oneAPIClient(
   host: string,
+  request: Omit<UpdateNoticeSubscription, 'payload'>
+): Promise<UpdateNoticeSubscription['payload']>
+export async function oneAPIClient(
+  host: string,
   request: Omit<UploadComment, 'payload'>
 ): Promise<UploadComment['payload']>
 export async function oneAPIClient(
@@ -102,7 +118,7 @@ export async function oneAPIClient<T extends OneApiAction>(
 ): Promise<OneAPIPayload<T>> {
   let accessToken = ''
 
-  if ('accessToken' in request.data) {
+  if (request.data && 'accessToken' in request.data) {
     accessToken = request.data['accessToken']
     delete request.data['accessToken']
   }
