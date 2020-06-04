@@ -118,18 +118,22 @@ export async function oneAPIClient<T extends OneApiAction>(
 ): Promise<OneAPIPayload<T>> {
   let accessToken = ''
 
+  const headers = {}
+
   if (request.data && 'accessToken' in request.data) {
     accessToken = request.data['accessToken']
+
+    // Remove `accessToken` key from the data
     delete request.data['accessToken']
+    // Move the `accessToken` to headers
+    headers['accesstoken'] = accessToken
   }
 
   const { data }: { data: OneAPIPayload<T> } = await axios({
     url: `${host}/one`,
     method: 'POST',
     data: request,
-    headers: {
-      accessToken: accessToken || '',
-    },
+    headers,
   })
 
   if ('err' in data) {
