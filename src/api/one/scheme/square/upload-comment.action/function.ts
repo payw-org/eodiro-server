@@ -1,12 +1,12 @@
-import { CommentAttrs } from '@/database/models/comment'
-import { PostAttrs } from '@/database/models/post'
-import { getUser } from '@/database/models/user'
-import { TableNames } from '@/database/table-names'
-import Db from '@/db'
-import Auth from '@/modules/auth'
-import SqlB from '@/modules/sqlb'
-import Time from '@/modules/time'
 import { Action } from './interface'
+import Auth from '@/modules/auth'
+import { CommentAttrs } from '@/database/models/comment'
+import Db from '@/db'
+import { PostAttrs } from '@/database/models/post'
+import SqlB from '@/modules/sqlb'
+import { TableNames } from '@/database/table-names'
+import Time from '@/modules/time'
+import { getUser } from '@/database/models/user'
 
 export default async function (
   data: Action['data']
