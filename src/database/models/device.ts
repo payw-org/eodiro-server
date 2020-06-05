@@ -28,4 +28,8 @@ export const getDevice = createInitModelFunction(Device, 'device', {
     type: DataTypes.DATE,
     allowNull: false,
   },
+  activated_at: {
+    type: DataTypes.DATE,
+    allowNull: true,
+  },
 })
