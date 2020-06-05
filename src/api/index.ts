@@ -45,10 +45,20 @@ router.post('/one', async (req, res) => {
     data.accessToken = accessToken
   }
 
-  const payload = await oneAPI({
-    action,
-    data,
-  })
+  let payload: unknown
+
+  try {
+    payload = await oneAPI({
+      action,
+      data,
+    })
+  } catch (err) {
+    res.json({
+      err: 'Internal Server Error',
+      errMsg: err.message,
+    })
+    return
+  }
 
   if (!payload) {
     res.json({
