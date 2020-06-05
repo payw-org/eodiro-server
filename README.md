@@ -66,7 +66,7 @@ We have multiple periodic jobs. Those are including clearing pending users, garb
 
 **[One API (Deprecated in favor of GraphQL)](#One-API)**
 
-**GraphQL (WIP)**
+**GraphQL (Obsolete)**
 
 ---
 
