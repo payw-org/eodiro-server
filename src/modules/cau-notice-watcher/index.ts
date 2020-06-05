@@ -204,6 +204,10 @@ export class CauNoticeWatcher {
             to: pushToken,
             title: `새로운 ${subscriber.name} 공지사항이 올라왔습니다.`,
             body: notices[i],
+            data: {
+              type: 'notice',
+              url: subscriber.url,
+            },
           }))
         )
 
