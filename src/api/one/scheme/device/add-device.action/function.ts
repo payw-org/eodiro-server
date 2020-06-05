@@ -17,6 +17,8 @@ const func: OneApiFunction<Action> = async ({
     },
   })
 
+  const currentTime = Time.getIsoString()
+
   if (userDevice) {
     // Device already registered with the corresponding deviceId
     // Update
@@ -34,6 +36,7 @@ const func: OneApiFunction<Action> = async ({
           },
           deviceId,
           pushToken,
+          activatedAt: currentTime,
         },
       })
     } catch (err) {
@@ -53,7 +56,8 @@ const func: OneApiFunction<Action> = async ({
           },
           deviceId,
           pushToken,
-          registeredAt: Time.getIsoString(),
+          registeredAt: currentTime,
+          activatedAt: currentTime,
         },
       })
     } catch (err) {
