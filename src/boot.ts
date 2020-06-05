@@ -7,6 +7,7 @@ import chalk from 'chalk'
 import cors from 'cors'
 import express from 'express'
 import http from 'http'
+import prisma from './modules/prisma'
 
 const log = console.log
 
@@ -94,6 +95,7 @@ export async function boot(options: {
 
   function quit() {
     DbConnector.getConnConfident().destroy()
+    prisma.disconnect()
     if (server) {
       server.close()
     }
