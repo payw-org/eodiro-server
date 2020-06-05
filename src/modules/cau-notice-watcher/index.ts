@@ -3,10 +3,13 @@ import puppeteer, { Page } from 'puppeteer'
 import EodiroMailer from '../eodiro-mailer'
 import { JSDOM } from 'jsdom'
 import { PendingXHR } from 'pending-xhr-puppeteer'
+import Push from '../push'
 import appRoot from 'app-root-path'
 import chalk from 'chalk'
+import config from '@/config'
 import fs from 'fs'
 import { isDev } from '../utils/is-dev'
+import prisma from '../prisma'
 
 export type TitleBuilder = (
   /** A single notice item */ noticeItemElement: HTMLElement | Element
@@ -173,11 +176,36 @@ export class CauNoticeWatcher {
         }
 
         // Push Notifications
-        // await Push.notify({
-        //   to: config.TEST_EXPO_PUSH_TOKEN,
-        //   title: `새로운 ${subscriber.name} 공지사항이 올라왔습니다.`,
-        //   body: notices[i],
-        // })
+        const subscriptionsInfo = await prisma.noticeNotificationsSubscription.findMany(
+          {
+            where: {
+              noticeKey: subscriber.key,
+            },
+            include: {
+              user: {
+                select: {
+                  devices: true,
+                },
+              },
+            },
+          }
+        )
+
+        const pushTokens = subscriptionsInfo.reduce(
+          (accum, curr) => [
+            ...accum,
+            ...curr.user.devices.map((device) => device.pushToken),
+          ],
+          [] as string[]
+        )
+
+        await Push.notify(
+          pushTokens.map((pushToken) => ({
+            to: pushToken,
+            title: `새로운 ${subscriber.name} 공지사항이 올라왔습니다.`,
+            body: notices[i],
+          }))
+        )
 
         if (!isDev()) {
           this.sendMail(
