@@ -2,7 +2,9 @@ import { Action } from './interface'
 import { OneApiFunction } from '@/api/one/scheme/types/utils'
 import prisma from '@/modules/prisma'
 
-const func: OneApiFunction<Action> = async ({ userId }) => {
+const func: OneApiFunction<Action> = async ({ authPayload }) => {
+  const { userId } = authPayload
+
   const devices = await prisma.device.findMany({
     where: {
       userId,

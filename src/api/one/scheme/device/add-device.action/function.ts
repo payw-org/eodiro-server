@@ -5,10 +5,12 @@ import Time from '@/modules/time'
 import prisma from '@/modules/prisma'
 
 const func: OneApiFunction<Action> = async ({
-  userId,
+  authPayload,
   deviceId,
   pushToken,
 }) => {
+  const { userId } = authPayload
+
   const userDevice = await prisma.device.findOne({
     where: {
       deviceId,

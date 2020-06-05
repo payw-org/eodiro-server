@@ -1,11 +1,10 @@
-import { OneApiError } from '@/api/one/scheme/types/utils'
+import { AuthRequired, OneApiError } from '@/api/one/scheme/types/utils'
 
 export interface Action {
-  data: {
-    userId: number
+  data: AuthRequired<{
     deviceId: string
     pushToken: string
-  }
+  }>
   payload: {
     err: OneApiError
     errMeta?: any

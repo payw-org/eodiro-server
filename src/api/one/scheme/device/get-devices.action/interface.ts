@@ -1,10 +1,9 @@
+import { AuthOnly, OneApiError } from '@/api/one/scheme/types/utils'
+
 import { Device } from '@prisma/client'
-import { OneApiError } from '@/api/one/scheme/types/utils'
 
 export interface Action {
-  data: {
-    userId: number
-  }
+  data: AuthOnly
   payload: {
     err: OneApiError
     data: Device[]

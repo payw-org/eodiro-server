@@ -1,14 +1,14 @@
 import { Payload as AuthPayload } from '@/modules/jwt'
 import { OneApiAction } from '..'
 
-export type OnlyAuth = {
+export type AuthOnly = {
   accessToken: string
 }
 
 /**
  * Where the API requires the authentication
  */
-export type AuthRequired<T> = T & OnlyAuth
+export type AuthRequired<T> = T & AuthOnly
 
 /**
  * The basic form of One API action's interface
