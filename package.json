@@ -46,7 +46,7 @@
     "@payw/cau-cafeteria-menus-scraper": "^2.1.5",
     "@payw/cau-timetable-scraper": "^2.1.2",
     "@prisma/client": "^2.0.0-beta.8",
-    "apollo-server-express": "^2.14.0",
+    "apollo-server-express": "^2.14.2",
     "axios": "^0.19.2",
     "bcrypt": "^4.0.1",
     "body-parser": "^1.19.0",
