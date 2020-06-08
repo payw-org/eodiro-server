@@ -1,9 +1,9 @@
 import Db, { MysqlInsertOrUpdateResult } from '@/db'
 
 import SqlB from '@/modules/sqlb'
-;
 import { boot } from '@/boot'
-(async (): Promise<void> => {
+
+async function run(): Promise<void> {
   await boot({
     mail: false,
   })
@@ -14,4 +14,6 @@ import { boot } from '@/boot'
       })
       .build()
   )
-})()
+}
+
+run()

@@ -1,4 +1,4 @@
-export default function argv<T = {}>(): T {
+export default function argv<T = Record<string, unknown>>(): T {
   const args = {}
   const rawArgs = process.argv.slice(2, process.argv.length)
   rawArgs.forEach((arg: string, index) => {

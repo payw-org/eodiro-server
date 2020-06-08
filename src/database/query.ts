@@ -1,4 +1,3 @@
-import { SqlBInstance } from '@/modules/sqlb'
 import {
   Model,
   QueryOptions,
@@ -6,7 +5,9 @@ import {
   QueryOptionsWithType,
   QueryTypes,
 } from 'sequelize'
+
 import { Database } from './index'
+import { SqlBInstance } from '@/modules/sqlb'
 export { QueryTypes } from 'sequelize'
 
 /**
@@ -67,12 +68,12 @@ export function query<M extends Model>(
   options: QueryOptionsWithModel
 ): Promise<M[]>
 
-export function query<T extends object>(
+export function query<T extends Record<string, unknown>>(
   sql: string | SqlBInstance | { query: string; values: unknown[] },
   options: QueryOptionsWithType<QueryTypes.SELECT> & { plain: true }
 ): Promise<T>
 
-export function query<T extends object>(
+export function query<T extends Record<string, unknown>>(
   sql: string | SqlBInstance | { query: string; values: unknown[] },
   options: QueryOptionsWithType<QueryTypes.SELECT>
 ): Promise<T[]>
