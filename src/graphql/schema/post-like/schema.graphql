@@ -1,4 +1,0 @@
-type PostLike {
-  userId: Int
-  postId: Int
-}

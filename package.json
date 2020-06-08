@@ -7,6 +7,7 @@
   "author": "PAYW",
   "license": "MIT",
   "scripts": {
+    "lint": "eslint . --ext .ts,.tsx",
     "sync-db:prod": "ts-node -r tsconfig-paths/register src/database/sync.ts",
     "sync-db:dev": "cross-env NODE_ENV=development ts-node -r tsconfig-paths/register src/database/sync.ts",
     "ts-node:prod": "ts-node -r tsconfig-paths/register",
@@ -42,11 +43,14 @@
     "codegen": "graphql-codegen",
     "codegen:watch": "graphql-codegen --watch"
   },
+  "pre-commit": [
+    "lint",
+    "type-check"
+  ],
   "dependencies": {
     "@payw/cau-cafeteria-menus-scraper": "^2.1.5",
     "@payw/cau-timetable-scraper": "^2.1.2",
     "@prisma/client": "^2.0.0-beta.8",
-    "apollo-server-express": "^2.14.0",
     "axios": "^0.19.2",
     "bcrypt": "^4.0.1",
     "body-parser": "^1.19.0",
@@ -127,6 +131,7 @@
     "graphql-tools": "^6.0.3",
     "mocha": "^7.2.0",
     "npm-run-all": "^4.1.5",
+    "pre-commit": "^1.2.2",
     "prettier": "^2.0.5",
     "rimraf": "^3.0.2",
     "serve": "^11.3.1",

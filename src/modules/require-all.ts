@@ -1,6 +1,9 @@
 import fs from 'fs'
 
-function requireAll<T>(dir: string, filter: (fileName: string) => {}): T[] {
+function requireAll<T>(
+  dir: string,
+  filter: (fileName: string) => Record<string, unknown>
+): T[] {
   const modules = []
   const files = fs.readdirSync(dir)
   for (const fileName of files) {

@@ -1,15 +1,15 @@
 <h1 align="center">eodiro 🌏 server</h1>
-<p align="center">A Node.js server application that powers the <b><a href="https://github.com/paywteam/eodiro">eodiro</a></b></p>
+<p align="center">A Node.js server application that powers the <b><a href="https://github.com/payw-org/eodiro">eodiro</a></b></p>
 
 <p align="center">
-  <img src="https://img.shields.io/github/license/paywteam/eodiro-api2" />
-  <a href="https://github.com/paywteam/eodiro-api2/actions">
-    <img src="https://github.com/paywteam/eodiro-api2/workflows/ci/badge.svg" />
+  <img src="https://img.shields.io/github/license/payw-org/eodiro-server" />
+  <a href="https://github.com/payw-org/eodiro-server/actions">
+    <img src="https://github.com/payw-org/eodiro-server/workflows/ci/badge.svg" />
   </a>
-  <a href="https://github.com/paywteam/eodiro-api2/releases">
-    <img src="https://img.shields.io/github/v/release/paywteam/eodiro-api2?label=server" />
+  <a href="https://github.com/payw-org/eodiro-server/releases">
+    <img src="https://img.shields.io/github/v/release/payw-org/eodiro-server?label=server" />
   </a>
-  <a href="https://github.com/paywteam/eodiro-api2/tree/master/src/api/eodiro-one-api">
+  <a href="https://github.com/payw-org/eodiro-server/tree/master/src/api/eodiro-one-api">
     <img alt="npm" src="https://img.shields.io/npm/v/@payw/eodiro-one-api?label=one-api">
   </a>
   <a href="https://github.com/nodejs/node/blob/master/doc/changelogs/CHANGELOG_V13.md#13.10.1">
@@ -49,9 +49,9 @@ It uses MySQL internally as its database.
 
 ### Cron
 
-We have multiple periodic jobs. Those are including clearing pending users, garbage collecting dangling user-uploaded files, scraping data from websites and much more. Previously these jobs were running inside the main process through so called **node-cron**. Unfortunately we faced the issue([#41](https://github.com/paywteam/eodiro-server/issues/41)) where the headless browsers(Zombie.js and Puppeteer) leak memories on every browser instance creation. So, from `v2.1.0`, they are separated from the main process and moved to **cron**. This approach additionally provides few improvements as well as resolving the memory leak problem which is critical. They are now isolated and run in background even when the main server process got blocked or updating. It means that periodic jobs never halt and always achieve what they have to.
+We have multiple periodic jobs. Those are including clearing pending users, garbage collecting dangling user-uploaded files, scraping data from websites and much more. Previously these jobs were running inside the main process through so called **node-cron**. Unfortunately we faced the issue([#41](https://github.com/payw-org/eodiro-server/issues/41)) where the headless browsers(Zombie.js and Puppeteer) leak memories on every browser instance creation. So, from `v2.1.0`, they are separated from the main process and moved to **cron**. This approach additionally provides few improvements as well as resolving the memory leak problem which is critical. They are now isolated and run in background even when the main server process got blocked or updating. It means that periodic jobs never halt and always achieve what they have to.
 
-[Configuration](https://github.com/paywteam/eodiro-server/blob/master/src/scripts/crontab.sh)
+[Configuration](https://github.com/payw-org/eodiro-server/blob/master/src/scripts/crontab.sh)
 
 ---
 
@@ -64,15 +64,11 @@ We have multiple periodic jobs. Those are including clearing pending users, garb
 - [Vacant](#Vacant)
 - [Cafeteria](#Cafeteria)
 
-**[One API (Deprecated in favor of GraphQL)](#One-API)**
-
-**GraphQL (Obsolete)**
+**[One API](#One-API)**
 
 ---
 
 ## One API
-
-> Deprecated in favor of GraphQL which means there will be no more updates and all of the features provided by the One API will be replaced by GraphQL in the near future.
 
 Introducing a new way to create APIs on server side and to use them on client side.
 
@@ -111,7 +107,7 @@ oneAPIClient(
 
 TypeScript will automatically inference the types of request data and payload as you choose the action.
 
-**[Development Guide](https://github.com/paywteam/eodiro-api2/tree/master/src/api/one)**
+**[Development Guide](https://github.com/payw-org/eodiro-server/tree/master/src/api/one)**
 
 ---
 
@@ -252,26 +248,59 @@ We share some specific types across the APIs.
 | ---- | ------------------------ |
 | 204  | No menus data on the day |
 
-## LICENSE
+---
 
-MIT License
+## Dev Prerequisites
 
-Copyright (c) 2020 PAYW
+### Dev Tools
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+**Node >= 13**
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+**MySQL >= 8**
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+**Visual Studio Code**: We enforce you to use VSCode as an editor for developing the eodiro server.
+
+- **Essential Extensions**
+  - ESLint
+  - Prettier
+  - sort-imports
+  - Prisma
+
+### Config
+
+**eodiro**
+
+Duplicate `src/config/example.ts`, rename it to `index.ts` and fill the information with your environment values.
+
+**Prisma**
+
+Create `prisma/.env` and fill with your database information.
+
+```
+DATABASE_URL="mysql://username:password@address:3306/db_name"
+```
+
+## NPM Scripts
+
+You can run the scripts below by `npm run [script-name]`.
+
+**Application**
+
+- `dev`: Runs in development mode (listens at port `config.DEV_PORT`)
+- `build`: Generate JavaScript artifacts into `build` directory
+- `start`: Start the production server using the build outputs (listens at port `config.PORT`)
+
+**Database**
+
+- `sync-db:prod`: Syncs the database models with the database described in `config.DB_NAME`.
+- `sync-db:dev`: Same as the previous one but instead syncs with `config.DB_NAME_DEV`.
+
+**CDN**
+
+- `cdn:dev`: Starts the CDN server in development mode (listens at `config.CDN_DEV_PORT`)
+- `cdn`: Starts the CDN server in production mode (listens at `config.CDN_PORT`)
+
+**Prisma**
+
+- `introspect`: Looks up the database described in `prisma/.env` and generate a prisma schema file. **Never run this script unless there exists any changes in db models. And if you do run, open `prisma/schema.prisma` and format the file with the Prisma extension in VSCode.**
+- `generate`: Generates Prisma Client with `prisma/schema.prisma`. **Run this script before start developing.**

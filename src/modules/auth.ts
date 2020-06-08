@@ -1,9 +1,10 @@
-import { getUser } from '@/database/models/user'
+import Jwt, { Payload } from '@/modules/jwt'
+
 import EodiroEncrypt from '@/modules/eodiro-encrypt'
 import EodiroMailer from '@/modules/eodiro-mailer'
-import Jwt, { Payload } from '@/modules/jwt'
-import crypto from 'crypto'
 import Mustache from 'mustache'
+import crypto from 'crypto'
+import { getUser } from '@/database/models/user'
 import joinEmailTemplate from './eodiro-mailer/templates/join'
 
 export interface SignInInfo {
@@ -30,10 +31,7 @@ export default class Auth {
    * Legacy password encryption
    */
   static encryptPwLegacy(password: string): string {
-    return crypto
-      .createHash('sha256')
-      .update(password)
-      .digest('base64')
+    return crypto.createHash('sha256').update(password).digest('base64')
   }
 
   /**
@@ -190,7 +188,8 @@ export default class Auth {
   }
 
   static async signUp(info: SignUpInfo): Promise<boolean> {
-    let { portalId, password, nickname } = info
+    let { portalId, nickname } = info
+    const { password } = info
 
     if (!portalId || !password || !nickname) {
       return false
@@ -198,7 +197,6 @@ export default class Auth {
 
     // Trim information
     portalId = portalId.trim().toLowerCase()
-    password = password
     nickname = nickname.trim()
 
     // Check the validity of portal email
