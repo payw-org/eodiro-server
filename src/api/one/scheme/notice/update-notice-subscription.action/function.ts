@@ -14,37 +14,32 @@ const func: OneApiFunction<Action> = async (data) => {
     }
   }
 
-  const subscriptions = await prisma.noticeNotificationsSubscription.findMany({
-    where: {
-      userId,
-      noticeKey,
-    },
-  })
+  try {
+    const subscriptions = await prisma.noticeNotificationsSubscription.findMany(
+      {
+        where: {
+          userId,
+          noticeKey,
+        },
+      }
+    )
 
-  if (subscriptions.length !== 0) {
-    // Already subscribed with the notice key
-    try {
+    if (subscriptions.length !== 0) {
+      // Already subscribed with the notice key
       await prisma.noticeNotificationsSubscription.delete({
         where: {
           userId,
           noticeKey,
         },
       })
-    } catch (err) {
-      console.log(err)
-      return {
-        err: OneApiError.INTERNAL_SERVER_ERROR,
-      }
-    }
 
-    return {
-      err: null,
-      data: {
-        [noticeKey]: false,
-      },
-    }
-  } else {
-    try {
+      return {
+        err: null,
+        data: {
+          [noticeKey]: false,
+        },
+      }
+    } else {
       await prisma.noticeNotificationsSubscription.create({
         data: {
           user: {
@@ -56,18 +51,18 @@ const func: OneApiFunction<Action> = async (data) => {
           subscribedAt: Time.getIsoString(),
         },
       })
-    } catch (err) {
-      console.log(err)
+
       return {
-        err: OneApiError.INTERNAL_SERVER_ERROR,
+        err: null,
+        data: {
+          [noticeKey]: true,
+        },
       }
     }
-
+  } catch (err) {
+    console.log(err)
     return {
-      err: null,
-      data: {
-        [noticeKey]: true,
-      },
+      err: OneApiError.INTERNAL_SERVER_ERROR,
     }
   }
 }
