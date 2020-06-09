@@ -3,14 +3,14 @@ import { DataTypes, Model } from 'sequelize'
 import { PrimaryAIAttribute } from '../utils/model-attributes'
 import { createInitModelFunction } from '../create-init-model'
 
-class HoneyTip extends Model {
-  static topicDict: { [key: string]: string } = {
-    'example1': 'EX1',
-    'example2': 'EX2',
-  }
+export const topicDict: { [key: string]: string } = {
+  'example1': 'EX1',
+  'example2': 'EX2',
+}
 
+class HoneyTip extends Model {
   static getTopicDisplay(key: string): string {
-    return this.topicDict[key]
+    return topicDict[key]
   }
 }
 
