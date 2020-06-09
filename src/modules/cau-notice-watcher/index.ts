@@ -133,7 +133,11 @@ export class CauNoticeWatcher {
     })
 
     for (const subscriber of this.subscribers) {
-      await this.processSubscriber(page, subscriber)
+      try {
+        await this.processSubscriber(page, subscriber)
+      } catch (err) {
+        console.log(err)
+      }
     }
 
     // Dispose the page and the browser
@@ -166,12 +170,14 @@ export class CauNoticeWatcher {
       return
     }
 
-    const lastNoticeIndex = notices.indexOf(this.getLastNoticeTitle(subscriber))
+    const lastNoticeIndex = notices.findIndex(
+      (notice) => notice.title === this.getLastNoticeTitle(subscriber)
+    )
 
     if (lastNoticeIndex > 0) {
       for (let i = lastNoticeIndex - 1; i >= 0; i--) {
         if (isDev()) {
-          console.log(`새로운 ${subscriber.name} 공지사항이 올라왔습니다.`)
+          console.log(`\n새로운 ${subscriber.name} 공지사항이 올라왔습니다.`)
           console.log(notices[i])
         }
 
@@ -199,19 +205,21 @@ export class CauNoticeWatcher {
           [] as string[]
         )
 
-        await Push.notify(
-          pushTokens.map((pushToken) => ({
-            to: pushToken,
-            title: `새로운 ${subscriber.name} 공지사항이 올라왔습니다.`,
-            body: notices[i],
-            data: {
-              type: 'notice',
-              url: subscriber.url,
-            },
-          }))
-        )
-
+        // Send push or email only in production mode
         if (!isDev()) {
+          // Send push notifications
+          await Push.notify(
+            pushTokens.map((pushToken) => ({
+              to: pushToken,
+              title: `새로운 ${subscriber.name} 공지사항이 올라왔습니다.`,
+              body: notices[i].title,
+              data: {
+                type: 'notice',
+                url: notices[i].noticeItemUrl,
+              },
+            }))
+          )
+
           this.sendMail(
             `새로운 ${subscriber.name} 공지사항이 올라왔습니다.`,
             subscriber.url,
@@ -225,7 +233,7 @@ export class CauNoticeWatcher {
       }
     }
 
-    this.updateLastNotice(subscriber, notices[0])
+    this.updateLastNotice(subscriber, notices[0].title)
     this.writeLastNoticeFile()
   }
 
@@ -233,7 +241,12 @@ export class CauNoticeWatcher {
     page: Page,
     subscriber: Subscriber,
     pageNumber?: number
-  ): Promise<Set<string>> {
+  ): Promise<
+    {
+      title: string
+      noticeItemUrl: string
+    }[]
+  > {
     const pendingXHR = new PendingXHR(page)
 
     await page.goto(subscriber.url)
@@ -244,12 +257,22 @@ export class CauNoticeWatcher {
 
     const body = new JSDOM(bodyHtml).window.document.body
 
-    const notices: Set<string> = new Set()
+    const notices: {
+      title: string
+      noticeItemUrl: string
+    }[] = []
     const noticeElms = body.querySelectorAll(subscriber.noticeItemSelector)
 
     for (const noticeElm of Array.from(noticeElms)) {
       const title = subscriber.titleBuilder(noticeElm)
-      notices.add(title)
+      const noticeItemUrl = subscriber.urlBuilder
+        ? subscriber.urlBuilder(noticeElm)
+        : subscriber.url
+
+      notices.push({
+        title,
+        noticeItemUrl,
+      })
     }
 
     return notices
