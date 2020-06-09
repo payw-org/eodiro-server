@@ -3,10 +3,10 @@ import { DataTypes, Model } from 'sequelize'
 import { PrimaryAIAttribute } from '../utils/model-attributes'
 import { createInitModelFunction } from '../create-init-model'
 
-class Archive extends Model {
+class HoneyTip extends Model {
   static topicDict: { [key: string]: string } = {
-    'tips': '꿀팁 게시판',
-    'interview': '면접 후기',
+    'example1': 'EX1',
+    'example2': 'EX2',
   }
 
   static getTopicDisplay(key: string): string {
@@ -14,11 +14,11 @@ class Archive extends Model {
   }
 }
 
-export const getArchive = createInitModelFunction(Archive, 'archive', {
+export const getHoneyTip = createInitModelFunction(HoneyTip, 'honey_tip', {
   id: PrimaryAIAttribute,
   topic: {
     type: DataTypes.ENUM,
-    values: ['tips', 'interview'],
+    values: ['example1', 'etexample2'],
   },
   user_id: {
     type: DataTypes.INTEGER,
