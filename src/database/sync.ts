@@ -5,10 +5,10 @@ import { changePassword } from './models/change_password'
 import { comment } from './models/comment'
 import { coverageMajor } from './models/coverage_major'
 import { coverageMajorLecture } from './models/coverage_major_lecture'
-import { getArchive } from './models/archive'
 import { getBoard } from './models/board'
 import { getDevice } from './models/device'
 import { getFile } from './models/file'
+import { getHoneyTip } from './models/honey_tip'
 import { getNoticeNotificationsSubscription } from './models/notice_notifications_subscription'
 import { getPostFile } from './models/post_file'
 import { getUser } from './models/user'
@@ -38,7 +38,7 @@ async function sync(): Promise<void> {
   await (await getPostFile()).sync(alter)
   await (await initPostLike()).sync(alter)
   await (await comment()).sync(alter)
-  await (await getArchive()).sync(alter)
+  await (await getHoneyTip()).sync(alter)
   await (await cafeteriaMenu()).sync(alter)
   await (await coverageMajor()).sync(alter)
   await (await lecture()).sync(alter)

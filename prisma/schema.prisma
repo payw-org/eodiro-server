@@ -14,23 +14,6 @@ model Admin {
   @@map(name: "admin")
 }
 
-model Archive {
-  body            String
-  createdAt      DateTime? @map(name: "created_at")
-  editedAt       DateTime? @map(name: "edited_at")
-  id              Int            @default(autoincrement()) @id
-  isRemoved      Boolean?       @default(false) @map(name: "is_removed")
-  isStarred      Boolean?       @default(false) @map(name: "is_starred")
-  randomNickname String @map(name: "random_nickname")
-  title           String
-  topic           archive_topic?
-  userId         Int @map(name: "user_id")
-  user User @relation(fields: [userId], references: [id])
-
-  @@index([userId], name: "user_id")
-  @@map(name: "archive")
-}
-
 model Board {
   boardName String @unique @map(name: "board_name")
   id         Int    @default(autoincrement()) @id
@@ -116,6 +99,23 @@ model File {
   postFiles PostFile[]
 
   @@map(name: "file")
+}
+
+model HoneyTip {
+  body            String
+  createdAt      DateTime? @map(name: "created_at")
+  editedAt       DateTime? @map(name: "edited_at")
+  id              Int              @default(autoincrement()) @id
+  isRemoved      Boolean?         @default(false) @map(name: "is_removed")
+  isStarred      Boolean?         @default(false) @map(name: "is_starred")
+  randomNickname String @map(name: "random_nickname")
+  title           String
+  topic           honey_tip_topic?
+  userId         Int @map(name: "user_id")
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId], name: "user_id")
+  @@map(name: "honey_tip")
 }
 
 model Inquiry {
@@ -258,10 +258,10 @@ model User {
   randomNickname                   String @map(name: "random_nickname")
   registeredAt                     DateTime @map(name: "registered_at")
   admins Admin[]
-  archives Archive[]
   changePasswords ChangePassword[]
   comments Comment[]
   devices Device[]
+  honeyTips HoneyTip[]
   inquiries Inquiry[]
   noticeNotificationsSubscriptions NoticeNotificationsSubscription[]
   posts Post[]
@@ -272,7 +272,7 @@ model User {
   @@map(name: "user")
 }
 
-enum archive_topic {
-  tips
-  interview
+enum honey_tip_topic {
+  example1
+  etexample2
 }
