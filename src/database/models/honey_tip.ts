@@ -4,8 +4,9 @@ import { PrimaryAIAttribute } from '../utils/model-attributes'
 import { createInitModelFunction } from '../create-init-model'
 
 export const topicDict: { [key: string]: string } = {
-  'example1': 'EX1',
-  'example2': 'EX2',
+  'school': '학교생활',
+  'interview': '면접',
+  'etc': '기타',
 }
 
 class HoneyTip extends Model {
@@ -18,7 +19,7 @@ export const getHoneyTip = createInitModelFunction(HoneyTip, 'honey_tip', {
   id: PrimaryAIAttribute,
   topic: {
     type: DataTypes.ENUM,
-    values: ['example1', 'etexample2'],
+    values: ['school', 'interview', 'etc'],
   },
   user_id: {
     type: DataTypes.INTEGER,
