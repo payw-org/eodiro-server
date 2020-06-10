@@ -8,9 +8,9 @@ import { coverageMajorLecture } from './models/coverage_major_lecture'
 import { getBoard } from './models/board'
 import { getDevice } from './models/device'
 import { getFile } from './models/file'
-import { getHoneyTip } from './models/honey_tip'
 import { getNoticeNotificationsSubscription } from './models/notice_notifications_subscription'
 import { getPostFile } from './models/post_file'
+import { getTip } from './models/tip'
 import { getUser } from './models/user'
 import { initPost } from './models/post'
 import { initPostLike } from './models/post_like'
@@ -38,7 +38,7 @@ async function sync(): Promise<void> {
   await (await getPostFile()).sync(alter)
   await (await initPostLike()).sync(alter)
   await (await comment()).sync(alter)
-  await (await getHoneyTip()).sync(alter)
+  await (await getTip()).sync(alter)
   await (await cafeteriaMenu()).sync(alter)
   await (await coverageMajor()).sync(alter)
   await (await lecture()).sync(alter)

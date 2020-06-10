@@ -32,4 +32,4 @@ export { default as isPostLiked } from './square/like/is-post-liked.action/funct
 export { default as likePost } from './square/like/like-post.action/function'
 export { default as savePost } from './square/save-post.action/function'
 export { default as uploadComment } from './square/upload-comment.action/function'
-export { default as getHoneyTipTopics } from './honey_tip/get-topics.action/function'
+export { default as getTipTopics } from './honey_tip/get-topics.action/function'

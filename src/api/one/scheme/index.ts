@@ -18,7 +18,6 @@ import { Action as EditPostRaw } from './square/edit-post.action/interface'
 import { Action as GetBoardIdRaw } from './square/get-board-id.action/interface'
 import { Action as GetCommentsRaw } from './square/get-comments.action/interface'
 import { Action as GetDevicesRaw } from './device/get-devices.action/interface'
-import { Action as GetHoneyTipTopicRaw } from './honey_tip/get-topics.action/interface'
 import { Action as GetMyPostsRaw } from './my/get-my-posts.action/interface'
 import { Action as GetMySubscriptionsRaw } from './notice/get-my-subscriptions.action/interface'
 import { Action as GetNoticeCatalogRaw } from './notice/get-notice-catalog.action/interface'
@@ -26,6 +25,7 @@ import { GetPostById } from './square/get-post-by-id'
 import { Action as GetPostLikesRaw } from './square/like/get-post-likes.action/interface'
 import { Action as GetPostsOfBoardRaw } from './square/get-posts-of-board.action/interface'
 import { Action as GetRecentPostsOfBoardRaw } from './square/get-recent-posts-of-board.action/interface'
+import { Action as GetTipTopicRaw } from './honey_tip/get-topics.action/interface'
 import { Action as GetUserIdRaw } from './auth/get-user-id.action/interface'
 import { Action as IsPostLikedRaw } from './square/like/is-post-liked.action/interface'
 import { Action as LikePostRaw } from './square/like/like-post.action/interface'
@@ -81,8 +81,8 @@ export type SavePost = SavePostRaw & { action: 'savePost' }
 
 export type UploadComment = UploadCommentRaw & { action: 'uploadComment' }
 
-export type GetHoneyTipTopics = GetHoneyTipTopicRaw & {
-  action: 'getHoneyTipTopics'
+export type GetTipTopics = GetTipTopicRaw & {
+  action: 'getTipTopics'
 }
 
 export type OneApiAction =
@@ -107,4 +107,4 @@ export type OneApiAction =
   | LikePost
   | SavePost
   | UploadComment
-  | GetHoneyTipTopics
+  | GetTipTopics
