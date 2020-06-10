@@ -287,8 +287,10 @@ You can run the scripts below by `npm run [script-name]`.
 **Application**
 
 - `dev`: Runs in development mode (listens at port `config.DEV_PORT`)
+  - `--nomail`: Use this argument if you want to bootstrap the application without an email feature
 - `build`: Generate JavaScript artifacts into `build` directory
 - `start`: Start the production server using the build outputs (listens at port `config.PORT`)
+  - `--nomail`: Same as above
 
 **Database**
 
