@@ -101,23 +101,6 @@ model File {
   @@map("file")
 }
 
-model HoneyTip {
-  body           String
-  createdAt      DateTime?        @map("created_at")
-  editedAt       DateTime?        @map("edited_at")
-  id             Int              @default(autoincrement()) @id
-  isRemoved      Boolean?         @default(false) @map("is_removed")
-  isStarred      Boolean?         @default(false) @map("is_starred")
-  randomNickname String           @map("random_nickname")
-  title          String
-  topic          honey_tip_topic?
-  userId         Int              @map("user_id")
-  user           User             @relation(fields: [userId], references: [id])
-
-  @@index([userId], name: "user_id")
-  @@map("honey_tip")
-}
-
 model Inquiry {
   answer     String?
   answeredAt DateTime? @map("answered_at")
@@ -278,7 +261,6 @@ model User {
   changePasswords                  ChangePassword[]
   comments                         Comment[]
   devices                          Device[]
-  honeyTips                        HoneyTip[]
   inquiries                        Inquiry[]
   noticeNotificationsSubscriptions NoticeNotificationsSubscription[]
   posts                            Post[]
@@ -288,12 +270,6 @@ model User {
 
   @@index([portalId], name: "user_portal_id")
   @@map("user")
-}
-
-enum honey_tip_topic {
-  school
-  interview
-  etc
 }
 
 enum tip_topic {
