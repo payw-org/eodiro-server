@@ -1,6 +1,6 @@
 import { Action } from './interface'
 import { OneApiFunction } from '../../types/utils'
-import { topicDict } from '@/database/models/honey_tip'
+import { topicDict } from '@/database/models/tip'
 
 const func: OneApiFunction<Action> = async () => {
   return {

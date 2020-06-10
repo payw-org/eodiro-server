@@ -9,13 +9,13 @@ export const topicDict: { [key: string]: string } = {
   'etc': '기타',
 }
 
-class HoneyTip extends Model {
+class Tip extends Model {
   static getTopicDisplay(key: string): string {
     return topicDict[key]
   }
 }
 
-export const getHoneyTip = createInitModelFunction(HoneyTip, 'honey_tip', {
+export const getTip = createInitModelFunction(Tip, 'tip', {
   id: PrimaryAIAttribute,
   topic: {
     type: DataTypes.ENUM,
