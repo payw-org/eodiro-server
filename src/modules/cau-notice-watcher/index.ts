@@ -222,7 +222,8 @@ export class CauNoticeWatcher {
 
           this.sendMail(
             `새로운 ${subscriber.name} 공지사항이 올라왔습니다.`,
-            subscriber.url,
+            `${notices[i].title}
+${notices[i].noticeItemUrl}`,
             subscriber
           )
         }
