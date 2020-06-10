@@ -12,6 +12,7 @@
  */
 
 import { Action as AddDeviceRaw } from './device/add-device.action/interface'
+import { Action as CreateTipRaw } from './tip/create-tip.action/interface'
 import { Action as DeleteCommentRaw } from './square/delete-comment.action/interface'
 import { Action as DeletePostRaw } from './square/delete-post.action/interface'
 import { Action as EditPostRaw } from './square/edit-post.action/interface'
@@ -85,6 +86,8 @@ export type GetTipTopics = GetTipTopicRaw & {
   action: 'getTipTopics'
 }
 
+export type CreateTip = CreateTipRaw & { action: 'createTip' }
+
 export type OneApiAction =
   | GetPostById
   | UploadPost
@@ -108,3 +111,4 @@ export type OneApiAction =
   | SavePost
   | UploadComment
   | GetTipTopics
+  | CreateTip
