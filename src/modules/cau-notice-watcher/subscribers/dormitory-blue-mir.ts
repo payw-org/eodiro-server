@@ -1,5 +1,7 @@
 import { Subscriber } from '..'
 
+// TODO: urlBuilder
+
 export const dormitoryBlueMir: Subscriber = {
   name: '생활관(블루미르홀)',
   key: 'dormitory-blue-mir',
