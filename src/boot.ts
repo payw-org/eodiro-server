@@ -56,7 +56,7 @@ export async function boot(options: {
     log(`[ ${chalk.green('DB')} ] skip db connection`)
   }
 
-  if (mail && process.env.NODE_ENV !== 'development') {
+  if (mail && process.env.npm_config_nomail !== 'true') {
     // Connect to Zoho mail server
     const isMailServerConnected = await EodiroMailer.verify()
 
