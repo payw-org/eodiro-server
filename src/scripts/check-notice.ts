@@ -17,12 +17,6 @@ async function run() {
 
   await feed.run()
 
-  // await EodiroMailer.sendMail({
-  //   to: 'contact@payw.org',
-  //   subject: '[eodiro] Checked CAU notice',
-  //   html: '',
-  // })
-
   quit()
 }
 
