@@ -1,12 +1,13 @@
-import { getStoragePath } from '@/cdn/get-storage-path'
-import { availableMimeTypes } from '@/config/available-mime-types'
-import { eodiroQuery, EodiroQueryType } from '@/database/eodiro-query'
+import { EodiroQueryType, eodiroQuery } from '@/database/eodiro-query'
+
 import { FileType } from '@/database/models/file'
-import { TableNames } from '@/database/table-names'
 import SqlB from '@/modules/sqlb'
+import { TableNames } from '@/database/table-names'
+import { availableMimeTypes } from '@/config/available-mime-types'
 import dayjs from 'dayjs'
 import express from 'express'
 import fs from 'fs'
+import { getStoragePath } from '@/cdn/get-storage-path'
 import multer from 'multer'
 import { v4 as uuidv4 } from 'uuid'
 
@@ -17,6 +18,10 @@ const publicContentUrl = 'public-user-content'
 router.post('/upload', async (req, res) => {
   upload(req, res, async (err) => {
     const storagePath = getStoragePath()
+
+    if (!fs.existsSync(storagePath)) {
+      fs.mkdirSync(storagePath)
+    }
 
     const files = Array.from(req.files as Express.Multer.File[])
     const result = [] as {
