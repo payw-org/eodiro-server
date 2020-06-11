@@ -3,6 +3,11 @@ import { DataTypes, Model } from 'sequelize'
 import { PrimaryAIAttribute } from '../utils/model-attributes'
 import { createInitModelFunction } from '../create-init-model'
 
+export type TipTopic = {
+  key: string
+  value: string
+}
+
 export const topicDict: { [key: string]: string } = {
   'school': '학교생활',
   'interview': '면접',

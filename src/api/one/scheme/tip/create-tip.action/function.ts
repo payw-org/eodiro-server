@@ -4,7 +4,7 @@ import Time from '@/modules/time'
 import prisma from '@/modules/prisma'
 
 const func: OneApiFunction<Action> = async (data) => {
-  const { authPayload, title, body } = data
+  const { authPayload, title, topic, body } = data
   const { userId } = authPayload
 
   const currentTime = Time.getIsoString()
@@ -22,9 +22,11 @@ const func: OneApiFunction<Action> = async (data) => {
         },
       },
       title,
+      topic,
       body,
       randomNickname: user.randomNickname,
       createdAt: currentTime,
+      editedAt: currentTime,
     },
   })
 
