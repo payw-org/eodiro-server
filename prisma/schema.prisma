@@ -245,9 +245,21 @@ model Tip {
   topic          tip_topic?
   userId         Int        @map("user_id")
   user           User       @relation(fields: [userId], references: [id])
+  tipLikes       TipLike[]
 
   @@index([userId], name: "user_id")
   @@map("tip")
+}
+
+model TipLike {
+  tipId  Int  @map("tip_id")
+  userId Int  @map("user_id")
+  tip    Tip  @relation(fields: [tipId], references: [id])
+  user   User @relation(fields: [userId], references: [id])
+
+  @@id([userId, tipId])
+  @@index([tipId], name: "tip_id")
+  @@map("tip_like")
 }
 
 model User {
@@ -267,6 +279,7 @@ model User {
   postLikes                        PostLike[]
   refreshTokens                    RefreshToken[]
   tips                             Tip[]
+  tipLikes                         TipLike[]
 
   @@index([portalId], name: "user_portal_id")
   @@map("user")
