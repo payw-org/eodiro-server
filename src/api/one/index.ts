@@ -1,7 +1,8 @@
-import { Payload } from '@/modules/jwt'
-import { OneApiAction } from './scheme'
 import * as funcs from './scheme/functions'
+
 import { OneAPIPayload } from './scheme/types/utils'
+import { OneApiAction } from './scheme'
+import { Payload } from '@/modules/jwt'
 
 const apiFunctions: Record<
   OneApiAction['action'],

@@ -1,6 +1,5 @@
-import { OneApiError, OneApiFunction } from '@/api/one/scheme/types/utils'
-
 import { Action } from './interface'
+import { OneApiFunction } from '@/api/one/scheme/types/utils'
 import Time from '@/modules/time'
 import prisma from '@/modules/prisma'
 
@@ -11,62 +10,34 @@ const func: OneApiFunction<Action> = async ({
 }) => {
   const { userId } = authPayload
 
-  const userDevice = await prisma.device.findOne({
+  const currentTime = Time.getIsoString()
+
+  await prisma.device.upsert({
     where: {
       deviceId,
     },
+    update: {
+      user: {
+        connect: {
+          id: userId,
+        },
+      },
+      deviceId,
+      pushToken,
+      activatedAt: currentTime,
+    },
+    create: {
+      user: {
+        connect: {
+          id: userId,
+        },
+      },
+      deviceId,
+      pushToken,
+      registeredAt: currentTime,
+      activatedAt: currentTime,
+    },
   })
-
-  const currentTime = Time.getIsoString()
-
-  if (userDevice) {
-    // Device already registered with the corresponding deviceId
-    // Update
-
-    try {
-      await prisma.device.update({
-        where: {
-          deviceId,
-        },
-        data: {
-          user: {
-            connect: {
-              id: userId,
-            },
-          },
-          deviceId,
-          pushToken,
-          activatedAt: currentTime,
-        },
-      })
-    } catch (err) {
-      return {
-        err: OneApiError.BAD_REQUEST,
-        errMeta: err.meta,
-      }
-    }
-  } else {
-    try {
-      await prisma.device.create({
-        data: {
-          user: {
-            connect: {
-              id: userId,
-            },
-          },
-          deviceId,
-          pushToken,
-          registeredAt: currentTime,
-          activatedAt: currentTime,
-        },
-      })
-    } catch (err) {
-      return {
-        err: OneApiError.BAD_REQUEST,
-        errMeta: err.meta,
-      }
-    }
-  }
 
   return {
     err: null,
