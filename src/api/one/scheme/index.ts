@@ -26,6 +26,7 @@ import { GetPostById } from './square/get-post-by-id'
 import { Action as GetPostLikesRaw } from './square/like/get-post-likes.action/interface'
 import { Action as GetPostsOfBoardRaw } from './square/get-posts-of-board.action/interface'
 import { Action as GetRecentPostsOfBoardRaw } from './square/get-recent-posts-of-board.action/interface'
+import { Action as GetTipRaw } from './tip/get-tip-detail.action/interface'
 import { Action as GetTipTopicRaw } from './tip/get-topics.action/interface'
 import { Action as GetUserIdRaw } from './auth/get-user-id.action/interface'
 import { Action as IsPostLikedRaw } from './square/like/is-post-liked.action/interface'
@@ -87,6 +88,7 @@ export type GetTipTopics = GetTipTopicRaw & {
 }
 
 export type CreateTip = CreateTipRaw & { action: 'createTip' }
+export type GetTip = GetTipRaw & { action: 'getTip' }
 
 export type OneApiAction =
   | GetPostById
@@ -112,3 +114,4 @@ export type OneApiAction =
   | UploadComment
   | GetTipTopics
   | CreateTip
+  | GetTip
