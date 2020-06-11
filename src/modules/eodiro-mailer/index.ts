@@ -26,6 +26,8 @@ export default class EodiroMailer {
     },
   })
 
+  private static isReady = false
+
   static async verify(): Promise<boolean> {
     return new Promise((resolve) => {
       this.transporter.verify((err) => {
@@ -35,6 +37,7 @@ export default class EodiroMailer {
           resolve(false)
         } else {
           log(`[ ${chalk.yellow('email')} ] connected to zoho mail server`)
+          this.isReady = true
           resolve(true)
         }
       })
@@ -42,6 +45,10 @@ export default class EodiroMailer {
   }
 
   static async sendMail(options: MailOption): Promise<any> {
+    if (!this.isReady) {
+      log(`[ ${chalk.yellow('email')} ] not connected to an email server`)
+    }
+
     return await this.transporter.sendMail({
       from: '"어디로" <support@eodiro.com>',
       ...options,
