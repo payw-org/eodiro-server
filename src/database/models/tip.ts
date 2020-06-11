@@ -9,6 +9,18 @@ export const topicDict: { [key: string]: string } = {
   'etc': '기타',
 }
 
+export type TipAttrs = {
+  id: number
+  topic: string
+  user_id: number
+  title: string
+  body: string
+  random_nickname: string
+  is_starred: boolean
+  created_at: string
+  edited_at: string
+}
+
 class Tip extends Model {
   static getTopicDisplay(key: string): string {
     return topicDict[key]
