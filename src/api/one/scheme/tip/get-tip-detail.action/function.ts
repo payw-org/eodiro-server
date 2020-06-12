@@ -11,6 +11,9 @@ const func: OneApiFunction<Action> = async (data) => {
       where: {
         id: tipId,
       },
+      include: {
+        tipLikes: true,
+      },
     })
     if (tip === null) {
       return {
@@ -19,9 +22,14 @@ const func: OneApiFunction<Action> = async (data) => {
       }
     }
 
+    const tipWithTipLikesCount = {
+      ...tip,
+      tipLikes: tip.tipLikes.length,
+    }
+
     return {
       err: null,
-      data: tip,
+      data: tipWithTipLikesCount,
     }
   } catch (err) {
     return {
