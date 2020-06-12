@@ -140,6 +140,19 @@ model Lecture {
   @@map(name: "lecture")
 }
 
+model LiveChat {
+  createdAt      DateTime @map(name: "created_at")
+  id             Int      @default(autoincrement())
+  message        String
+  randomNickname String   @map(name: "random_nickname")
+  userId         Int      @map(name: "user_id")
+  user           User     @relation(fields: [userId], references: [id])
+
+  @@id([id, userId])
+  @@index([userId], name: "user_id")
+  @@map(name: "live_chat")
+}
+
 model NoticeNotificationsSubscription {
   id           Int      @default(autoincrement()) @id
   noticeKey    String   @map(name: "notice_key")
@@ -233,6 +246,35 @@ model RefreshToken {
   @@map(name: "refresh_token")
 }
 
+model Tip {
+  body           String
+  createdAt      DateTime?  @map(name: "created_at")
+  editedAt       DateTime?  @map(name: "edited_at")
+  id             Int        @default(autoincrement()) @id
+  isRemoved      Boolean?   @default(false) @map(name: "is_removed")
+  isStarred      Boolean?   @default(false) @map(name: "is_starred")
+  randomNickname String     @map(name: "random_nickname")
+  title          String
+  topic          tip_topic?
+  userId         Int        @map(name: "user_id")
+  user           User       @relation(fields: [userId], references: [id])
+  tipLikes       TipLike[]
+
+  @@index([userId], name: "user_id")
+  @@map(name: "tip")
+}
+
+model TipLike {
+  tipId  Int  @map(name: "tip_id")
+  userId Int  @map(name: "user_id")
+  tip    Tip  @relation(fields: [tipId], references: [id])
+  user   User @relation(fields: [userId], references: [id])
+
+  @@id([userId, tipId])
+  @@index([tipId], name: "tip_id")
+  @@map(name: "tip_like")
+}
+
 model User {
   id                               Int                               @default(autoincrement()) @id
   nickname                         String
@@ -245,11 +287,20 @@ model User {
   comments                         Comment[]
   devices                          Device[]
   inquiries                        Inquiry[]
+  liveChats                        LiveChat[]
   noticeNotificationsSubscriptions NoticeNotificationsSubscription[]
   posts                            Post[]
   postLikes                        PostLike[]
   refreshTokens                    RefreshToken[]
+  tips                             Tip[]
+  tipLikes                         TipLike[]
 
   @@index([portalId], name: "user_portal_id")
   @@map(name: "user")
+}
+
+enum tip_topic {
+  school
+  interview
+  etc
 }
