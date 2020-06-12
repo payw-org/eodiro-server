@@ -1,17 +1,18 @@
 import { DataTypes, Model } from 'sequelize'
 
+import { PrimaryAIAttribute } from '../utils/model-attributes'
 import { createInitModelFunction } from '../create-init-model'
 
 export type TipLikeAttrs = {
+  id: number
   user_id: number
   tip_id: number
 }
 
-export class TipLike extends Model {
-  static tableName = 'tip_like'
-}
+export class TipLike extends Model {}
 
-export const getTipLike = createInitModelFunction(TipLike, TipLike.tableName, {
+export const getTipLike = createInitModelFunction(TipLike, 'tip_like', {
+  id: PrimaryAIAttribute,
   user_id: {
     primaryKey: true,
     type: DataTypes.INTEGER,
