@@ -15,9 +15,9 @@ const func: OneApiFunction<Action> = async (data) => {
   })
 
   if (bookmark.length === 0) {
-    isBookmarked = await Tip.like(userId, tipId)
+    isBookmarked = await Tip.bookmark(userId, tipId)
   } else {
-    isBookmarked = await Tip.unlike(userId, tipId)
+    isBookmarked = await Tip.cancelBookmark(userId, tipId)
   }
 
   return {
