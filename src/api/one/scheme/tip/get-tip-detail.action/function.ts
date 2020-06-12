@@ -1,6 +1,7 @@
 import { OneApiError, OneApiFunction } from '@/api/one/scheme/types/utils'
 
 import { Action } from './interface'
+import { TipResponse } from '@/database/models/tip'
 import prisma from '@/modules/prisma'
 
 const func: OneApiFunction<Action> = async (data) => {
@@ -13,6 +14,7 @@ const func: OneApiFunction<Action> = async (data) => {
       },
       include: {
         tipLikes: true,
+        tipBookmarks: true,
       },
     })
     if (tip === null) {
@@ -22,14 +24,15 @@ const func: OneApiFunction<Action> = async (data) => {
       }
     }
 
-    const tipWithTipLikesCount = {
+    const tipResponse: TipResponse = {
       ...tip,
       tipLikes: tip.tipLikes.length,
+      tipBookmarks: tip.tipBookmarks.length,
     }
 
     return {
       err: null,
-      data: tipWithTipLikesCount,
+      data: tipResponse,
     }
   } catch (err) {
     return {
