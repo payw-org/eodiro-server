@@ -1,6 +1,6 @@
 import { Action } from './interface'
 import { OneApiFunction } from '@/api/one/scheme/types/utils'
-import { TipResponse } from '@/database/models/tip'
+import { TipListResponse } from '@/database/models/tip'
 import prisma from '@/modules/prisma'
 
 const func: OneApiFunction<Action> = async (data) => {
@@ -23,10 +23,12 @@ const func: OneApiFunction<Action> = async (data) => {
   })
 
   const tips = tipList.map((item) => {
-    const response: TipResponse = {
+    const response: TipListResponse = {
       ...item,
       tipLikes: item.tipLikes.length,
       tipBookmarks: item.tipBookmarks.length,
+      isLiked: true,
+      isBookmarked: true,
     }
     return response
   })

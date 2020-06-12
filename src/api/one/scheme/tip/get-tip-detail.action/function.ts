@@ -28,6 +28,8 @@ const func: OneApiFunction<Action> = async (data) => {
       ...tip,
       tipLikes: tip.tipLikes.length,
       tipBookmarks: tip.tipBookmarks.length,
+      isLiked: true,
+      isBookmarked: true,
     }
 
     return {

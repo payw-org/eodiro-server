@@ -21,6 +21,8 @@ export type TipResponse = {
   isArchived: boolean
   createdAt: Date
   editedAt: Date
+  isLiked: boolean
+  isBookmarked: boolean
   tipLikes: number
   tipBookmarks: number
 }
@@ -33,6 +35,8 @@ export type TipListResponse = {
   isArchived: boolean
   createdAt: Date
   editedAt: Date
+  isLiked: boolean
+  isBookmarked: boolean
   tipLikes: number
   tipBookmarks: number
 }

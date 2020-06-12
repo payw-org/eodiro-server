@@ -1,5 +1,5 @@
 import { OneApiError } from '@/api/one/scheme/types/utils'
-import { TipResponse } from '@/database/models/tip'
+import { TipListResponse } from '@/database/models/tip'
 import { TipTopic } from '@prisma/client'
 
 export interface Action {
@@ -10,7 +10,7 @@ export interface Action {
   payload: {
     err: OneApiError
     data: {
-      tips: TipResponse[]
+      tips: TipListResponse[]
       totalCount: number
     }
   }
