@@ -80,11 +80,17 @@ export type SavePost = SavePostRaw & { action: 'savePost' }
 import { Action as UploadCommentRaw } from './square/upload-comment.action/interface'
 export type UploadComment = UploadCommentRaw & { action: 'uploadComment' }
 
+import { Action as BookmarkTipRaw } from './tip/bookmark-tip.action/interface'
+export type BookmarkTip = BookmarkTipRaw & { action: 'bookmarkTip' }
+
 import { Action as CreateTipRaw } from './tip/create-tip.action/interface'
 export type CreateTip = CreateTipRaw & { action: 'createTip' }
 
 import { Action as GetTipDetailRaw } from './tip/get-tip-detail.action/interface'
 export type GetTipDetail = GetTipDetailRaw & { action: 'getTipDetail' }
+
+import { Action as GetTipsRaw } from './tip/get-tips.action/interface'
+export type GetTips = GetTipsRaw & { action: 'getTips' }
 
 import { Action as GetTopicsRaw } from './tip/get-topics.action/interface'
 export type GetTopics = GetTopicsRaw & { action: 'getTopics' }
@@ -114,7 +120,9 @@ export type OneApiAction =
   | LikePost
   | SavePost
   | UploadComment
+  | BookmarkTip
   | CreateTip
   | GetTipDetail
+  | GetTips
   | GetTopics
   | LikeTip
