@@ -8,6 +8,7 @@ import cors from 'cors'
 import express from 'express'
 import http from 'http'
 import prisma from './modules/prisma'
+import socketIO from 'socket.io'
 
 const log = console.log
 
@@ -91,6 +92,15 @@ export async function boot(options: {
     })
 
     server = expressServer
+
+    const io = socketIO(server)
+
+    io.on('connection', (socket) => {
+      socket.emit('news', { hello: 'world' })
+      socket.on('my other event', (data) => {
+        console.log(data)
+      })
+    })
   }
 
   function quit() {

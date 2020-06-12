@@ -22,6 +22,7 @@
     "prebuild": "npm run clear && npm run generate",
     "build-fix-sequelize": "node fix-sequelize-type.js && ttsc",
     "build": "ttsc",
+    "postbuild": "node prisma/utils/copy-schema-to-build",
     "start": "node --harmony build/src/main.js",
     "start:dev": "cross-env NODE_ENV=development node --harmony build/src/main.js",
     "pm2:start": "if pm2 show eodiro-server ; then npm run pm2:stop && npm run pm2:delete && npm run pm2:start ; else pm2 start build/src/main.js --name \"eodiro-server\" ; fi",
@@ -39,9 +40,7 @@
     "one-api:deploy": "npm run one-api:refresh && npm run build && npm run --prefix src/api/one copy-packagejson && npm run --prefix build/src deploy",
     "introspect": "prisma introspect && node prisma/utils/map-and-pluralize",
     "generate": "prisma generate",
-    "prisma:all": "npm run introspect && npm run generate",
-    "codegen": "graphql-codegen",
-    "codegen:watch": "graphql-codegen --watch"
+    "prisma:all": "npm run introspect && npm run generate"
   },
   "husky": {
     "hooks": {
@@ -74,6 +73,7 @@
     "reflect-metadata": "^0.1.13",
     "sequelize": "^6.0.0-beta.6",
     "serve-handler": "^6.1.2",
+    "socket.io": "^2.3.0",
     "sql-formatter": "^2.3.3",
     "uuid": "^8.1.0",
     "zombie": "^6.1.4"
@@ -104,6 +104,7 @@
     "@types/puppeteer": "^3.0.0",
     "@types/rimraf": "^3.0.0",
     "@types/serve-handler": "^6.1.0",
+    "@types/socket.io": "^2.1.8",
     "@types/uuid": "^8.0.0",
     "@types/validator": "^13.0.0",
     "@typescript-eslint/eslint-plugin": "^3.1.0",
