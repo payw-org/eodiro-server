@@ -8,14 +8,13 @@ const func: OneApiFunction<Action> = async (data) => {
   const { userId } = authPayload
   let isLike = false
 
-  const like = await prisma.tipLike.findOne({
+  const like = await prisma.tipLike.findMany({
     where: {
-      userId: userId,
-      tipId: tipId,
+      AND: [{ userId: userId }, { tipId: tipId }],
     },
   })
 
-  if (like === null) {
+  if (like.length === 0) {
     isLike = await Tip.like(userId, tipId)
   } else {
     isLike = await Tip.unlike(userId, tipId)

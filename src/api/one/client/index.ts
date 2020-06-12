@@ -1,6 +1,7 @@
 import {
   OneApiAction,
   AddDevice,
+  CreateTip,
   DeleteComment,
   DeletePost,
   EditPost,
@@ -14,9 +15,12 @@ import {
   GetPostLikes,
   GetPostsOfBoard,
   GetRecentPostsOfBoard,
+  GetTipDetail,
+  GetTopics,
   GetUserId,
   IsPostLiked,
   LikePost,
+  LikeTip,
   SavePost,
   UpdateNoticeSubscription,
   UploadComment,
@@ -31,6 +35,10 @@ export async function oneAPIClient(
   host: string,
   request: Omit<AddDevice, 'payload'>
 ): Promise<AddDevice['payload']>
+export async function oneAPIClient(
+  host: string,
+  request: Omit<CreateTip, 'payload'>
+): Promise<CreateTip['payload']>
 export async function oneAPIClient(
   host: string,
   request: Omit<DeleteComment, 'payload'>
@@ -85,6 +93,14 @@ export async function oneAPIClient(
 ): Promise<GetRecentPostsOfBoard['payload']>
 export async function oneAPIClient(
   host: string,
+  request: Omit<GetTipDetail, 'payload'>
+): Promise<GetTipDetail['payload']>
+export async function oneAPIClient(
+  host: string,
+  request: Omit<GetTopics, 'payload'>
+): Promise<GetTopics['payload']>
+export async function oneAPIClient(
+  host: string,
   request: Omit<GetUserId, 'payload'>
 ): Promise<GetUserId['payload']>
 export async function oneAPIClient(
@@ -95,6 +111,10 @@ export async function oneAPIClient(
   host: string,
   request: Omit<LikePost, 'payload'>
 ): Promise<LikePost['payload']>
+export async function oneAPIClient(
+  host: string,
+  request: Omit<LikeTip, 'payload'>
+): Promise<LikeTip['payload']>
 export async function oneAPIClient(
   host: string,
   request: Omit<SavePost, 'payload'>

@@ -11,84 +11,86 @@
  * please update the source "dev/refresh.js".
  */
 
-import { Action as AddDeviceRaw } from './device/add-device.action/interface'
-import { Action as CreateTipRaw } from './tip/create-tip.action/interface'
-import { Action as DeleteCommentRaw } from './square/delete-comment.action/interface'
-import { Action as DeletePostRaw } from './square/delete-post.action/interface'
-import { Action as EditPostRaw } from './square/edit-post.action/interface'
-import { Action as GetBoardIdRaw } from './square/get-board-id.action/interface'
-import { Action as GetCommentsRaw } from './square/get-comments.action/interface'
-import { Action as GetDevicesRaw } from './device/get-devices.action/interface'
-import { Action as GetMyPostsRaw } from './my/get-my-posts.action/interface'
-import { Action as GetMySubscriptionsRaw } from './notice/get-my-subscriptions.action/interface'
-import { Action as GetNoticeCatalogRaw } from './notice/get-notice-catalog.action/interface'
 import { GetPostById } from './square/get-post-by-id'
-import { Action as GetPostLikesRaw } from './square/like/get-post-likes.action/interface'
-import { Action as GetPostsOfBoardRaw } from './square/get-posts-of-board.action/interface'
-import { Action as GetRecentPostsOfBoardRaw } from './square/get-recent-posts-of-board.action/interface'
-import { Action as GetTipRaw } from './tip/get-tip-detail.action/interface'
-import { Action as GetTipTopicRaw } from './tip/get-topics.action/interface'
-import { Action as GetUserIdRaw } from './auth/get-user-id.action/interface'
-import { Action as IsPostLikedRaw } from './square/like/is-post-liked.action/interface'
-import { Action as LikePostRaw } from './square/like/like-post.action/interface'
-import { Action as SavePostRaw } from './square/save-post.action/interface'
-import { Action as UpdateNoticeSubscriptionRaw } from './notice/update-notice-subscription.action/interface'
-import { Action as UploadCommentRaw } from './square/upload-comment.action/interface'
-import { UploadPost } from './square/upload-post'
 export { GetPostById } from './square/get-post-by-id'
+import { UploadPost } from './square/upload-post'
 export { UploadPost } from './square/upload-post'
+import { Action as GetUserIdRaw } from './auth/get-user-id.action/interface'
 export type GetUserId = GetUserIdRaw & { action: 'getUserId' }
 
+import { Action as AddDeviceRaw } from './device/add-device.action/interface'
 export type AddDevice = AddDeviceRaw & { action: 'addDevice' }
 
+import { Action as GetDevicesRaw } from './device/get-devices.action/interface'
 export type GetDevices = GetDevicesRaw & { action: 'getDevices' }
 
+import { Action as GetMyPostsRaw } from './my/get-my-posts.action/interface'
 export type GetMyPosts = GetMyPostsRaw & { action: 'getMyPosts' }
 
+import { Action as GetMySubscriptionsRaw } from './notice/get-my-subscriptions.action/interface'
 export type GetMySubscriptions = GetMySubscriptionsRaw & {
   action: 'getMySubscriptions'
 }
 
+import { Action as GetNoticeCatalogRaw } from './notice/get-notice-catalog.action/interface'
 export type GetNoticeCatalog = GetNoticeCatalogRaw & {
   action: 'getNoticeCatalog'
 }
 
+import { Action as UpdateNoticeSubscriptionRaw } from './notice/update-notice-subscription.action/interface'
 export type UpdateNoticeSubscription = UpdateNoticeSubscriptionRaw & {
   action: 'updateNoticeSubscription'
 }
 
+import { Action as DeleteCommentRaw } from './square/delete-comment.action/interface'
 export type DeleteComment = DeleteCommentRaw & { action: 'deleteComment' }
 
+import { Action as DeletePostRaw } from './square/delete-post.action/interface'
 export type DeletePost = DeletePostRaw & { action: 'deletePost' }
 
+import { Action as EditPostRaw } from './square/edit-post.action/interface'
 export type EditPost = EditPostRaw & { action: 'editPost' }
 
+import { Action as GetBoardIdRaw } from './square/get-board-id.action/interface'
 export type GetBoardId = GetBoardIdRaw & { action: 'getBoardId' }
 
+import { Action as GetCommentsRaw } from './square/get-comments.action/interface'
 export type GetComments = GetCommentsRaw & { action: 'getComments' }
 
+import { Action as GetPostsOfBoardRaw } from './square/get-posts-of-board.action/interface'
 export type GetPostsOfBoard = GetPostsOfBoardRaw & { action: 'getPostsOfBoard' }
 
+import { Action as GetRecentPostsOfBoardRaw } from './square/get-recent-posts-of-board.action/interface'
 export type GetRecentPostsOfBoard = GetRecentPostsOfBoardRaw & {
   action: 'getRecentPostsOfBoard'
 }
 
+import { Action as GetPostLikesRaw } from './square/like/get-post-likes.action/interface'
 export type GetPostLikes = GetPostLikesRaw & { action: 'getPostLikes' }
 
+import { Action as IsPostLikedRaw } from './square/like/is-post-liked.action/interface'
 export type IsPostLiked = IsPostLikedRaw & { action: 'isPostLiked' }
 
+import { Action as LikePostRaw } from './square/like/like-post.action/interface'
 export type LikePost = LikePostRaw & { action: 'likePost' }
 
+import { Action as SavePostRaw } from './square/save-post.action/interface'
 export type SavePost = SavePostRaw & { action: 'savePost' }
 
+import { Action as UploadCommentRaw } from './square/upload-comment.action/interface'
 export type UploadComment = UploadCommentRaw & { action: 'uploadComment' }
 
-export type GetTipTopics = GetTipTopicRaw & {
-  action: 'getTipTopics'
-}
-
+import { Action as CreateTipRaw } from './tip/create-tip.action/interface'
 export type CreateTip = CreateTipRaw & { action: 'createTip' }
-export type GetTip = GetTipRaw & { action: 'getTip' }
+
+import { Action as GetTipDetailRaw } from './tip/get-tip-detail.action/interface'
+export type GetTipDetail = GetTipDetailRaw & { action: 'getTipDetail' }
+
+import { Action as GetTopicsRaw } from './tip/get-topics.action/interface'
+export type GetTopics = GetTopicsRaw & { action: 'getTopics' }
+
+import { Action as LikeTipRaw } from './tip/like-tip.action/interface'
+export type LikeTip = LikeTipRaw & { action: 'likeTip' }
 
 export type OneApiAction =
   | GetPostById
@@ -112,6 +114,7 @@ export type OneApiAction =
   | LikePost
   | SavePost
   | UploadComment
-  | GetTipTopics
   | CreateTip
-  | GetTip
+  | GetTipDetail
+  | GetTopics
+  | LikeTip
