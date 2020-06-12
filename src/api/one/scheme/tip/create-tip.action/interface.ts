@@ -1,10 +1,10 @@
 import { AuthRequired, OneApiError } from '@/api/one/scheme/types/utils'
 
-import { tip_topic } from '@prisma/client'
+import { TipTopic } from '@prisma/client'
 
 export interface Action {
   data: AuthRequired<{
-    topic: tip_topic
+    topic: TipTopic
     title: string
     body: string
   }>
