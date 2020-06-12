@@ -1,11 +1,12 @@
 import { OneApiError, OneApiFunction } from '@/api/one/scheme/types/utils'
+import { Tip, TipResponse } from '@/database/models/tip'
 
 import { Action } from './interface'
-import { TipResponse } from '@/database/models/tip'
 import prisma from '@/modules/prisma'
 
 const func: OneApiFunction<Action> = async (data) => {
-  const { tipId } = data
+  const { authPayload, tipId } = data
+  const { userId } = authPayload
 
   try {
     const tip = await prisma.tip.findOne({
@@ -28,8 +29,8 @@ const func: OneApiFunction<Action> = async (data) => {
       ...tip,
       tipLikes: tip.tipLikes.length,
       tipBookmarks: tip.tipBookmarks.length,
-      isLiked: true,
-      isBookmarked: true,
+      isLiked: await Tip.isLiked(userId, tipId),
+      isBookmarked: await Tip.isBookmarked(userId, tipId),
     }
 
     return {
