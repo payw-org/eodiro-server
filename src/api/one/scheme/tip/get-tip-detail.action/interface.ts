@@ -1,6 +1,6 @@
 import { AuthRequired, OneApiError } from '@/api/one/scheme/types/utils'
 
-import { Tip } from '@prisma/client'
+import { TipResponse } from '@/database/models/tip'
 
 export interface Action {
   data: AuthRequired<{
@@ -8,8 +8,6 @@ export interface Action {
   }>
   payload: {
     err: OneApiError
-    data: Tip & {
-      tipLikes: number
-    }
+    data: TipResponse
   }
 }
