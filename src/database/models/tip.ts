@@ -18,7 +18,19 @@ export type TipResponse = {
   title: string
   body: string
   randomNickname: string
-  isStarred: boolean
+  isArchived: boolean
+  createdAt: Date
+  editedAt: Date
+  tipLikes: number
+  tipBookmarks: number
+}
+
+export type TipListResponse = {
+  id: number
+  topic: TipTopic
+  title: string
+  randomNickname: string
+  isArchived: boolean
   createdAt: Date
   editedAt: Date
   tipLikes: number
@@ -115,7 +127,7 @@ export const getTip = createInitModelFunction(Tip, 'tip', {
     type: DataTypes.STRING(30),
     allowNull: false,
   },
-  is_starred: {
+  is_archived: {
     type: DataTypes.BOOLEAN,
     defaultValue: false,
   },

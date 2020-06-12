@@ -238,8 +238,8 @@ model Tip {
   createdAt      DateTime?     @map("created_at")
   editedAt       DateTime?     @map("edited_at")
   id             Int           @default(autoincrement()) @id
+  isArchived     Boolean?      @default(false) @map("is_archived")
   isRemoved      Boolean?      @default(false) @map("is_removed")
-  isStarred      Boolean?      @default(false) @map("is_starred")
   randomNickname String        @map("random_nickname")
   title          String
   topic          TipTopic?
