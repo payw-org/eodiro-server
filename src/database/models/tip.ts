@@ -46,6 +46,23 @@ export class Tip extends Model {
     return topicDict[key]
   }
 
+  static async isLiked(userId: number, tipId: number): Promise<boolean> {
+    const like = await prisma.tipLike.findMany({
+      where: {
+        AND: [{ userId: userId }, { tipId: tipId }],
+      },
+    })
+    return like.length !== 0 ? true : false
+  }
+
+  static async isBookmarked(userId: number, tipId: number): Promise<boolean> {
+    const like = await prisma.tipBookmark.findMany({
+      where: {
+        AND: [{ userId: userId }, { tipId: tipId }],
+      },
+    })
+    return like.length !== 0 ? true : false
+  }
   static async like(userId: number, tipId: number): Promise<boolean> {
     await prisma.tipLike.create({
       data: {
