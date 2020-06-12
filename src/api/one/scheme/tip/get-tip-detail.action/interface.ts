@@ -8,6 +8,8 @@ export interface Action {
   }>
   payload: {
     err: OneApiError
-    data: Tip
+    data: Tip & {
+      tipLikes: number
+    }
   }
 }
