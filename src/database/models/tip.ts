@@ -2,11 +2,7 @@ import { DataTypes, Model } from 'sequelize'
 
 import { PrimaryAIAttribute } from '../utils/model-attributes'
 import { createInitModelFunction } from '../create-init-model'
-
-export type TipTopic = {
-  key: string
-  value: string
-}
+import prisma from '@/modules/prisma'
 
 export const topicDict: { [key: string]: string } = {
   'school': '학교생활',
@@ -26,9 +22,37 @@ export type TipAttrs = {
   edited_at: string
 }
 
-class Tip extends Model {
+export class Tip extends Model {
   static getTopicDisplay(key: string): string {
     return topicDict[key]
+  }
+
+  static async like(userId: number, tipId: number) {
+    await prisma.tipLike.create({
+      data: {
+        user: {
+          connect: {
+            id: userId,
+          },
+        },
+        tip: {
+          connect: {
+            id: tipId,
+          },
+        },
+      },
+    })
+    return true
+  }
+
+  static async unlike(userId: number, tipId: number) {
+    await prisma.tipLike.delete({
+      where: {
+        userId: userId,
+        tipId: tipId,
+      },
+    })
+    return false
   }
 }
 
