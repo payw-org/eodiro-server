@@ -27,7 +27,7 @@ export class Tip extends Model {
     return topicDict[key]
   }
 
-  static async like(userId: number, tipId: number) {
+  static async like(userId: number, tipId: number): Promise<boolean> {
     await prisma.tipLike.create({
       data: {
         user: {
@@ -45,8 +45,36 @@ export class Tip extends Model {
     return true
   }
 
-  static async unlike(userId: number, tipId: number) {
+  static async unlike(userId: number, tipId: number): Promise<boolean> {
     await prisma.tipLike.delete({
+      where: {
+        userId: userId,
+        tipId: tipId,
+      },
+    })
+    return false
+  }
+
+  static async bookmark(userId: number, tipId: number): Promise<boolean> {
+    await prisma.tipBookmark.create({
+      data: {
+        user: {
+          connect: {
+            id: userId,
+          },
+        },
+        tip: {
+          connect: {
+            id: tipId,
+          },
+        },
+      },
+    })
+    return true
+  }
+
+  static async cancelBookmark(userId: number, tipId: number): Promise<boolean> {
+    await prisma.tipBookmark.delete({
       where: {
         userId: userId,
         tipId: tipId,
