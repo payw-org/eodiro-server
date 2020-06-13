@@ -10,19 +10,15 @@ const func: OneApiFunction<Action> = async (data) => {
   const updateBody: TipUpdateBody = { title, body }
 
   try {
-    const tip = await prisma.tip.findOne({ where: { id: tipId } })
-    if (tip === null) {
+    if ((await prisma.tip.findOne({ where: { id: tipId } })) === null) {
       return {
         err: OneApiError.NO_CONTENT,
         data: null,
       }
     }
 
-    if (tip.userId !== userId) {
-      return {
-        err: OneApiError.FORBIDDEN,
-        data: null,
-      }
+    if (!Tip.isOwnedBy(userId, tipId)) {
+      return { err: OneApiError.FORBIDDEN, data: null }
     }
 
     Tip.renew(tipId, updateBody)

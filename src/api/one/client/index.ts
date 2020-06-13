@@ -5,6 +5,7 @@ import {
   CreateTip,
   DeleteComment,
   DeletePost,
+  DeleteTip,
   EditPost,
   GetBoardId,
   GetComments,
@@ -25,6 +26,7 @@ import {
   LikeTip,
   SavePost,
   UpdateNoticeSubscription,
+  UpdateTip,
   UploadComment,
   UploadPost,
 } from '../scheme'
@@ -53,6 +55,10 @@ export async function oneAPIClient(
   host: string,
   request: Omit<DeletePost, 'payload'>
 ): Promise<DeletePost['payload']>
+export async function oneAPIClient(
+  host: string,
+  request: Omit<DeleteTip, 'payload'>
+): Promise<DeleteTip['payload']>
 export async function oneAPIClient(
   host: string,
   request: Omit<EditPost, 'payload'>
@@ -133,6 +139,10 @@ export async function oneAPIClient(
   host: string,
   request: Omit<UpdateNoticeSubscription, 'payload'>
 ): Promise<UpdateNoticeSubscription['payload']>
+export async function oneAPIClient(
+  host: string,
+  request: Omit<UpdateTip, 'payload'>
+): Promise<UpdateTip['payload']>
 export async function oneAPIClient(
   host: string,
   request: Omit<UploadComment, 'payload'>
