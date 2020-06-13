@@ -11,6 +11,11 @@ export const topicDict: { [key: string]: string } = {
   'etc': '기타',
 }
 
+export type TipUpdateBody = {
+  title: string
+  body: string
+}
+
 export type TipResponse = {
   id: number
   topic: TipTopic
@@ -117,6 +122,16 @@ export class Tip extends Model {
       },
     })
     return false
+  }
+
+  static async renew(tipId: number, updateBody: TipUpdateBody): Promise<void> {
+    const { title, body } = updateBody
+    await prisma.tip.update({
+      where: {
+        id: tipId,
+      },
+      data: { title, body },
+    })
   }
 }
 
