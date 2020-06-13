@@ -20,7 +20,6 @@ export const getTipComment = createInitModelFunction(
   {
     id: PrimaryAIAttribute,
     user_id: {
-      primaryKey: true,
       type: DataTypes.INTEGER,
       references: {
         model: 'user',
@@ -30,7 +29,6 @@ export const getTipComment = createInitModelFunction(
       onUpdate: 'cascade',
     },
     tip_id: {
-      primaryKey: true,
       type: DataTypes.INTEGER,
       references: {
         model: 'tip',
