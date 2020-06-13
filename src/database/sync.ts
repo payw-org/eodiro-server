@@ -11,6 +11,9 @@ import { getFile } from './models/file'
 import { getLiveChat } from './models/live_chat'
 import { getNoticeNotificationsSubscription } from './models/notice_notifications_subscription'
 import { getPostFile } from './models/post_file'
+import { getTip } from './models/tip'
+import { getTipBookMark } from './models/tip_bookmark'
+import { getTipLike } from './models/tip_like'
 import { getUser } from './models/user'
 import { initPost } from './models/post'
 import { initPostLike } from './models/post_like'
@@ -38,6 +41,9 @@ async function sync(): Promise<void> {
   await (await getPostFile()).sync(alter)
   await (await initPostLike()).sync(alter)
   await (await comment()).sync(alter)
+  await (await getTip()).sync(alter)
+  await (await getTipLike()).sync(alter)
+  await (await getTipBookMark()).sync(alter)
   await (await cafeteriaMenu()).sync(alter)
   await (await coverageMajor()).sync(alter)
   await (await lecture()).sync(alter)
