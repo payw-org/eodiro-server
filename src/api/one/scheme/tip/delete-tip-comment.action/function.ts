@@ -8,24 +8,32 @@ const func: OneApiFunction<Action> = async (data) => {
   const { authPayload, tipCommentId } = data
   const { userId } = authPayload
 
-  if (
-    (await prisma.tipComment.findOne({ where: { id: tipCommentId } })) === null
-  ) {
+  try {
+    if (
+      (await prisma.tipComment.findOne({ where: { id: tipCommentId } })) ===
+      null
+    ) {
+      return {
+        err: OneApiError.NO_CONTENT,
+        data: null,
+      }
+    }
+
+    if (!TipComment.isOwnedBy(userId, tipCommentId)) {
+      return { err: OneApiError.FORBIDDEN, data: null }
+    }
+
+    await prisma.tipComment.delete({ where: { id: tipCommentId } })
+
     return {
-      err: OneApiError.NO_CONTENT,
+      err: null,
+      data: true,
+    }
+  } catch (err) {
+    return {
+      err: OneApiError.INTERNAL_SERVER_ERROR,
       data: null,
     }
-  }
-
-  if (!TipComment.isOwnedBy(userId, tipCommentId)) {
-    return { err: OneApiError.FORBIDDEN, data: null }
-  }
-
-  await prisma.tipComment.delete({ where: { id: tipCommentId } })
-
-  return {
-    err: null,
-    data: true,
   }
 }
 
