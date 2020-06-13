@@ -51,6 +51,13 @@ export class Tip extends Model {
     return topicDict[key]
   }
 
+  static async isOwnedBy(userId: number, tipId: number): Promise<boolean> {
+    const tip = await prisma.tip.findOne({
+      where: { id: tipId },
+    })
+    return tip.userId === userId ? true : false
+  }
+
   static async isLiked(userId: number, tipId: number): Promise<boolean> {
     const like = await prisma.tipLike.findMany({
       where: {
