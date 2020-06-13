@@ -18,6 +18,7 @@ import {
   GetPostLikes,
   GetPostsOfBoard,
   GetRecentPostsOfBoard,
+  GetTipComments,
   GetTipDetail,
   GetTips,
   GetTopics,
@@ -108,6 +109,10 @@ export async function oneAPIClient(
   host: string,
   request: Omit<GetRecentPostsOfBoard, 'payload'>
 ): Promise<GetRecentPostsOfBoard['payload']>
+export async function oneAPIClient(
+  host: string,
+  request: Omit<GetTipComments, 'payload'>
+): Promise<GetTipComments['payload']>
 export async function oneAPIClient(
   host: string,
   request: Omit<GetTipDetail, 'payload'>
