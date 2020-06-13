@@ -94,6 +94,9 @@ export type CreateTip = CreateTipRaw & { action: 'createTip' }
 import { Action as DeleteTipRaw } from './tip/delete-tip.action/interface'
 export type DeleteTip = DeleteTipRaw & { action: 'deleteTip' }
 
+import { Action as GetTipCommentsRaw } from './tip/get-tip-comments.action/interface'
+export type GetTipComments = GetTipCommentsRaw & { action: 'getTipComments' }
+
 import { Action as GetTipDetailRaw } from './tip/get-tip-detail.action/interface'
 export type GetTipDetail = GetTipDetailRaw & { action: 'getTipDetail' }
 
@@ -135,6 +138,7 @@ export type OneApiAction =
   | CreateTipComment
   | CreateTip
   | DeleteTip
+  | GetTipComments
   | GetTipDetail
   | GetTips
   | GetTopics
