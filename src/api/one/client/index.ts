@@ -1,8 +1,11 @@
 import {
   OneApiAction,
   AddDevice,
+  BookmarkTip,
+  CreateTip,
   DeleteComment,
   DeletePost,
+  DeleteTip,
   EditPost,
   GetBoardId,
   GetComments,
@@ -14,11 +17,16 @@ import {
   GetPostLikes,
   GetPostsOfBoard,
   GetRecentPostsOfBoard,
+  GetTipDetail,
+  GetTips,
+  GetTopics,
   GetUserId,
   IsPostLiked,
   LikePost,
+  LikeTip,
   SavePost,
   UpdateNoticeSubscription,
+  UpdateTip,
   UploadComment,
   UploadPost,
 } from '../scheme'
@@ -33,12 +41,24 @@ export async function oneAPIClient(
 ): Promise<AddDevice['payload']>
 export async function oneAPIClient(
   host: string,
+  request: Omit<BookmarkTip, 'payload'>
+): Promise<BookmarkTip['payload']>
+export async function oneAPIClient(
+  host: string,
+  request: Omit<CreateTip, 'payload'>
+): Promise<CreateTip['payload']>
+export async function oneAPIClient(
+  host: string,
   request: Omit<DeleteComment, 'payload'>
 ): Promise<DeleteComment['payload']>
 export async function oneAPIClient(
   host: string,
   request: Omit<DeletePost, 'payload'>
 ): Promise<DeletePost['payload']>
+export async function oneAPIClient(
+  host: string,
+  request: Omit<DeleteTip, 'payload'>
+): Promise<DeleteTip['payload']>
 export async function oneAPIClient(
   host: string,
   request: Omit<EditPost, 'payload'>
@@ -85,6 +105,18 @@ export async function oneAPIClient(
 ): Promise<GetRecentPostsOfBoard['payload']>
 export async function oneAPIClient(
   host: string,
+  request: Omit<GetTipDetail, 'payload'>
+): Promise<GetTipDetail['payload']>
+export async function oneAPIClient(
+  host: string,
+  request: Omit<GetTips, 'payload'>
+): Promise<GetTips['payload']>
+export async function oneAPIClient(
+  host: string,
+  request: Omit<GetTopics, 'payload'>
+): Promise<GetTopics['payload']>
+export async function oneAPIClient(
+  host: string,
   request: Omit<GetUserId, 'payload'>
 ): Promise<GetUserId['payload']>
 export async function oneAPIClient(
@@ -97,12 +129,20 @@ export async function oneAPIClient(
 ): Promise<LikePost['payload']>
 export async function oneAPIClient(
   host: string,
+  request: Omit<LikeTip, 'payload'>
+): Promise<LikeTip['payload']>
+export async function oneAPIClient(
+  host: string,
   request: Omit<SavePost, 'payload'>
 ): Promise<SavePost['payload']>
 export async function oneAPIClient(
   host: string,
   request: Omit<UpdateNoticeSubscription, 'payload'>
 ): Promise<UpdateNoticeSubscription['payload']>
+export async function oneAPIClient(
+  host: string,
+  request: Omit<UpdateTip, 'payload'>
+): Promise<UpdateTip['payload']>
 export async function oneAPIClient(
   host: string,
   request: Omit<UploadComment, 'payload'>
