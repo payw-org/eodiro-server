@@ -7,7 +7,8 @@
     "copy-packagejson": "node scripts/copy-packagejson.js",
     "refresh": "node scripts/refresh",
     "versioning": "",
-    "deploy": "npm publish --access public"
+    "deploy": "npm publish --access public",
+    "deploy:next": "npm publish --access public --tag next"
   },
   "files": [
     "api/one/client",
