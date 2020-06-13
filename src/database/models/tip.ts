@@ -131,7 +131,10 @@ export class Tip extends Model {
     return false
   }
 
-  static async renew(tipId: number, updateBody: TipUpdateBody): Promise<void> {
+  static async renew(
+    tipId: number,
+    updateBody: TipUpdateBody
+  ): Promise<boolean> {
     const { title, body } = updateBody
     await prisma.tip.update({
       where: {
@@ -139,6 +142,7 @@ export class Tip extends Model {
       },
       data: { title, body },
     })
+    return true
   }
 }
 

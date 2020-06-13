@@ -86,6 +86,9 @@ export type BookmarkTip = BookmarkTipRaw & { action: 'bookmarkTip' }
 import { Action as CreateTipRaw } from './tip/create-tip.action/interface'
 export type CreateTip = CreateTipRaw & { action: 'createTip' }
 
+import { Action as DeleteTipRaw } from './tip/delete-tip.action/interface'
+export type DeleteTip = DeleteTipRaw & { action: 'deleteTip' }
+
 import { Action as GetTipDetailRaw } from './tip/get-tip-detail.action/interface'
 export type GetTipDetail = GetTipDetailRaw & { action: 'getTipDetail' }
 
@@ -97,6 +100,9 @@ export type GetTopics = GetTopicsRaw & { action: 'getTopics' }
 
 import { Action as LikeTipRaw } from './tip/like-tip.action/interface'
 export type LikeTip = LikeTipRaw & { action: 'likeTip' }
+
+import { Action as UpdateTipRaw } from './tip/update-tip.action/interface'
+export type UpdateTip = UpdateTipRaw & { action: 'updateTip' }
 
 export type OneApiAction =
   | GetPostById
@@ -122,7 +128,9 @@ export type OneApiAction =
   | UploadComment
   | BookmarkTip
   | CreateTip
+  | DeleteTip
   | GetTipDetail
   | GetTips
   | GetTopics
   | LikeTip
+  | UpdateTip
