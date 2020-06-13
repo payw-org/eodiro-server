@@ -321,3 +321,16 @@ export const getUser = createInitModelFunction(
     ],
   }
 )
+
+export const userId = {
+  user_id: {
+    primaryKey: true,
+    type: DataTypes.INTEGER,
+    references: {
+      model: 'user',
+      key: 'id',
+    },
+    onDelete: 'cascade',
+    onUpdate: 'cascade',
+  },
+}
