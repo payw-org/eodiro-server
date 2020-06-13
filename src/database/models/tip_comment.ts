@@ -2,6 +2,7 @@ import { DataTypes, Model } from 'sequelize'
 
 import { PrimaryAIAttribute } from '../utils/model-attributes'
 import { createInitModelFunction } from '../create-init-model'
+import prisma from '@/modules/prisma'
 
 export type TipCommentsResponse = {
   id: number
@@ -12,7 +13,17 @@ export type TipCommentsResponse = {
   editedAt: Date
 }
 
-export class TipComment extends Model {}
+export class TipComment extends Model {
+  static async isOwnedBy(
+    userId: number,
+    tipCommentId: number
+  ): Promise<boolean> {
+    const tip = await prisma.tipComment.findOne({
+      where: { id: tipCommentId },
+    })
+    return tip.userId === userId ? true : false
+  }
+}
 
 export const getTipComment = createInitModelFunction(
   TipComment,
