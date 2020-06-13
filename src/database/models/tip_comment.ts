@@ -3,6 +3,15 @@ import { DataTypes, Model } from 'sequelize'
 import { PrimaryAIAttribute } from '../utils/model-attributes'
 import { createInitModelFunction } from '../create-init-model'
 
+export type TipCommentsResponse = {
+  id: number
+  userId: number
+  body: string
+  randomNickname: string
+  createdAt: Date
+  editedAt: Date
+}
+
 export class TipComment extends Model {}
 
 export const getTipComment = createInitModelFunction(
