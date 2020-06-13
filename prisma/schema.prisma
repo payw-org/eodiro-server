@@ -283,15 +283,14 @@ model TipComment {
   body           String
   createdAt      DateTime? @map("created_at")
   editedAt       DateTime? @map("edited_at")
-  id             Int       @default(autoincrement())
+  id             Int       @default(autoincrement()) @id
   isRemoved      Boolean?  @default(false) @map("is_removed")
   randomNickname String    @map("random_nickname")
-  tipId          Int       @map("tip_id")
-  userId         Int       @map("user_id")
-  tip            Tip       @relation(fields: [tipId], references: [id])
-  user           User      @relation(fields: [userId], references: [id])
+  tipId          Int?      @map("tip_id")
+  userId         Int?      @map("user_id")
+  tip            Tip?      @relation(fields: [tipId], references: [id])
+  user           User?     @relation(fields: [userId], references: [id])
 
-  @@id([id, userId, tipId])
   @@index([tipId], name: "tip_id")
   @@index([userId], name: "user_id")
   @@map("tip_comment")
