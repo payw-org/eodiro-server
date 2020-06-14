@@ -153,7 +153,7 @@ export default class Auth {
    * Otherwise returns false.
    */
   static async isSignedUser(accessToken: string): Promise<Payload | false> {
-    if (!accessToken) {
+    if (!accessToken || accessToken === 'null' || accessToken === 'undefined') {
       return false
     }
     const result = await Jwt.verify(accessToken)
