@@ -103,9 +103,22 @@ export async function boot(options: {
 
       if (!authPaylod) {
         socket.error('Unauthorized')
+        socket.disconnect()
         return
       } else {
         const user = await User.findAtId(authPaylod.userId)
+
+        io.emit(
+          'user_num_changed',
+          Object.keys(io.nsps['/'].adapter.rooms).length
+        )
+
+        socket.on('disconnect', () => {
+          io.emit(
+            'user_num_changed',
+            Object.keys(io.nsps['/'].adapter.rooms).length
+          )
+        })
 
         socket.on('send_live_chat', (data) => {
           // mine
