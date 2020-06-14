@@ -1,6 +1,8 @@
+import Auth from './modules/auth'
 import Config from './config'
 import DbConnector from './modules/db-connector'
 import EodiroMailer from './modules/eodiro-mailer'
+import { User } from './database/models/user'
 import api from './api'
 import bodyParser from 'body-parser'
 import chalk from 'chalk'
@@ -95,11 +97,26 @@ export async function boot(options: {
 
     const io = socketIO(server)
 
-    io.on('connection', (socket) => {
-      socket.emit('news', { hello: 'world' })
-      socket.on('my other event', (data) => {
-        console.log(data)
-      })
+    io.on('connection', async (socket) => {
+      const accessToken = socket.handshake.query.accessToken as string
+      const authPaylod = await Auth.isSignedUser(accessToken)
+
+      if (!authPaylod) {
+        socket.error('Unauthorized')
+        return
+      } else {
+        const user = await User.findAtId(authPaylod.userId)
+
+        socket.on('send_live_chat', (data) => {
+          // mine
+          socket.emit('new_live_chat_mine', data)
+          // others
+          socket.broadcast.emit('new_live_chat', {
+            ...data,
+            rn: user.random_nickname,
+          })
+        })
+      }
     })
   }
 
