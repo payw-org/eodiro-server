@@ -4,6 +4,10 @@ export type AuthOnly = {
   accessToken: string
 }
 
+export type AuthOptional = {
+  accessToken?: string
+}
+
 /**
  * Where the API requires the authentication
  */
@@ -42,7 +46,7 @@ export type OneApiFuncWithoutRequestData<
 > = () => Promise<T['payload']>
 
 export type OneApiFunc<T extends OneApiActionTemplate> = (
-  data: T['data'] extends AuthOnly
+  data: T['data'] extends AuthOnly | AuthOptional
     ? Omit<T['data'], 'accessToken'> & { authPayload: AuthPayload }
     : T['data']
 ) => Promise<T['payload']>

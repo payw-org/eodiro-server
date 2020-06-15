@@ -1,14 +1,11 @@
 import {
+  AuthOptional,
+  OneApiActionTemplate,
   OneApiActionTemplatePayload,
-  OneApiActionTemplateWithoutReqeustData,
   OneApiError,
 } from '../../types'
 
-export type Action = OneApiActionTemplateWithoutReqeustData<
-  OneApiActionTemplatePayload<
-    OneApiError | 'WHAT',
-    {
-      what: string
-    }
-  >
+export type Action = OneApiActionTemplate<
+  AuthOptional,
+  OneApiActionTemplatePayload<OneApiError | 'WHAT', null>
 >

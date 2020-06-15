@@ -1,11 +1,16 @@
+import {
+  OneApiError,
+  OneApiFunc,
+  OneApiFuncWithoutRequestData,
+} from '@/api/one/types'
+
 import { Action } from './interface'
-import { OneApiFuncWithoutRequestData } from '@/api/one/types'
 import { oneApiResponse } from '../../utils'
 
-const func: OneApiFuncWithoutRequestData<Action> = async () => {
-  return oneApiResponse<Action>({
-    what: '',
-  })
+const func: OneApiFunc<Action> = async (data) => {
+  const response = oneApiResponse<Action>(OneApiError.UNAUTHORIZED)
+
+  return response
 }
 
 export default func
