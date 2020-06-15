@@ -17,7 +17,7 @@ export type OneApiActionTemplatePayload<
   D extends Record<string, unknown>
 > = {
   err: OneApiError | E
-  data: D
+  data: D | null
 }
 
 /**
