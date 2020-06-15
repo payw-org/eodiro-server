@@ -1,5 +1,5 @@
 import { Action } from './interface'
-import { OneApiFunction } from '@/api/one/scheme/types/utils'
+import { OneApiFunction } from '@/api/one/types'
 import Time from '@/modules/time'
 import prisma from '@/modules/prisma'
 

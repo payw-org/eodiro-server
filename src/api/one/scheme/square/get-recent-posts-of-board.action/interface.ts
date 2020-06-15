@@ -1,4 +1,4 @@
-import { OneApiError } from '@/api/one/scheme/types/utils'
+import { OneApiError } from '@/api/one/types'
 import { PostAttrs } from '@/database/models/post'
 
 /**

@@ -1,7 +1,7 @@
 import { Action, NoticeItem } from './interface'
 
 import { CauNoticeWatcher } from '@/modules/cau-notice-watcher'
-import { OneApiFunction } from '@/api/one/scheme/types/utils'
+import { OneApiFunction } from '@/api/one/types'
 
 const func: OneApiFunction<Action> = async () => {
   const noticeWatcher = new CauNoticeWatcher()

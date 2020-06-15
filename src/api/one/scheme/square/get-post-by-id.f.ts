@@ -1,22 +1,18 @@
-import { eodiroQuery, EodiroQueryType } from '@/database/eodiro-query'
-import { FileType } from '@/database/models/file'
-import { initPost, Post, PostAttrs } from '@/database/models/post'
-import { PostFileType } from '@/database/models/post_file'
+import { EodiroQueryType, eodiroQuery } from '@/database/eodiro-query'
+import { OneApiError, OneApiPayloadData } from '../../types'
+import { Post, PostAttrs, initPost } from '@/database/models/post'
 import { PostLike, PostLikeAttrs } from '@/database/models/post_like'
-import Auth from '@/modules/auth'
 import SqlB, { Q } from '@/modules/sqlb'
-import dayjs from 'dayjs'
-import {
-  OneAPIData,
-  OneApiError,
-  OneAPIPayload,
-  OneApiPayloadData,
-} from '../types/utils'
+
+import Auth from '@/modules/auth'
+import { FileType } from '@/database/models/file'
 import { GetPostById } from './get-post-by-id'
+import { PostFileType } from '@/database/models/post_file'
+import dayjs from 'dayjs'
 
 export async function getPostById(
-  data: OneAPIData<GetPostById>
-): Promise<OneAPIPayload<GetPostById>> {
+  data: GetPostById['data']
+): Promise<GetPostById['payload']> {
   const authPayload = await Auth.isSignedUser(data.accessToken)
 
   if (!authPayload) {

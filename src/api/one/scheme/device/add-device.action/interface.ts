@@ -1,4 +1,4 @@
-import { AuthRequired, OneApiError } from '@/api/one/scheme/types/utils'
+import { AuthRequired, OneApiError } from '@/api/one/types'
 
 export interface Action {
   data: AuthRequired<{

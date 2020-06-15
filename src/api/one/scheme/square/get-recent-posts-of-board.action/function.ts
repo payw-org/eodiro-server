@@ -1,13 +1,14 @@
-import { OneApiFunction, OneApiPayloadData } from '@/api/one/scheme/types/utils'
-import { eodiroQuery } from '@/database/eodiro-query'
-import { Comment } from '@/database/models/comment'
+import { OneApiFunction, OneApiPayloadData } from '@/api/one/types'
 import { Post, postAttrs } from '@/database/models/post'
+
+import { Action } from './interface'
+import { ArrayUtil } from '@/modules/utils/array-util'
+import { Comment } from '@/database/models/comment'
+import { GetRecentPostsOfBoard } from '../..'
 import { PostLike } from '@/database/models/post_like'
 import { Q } from '@/modules/sqlb'
-import { ArrayUtil } from '@/modules/utils/array-util'
 import _ from 'lodash'
-import { GetRecentPostsOfBoard } from '../..'
-import { Action } from './interface'
+import { eodiroQuery } from '@/database/eodiro-query'
 
 const func: OneApiFunction<Action> = async (data) => {
   const { boardId, mostRecentPostId, noBody } = data

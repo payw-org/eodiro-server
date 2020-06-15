@@ -1,12 +1,13 @@
-import { initPost, PostAttrs } from '@/database/models/post'
-import { PostFileType } from '@/database/models/post_file'
-import { query, QueryTypes } from '@/database/query'
-import { TableNames } from '@/database/table-names'
-import Auth from '@/modules/auth'
-import SqlB from '@/modules/sqlb'
-import Time from '@/modules/time'
-import { OneApiError } from '../../types/utils'
+import { PostAttrs, initPost } from '@/database/models/post'
+import { QueryTypes, query } from '@/database/query'
+
 import { Action } from './interface'
+import Auth from '@/modules/auth'
+import { OneApiError } from '@/api/one/types'
+import { PostFileType } from '@/database/models/post_file'
+import SqlB from '@/modules/sqlb'
+import { TableNames } from '@/database/table-names'
+import Time from '@/modules/time'
 
 export default async function (
   data: Action['data']

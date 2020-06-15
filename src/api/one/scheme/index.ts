@@ -80,6 +80,9 @@ export type SavePost = SavePostRaw & { action: 'savePost' }
 import { Action as UploadCommentRaw } from './square/upload-comment.action/interface'
 export type UploadComment = UploadCommentRaw & { action: 'uploadComment' }
 
+import { Action as TestRaw } from './test.action/interface'
+export type Test = TestRaw & { action: 'test' }
+
 import { Action as BookmarkTipRaw } from './tip/bookmark-tip.action/interface'
 export type BookmarkTip = BookmarkTipRaw & { action: 'bookmarkTip' }
 
@@ -90,6 +93,11 @@ export type CreateTipComment = CreateTipCommentRaw & {
 
 import { Action as CreateTipRaw } from './tip/create-tip.action/interface'
 export type CreateTip = CreateTipRaw & { action: 'createTip' }
+
+import { Action as DeleteTipCommentRaw } from './tip/delete-tip-comment.action/interface'
+export type DeleteTipComment = DeleteTipCommentRaw & {
+  action: 'deleteTipComment'
+}
 
 import { Action as DeleteTipRaw } from './tip/delete-tip.action/interface'
 export type DeleteTip = DeleteTipRaw & { action: 'deleteTip' }
@@ -111,36 +119,3 @@ export type LikeTip = LikeTipRaw & { action: 'likeTip' }
 
 import { Action as UpdateTipRaw } from './tip/update-tip.action/interface'
 export type UpdateTip = UpdateTipRaw & { action: 'updateTip' }
-
-export type OneApiAction =
-  | GetPostById
-  | UploadPost
-  | GetUserId
-  | AddDevice
-  | GetDevices
-  | GetMyPosts
-  | GetMySubscriptions
-  | GetNoticeCatalog
-  | UpdateNoticeSubscription
-  | DeleteComment
-  | DeletePost
-  | EditPost
-  | GetBoardId
-  | GetComments
-  | GetPostsOfBoard
-  | GetRecentPostsOfBoard
-  | GetPostLikes
-  | IsPostLiked
-  | LikePost
-  | SavePost
-  | UploadComment
-  | BookmarkTip
-  | CreateTipComment
-  | CreateTip
-  | DeleteTip
-  | GetTipComments
-  | GetTipDetail
-  | GetTips
-  | GetTopics
-  | LikeTip
-  | UpdateTip

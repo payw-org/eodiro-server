@@ -1,5 +1,4 @@
 import { Payload as AuthPayload } from '@/modules/jwt'
-import { OneApiAction } from '..'
 
 export type AuthOnly = {
   accessToken: string
@@ -11,9 +10,48 @@ export type AuthOnly = {
 export type AuthRequired<T> = T & AuthOnly
 
 /**
- * The basic form of One API action's interface
+ * Payload of One API Action Template
  */
-interface OneApiActionSkeleton {
+export type OneApiActionTemplatePayload<
+  E,
+  D extends Record<string, unknown>
+> = {
+  err: OneApiError | E
+  data: D
+}
+
+/**
+ * One API Action Template
+ */
+export type OneApiActionTemplate<
+  D = Record<string, unknown>,
+  P = OneApiActionTemplatePayload<unknown, Record<string, unknown>>
+> = {
+  data: D
+  payload: P
+}
+
+export type OneApiActionTemplateWithoutReqeustData<
+  P = OneApiActionTemplatePayload<unknown, Record<string, unknown>>
+> = {
+  payload: P
+}
+
+export type OneApiFuncWithoutRequestData<
+  T extends OneApiActionTemplateWithoutReqeustData
+> = () => Promise<T['payload']>
+
+export type OneApiFunc<T extends OneApiActionTemplate> = (
+  data: T['data'] extends AuthOnly
+    ? Omit<T['data'], 'accessToken'> & { authPayload: AuthPayload }
+    : T['data']
+) => Promise<T['payload']>
+
+/**
+ * The basic form of One API action's interface
+ * @deprecated
+ */
+export interface OneApiActionSkeleton {
   data: unknown
   payload: {
     err: OneApiError | unknown
@@ -58,24 +96,3 @@ export enum OneApiError {
   INTERNAL_SERVER_ERROR = 'Internal Server Error',
   NO_CONTENT = 'No Content',
 }
-
-/**
- * @deprecated Use `OneApiData` instead
- */
-export type OneAPIData<T extends OneApiAction> = T['data']
-/**
- * @deprecated Use `OneApiPayload` instead
- */
-export type OneAPIPayload<T extends OneApiAction> = T['payload']
-
-/**
- * @deprecated Use `OneApiError`
- */
-export type OneAPIError<T> =
-  | null
-  | 'Unauthorized'
-  | 'No Content'
-  | 'Bad Request'
-  | 'Forbidden'
-  | 'Internal Server Error'
-  | T

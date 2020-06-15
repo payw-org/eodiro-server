@@ -1,4 +1,5 @@
-import { AuthRequired, OneApiError } from '@/api/one/scheme/types/utils'
+import { AuthRequired, OneApiError } from '@/api/one/types'
+
 import { BoardType } from '@/database/models/board'
 import { PostAttrs } from '@/database/models/post'
 

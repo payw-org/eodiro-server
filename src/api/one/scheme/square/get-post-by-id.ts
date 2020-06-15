@@ -1,5 +1,6 @@
-import { PostAttrs } from '../../../../database/models/post'
-import { AuthRequired, OneApiError } from '../types/utils'
+import { AuthRequired, OneApiError } from '../../types'
+
+import { PostAttrs } from '@/database/models/post'
 
 export interface GetPostById {
   action: 'getPostById'

@@ -1,10 +1,10 @@
-import { CommentAttrs } from '@/database/models/comment'
-import { getUser } from '@/database/models/user'
-import Db from '@/db'
-import Auth from '@/modules/auth'
-import SqlB from '@/modules/sqlb'
-import { OneApiError } from '../../types/utils'
 import { Action } from './interface'
+import Auth from '@/modules/auth'
+import { CommentAttrs } from '@/database/models/comment'
+import Db from '@/db'
+import { OneApiError } from '@/api/one/types'
+import SqlB from '@/modules/sqlb'
+import { getUser } from '@/database/models/user'
 
 export default async function (
   data: Action['data']

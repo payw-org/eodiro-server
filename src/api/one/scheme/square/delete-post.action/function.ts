@@ -1,9 +1,10 @@
-import { initPost, PostAttrs } from '@/database/models/post'
-import { query, QueryTypes } from '@/database/query'
+import { PostAttrs, initPost } from '@/database/models/post'
+import { QueryTypes, query } from '@/database/query'
+
 import Auth from '@/modules/auth'
-import SqlB from '@/modules/sqlb'
 import { DeletePost } from '../..'
-import { OneApiError } from '../../types/utils'
+import { OneApiError } from '@/api/one/types'
+import SqlB from '@/modules/sqlb'
 
 export default async function (
   data: DeletePost['data']

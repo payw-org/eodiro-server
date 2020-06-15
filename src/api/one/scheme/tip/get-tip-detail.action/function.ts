@@ -1,4 +1,4 @@
-import { OneApiError, OneApiFunction } from '@/api/one/scheme/types/utils'
+import { OneApiError, OneApiFunction } from '@/api/one/types'
 import { Tip, TipResponse } from '@/database/models/tip'
 
 import { Action } from './interface'
