@@ -1,5 +1,6 @@
-import Auth from '@/modules/auth'
 import { Action } from './interface'
+import Auth from '@/modules/auth'
+import { OneApiError } from '@/api/one/types'
 
 export default async function (
   data: Action['data']
@@ -8,7 +9,7 @@ export default async function (
 
   if (!authPayload) {
     return {
-      err: 'Unauthorized',
+      err: OneApiError.UNAUTHORIZED,
       data: null,
     }
   }

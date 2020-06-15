@@ -1,5 +1,5 @@
 import { Action } from './interface'
-import { OneApiFunction } from '../../types/utils'
+import { OneApiFunction } from '@/api/one/types'
 import { topicDict } from '@/database/models/tip'
 
 const func: OneApiFunction<Action> = async () => {

@@ -95,15 +95,15 @@ export type ${name} = ${name}Raw & { action: '${camelCase(name)}' }
     .map((file) => importType(file))
     .concat(importStmts)
     .join('\n')
+  const OneApiActionMix = `export type OneApiAction = ${legacyFTSFiles
+    .map((file) => getPascalName(file))
+    .concat(interfacesNames)
+    .join(' | ')}
+`
   const interfaceFile = prettier.format(
     `${msg}
 
 ${interfaceImports}
-
-export type OneApiAction = ${legacyFTSFiles
-      .map((file) => getPascalName(file))
-      .concat(interfacesNames)
-      .join(' | ')}
 `,
     prettierRC
   )
@@ -132,13 +132,12 @@ ${functionExports}
     .map((file) => getPascalName(file))
     .concat(interfacesNames) // Combine legacy interface names and new interface.ts
   // !!! Insert 'OneApiAction' at the beginning for regular expression matching
-  const clientImportStatements = `import {${[
-    'OneApiAction',
-    ...allInterfacesNames.sort(),
-  ].join(',')}} from '../scheme'`
+  const clientImportStatements = `import {${[...allInterfacesNames.sort()].join(
+    ','
+  )}} from '../scheme'`
   let clientSource = fs.readFileSync('client/index.ts', 'utf8')
   clientSource = clientSource.replace(
-    /import {[\s\S]*?OneApiAction[\s\S]*?} from '\.\.\/scheme'/g,
+    /import {[\s\S]*?} from '\.\.\/scheme'/g,
     clientImportStatements
   )
   const clientSourceSplitted = clientSource.split('\n')
@@ -163,7 +162,7 @@ ${functionExports}
   // Generate overloading functions
   const overloadings = allInterfacesNames.map(
     (interfaceName) =>
-      `export async function oneAPIClient(host: string, request: Omit<${interfaceName}, 'payload'>): Promise<${interfaceName}['payload']>`
+      `export async function oneApiClient(host: string, request: Omit<${interfaceName}, 'payload'>): Promise<${interfaceName}['payload']>`
   )
 
   // Remove old overloadings

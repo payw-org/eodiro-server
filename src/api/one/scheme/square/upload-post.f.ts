@@ -1,17 +1,18 @@
+import { QueryTypes, query } from '@/database/query'
+
+import Auth from '@/modules/auth'
+import { OneApiError } from '../../types'
 import { PostAttrs } from '@/database/models/post'
 import { PostFileType } from '@/database/models/post_file'
-import { getUser } from '@/database/models/user'
-import { query, QueryTypes } from '@/database/query'
-import { TableNames } from '@/database/table-names'
-import Auth from '@/modules/auth'
 import SqlB from '@/modules/sqlb'
+import { TableNames } from '@/database/table-names'
 import Time from '@/modules/time'
-import { OneAPIData, OneApiError, OneAPIPayload } from '../types/utils'
 import { UploadPost } from './upload-post'
+import { getUser } from '@/database/models/user'
 
 export async function uploadPost(
-  data: OneAPIData<UploadPost>
-): Promise<OneAPIPayload<UploadPost>> {
+  data: UploadPost['data']
+): Promise<UploadPost['payload']> {
   const authPayload = await Auth.isSignedUser(data.accessToken)
   if (!authPayload) {
     return {

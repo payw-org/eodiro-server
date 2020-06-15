@@ -1,19 +1,15 @@
 import * as funcs from './scheme/functions'
 
-import { OneAPIPayload } from './scheme/types/utils'
-import { OneApiAction } from './scheme'
 import { Payload } from '@/modules/jwt'
 
 const apiFunctions: Record<
-  OneApiAction['action'],
+  string,
   (data: any, authPayload?: Payload) => Promise<any>
 > = {
   ...funcs,
 }
 
-export async function oneAPI<T extends OneApiAction>(
-  request: Omit<T, 'payload'>
-): Promise<OneAPIPayload<T>> {
+export async function oneApi(request: Record<string, any>): Promise<unknown> {
   const apiF = apiFunctions[request.action]
 
   if (!apiF) {

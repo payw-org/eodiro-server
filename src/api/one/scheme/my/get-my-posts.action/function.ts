@@ -1,6 +1,6 @@
 import { Action } from './interface'
 import { BoardType } from '@/database/models/board'
-import { OneApiFunction } from '../../types/utils'
+import { OneApiFunction } from '@/api/one/types'
 import { PostAttrs } from '@/database/models/post'
 import { Q } from '@/modules/sqlb'
 import { eodiroQuery } from '@/database/eodiro-query'

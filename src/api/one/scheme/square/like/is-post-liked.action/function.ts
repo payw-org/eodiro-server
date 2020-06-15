@@ -1,6 +1,6 @@
-import { OneApiFunction } from '@/api/one/scheme/types/utils'
-import { Post } from '@/database/models/post'
 import { Action } from './interface'
+import { OneApiFunction } from '@/api/one/types'
+import { Post } from '@/database/models/post'
 
 const func: OneApiFunction<Action> = async (data) => {
   return {

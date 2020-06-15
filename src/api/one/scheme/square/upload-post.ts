@@ -1,4 +1,4 @@
-import { OneApiError } from '../types/utils'
+import { OneApiError } from '../../types'
 
 export interface UploadPost {
   action: 'uploadPost'

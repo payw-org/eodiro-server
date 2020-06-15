@@ -1,8 +1,9 @@
+import { Action } from './interface'
+import Auth from '@/modules/auth'
 import { CommentAttrs } from '@/database/models/comment'
 import Db from '@/db'
-import Auth from '@/modules/auth'
+import { OneApiError } from '@/api/one/types'
 import SqlB from '@/modules/sqlb'
-import { Action } from './interface'
 
 export default async function (
   data: Action['data']
@@ -10,7 +11,7 @@ export default async function (
   const authPayload = await Auth.isSignedUser(data.accessToken)
   if (!authPayload)
     return {
-      err: 'Unauthorized',
+      err: OneApiError.UNAUTHORIZED,
       data: null,
     }
 
@@ -28,7 +29,7 @@ export default async function (
 
   if (err) {
     return {
-      err: 'Internal Server Error',
+      err: OneApiError.INTERNAL_SERVER_ERROR,
       data: null,
     }
   }

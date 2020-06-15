@@ -1,12 +1,13 @@
-import { OneApiFunction } from '@/api/one/scheme/types/utils'
-import { eodiroQuery } from '@/database/eodiro-query'
-import { Comment } from '@/database/models/comment'
 import { Post, PostAttrs } from '@/database/models/post'
-import { PostLike } from '@/database/models/post_like'
 import SqlB, { Q } from '@/modules/sqlb'
-import { ArrayUtil } from '@/modules/utils/array-util'
-import _ from 'lodash'
+
 import { Action } from './interface'
+import { ArrayUtil } from '@/modules/utils/array-util'
+import { Comment } from '@/database/models/comment'
+import { OneApiFunction } from '@/api/one/types'
+import { PostLike } from '@/database/models/post_like'
+import _ from 'lodash'
+import { eodiroQuery } from '@/database/eodiro-query'
 
 const func: OneApiFunction<Action> = async (data) => {
   const fromId = data?.lastPostId || 0

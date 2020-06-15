@@ -1,4 +1,4 @@
-import { AuthOnly, OneApiError } from '@/api/one/scheme/types/utils'
+import { AuthOnly, OneApiError } from '@/api/one/types'
 
 export interface Action {
   data: AuthOnly

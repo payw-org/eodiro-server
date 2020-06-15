@@ -2,6 +2,7 @@ import { Action } from './interface'
 import Auth from '@/modules/auth'
 import { CommentAttrs } from '@/database/models/comment'
 import Db from '@/db'
+import { OneApiError } from '@/api/one/types'
 import { PostAttrs } from '@/database/models/post'
 import SqlB from '@/modules/sqlb'
 import { TableNames } from '@/database/table-names'
@@ -15,7 +16,7 @@ export default async function (
 
   if (authPayload === false) {
     return {
-      err: 'Unauthorized',
+      err: OneApiError.UNAUTHORIZED,
     }
   }
 
@@ -58,7 +59,7 @@ export default async function (
   const [err] = await Db.query(query)
   if (err) {
     return {
-      err: 'Internal Server Error',
+      err: OneApiError.INTERNAL_SERVER_ERROR,
     }
   }
 

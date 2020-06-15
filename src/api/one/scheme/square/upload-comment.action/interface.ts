@@ -1,4 +1,4 @@
-import { OneAPIError } from '../../types/utils'
+import { OneApiError } from '@/api/one/types'
 
 export interface Action {
   data: {
@@ -7,6 +7,6 @@ export interface Action {
     body: string
   }
   payload: {
-    err: OneAPIError<'No Body' | 'No Post'>
+    err: OneApiError | 'No Body' | 'No Post'
   }
 }

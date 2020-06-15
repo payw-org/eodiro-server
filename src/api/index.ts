@@ -1,12 +1,12 @@
 import Auth from '@/modules/auth'
-import { OneApiError } from './one/scheme/types/utils'
+import { OneApiError } from './one/types'
 import authRouter from '@/api/auth'
 import cafeteriaRouter from '@/api/cafeteria'
 import express from 'express'
 import inquiryRouter from '@/api/inquiry'
 import lecturesRouter from '@/api/lectures'
 import myRouter from '@/api/my'
-import { oneAPI } from './one'
+import { oneApi } from './one'
 import peperoSquareRouter from '@/api/pepero-square'
 import uploadRouter from '@/api/upload'
 import vacantRouter from '@/api/vacant'
@@ -48,7 +48,7 @@ router.post('/one', async (req, res) => {
   let payload: unknown
 
   try {
-    payload = await oneAPI({
+    payload = await oneApi({
       action,
       data,
     })

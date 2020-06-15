@@ -18,5 +18,8 @@
     "prisma/schema.prisma"
   ],
   "author": "PAYW",
-  "license": "MIT"
+  "license": "MIT",
+  "peerDependencies": {
+    "axios": "0.19.x"
+  }
 }

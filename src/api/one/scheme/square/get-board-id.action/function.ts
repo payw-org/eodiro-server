@@ -1,8 +1,8 @@
+import { Action } from './interface'
 import { BoardType } from '@/database/models/board'
 import Db from '@/db'
+import { OneApiError } from '@/api/one/types'
 import SqlB from '@/modules/sqlb'
-import { OneApiError } from '../../types/utils'
-import { Action } from './interface'
 
 export default async function (
   data: Action['data']
