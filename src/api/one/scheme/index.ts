@@ -83,11 +83,19 @@ export type UploadComment = UploadCommentRaw & { action: 'uploadComment' }
 import { Action as BookmarkTipRaw } from './tip/bookmark-tip.action/interface'
 export type BookmarkTip = BookmarkTipRaw & { action: 'bookmarkTip' }
 
+import { Action as CreateTipCommentRaw } from './tip/create-tip-comment.action/interface'
+export type CreateTipComment = CreateTipCommentRaw & {
+  action: 'createTipComment'
+}
+
 import { Action as CreateTipRaw } from './tip/create-tip.action/interface'
 export type CreateTip = CreateTipRaw & { action: 'createTip' }
 
 import { Action as DeleteTipRaw } from './tip/delete-tip.action/interface'
 export type DeleteTip = DeleteTipRaw & { action: 'deleteTip' }
+
+import { Action as GetTipCommentsRaw } from './tip/get-tip-comments.action/interface'
+export type GetTipComments = GetTipCommentsRaw & { action: 'getTipComments' }
 
 import { Action as GetTipDetailRaw } from './tip/get-tip-detail.action/interface'
 export type GetTipDetail = GetTipDetailRaw & { action: 'getTipDetail' }
@@ -127,8 +135,10 @@ export type OneApiAction =
   | SavePost
   | UploadComment
   | BookmarkTip
+  | CreateTipComment
   | CreateTip
   | DeleteTip
+  | GetTipComments
   | GetTipDetail
   | GetTips
   | GetTopics

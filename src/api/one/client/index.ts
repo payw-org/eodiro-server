@@ -3,6 +3,7 @@ import {
   AddDevice,
   BookmarkTip,
   CreateTip,
+  CreateTipComment,
   DeleteComment,
   DeletePost,
   DeleteTip,
@@ -17,6 +18,7 @@ import {
   GetPostLikes,
   GetPostsOfBoard,
   GetRecentPostsOfBoard,
+  GetTipComments,
   GetTipDetail,
   GetTips,
   GetTopics,
@@ -47,6 +49,10 @@ export async function oneAPIClient(
   host: string,
   request: Omit<CreateTip, 'payload'>
 ): Promise<CreateTip['payload']>
+export async function oneAPIClient(
+  host: string,
+  request: Omit<CreateTipComment, 'payload'>
+): Promise<CreateTipComment['payload']>
 export async function oneAPIClient(
   host: string,
   request: Omit<DeleteComment, 'payload'>
@@ -103,6 +109,10 @@ export async function oneAPIClient(
   host: string,
   request: Omit<GetRecentPostsOfBoard, 'payload'>
 ): Promise<GetRecentPostsOfBoard['payload']>
+export async function oneAPIClient(
+  host: string,
+  request: Omit<GetTipComments, 'payload'>
+): Promise<GetTipComments['payload']>
 export async function oneAPIClient(
   host: string,
   request: Omit<GetTipDetail, 'payload'>
