@@ -1,8 +1,9 @@
 import { Action } from './interface'
-import { OneApiFunction } from '@/api/one/types'
+import { OneApiFunc } from '@/api/one/types'
 import { Tip } from '@/database/models/tip'
+import { oneApiResponse } from '@/api/one/utils'
 
-const func: OneApiFunction<Action> = async (data) => {
+const func: OneApiFunc<Action> = async (data) => {
   const { authPayload, tipId } = data
   const { userId } = authPayload
   let isBookmarked = false
@@ -13,12 +14,7 @@ const func: OneApiFunction<Action> = async (data) => {
     isBookmarked = await Tip.bookmark(userId, tipId)
   }
 
-  return {
-    err: null,
-    data: {
-      isBookmarked,
-    },
-  }
+  return oneApiResponse<Action>({ isBookmarked })
 }
 
 export default func
