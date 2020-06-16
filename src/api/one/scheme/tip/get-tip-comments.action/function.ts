@@ -14,6 +14,7 @@ const func: OneApiFunc<Action> = async (data) => {
     const tipCommentList = await prisma.tipComment.findMany({
       where: {
         tipId: tipId,
+        isRemoved: false,
         id: {
           gt: lastCommentId,
         },
