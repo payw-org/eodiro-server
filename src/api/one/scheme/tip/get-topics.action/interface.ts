@@ -1,9 +1,9 @@
-import { AuthOnly, OneApiError } from '@/api/one/types'
+import {
+  OneApiActionTemplatePayload,
+  OneApiActionTemplateWithoutReqeustData,
+  OneApiError,
+} from '@/api/one/types'
 
-export interface Action {
-  data: AuthOnly
-  payload: {
-    err: OneApiError
-    data: { [key: string]: string }
-  }
-}
+export type Action = OneApiActionTemplateWithoutReqeustData<
+  OneApiActionTemplatePayload<OneApiError, { [key: string]: string }>
+>
