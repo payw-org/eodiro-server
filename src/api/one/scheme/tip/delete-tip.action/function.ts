@@ -20,7 +20,10 @@ const func: OneApiFunc<Action> = async (data) => {
     return oneApiResponse<Action>(OneApiError.FORBIDDEN)
   }
 
-  await prisma.tip.delete({ where: { id: tipId } })
+  await prisma.tipComment.update({
+    where: { id: tipId },
+    data: { isRemoved: true },
+  })
 
   return oneApiResponse<Action>({ isRemoved: true })
 }
