@@ -1,12 +1,10 @@
 import { Action } from './interface'
-import { OneApiFunction } from '@/api/one/types'
+import { OneApiFuncWithoutRequestData } from '@/api/one/types'
+import { oneApiResponse } from '@/api/one/utils'
 import { topicDict } from '@/database/models/tip'
 
-const func: OneApiFunction<Action> = async () => {
-  return {
-    err: null,
-    data: topicDict,
-  }
+const func: OneApiFuncWithoutRequestData<Action> = async () => {
+  return oneApiResponse<Action>(topicDict)
 }
 
 export default func
