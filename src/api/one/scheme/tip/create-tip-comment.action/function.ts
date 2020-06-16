@@ -1,9 +1,11 @@
+import { OneApiError, OneApiFunc } from '@/api/one/types'
+
 import { Action } from './interface'
-import { OneApiFunction } from '@/api/one/types'
 import Time from '@/modules/time'
+import { oneApiResponse } from '@/api/one/utils'
 import prisma from '@/modules/prisma'
 
-const func: OneApiFunction<Action> = async (data) => {
+const func: OneApiFunc<Action> = async (data) => {
   const { authPayload, tipId, body } = data
   const { userId } = authPayload
 
@@ -34,15 +36,9 @@ const func: OneApiFunction<Action> = async (data) => {
       },
     })
 
-    return {
-      err: null,
-      data: { tipCommentId: tipComment.id },
-    }
+    return oneApiResponse<Action>({ tipCommentId: tipComment.id })
   } catch (err) {
-    return {
-      err: null,
-      data: null,
-    }
+    return oneApiResponse<Action>(OneApiError.INTERNAL_SERVER_ERROR)
   }
 }
 
