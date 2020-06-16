@@ -12,6 +12,7 @@ const func: OneApiFunc<Action> = async (data) => {
   const tipList = await prisma.tip.findMany({
     where: {
       topic: topic,
+      isRemoved: false,
     },
     include: {
       tipLikes: true,
