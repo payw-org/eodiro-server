@@ -1,8 +1,9 @@
 import { Action } from './interface'
-import { OneApiFunction } from '@/api/one/types'
+import { OneApiFunc } from '@/api/one/types'
 import { Tip } from '@/database/models/tip'
+import { oneApiResponse } from '@/api/one/utils'
 
-const func: OneApiFunction<Action> = async (data) => {
+const func: OneApiFunc<Action> = async (data) => {
   const { authPayload, tipId } = data
   const { userId } = authPayload
   let isLike = false
@@ -13,12 +14,7 @@ const func: OneApiFunction<Action> = async (data) => {
     isLike = await Tip.like(userId, tipId)
   }
 
-  return {
-    err: null,
-    data: {
-      isLike,
-    },
-  }
+  return oneApiResponse<Action>({ isLike })
 }
 
 export default func
