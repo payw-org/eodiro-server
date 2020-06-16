@@ -1,37 +1,29 @@
-import { OneApiError, OneApiFunction } from '@/api/one/types'
+import { OneApiError, OneApiFunc } from '@/api/one/types'
 import { Tip, TipUpdateBody } from '@/database/models/tip'
 
 import { Action } from './interface'
+import { oneApiResponse } from '@/api/one/utils'
 import prisma from '@/modules/prisma'
 
-const func: OneApiFunction<Action> = async (data) => {
+const func: OneApiFunc<Action> = async (data) => {
   const { authPayload, tipId, title, body } = data
   const { userId } = authPayload
   const updateBody: TipUpdateBody = { title, body }
 
   try {
     if ((await prisma.tip.findOne({ where: { id: tipId } })) === null) {
-      return {
-        err: OneApiError.NO_CONTENT,
-        data: null,
-      }
+      return oneApiResponse<Action>(OneApiError.NO_CONTENT)
     }
 
     if (!Tip.isOwnedBy(userId, tipId)) {
-      return { err: OneApiError.FORBIDDEN, data: null }
+      return oneApiResponse<Action>(OneApiError.FORBIDDEN)
     }
 
     Tip.renew(tipId, updateBody)
 
-    return {
-      err: null,
-      data: true,
-    }
+    return oneApiResponse<Action>({ isUpdate: true })
   } catch (err) {
-    return {
-      err: OneApiError.INTERNAL_SERVER_ERROR,
-      data: null,
-    }
+    return oneApiResponse<Action>(OneApiError.INTERNAL_SERVER_ERROR)
   }
 }
 
