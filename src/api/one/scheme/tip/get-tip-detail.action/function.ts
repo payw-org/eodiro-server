@@ -19,7 +19,7 @@ const func: OneApiFunc<Action> = async (data) => {
         tipBookmarks: true,
       },
     })
-    if (tip === null) {
+    if (tip === null || tip.isRemoved) {
       return oneApiResponse<Action>(OneApiError.NO_CONTENT)
     }
 
