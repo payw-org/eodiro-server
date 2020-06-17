@@ -1,10 +1,11 @@
-import { OneApiError, OneApiFunction } from '@/api/one/types'
+import { OneApiError, OneApiFunc } from '@/api/one/types'
 import { Tip, TipResponse } from '@/database/models/tip'
 
 import { Action } from './interface'
+import { oneApiResponse } from '@/api/one/utils'
 import prisma from '@/modules/prisma'
 
-const func: OneApiFunction<Action> = async (data) => {
+const func: OneApiFunc<Action> = async (data) => {
   const { authPayload, tipId } = data
   const { userId } = authPayload
 
@@ -18,11 +19,8 @@ const func: OneApiFunction<Action> = async (data) => {
         tipBookmarks: true,
       },
     })
-    if (tip === null) {
-      return {
-        err: OneApiError.NO_CONTENT,
-        data: null,
-      }
+    if (tip === null || tip.isRemoved) {
+      return oneApiResponse<Action>(OneApiError.NO_CONTENT)
     }
 
     const tipResponse: TipResponse = {
@@ -33,15 +31,9 @@ const func: OneApiFunction<Action> = async (data) => {
       isBookmarked: await Tip.isBookmarked(userId, tipId),
     }
 
-    return {
-      err: null,
-      data: tipResponse,
-    }
+    return oneApiResponse<Action>(tipResponse)
   } catch (err) {
-    return {
-      err: OneApiError.INTERNAL_SERVER_ERROR,
-      data: null,
-    }
+    return oneApiResponse<Action>(OneApiError.INTERNAL_SERVER_ERROR)
   }
 }
 

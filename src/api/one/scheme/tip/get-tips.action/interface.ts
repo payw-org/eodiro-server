@@ -1,17 +1,23 @@
-import { OneApiError } from '@/api/one/types'
+import {
+  AuthRequired,
+  OneApiActionTemplate,
+  OneApiActionTemplatePayload,
+  OneApiError,
+} from '@/api/one/types'
+
 import { TipListResponse } from '@/database/models/tip'
 import { TipTopic } from '@prisma/client'
 
-export interface Action {
-  data: {
+export type Action = OneApiActionTemplate<
+  AuthRequired<{
     topic: TipTopic
     cursor: number
-  }
-  payload: {
-    err: OneApiError
-    data: {
+  }>,
+  OneApiActionTemplatePayload<
+    OneApiError,
+    {
       tips: TipListResponse[]
       totalCount: number
     }
-  }
-}
+  >
+>

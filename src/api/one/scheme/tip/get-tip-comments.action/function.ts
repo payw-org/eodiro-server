@@ -1,10 +1,11 @@
-import { OneApiError, OneApiFunction } from '@/api/one/types'
+import { OneApiError, OneApiFunc } from '@/api/one/types'
 
 import { Action } from './interface'
 import { TipCommentsResponse } from '@/database/models/tip_comment'
+import { oneApiResponse } from '@/api/one/utils'
 import prisma from '@/modules/prisma'
 
-const func: OneApiFunction<Action> = async (data) => {
+const func: OneApiFunc<Action> = async (data) => {
   const { tipId, lastCommentId } = data
 
   try {
@@ -13,6 +14,7 @@ const func: OneApiFunction<Action> = async (data) => {
     const tipCommentList = await prisma.tipComment.findMany({
       where: {
         tipId: tipId,
+        isRemoved: false,
         id: {
           gt: lastCommentId,
         },
@@ -26,18 +28,12 @@ const func: OneApiFunction<Action> = async (data) => {
       return response
     })
 
-    return {
-      err: null,
-      data: {
-        tipComments,
-        totalCount,
-      },
-    }
+    return oneApiResponse<Action>({
+      tipComments,
+      totalCount,
+    })
   } catch (err) {
-    return {
-      err: OneApiError.INTERNAL_SERVER_ERROR,
-      data: null,
-    }
+    return oneApiResponse<Action>(OneApiError.INTERNAL_SERVER_ERROR)
   }
 }
 

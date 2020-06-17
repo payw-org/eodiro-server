@@ -1,17 +1,22 @@
-import { AuthRequired, OneApiError } from '@/api/one/types'
+import {
+  AuthRequired,
+  OneApiActionTemplate,
+  OneApiActionTemplatePayload,
+  OneApiError,
+} from '@/api/one/types'
 
 import { TipCommentsResponse } from '@/database/models/tip_comment'
 
-export interface Action {
-  data: AuthRequired<{
+export type Action = OneApiActionTemplate<
+  AuthRequired<{
     tipId: number
     lastCommentId: number
-  }>
-  payload: {
-    err: OneApiError
-    data: {
+  }>,
+  OneApiActionTemplatePayload<
+    OneApiError,
+    {
       tipComments: TipCommentsResponse[]
       totalCount: number
     }
-  }
-}
+  >
+>
