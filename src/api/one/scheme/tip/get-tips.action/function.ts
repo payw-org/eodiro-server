@@ -1,9 +1,10 @@
 import { Action } from './interface'
-import { OneApiFunction } from '@/api/one/types'
+import { OneApiFunc } from '@/api/one/types'
 import { TipListResponse } from '@/database/models/tip'
+import { oneApiResponse } from '@/api/one/utils'
 import prisma from '@/modules/prisma'
 
-const func: OneApiFunction<Action> = async (data) => {
+const func: OneApiFunc<Action> = async (data) => {
   const { topic, cursor } = data
 
   const totalCount = await prisma.tip.count()
@@ -11,6 +12,7 @@ const func: OneApiFunction<Action> = async (data) => {
   const tipList = await prisma.tip.findMany({
     where: {
       topic: topic,
+      isRemoved: false,
     },
     include: {
       tipLikes: true,
@@ -33,13 +35,7 @@ const func: OneApiFunction<Action> = async (data) => {
     return response
   })
 
-  return {
-    err: null,
-    data: {
-      tips,
-      totalCount,
-    },
-  }
+  return oneApiResponse<Action>({ tips, totalCount })
 }
 
 export default func

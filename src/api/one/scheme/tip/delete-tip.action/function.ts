@@ -1,10 +1,11 @@
-import { OneApiError, OneApiFunction } from '@/api/one/types'
+import { OneApiError, OneApiFunc } from '@/api/one/types'
 
 import { Action } from './interface'
 import { Tip } from '@/database/models/tip'
+import { oneApiResponse } from '@/api/one/utils'
 import prisma from '@/modules/prisma'
 
-const func: OneApiFunction<Action> = async (data) => {
+const func: OneApiFunc<Action> = async (data) => {
   const { authPayload, tipId } = data
   const { userId } = authPayload
 
@@ -16,15 +17,15 @@ const func: OneApiFunction<Action> = async (data) => {
   }
 
   if (!Tip.isOwnedBy(userId, tipId)) {
-    return { err: OneApiError.FORBIDDEN, data: null }
+    return oneApiResponse<Action>(OneApiError.FORBIDDEN)
   }
 
-  await prisma.tip.delete({ where: { id: tipId } })
+  await prisma.tip.update({
+    where: { id: tipId },
+    data: { isRemoved: true },
+  })
 
-  return {
-    err: null,
-    data: true,
-  }
+  return oneApiResponse<Action>({ isRemoved: true })
 }
 
 export default func
