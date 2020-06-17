@@ -1,9 +1,10 @@
 import { Action } from './interface'
-import { OneApiFunction } from '@/api/one/types'
+import { OneApiFunc } from '@/api/one/types'
 import Time from '@/modules/time'
+import { oneApiResponse } from '@/api/one/utils'
 import prisma from '@/modules/prisma'
 
-const func: OneApiFunction<Action> = async (data) => {
+const func: OneApiFunc<Action> = async (data) => {
   const { authPayload, title, topic, body } = data
   const { userId } = authPayload
 
@@ -30,10 +31,7 @@ const func: OneApiFunction<Action> = async (data) => {
     },
   })
 
-  return {
-    err: null,
-    data: tip.id,
-  }
+  return oneApiResponse<Action>({ tipId: tip.id })
 }
 
 export default func
