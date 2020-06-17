@@ -5,7 +5,8 @@ import { oneApiResponse } from '@/api/one/utils'
 import prisma from '@/modules/prisma'
 
 const func: OneApiFunc<Action> = async (data) => {
-  const { topic, cursor } = data
+  const { topic, page } = data
+  const pageSize = 10
 
   const totalCount = await prisma.tip.count()
 
@@ -18,10 +19,9 @@ const func: OneApiFunc<Action> = async (data) => {
       tipLikes: true,
       tipBookmarks: true,
     },
-    cursor: {
-      id: cursor,
-    },
-    take: -10,
+    take: -pageSize,
+    skip: (page - 1) * pageSize,
+    orderBy: { createdAt: 'desc' },
   })
 
   const tips = tipList.map((item) => {
