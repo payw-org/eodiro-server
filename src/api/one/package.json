@@ -1,14 +1,16 @@
 {
   "name": "@payw/eodiro-one-api",
-  "version": "2.0.7",
+  "version": "2.1.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "copy-packagejson": "node scripts/copy-packagejson.js",
     "refresh": "node scripts/refresh",
     "versioning": "",
+    "!!! Run deploy scripts inside build directory !!!": "",
     "deploy": "npm publish --access public",
-    "deploy:next": "npm publish --access public --tag next"
+    "deploy:next": "npm publish --access public --tag next",
+    "postinstall": "prisma generate"
   },
   "files": [
     "api/one/client",
@@ -20,6 +22,7 @@
   "author": "PAYW",
   "license": "MIT",
   "peerDependencies": {
-    "axios": "0.19.x"
+    "axios": "0.19.x",
+    "@prisma/cli": "2.x"
   }
 }
