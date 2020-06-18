@@ -1,7 +1,7 @@
 import { DataTypes, Model } from 'sequelize'
+import { TipBookmark, TipLike, TipTopic } from '@prisma/client'
 
 import { PrimaryAIAttribute } from '../utils/model-attributes'
-import { TipTopic } from '@prisma/client'
 import { createInitModelFunction } from '../create-init-model'
 import prisma from '@/modules/prisma'
 
@@ -14,6 +14,20 @@ export const topicDict: { [key: string]: string } = {
 export type TipUpdateBody = {
   title: string
   body: string
+}
+
+export type TipAttrs = {
+  id: number
+  topic: TipTopic
+  userId: number
+  title: string
+  body: string
+  randomNickname: string
+  isArchived: boolean
+  createdAt: Date
+  editedAt: Date
+  tipLikes: TipLike[]
+  tipBookmarks: TipBookmark[]
 }
 
 export type TipResponse = {

@@ -1,28 +1,49 @@
+import {
+  Tip,
+  TipAttrs,
+  TipListResponse,
+  TipResponse,
+} from '@/database/models/tip'
+
 import { Action } from './interface'
 import { OneApiFunc } from '@/api/one/types'
-import { TipListResponse } from '@/database/models/tip'
 import { oneApiResponse } from '@/api/one/utils'
 import prisma from '@/modules/prisma'
 
 const func: OneApiFunc<Action> = async (data) => {
   const { topic, page } = data
   const pageSize = 10
+  let tipList: TipAttrs[]
 
   const totalCount = await prisma.tip.count()
-
-  const tipList = await prisma.tip.findMany({
-    where: {
-      topic: topic,
-      isRemoved: false,
-    },
-    include: {
-      tipLikes: true,
-      tipBookmarks: true,
-    },
-    take: -pageSize,
-    skip: (page - 1) * pageSize,
-    orderBy: { createdAt: 'desc' },
-  })
+  if (topic === null) {
+    tipList = await prisma.tip.findMany({
+      where: {
+        isRemoved: false,
+      },
+      include: {
+        tipLikes: true,
+        tipBookmarks: true,
+      },
+      take: -pageSize,
+      skip: (page - 1) * pageSize,
+      orderBy: { createdAt: 'desc' },
+    })
+  } else {
+    tipList = await prisma.tip.findMany({
+      where: {
+        topic: topic,
+        isRemoved: false,
+      },
+      include: {
+        tipLikes: true,
+        tipBookmarks: true,
+      },
+      take: -pageSize,
+      skip: (page - 1) * pageSize,
+      orderBy: { createdAt: 'desc' },
+    })
+  }
 
   const tips = tipList.map((item) => {
     const response: TipListResponse = {
