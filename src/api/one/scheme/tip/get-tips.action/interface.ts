@@ -18,6 +18,8 @@ export type Action = OneApiActionTemplate<
     {
       tips: TipListResponse[]
       totalCount: number
+      totalPage: number
+      page: number
     }
   >
 >
