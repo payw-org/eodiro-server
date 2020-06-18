@@ -21,7 +21,7 @@ const func: OneApiFunc<Action> = async (data) => {
 
     Tip.renew(tipId, updateBody)
 
-    return oneApiResponse<Action>({ isUpdate: true })
+    return oneApiResponse<Action>({ isUpdated: true })
   } catch (err) {
     return oneApiResponse<Action>(OneApiError.INTERNAL_SERVER_ERROR)
   }

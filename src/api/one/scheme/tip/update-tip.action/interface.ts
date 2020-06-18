@@ -11,5 +11,5 @@ export type Action = OneApiActionTemplate<
     title: string
     body: string
   }>,
-  OneApiActionTemplatePayload<OneApiError, { isUpdate: boolean }>
+  OneApiActionTemplatePayload<OneApiError, { isUpdated: boolean }>
 >
