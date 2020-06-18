@@ -22,6 +22,7 @@ export type TipAttrs = {
   userId: number
   title: string
   body: string
+  isRemoved: boolean
   randomNickname: string
   isArchived: boolean
   createdAt: Date
