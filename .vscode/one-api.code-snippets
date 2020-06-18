@@ -1,46 +1,91 @@
 {
-  "One API Interface": {
+  "One API type": {
     "scope": "typescript",
-    "prefix": "oneint",
+    "prefix": "onetype",
     "body": [
-      "import { OneApiError } from '@/api/one/scheme/types/utils'",
+      "import type {",
+      "  OneApiActionTemplate,",
+      "  OneApiActionTemplatePayload,",
+      "  OneApiError,",
+      "} from '@/api/one/types'",
       "",
-      "export interface Action {",
-      "  data: {",
-      "    $1",
-      "  }",
-      "  payload: {",
-      "    err: OneApiError",
-      "    data: $2",
-      "  }",
-      "}"
+      "export type Action = OneApiActionTemplate<",
+      "  $1,",
+      "  OneApiActionTemplatePayload<",
+      "    OneApiError,",
+      "    {",
+      "      $2",
+      "    }",
+      "  >",
+      ">"
     ]
   },
-  "One API Interface Auth Required": {
+  "One API type auth required": {
     "scope": "typescript",
-    "prefix": "oneintauth",
+    "prefix": "onetypeauth",
     "body": [
-      "import { AuthRequired, OneApiError } from '@/api/one/scheme/types/utils'",
+      "import type {",
+      "  AuthRequired,",
+      "  OneApiActionTemplate,",
+      "  OneApiActionTemplatePayload,",
+      "  OneApiError,",
+      "} from '@/api/one/types'",
       "",
-      "export interface Action {",
-      "  data: AuthRequired<{",
+      "export type Action = OneApiActionTemplate<",
+      "  AuthRequired<{",
       "    $1",
-      "  }>",
-      "  payload: {",
-      "    err: OneApiError",
-      "    data: $2",
-      "  }",
-      "}"
+      "  }>,",
+      "  OneApiActionTemplatePayload<",
+      "    OneApiError,",
+      "    {",
+      "      $2",
+      "    }",
+      "  >",
+      ">"
     ]
   },
-  "One API Function": {
+  "One API type without request data": {
+    "scope": "typescript",
+    "prefix": "onetypenodata",
+    "body": [
+      "import type {",
+      "  OneApiActionTemplatePayload,",
+      "  OneApiActionTemplateWithoutReqeustData,",
+      "  OneApiError,",
+      "} from '@/api/one/types'",
+      "",
+      "export type Action = OneApiActionTemplateWithoutReqeustData<",
+      "  OneApiActionTemplatePayload<",
+      "    OneApiError,",
+      "    {",
+      "      $2",
+      "    }",
+      "  >",
+      ">"
+    ]
+  },
+  "One API function": {
     "scope": "typescript",
     "prefix": "onefunc",
     "body": [
-      "import { OneApiFunction } from '@/api/one/scheme/types/utils'",
       "import { Action } from './interface'",
+      "import { OneApiFunc } from '@/api/one/types'",
       "",
-      "const func: OneApiFunction<Action> = async (data) => {",
+      "const func: OneApiFunc<Action> = async (data) => {",
+      "  $0",
+      "}",
+      "",
+      "export default func"
+    ]
+  },
+  "One API function without request data": {
+    "scope": "typescript",
+    "prefix": "onefuncnodata",
+    "body": [
+      "import type { Action } from './interface'",
+      "import type { OneApiFuncWithoutRequestData } from '@/api/one/types'",
+      "",
+      "const func: OneApiFuncWithoutRequestData<Action> = async () => {",
       "  $0",
       "}",
       "",
