@@ -53,6 +53,9 @@ router.post('/one', async (req, res) => {
       data,
     })
   } catch (err) {
+    // For debugging
+    console.log(err)
+
     res.json({
       err: 'Internal Server Error',
       errMsg: err.message,
