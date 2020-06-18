@@ -1,7 +1,8 @@
 {
   "name": "@payw/eodiro-one-api",
   "version": "2.1.3",
-  "description": "",
+  "description": "One API",
+  "repository": "https://github.com/payw-org/eodiro-server",
   "main": "index.js",
   "scripts": {
     "copy-packagejson": "node scripts/copy-packagejson.js",
