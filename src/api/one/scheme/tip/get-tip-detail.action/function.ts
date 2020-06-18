@@ -2,23 +2,15 @@ import { OneApiError, OneApiFunc } from '@/api/one/types'
 import { Tip, TipResponse } from '@/database/models/tip'
 
 import { Action } from './interface'
+import { TipRepository } from '@/database/repository/tip-repository'
 import { oneApiResponse } from '@/api/one/utils'
-import prisma from '@/modules/prisma'
 
 const func: OneApiFunc<Action> = async (data) => {
   const { authPayload, tipId } = data
   const { userId } = authPayload
 
   try {
-    const tip = await prisma.tip.findOne({
-      where: {
-        id: tipId,
-      },
-      include: {
-        tipLikes: true,
-        tipBookmarks: true,
-      },
-    })
+    const tip = await TipRepository.findById(tipId)
     if (tip === null || tip.isRemoved) {
       return oneApiResponse<Action>(OneApiError.NO_CONTENT)
     }

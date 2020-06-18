@@ -1,9 +1,4 @@
-import {
-  Tip,
-  TipAttrs,
-  TipListResponse,
-  TipResponse,
-} from '@/database/models/tip'
+import { TipAttrs, TipListResponse } from '@/database/models/tip'
 
 import { Action } from './interface'
 import { OneApiFunc } from '@/api/one/types'
