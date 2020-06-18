@@ -11,13 +11,15 @@ import { TipTopic } from '@prisma/client'
 export type Action = OneApiActionTemplate<
   AuthRequired<{
     topic: TipTopic
-    cursor: number
+    page: number
   }>,
   OneApiActionTemplatePayload<
     OneApiError,
     {
       tips: TipListResponse[]
       totalCount: number
+      totalPage: number
+      page: number
     }
   >
 >
