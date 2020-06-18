@@ -1,6 +1,6 @@
 {
   "name": "@payw/eodiro-one-api",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -15,6 +15,7 @@
   "files": [
     "api/one/client",
     "api/one/scheme",
+    "api/one/types",
     "database/models",
     "index.d.ts",
     "prisma/schema.prisma"
