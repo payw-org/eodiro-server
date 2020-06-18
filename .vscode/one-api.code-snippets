@@ -66,6 +66,28 @@
       ">"
     ]
   },
+  "One API type auth optional": {
+    "scope": "typescript",
+    "prefix": "onetypeauthoptional",
+    "body": [
+      "import type {",
+      "  AuthOptional,",
+      "  OneApiActionTemplate,",
+      "  OneApiActionTemplatePayload,",
+      "  OneApiError,",
+      "} from '@/api/one/types'",
+      "",
+      "export type Action = OneApiActionTemplate<",
+      "  AuthOptional,",
+      "  OneApiActionTemplatePayload<",
+      "    OneApiError,",
+      "    {",
+      "      $2",
+      "    }",
+      "  >",
+      ">"
+    ]
+  },
   "One API type without request data": {
     "scope": "typescript",
     "prefix": "onetypenodata",
