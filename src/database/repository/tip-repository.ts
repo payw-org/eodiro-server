@@ -1,6 +1,5 @@
-import { Tip, TipAttrs } from '../models/tip'
-
 import Time from '@/modules/time'
+import { TipAttrs } from '../models/tip'
 import { TipTopic } from '@prisma/client'
 import prisma from '@/modules/prisma'
 

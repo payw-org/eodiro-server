@@ -159,6 +159,14 @@ export class Tip extends Model {
     })
     return true
   }
+
+  static async delete(tipId: number): Promise<boolean> {
+    await prisma.tip.update({
+      where: { id: tipId },
+      data: { isRemoved: true },
+    })
+    return true
+  }
 }
 
 export const getTip = createInitModelFunction(Tip, 'tip', {
