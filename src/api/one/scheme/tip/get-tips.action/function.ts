@@ -35,7 +35,10 @@ const func: OneApiFunc<Action> = async (data) => {
     return response
   })
 
-  return oneApiResponse<Action>({ tips, totalCount })
+  const totalPage =
+    totalCount % 10 === 0 ? totalCount / 10 : Math.floor(totalCount / 10) + 1
+
+  return oneApiResponse<Action>({ tips, totalCount, totalPage, page })
 }
 
 export default func
