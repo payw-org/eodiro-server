@@ -1,9 +1,36 @@
-import { TipAttrs, TipResponse } from '../models/tip'
+import { Tip, TipAttrs } from '../models/tip'
 
+import Time from '@/modules/time'
 import { TipTopic } from '@prisma/client'
 import prisma from '@/modules/prisma'
 
 export class TipRepository {
+  static async create(
+    userId: number,
+    title: string,
+    topic: TipTopic,
+    body: string,
+    randomNick: string
+  ): Promise<number> {
+    const currentTime = Time.getIsoString()
+    const tip = await prisma.tip.create({
+      data: {
+        user: {
+          connect: {
+            id: userId,
+          },
+        },
+        title,
+        topic,
+        body,
+        randomNickname: randomNick,
+        createdAt: currentTime,
+        editedAt: currentTime,
+      },
+    })
+    return tip.id
+  }
+
   static async findById(tipId: number): Promise<TipAttrs> {
     const tip = await prisma.tip.findOne({
       where: {
