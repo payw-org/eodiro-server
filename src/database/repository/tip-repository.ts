@@ -11,7 +11,7 @@ export class TipRepository {
     body: string,
     randomNick: string
   ): Promise<number> {
-    const currentTime = Time.getIsoString()
+    const currentTime = Time.getPrismaCurrent()
     const tip = await prisma.tip.create({
       data: {
         user: {
