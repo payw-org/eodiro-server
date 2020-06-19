@@ -1,7 +1,7 @@
 import { DataTypes, Model } from 'sequelize'
+import { TipBookmark, TipLike, TipTopic } from '@prisma/client'
 
 import { PrimaryAIAttribute } from '../utils/model-attributes'
-import { TipTopic } from '@prisma/client'
 import { createInitModelFunction } from '../create-init-model'
 import prisma from '@/modules/prisma'
 
@@ -14,6 +14,21 @@ export const topicDict: { [key: string]: string } = {
 export type TipUpdateBody = {
   title: string
   body: string
+}
+
+export type TipAttrs = {
+  id: number
+  topic: TipTopic
+  userId: number
+  title: string
+  body: string
+  isRemoved: boolean
+  randomNickname: string
+  isArchived: boolean
+  createdAt: Date
+  editedAt: Date
+  tipLikes: TipLike[]
+  tipBookmarks: TipBookmark[]
 }
 
 export type TipResponse = {
@@ -141,6 +156,14 @@ export class Tip extends Model {
         id: tipId,
       },
       data: { title, body },
+    })
+    return true
+  }
+
+  static async delete(tipId: number): Promise<boolean> {
+    await prisma.tip.update({
+      where: { id: tipId },
+      data: { isRemoved: true },
     })
     return true
   }
