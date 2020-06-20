@@ -221,7 +221,7 @@ model PostFile {
   post   Post @relation(fields: [postId], references: [id])
 
   @@index([fileId], name: "file_id")
-  @@index([postId], name: "post_file_post_id_foreign_idx")
+  @@index([postId], name: "post_id")
   @@map(name: "post_file")
 }
 
@@ -299,11 +299,12 @@ model TipComment {
 }
 
 model TipFile {
-  fileId Int  @map(name: "file_id")
-  id     Int  @default(autoincrement()) @id
-  tipId  Int  @map(name: "tip_id")
-  file   File @relation(fields: [fileId], references: [id])
-  tip    Tip  @relation(fields: [tipId], references: [id])
+  createdAt DateTime? @map(name: "created_at")
+  fileId    Int       @map(name: "file_id")
+  id        Int       @default(autoincrement()) @id
+  tipId     Int       @map(name: "tip_id")
+  file      File      @relation(fields: [fileId], references: [id])
+  tip       Tip       @relation(fields: [tipId], references: [id])
 
   @@index([fileId], name: "file_id")
   @@index([tipId], name: "tip_id")

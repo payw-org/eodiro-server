@@ -33,4 +33,8 @@ export const getTipFile = createInitModelFunction(TipFile, 'tip_file', {
     onDelete: 'cascade',
     onUpdate: 'cascade',
   },
+  created_at: {
+    type: DataTypes.DATE,
+    defaultValue: DataTypes.NOW,
+  },
 })
