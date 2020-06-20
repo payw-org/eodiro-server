@@ -66,6 +66,16 @@ export class Tip extends Model {
     return topicDict[key]
   }
 
+  static async archive(tipId: number): Promise<boolean> {
+    const tip = await prisma.tip.update({
+      where: { id: tipId },
+      data: {
+        isArchived: true,
+      },
+    })
+    return tip.isArchived
+  }
+
   static async isOwnedBy(userId: number, tipId: number): Promise<boolean> {
     const tip = await prisma.tip.findOne({
       where: { id: tipId },
