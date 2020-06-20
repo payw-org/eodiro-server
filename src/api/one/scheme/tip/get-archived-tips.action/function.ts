@@ -1,24 +1,20 @@
-import { TipAttrs, TipListResponse } from '@/database/models/tip'
-
 import { Action } from './interface'
 import { OneApiFunc } from '@/api/one/types'
+import { TipListResponse } from '@/database/models/tip'
 import { TipRepository } from '@/database/repository/tip-repository'
 import { oneApiResponse } from '@/api/one/utils'
 import prisma from '@/modules/prisma'
 import { prismaTimeMod } from '@/modules/time'
 
 const func: OneApiFunc<Action> = async (data) => {
-  const { topic, page } = data
+  const { page } = data
   const pageSize = 10
-  let tipList: TipAttrs[]
 
-  const totalCount = await prisma.tip.count({ where: { isRemoved: false } })
+  const totalCount = await prisma.tip.count({
+    where: { isArchived: true, isRemoved: false },
+  })
 
-  if (topic === null) {
-    tipList = await TipRepository.findAll(pageSize, page)
-  } else {
-    tipList = await TipRepository.findByTopic(topic, pageSize, page)
-  }
+  const tipList = await TipRepository.findArchived(pageSize, page)
 
   const tips = tipList.map((item) => {
     const response: TipListResponse = {
