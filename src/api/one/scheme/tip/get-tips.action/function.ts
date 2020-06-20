@@ -20,23 +20,26 @@ const func: OneApiFunc<Action> = async (data) => {
     tipList = await TipRepository.findByTopic(topic, pageSize, page)
   }
 
-  const tips = prismaTimeMod(
-    tipList.map((item) => {
-      const response: TipListResponse = {
-        ...item,
-        tipLikes: item.tipLikes.length,
-        tipBookmarks: item.tipBookmarks.length,
-        isLiked: true,
-        isBookmarked: true,
-      }
-      return response
-    })
-  )
+  const tips = tipList.map((item) => {
+    const response: TipListResponse = {
+      ...item,
+      tipLikes: item.tipLikes.length,
+      tipBookmarks: item.tipBookmarks.length,
+      isLiked: true,
+      isBookmarked: true,
+    }
+    return response
+  })
 
   const totalPage =
     totalCount % 10 === 0 ? totalCount / 10 : Math.floor(totalCount / 10) + 1
 
-  return oneApiResponse<Action>({ tips, totalCount, totalPage, page })
+  return oneApiResponse<Action>({
+    tips: prismaTimeMod(tips),
+    totalCount,
+    totalPage,
+    page,
+  })
 }
 
 export default func
