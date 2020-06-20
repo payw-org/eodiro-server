@@ -8,6 +8,7 @@ import {
   DeleteTip,
   DeleteTipComment,
   EditPost,
+  GetArchivedTips,
   GetBoardId,
   GetComments,
   GetDevices,
@@ -74,6 +75,10 @@ export async function oneApiClient(
   host: string,
   request: Omit<EditPost, 'payload'>
 ): Promise<EditPost['payload']>
+export async function oneApiClient(
+  host: string,
+  request: Omit<GetArchivedTips, 'payload'>
+): Promise<GetArchivedTips['payload']>
 export async function oneApiClient(
   host: string,
   request: Omit<GetBoardId, 'payload'>
