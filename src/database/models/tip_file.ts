@@ -3,7 +3,13 @@ import { DataTypes, Model } from 'sequelize'
 import { PrimaryAIAttribute } from '../utils/model-attributes'
 import { createInitModelFunction } from '../create-init-model'
 
-class TipFile extends Model {}
+export type TipFileAttrs = {
+  id: number
+  tip_id: number
+  file_id: number
+}
+
+export class TipFile extends Model {}
 
 export const getTipFile = createInitModelFunction(TipFile, 'tip_file', {
   id: PrimaryAIAttribute,
@@ -28,8 +34,3 @@ export const getTipFile = createInitModelFunction(TipFile, 'tip_file', {
     onUpdate: 'cascade',
   },
 })
-
-export type TipFileType = {
-  tip_id: number
-  file_id: number
-}
