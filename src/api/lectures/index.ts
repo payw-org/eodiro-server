@@ -1,6 +1,6 @@
-import { TableNames } from '@/database/table-names'
 import Db from '@/db'
 import SqlB from '@/modules/sqlb'
+import { TableNames } from '@/database/table-names'
 import express from 'express'
 
 const router = express.Router()
@@ -69,18 +69,21 @@ router.get('/lectures/:year/:semester/:campus/search', async (req, res) => {
       .join(TableNames.lecture, `${TableNames.coverage_major} major`, 'left')
       .on(`${TableNames.lecture}.major = major.name`)
       .where(`year=? AND semester=? AND campus=?`)
-      .and()
-      .like('college', `%${searchKeyword}%`)
-      .or()
-      .like('major', `%${searchKeyword}%`)
-      .or()
-      .like('lecture.name', `%${searchKeyword}%`)
-      .or()
-      .like('lecture.code', `%${searchKeyword}%`)
-      .or()
-      .like('schedule', `%${searchKeyword}%`)
-      .or()
-      .like('professor', `%${searchKeyword}%`)
+      .and(
+        SqlB()
+          .like('college', `%${searchKeyword}%`)
+          .or()
+          .like('major', `%${searchKeyword}%`)
+          .or()
+          .like('lecture.name', `%${searchKeyword}%`)
+          .or()
+          .like('lecture.code', `%${searchKeyword}%`)
+          .or()
+          .like('schedule', `%${searchKeyword}%`)
+          .or()
+          .like('professor', `%${searchKeyword}%`)
+          .bind()
+      )
       .multiOrder([
         ['lecture.name', 'ASC'],
         ['professor', 'ASC'],
