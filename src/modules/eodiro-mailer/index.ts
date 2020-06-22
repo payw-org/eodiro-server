@@ -8,7 +8,10 @@ interface MailOption {
   /**
    * "name" \<id@domain.com\>
    */
-  from?: string
+  from?: {
+    name: string
+    alias: string
+  }
   subject: string
   to: string
   html?: string
@@ -44,14 +47,24 @@ export default class EodiroMailer {
     })
   }
 
+  private static createFrom(name: string, alias: string) {
+    return `"${name}" <${alias}@eodiro.com>`
+  }
+
   static async sendMail(options: MailOption): Promise<any> {
     if (!this.isReady) {
       log(`[ ${chalk.yellow('email')} ] not connected to an email server`)
     }
 
-    return await this.transporter.sendMail({
-      from: '"어디로" <support@eodiro.com>',
+    const defaultFrom = this.createFrom('어디로', 'no-reply')
+
+    const sendOptions = {
       ...options,
-    })
+      from: options.from
+        ? this.createFrom(options.from.name, options.from.alias)
+        : defaultFrom,
+    }
+
+    return await this.transporter.sendMail(sendOptions)
   }
 }

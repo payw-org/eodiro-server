@@ -155,7 +155,10 @@ export class CauNoticeWatcher {
 
     return emailAddrs.map((address) => {
       return EodiroMailer.sendMail({
-        from: `"[어디로 알림] ${subscriber.name}" <notification@eodiro.com>`,
+        from: {
+          name: `[어디로 알림] ${subscriber.name}`,
+          alias: 'notifications',
+        },
         to: address,
         subject,
         html: body,
