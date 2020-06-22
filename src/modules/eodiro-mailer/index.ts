@@ -6,7 +6,7 @@ const log = console.log
 
 interface MailOption {
   /**
-   * "name" \<id@domain.com\>
+   * "name" \<alias@eodiro.com\>
    */
   from?: {
     name: string
