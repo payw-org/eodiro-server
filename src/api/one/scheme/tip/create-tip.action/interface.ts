@@ -12,6 +12,7 @@ export type Action = OneApiActionTemplate<
     title: string
     topic: TipTopic
     body: string
+    fileIds: number[]
   }>,
   OneApiActionTemplatePayload<OneApiError, { tipId: number }>
 >
