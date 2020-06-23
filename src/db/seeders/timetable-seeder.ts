@@ -72,7 +72,7 @@ export default async function (lectures: RefinedLectures): Promise<void> {
 
       dbCoverageMajorLectures.push({
         lecture_id: lectureId,
-        major_name: coverage.major,
+        coverage_major: coverage.major,
       })
     }
   }

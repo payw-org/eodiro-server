@@ -12,6 +12,7 @@ import {
   GetBoardId,
   GetComments,
   GetDevices,
+  GetLecturesYears,
   GetMyPosts,
   GetMySubscriptions,
   GetNoticeCatalog,
@@ -91,6 +92,10 @@ export async function oneApiClient(
   host: string,
   request: Omit<GetDevices, 'payload'>
 ): Promise<GetDevices['payload']>
+export async function oneApiClient(
+  host: string,
+  request: Omit<GetLecturesYears, 'payload'>
+): Promise<GetLecturesYears['payload']>
 export async function oneApiClient(
   host: string,
   request: Omit<GetMyPosts, 'payload'>

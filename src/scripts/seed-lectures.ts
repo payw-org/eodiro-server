@@ -1,3 +1,7 @@
+/**
+ * npm run ts-node:[prod|dev] src/scripts/seed-lectures -- --lecturesFile data/lectures-2020-하계-1592711940996.json
+ */
+
 import { CTTS } from '@payw/cau-timetable-scraper'
 import Config from '@/config'
 import { Semester } from '@/types'
@@ -22,7 +26,7 @@ async function main(): Promise<void> {
     lecturesFile: string
   }>()
 
-  await boot({
+  const quit = await boot({
     db: true,
     listen: false,
   })
@@ -73,6 +77,8 @@ async function main(): Promise<void> {
   }
 
   log(`[ ${chalk.blue('seeding')} ] Done seeding lectures`)
+
+  quit()
 }
 
 main()

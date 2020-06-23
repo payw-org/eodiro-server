@@ -24,6 +24,11 @@ export type AddDevice = AddDeviceRaw & { action: 'addDevice' }
 import { Action as GetDevicesRaw } from './device/get-devices.action/interface'
 export type GetDevices = GetDevicesRaw & { action: 'getDevices' }
 
+import { Action as GetLecturesYearsRaw } from './lectures/get-lectures-years.action/interface'
+export type GetLecturesYears = GetLecturesYearsRaw & {
+  action: 'getLecturesYears'
+}
+
 import { Action as GetMyPostsRaw } from './my/get-my-posts.action/interface'
 export type GetMyPosts = GetMyPostsRaw & { action: 'getMyPosts' }
 
