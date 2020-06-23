@@ -17,7 +17,8 @@
       "      $2",
       "    }",
       "  >",
-      ">"
+      ">",
+      ""
     ]
   },
   "One API type auth required": {
@@ -41,7 +42,8 @@
       "      $2",
       "    }",
       "  >",
-      ">"
+      ">",
+      ""
     ]
   },
   "One API type auth only": {
@@ -63,7 +65,8 @@
       "      $2",
       "    }",
       "  >",
-      ">"
+      ">",
+      ""
     ]
   },
   "One API type auth optional": {
@@ -85,7 +88,8 @@
       "      $2",
       "    }",
       "  >",
-      ">"
+      ">",
+      ""
     ]
   },
   "One API type without request data": {
@@ -105,7 +109,8 @@
       "      $2",
       "    }",
       "  >",
-      ">"
+      ">",
+      ""
     ]
   },
   "One API function": {
@@ -119,7 +124,8 @@
       "  $0",
       "}",
       "",
-      "export default func"
+      "export default func",
+      ""
     ]
   },
   "One API function without request data": {
@@ -133,7 +139,8 @@
       "  $0",
       "}",
       "",
-      "export default func"
+      "export default func",
+      ""
     ]
   }
 }
