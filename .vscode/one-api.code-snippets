@@ -142,5 +142,10 @@
       "export default func",
       ""
     ]
+  },
+  "One API Response": {
+    "scope": "typescript",
+    "prefix": "oneres",
+    "body": "oneApiResponse<Action>($0)"
   }
 }
