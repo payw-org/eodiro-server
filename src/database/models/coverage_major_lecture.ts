@@ -47,5 +47,5 @@ export const coverageMajorLecture = createInitModelFunction(
 
 export type CoverageMajorLectureType = {
   lecture_id: number
-  major_name: string
+  coverage_major: string
 }

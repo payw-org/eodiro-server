@@ -14,6 +14,7 @@ async function run() {
   feed.subscribe(Subscribers.cau)
   feed.subscribe(Subscribers.dormitoryBlueMir)
   feed.subscribe(Subscribers.cse)
+  feed.subscribe(Subscribers.log)
 
   await feed.run()
 
