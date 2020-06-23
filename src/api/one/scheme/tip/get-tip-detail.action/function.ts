@@ -3,7 +3,9 @@ import { Tip, TipResponse } from '@/database/models/tip'
 
 import { Action } from './interface'
 import { FileRepository } from '@/database/repository/file-repository'
+import { FileResponse } from '@/database/models/file'
 import { TipRepository } from '@/database/repository/tip-repository'
+import dayjs from 'dayjs'
 import { oneApiResponse } from '@/api/one/utils'
 
 const func: OneApiFunc<Action> = async (data) => {
@@ -17,6 +19,17 @@ const func: OneApiFunc<Action> = async (data) => {
     }
 
     const tipFiles = await FileRepository.findTipFiles(tip.id)
+    const fileResponses = tipFiles.map((item) => {
+      const response: FileResponse = {
+        fileId: item.id,
+        path: `/public-user-content/${dayjs(item.uploadedAt).format(
+          'YYYYMMDD'
+        )}/${item.uuid}/${encodeURIComponent(item.fileName)}`,
+        mimeType: item.mime,
+        name: item.fileName,
+      }
+      return response
+    })
 
     const tipResponse: TipResponse = {
       ...tip,
@@ -24,7 +37,7 @@ const func: OneApiFunc<Action> = async (data) => {
       tipBookmarks: tip.tipBookmarks.length,
       isLiked: await Tip.isLiked(userId, tipId),
       isBookmarked: await Tip.isBookmarked(userId, tipId),
-      tipFiles: tipFiles,
+      tipFiles: fileResponses,
     }
 
     return oneApiResponse<Action>(tipResponse)
