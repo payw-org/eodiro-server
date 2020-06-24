@@ -1,6 +1,6 @@
 {
   "name": "@payw/eodiro-one-api",
-  "version": "2.2.1",
+  "version": "2.3.0",
   "description": "One API",
   "repository": "https://github.com/payw-org/eodiro-server",
   "main": "index.js",
