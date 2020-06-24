@@ -7,6 +7,7 @@ import { FileResponse } from '@/database/models/file'
 import { TipRepository } from '@/database/repository/tip-repository'
 import dayjs from 'dayjs'
 import { oneApiResponse } from '@/api/one/utils'
+import { prismaTimeMod } from '@/modules/time'
 
 const func: OneApiFunc<Action> = async (data) => {
   const { authPayload, tipId } = data
@@ -40,7 +41,7 @@ const func: OneApiFunc<Action> = async (data) => {
       tipFiles: fileResponses,
     }
 
-    return oneApiResponse<Action>(tipResponse)
+    return oneApiResponse<Action>(prismaTimeMod(tipResponse))
   } catch (err) {
     console.log(err)
     return oneApiResponse<Action>(OneApiError.INTERNAL_SERVER_ERROR)
