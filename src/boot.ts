@@ -71,8 +71,6 @@ export async function boot(options: {
       )
       return null
     }
-  } else {
-    log(`[ ${chalk.yellow('email')} ] skip connection`)
   }
 
   let server: http.Server = undefined
