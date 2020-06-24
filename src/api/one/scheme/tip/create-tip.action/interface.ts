@@ -14,5 +14,8 @@ export type Action = OneApiActionTemplate<
     body: string
     fileIds: number[]
   }>,
-  OneApiActionTemplatePayload<OneApiError, { tipId: number }>
+  OneApiActionTemplatePayload<
+    OneApiError | 'No Title' | 'No Body',
+    { tipId: number }
+  >
 >

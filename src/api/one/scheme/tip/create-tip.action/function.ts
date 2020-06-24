@@ -9,6 +9,14 @@ const func: OneApiFunc<Action> = async (data) => {
   const { authPayload, title, topic, body, fileIds } = data
   const { userId } = authPayload
 
+  if (title.trim().length === 0) {
+    return oneApiResponse<Action>('No Title')
+  }
+
+  if (body.trim().length === 0) {
+    return oneApiResponse<Action>('No Body')
+  }
+
   const user = await prisma.user.findOne({
     where: {
       id: userId,
