@@ -9,5 +9,11 @@ export type Action = OneApiActionTemplate<
   AuthRequired<{
     tipId: number
   }>,
-  OneApiActionTemplatePayload<OneApiError, { isBookmarked: boolean }>
+  OneApiActionTemplatePayload<
+    OneApiError,
+    {
+      isBookmarked: boolean
+      bookmarks: number
+    }
+  >
 >

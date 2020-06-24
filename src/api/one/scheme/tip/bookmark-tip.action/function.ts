@@ -1,6 +1,7 @@
 import { Action } from './interface'
 import { OneApiFunc } from '@/api/one/types'
 import { Tip } from '@/database/models/tip'
+import { TipRepository } from '@/database/repository/tip-repository'
 import { oneApiResponse } from '@/api/one/utils'
 
 const func: OneApiFunc<Action> = async (data) => {
@@ -14,7 +15,10 @@ const func: OneApiFunc<Action> = async (data) => {
     isBookmarked = await Tip.bookmark(userId, tipId)
   }
 
-  return oneApiResponse<Action>({ isBookmarked })
+  const tip = await TipRepository.findById(tipId)
+  const bookmarks = tip.tipBookmarks.length
+
+  return oneApiResponse<Action>({ isBookmarked, bookmarks })
 }
 
 export default func
