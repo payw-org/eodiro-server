@@ -1,3 +1,4 @@
+import Time from '@/modules/time'
 import prisma from '@/modules/prisma'
 
 export class TipFileRepository {
@@ -14,6 +15,7 @@ export class TipFileRepository {
             id: fileId,
           },
         },
+        createdAt: Time.getPrismaCurrent(),
       },
     })
     return true
