@@ -108,6 +108,15 @@ export class Tip extends Model {
     return true
   }
 
+  static async isViewd(userId: number, tipId: number): Promise<boolean> {
+    const like = await prisma.tipView.findMany({
+      where: {
+        AND: [{ userId: userId }, { tipId: tipId }],
+      },
+    })
+    return like.length !== 0 ? true : false
+  }
+
   static async isLiked(userId: number, tipId: number): Promise<boolean> {
     const like = await prisma.tipLike.findMany({
       where: {
