@@ -1,6 +1,7 @@
 import { DataTypes, Model } from 'sequelize'
 import { TipBookmark, TipLike, TipTopic } from '@prisma/client'
 
+import { FileResponse } from './file'
 import { PrimaryAIAttribute } from '../utils/model-attributes'
 import { createInitModelFunction } from '../create-init-model'
 import prisma from '@/modules/prisma'
@@ -45,6 +46,7 @@ export type TipResponse = {
   isBookmarked: boolean
   tipLikes: number
   tipBookmarks: number
+  tipFiles: FileResponse[]
 }
 
 export type TipListResponse = {

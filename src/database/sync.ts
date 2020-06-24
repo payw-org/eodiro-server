@@ -14,6 +14,7 @@ import { getPostFile } from './models/post_file'
 import { getTip } from './models/tip'
 import { getTipBookMark } from './models/tip_bookmark'
 import { getTipComment } from './models/tip_comment'
+import { getTipFile } from './models/tip_file'
 import { getTipLike } from './models/tip_like'
 import { getUser } from './models/user'
 import { initPost } from './models/post'
@@ -46,6 +47,7 @@ async function sync(): Promise<void> {
   await (await getTipLike()).sync(alter)
   await (await getTipBookMark()).sync(alter)
   await (await getTipComment()).sync(alter)
+  await (await getTipFile()).sync(alter)
   await (await cafeteriaMenu()).sync(alter)
   await (await coverageMajor()).sync(alter)
   await (await lecture()).sync(alter)
