@@ -20,4 +20,11 @@ export class TipFileRepository {
     })
     return true
   }
+
+  static async deleteAll(tipId: number): Promise<boolean> {
+    await prisma.tipFile.deleteMany({
+      where: { tipId },
+    })
+    return true
+  }
 }
