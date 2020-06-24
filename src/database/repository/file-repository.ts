@@ -5,7 +5,7 @@ export class FileRepository {
   static async findTipFiles(tipId: number): Promise<File[]> {
     const fileList = await prisma.file.findMany({
       include: {
-        tipFiles: { where: { tipId: tipId } },
+        tipFiles: { where: { tipId } },
       },
     })
     return fileList
