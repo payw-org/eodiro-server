@@ -18,6 +18,10 @@ const func: OneApiFunc<Action> = async (data) => {
       return oneApiResponse<Action>(OneApiError.NO_CONTENT)
     }
 
+    if (tip.userId !== userId && !Tip.isViewd(userId, tipId)) {
+      Tip.view(userId, tipId)
+    }
+
     const tipFiles = await FileRepository.findTipFiles(tip.id)
     const fileResponses = tipFiles.map((item) => {
       const response: FileResponse = {
