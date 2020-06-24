@@ -99,4 +99,36 @@ export class TipRepository {
     })
     return tipList
   }
+
+  static async searchAll(
+    keyword: string,
+    pageSize: number,
+    page: number
+  ): Promise<TipAttrs[]> {
+    const tipList = await prisma.tip.findMany({
+      where: {
+        isRemoved: false,
+        OR: [
+          {
+            title: {
+              contains: keyword,
+            },
+          },
+          {
+            body: {
+              contains: keyword,
+            },
+          },
+        ],
+      },
+      include: {
+        tipLikes: true,
+        tipBookmarks: true,
+      },
+      take: -pageSize,
+      skip: (page - 1) * pageSize,
+      orderBy: { createdAt: 'desc' },
+    })
+    return tipList
+  }
 }
