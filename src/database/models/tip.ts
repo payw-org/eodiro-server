@@ -90,6 +90,24 @@ export class Tip extends Model {
     return tip.userId === userId ? true : false
   }
 
+  static async view(userId: number, tipId: number): Promise<boolean> {
+    await prisma.tipView.create({
+      data: {
+        user: {
+          connect: {
+            id: userId,
+          },
+        },
+        tip: {
+          connect: {
+            id: tipId,
+          },
+        },
+      },
+    })
+    return true
+  }
+
   static async isLiked(userId: number, tipId: number): Promise<boolean> {
     const like = await prisma.tipLike.findMany({
       where: {
