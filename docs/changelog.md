@@ -18,13 +18,13 @@
 
 ### Fix
 
-- **lectures:** now search with current year and semester ([7210a5c](https://github.com/payw-org/eodiro-server/commit/7210a5c8c8f925b07bfc7d7247e441fc189c9ed2))
-- **lectures:** fix table attribute name ([834daf1](https://github.com/payw-org/eodiro-server/commit/834daf12ebc95341f91805b97be354671ef3b272))
+- **lectures:** now search with current year and semester - 7210a5c
+- **lectures:** fix table attribute name - 834daf1
 
 ### Chore
 
 - **deps:** remove graphql, dts-gen
-- **seed:** quit timetable seeder after finished the process ([b851a35](https://github.com/payw-org/eodiro-server/commit/b851a350b86f17c01bf78014cb42cfd370eef857))
+- **seed:** quit timetable seeder after finished the process - b851a35
 
 ## v2.2.1
 
