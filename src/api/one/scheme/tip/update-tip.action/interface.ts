@@ -10,6 +10,7 @@ export type Action = OneApiActionTemplate<
     tipId: number
     title: string
     body: string
+    fileIds: number[]
   }>,
   OneApiActionTemplatePayload<OneApiError, { isUpdated: boolean }>
 >
