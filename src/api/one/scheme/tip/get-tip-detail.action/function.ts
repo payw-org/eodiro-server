@@ -42,6 +42,7 @@ const func: OneApiFunc<Action> = async (data) => {
 
     return oneApiResponse<Action>(tipResponse)
   } catch (err) {
+    console.log(err)
     return oneApiResponse<Action>(OneApiError.INTERNAL_SERVER_ERROR)
   }
 }
