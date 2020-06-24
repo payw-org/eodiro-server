@@ -24,8 +24,8 @@ const func: OneApiFunc<Action> = async (data) => {
   )
 
   // create TipFile ManyToMany relation
-  fileIds.forEach((fileId) => {
-    TipFileRepository.create(tipId, fileId)
+  fileIds.forEach(async (fileId) => {
+    await TipFileRepository.create(tipId, fileId)
   })
 
   return oneApiResponse<Action>({ tipId })
