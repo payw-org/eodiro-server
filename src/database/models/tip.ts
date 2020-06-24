@@ -7,8 +7,13 @@ import { createInitModelFunction } from '../create-init-model'
 import prisma from '@/modules/prisma'
 
 export const topicDict: { [key: string]: string } = {
-  'school': '학교생활',
-  'interview': '면접',
+  'university': '학교생활',
+  'employment': '취업',
+  'newbie': '새내기',
+  'certificate': '자격증',
+  'exam': '시험',
+  'club': '동아리',
+  'contest': '공모전',
   'etc': '기타',
 }
 
@@ -185,7 +190,16 @@ export const getTip = createInitModelFunction(Tip, 'tip', {
   id: PrimaryAIAttribute,
   topic: {
     type: DataTypes.ENUM,
-    values: ['school', 'interview', 'etc'],
+    values: [
+      'university',
+      'employment',
+      'newbie',
+      'certificate',
+      'exam',
+      'club',
+      'contest',
+      'etc',
+    ],
   },
   user_id: {
     type: DataTypes.INTEGER,
