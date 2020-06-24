@@ -4,24 +4,29 @@ import { Tip } from '@/database/models/tip'
 import { TipRepository } from '@/database/repository/tip-repository'
 import { oneApiResponse } from '@/api/one/utils'
 
-const func: OneApiFunc<Action> = async (data) => {
-  const { authPayload, tipId } = data
+const func: OneApiFunc<Action> = async ({ authPayload, tipId }) => {
   const { userId } = authPayload
-  let isLike = false
+
+  let isLiked = false
+  let likes = 0
 
   if (await Tip.isLiked(userId, tipId)) {
-    isLike = await Tip.unlike(userId, tipId)
-  } else {
-    isLike = await Tip.like(userId, tipId)
+    isLiked = await Tip.unlike(userId, tipId)
 
     const tip = await TipRepository.findById(tipId)
+    likes = tip.tipLikes.length
+  } else {
+    isLiked = await Tip.like(userId, tipId)
 
-    if (tip.tipLikes.length >= 50) {
+    const tip = await TipRepository.findById(tipId)
+    likes = tip.tipLikes.length
+
+    if (likes >= 50) {
       Tip.archive(tipId)
     }
   }
 
-  return oneApiResponse<Action>({ isLike })
+  return oneApiResponse<Action>({ isLiked, likes })
 }
 
 export default func

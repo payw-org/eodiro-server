@@ -12,7 +12,8 @@ export type Action = OneApiActionTemplate<
   OneApiActionTemplatePayload<
     OneApiError,
     {
-      isLike: boolean
+      isLiked: boolean
+      likes: number
     }
   >
 >
