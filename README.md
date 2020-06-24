@@ -33,7 +33,7 @@ Node.js running on NGINX using reverse proxy.
 
 ```nginx
 server {
-    client_max_body_size 100M;
+    client_max_body_size 3M;
 }
 ```
 
