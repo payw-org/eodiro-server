@@ -33,8 +33,12 @@ router.post('/one', async (req, res) => {
     const authPayload = await Auth.isSignedUser(accessToken as string)
 
     if (!authPayload) {
+      // For debugging
+      console.log('Unauthorized')
+
       res.json({
         err: OneApiError.UNAUTHORIZED,
+        data: null,
       })
       return
     }
@@ -57,15 +61,20 @@ router.post('/one', async (req, res) => {
     console.log(err)
 
     res.json({
-      err: 'Internal Server Error',
+      err: OneApiError.INTERNAL_SERVER_ERROR,
       errMsg: err.message,
+      data: null,
     })
     return
   }
 
   if (!payload) {
+    // For debugging
+    console.log('No action found')
+
     res.json({
       err: 'No Action Found',
+      data: null,
     })
     return
   }
