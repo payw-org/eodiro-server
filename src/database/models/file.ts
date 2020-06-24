@@ -1,6 +1,14 @@
 import { DataTypes, Model } from 'sequelize'
-import { createInitModelFunction } from '../create-init-model'
+
 import { PrimaryAIAttribute } from '../utils/model-attributes'
+import { createInitModelFunction } from '../create-init-model'
+
+export type FileResponse = {
+  mimeType: string
+  name: string
+  fileId: number
+  path: string
+}
 
 class File extends Model {}
 

@@ -97,6 +97,7 @@ model File {
   uploadedAt DateTime   @map(name: "uploaded_at")
   uuid       String     @unique
   postFiles  PostFile[]
+  tipFiles   TipFile[]
 
   @@map(name: "file")
 }
@@ -260,6 +261,7 @@ model Tip {
   user           User          @relation(fields: [userId], references: [id])
   tipBookmarks   TipBookmark[]
   tipComments    TipComment[]
+  tipFiles       TipFile[]
   tipLikes       TipLike[]
 
   @@index([userId], name: "user_id")
@@ -294,6 +296,19 @@ model TipComment {
   @@index([tipId], name: "tip_id")
   @@index([userId], name: "user_id")
   @@map(name: "tip_comment")
+}
+
+model TipFile {
+  createdAt DateTime? @map(name: "created_at")
+  fileId    Int       @map(name: "file_id")
+  id        Int       @default(autoincrement()) @id
+  tipId     Int       @map(name: "tip_id")
+  file      File      @relation(fields: [fileId], references: [id])
+  tip       Tip       @relation(fields: [tipId], references: [id])
+
+  @@index([fileId], name: "file_id")
+  @@index([tipId], name: "tip_id")
+  @@map(name: "tip_file")
 }
 
 model TipLike {
