@@ -258,12 +258,12 @@ model Tip {
   title          String
   topic          TipTopic?
   userId         Int           @map(name: "user_id")
-  viewCount      Int?          @default(0) @map(name: "view_count")
   user           User          @relation(fields: [userId], references: [id])
   tipBookmarks   TipBookmark[]
   tipComments    TipComment[]
   tipFiles       TipFile[]
   tipLikes       TipLike[]
+  tipViews       TipView[]
 
   @@index([userId], name: "user_id")
   @@map(name: "tip")
@@ -325,6 +325,19 @@ model TipLike {
   @@map(name: "tip_like")
 }
 
+model TipView {
+  id     Int  @default(autoincrement())
+  tipId  Int  @map(name: "tip_id")
+  userId Int  @map(name: "user_id")
+  tip    Tip  @relation(fields: [tipId], references: [id])
+  user   User @relation(fields: [userId], references: [id])
+
+  @@id([id, userId, tipId])
+  @@index([tipId], name: "tip_id")
+  @@index([userId], name: "user_id")
+  @@map(name: "tip_view")
+}
+
 model User {
   id                               Int                               @default(autoincrement()) @id
   nickname                         String
@@ -346,6 +359,7 @@ model User {
   tipBookmarks                     TipBookmark[]
   tipComments                      TipComment[]
   tipLikes                         TipLike[]
+  tipViews                         TipView[]
 
   @@index([portalId], name: "user_portal_id")
   @@map(name: "user")
