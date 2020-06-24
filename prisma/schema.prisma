@@ -24,7 +24,7 @@ model Board {
 
 model CafeteriaMenu {
   campus   String
-  data     String?
+  data     Json?
   servedAt DateTime @map(name: "served_at")
 
   @@id([campus, servedAt])
@@ -351,8 +351,13 @@ model User {
 }
 
 enum TipTopic {
-  school
-  interview
+  university
+  employment
+  newbie
+  certificate
+  exam
+  club
+  contest
   etc
 
   @@map(name: "tip_topic")
