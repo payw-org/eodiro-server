@@ -12,7 +12,11 @@ import multer from 'multer'
 import { v4 as uuidv4 } from 'uuid'
 
 const router = express.Router()
-const upload = multer().array('file')
+const upload = multer({
+  limits: {
+    fileSize: 1024 * 1024 * 3,
+  },
+}).array('file')
 const publicContentUrl = 'public-user-content'
 
 router.post('/upload', async (req, res) => {
