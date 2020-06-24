@@ -227,6 +227,10 @@ export const getTip = createInitModelFunction(Tip, 'tip', {
     type: DataTypes.BOOLEAN,
     defaultValue: false,
   },
+  view_count: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0,
+  },
   is_removed: {
     type: DataTypes.BOOLEAN,
     defaultValue: false,

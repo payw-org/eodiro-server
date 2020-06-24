@@ -258,6 +258,7 @@ model Tip {
   title          String
   topic          TipTopic?
   userId         Int           @map(name: "user_id")
+  viewCount      Int?          @default(0) @map(name: "view_count")
   user           User          @relation(fields: [userId], references: [id])
   tipBookmarks   TipBookmark[]
   tipComments    TipComment[]
@@ -351,8 +352,13 @@ model User {
 }
 
 enum TipTopic {
-  school
-  interview
+  university
+  employment
+  newbie
+  certificate
+  exam
+  club
+  contest
   etc
 
   @@map(name: "tip_topic")
