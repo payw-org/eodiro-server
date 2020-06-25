@@ -10,7 +10,7 @@ import { TipTopic } from '@prisma/client'
 
 export type Action = OneApiActionTemplate<
   AuthRequired<{
-    topic: TipTopic | null
+    topic?: TipTopic
     page: number
   }>,
   OneApiActionTemplatePayload<
