@@ -125,5 +125,8 @@ export type GetTopics = GetTopicsRaw & { action: 'getTopics' }
 import { Action as LikeTipRaw } from './tip/like-tip.action/interface'
 export type LikeTip = LikeTipRaw & { action: 'likeTip' }
 
+import { Action as SearchTipRaw } from './tip/search-tip.action/interface'
+export type SearchTip = SearchTipRaw & { action: 'searchTip' }
+
 import { Action as UpdateTipRaw } from './tip/update-tip.action/interface'
 export type UpdateTip = UpdateTipRaw & { action: 'updateTip' }
