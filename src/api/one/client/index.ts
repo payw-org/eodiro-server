@@ -29,6 +29,7 @@ import {
   LikePost,
   LikeTip,
   SavePost,
+  SearchTip,
   Test,
   UpdateNoticeSubscription,
   UpdateTip,
@@ -160,6 +161,10 @@ export async function oneApiClient(
   host: string,
   request: Omit<SavePost, 'payload'>
 ): Promise<SavePost['payload']>
+export async function oneApiClient(
+  host: string,
+  request: Omit<SearchTip, 'payload'>
+): Promise<SearchTip['payload']>
 export async function oneApiClient(
   host: string,
   request: Omit<Test, 'payload'>
