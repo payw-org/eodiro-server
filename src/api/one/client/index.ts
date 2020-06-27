@@ -1,6 +1,5 @@
 import {
   AddDevice,
-  BookmarkTip,
   CreateTip,
   CreateTipComment,
   DeleteComment,
@@ -45,10 +44,6 @@ export async function oneApiClient(
   host: string,
   request: Omit<AddDevice, 'payload'>
 ): Promise<AddDevice['payload']>
-export async function oneApiClient(
-  host: string,
-  request: Omit<BookmarkTip, 'payload'>
-): Promise<BookmarkTip['payload']>
 export async function oneApiClient(
   host: string,
   request: Omit<CreateTip, 'payload'>
