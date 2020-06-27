@@ -88,9 +88,6 @@ export type UploadComment = UploadCommentRaw & { action: 'uploadComment' }
 import { Action as TestRaw } from './test.action/interface'
 export type Test = TestRaw & { action: 'test' }
 
-import { Action as BookmarkTipRaw } from './tip/bookmark-tip.action/interface'
-export type BookmarkTip = BookmarkTipRaw & { action: 'bookmarkTip' }
-
 import { Action as CreateTipCommentRaw } from './tip/create-tip-comment.action/interface'
 export type CreateTipComment = CreateTipCommentRaw & {
   action: 'createTipComment'
