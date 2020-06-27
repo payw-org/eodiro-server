@@ -39,9 +39,7 @@ const func: OneApiFunc<Action> = async (data) => {
     const tipResponse: TipResponse = {
       ...tip,
       tipLikes: tip.tipLikes.length,
-      tipBookmarks: tip.tipBookmarks.length,
       isLiked: await Tip.isLiked(userId, tipId),
-      isBookmarked: await Tip.isBookmarked(userId, tipId),
       tipFiles: fileResponses,
     }
 
