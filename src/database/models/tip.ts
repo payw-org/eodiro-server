@@ -1,5 +1,5 @@
 import { DataTypes, Model } from 'sequelize'
-import { TipBookmark, TipLike, TipTopic } from '@prisma/client'
+import { TipLike, TipTopic } from '@prisma/client'
 
 import { FileResponse } from './file'
 import { PrimaryAIAttribute } from '../utils/model-attributes'
@@ -34,7 +34,6 @@ export type TipAttrs = {
   createdAt: Date
   editedAt: Date
   tipLikes: TipLike[]
-  tipBookmarks: TipBookmark[]
 }
 
 export type TipResponse = {
@@ -48,9 +47,7 @@ export type TipResponse = {
   createdAt: Date
   editedAt: Date
   isLiked: boolean
-  isBookmarked: boolean
   tipLikes: number
-  tipBookmarks: number
   tipFiles: FileResponse[]
 }
 
@@ -63,9 +60,7 @@ export type TipListResponse = {
   createdAt: Date
   editedAt: Date
   isLiked: boolean
-  isBookmarked: boolean
   tipLikes: number
-  tipBookmarks: number
 }
 
 export class Tip extends Model {
@@ -126,14 +121,6 @@ export class Tip extends Model {
     return like.length !== 0 ? true : false
   }
 
-  static async isBookmarked(userId: number, tipId: number): Promise<boolean> {
-    const like = await prisma.tipBookmark.findMany({
-      where: {
-        AND: [{ userId: userId }, { tipId: tipId }],
-      },
-    })
-    return like.length !== 0 ? true : false
-  }
   static async like(userId: number, tipId: number): Promise<boolean> {
     await prisma.tipLike.create({
       data: {
@@ -154,34 +141,6 @@ export class Tip extends Model {
 
   static async unlike(userId: number, tipId: number): Promise<boolean> {
     await prisma.tipLike.delete({
-      where: {
-        userId: userId,
-        tipId: tipId,
-      },
-    })
-    return false
-  }
-
-  static async bookmark(userId: number, tipId: number): Promise<boolean> {
-    await prisma.tipBookmark.create({
-      data: {
-        user: {
-          connect: {
-            id: userId,
-          },
-        },
-        tip: {
-          connect: {
-            id: tipId,
-          },
-        },
-      },
-    })
-    return true
-  }
-
-  static async cancelBookmark(userId: number, tipId: number): Promise<boolean> {
-    await prisma.tipBookmark.delete({
       where: {
         userId: userId,
         tipId: tipId,

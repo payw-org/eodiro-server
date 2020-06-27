@@ -58,9 +58,7 @@ const func: OneApiFunc<Action> = async (data) => {
     const response: TipListResponse = {
       ...item,
       tipLikes: item.tipLikes.length,
-      tipBookmarks: item.tipBookmarks.length,
       isLiked: true,
-      isBookmarked: true,
     }
     return response
   })
