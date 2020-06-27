@@ -12,7 +12,6 @@ import { getLiveChat } from './models/live_chat'
 import { getNoticeNotificationsSubscription } from './models/notice_notifications_subscription'
 import { getPostFile } from './models/post_file'
 import { getTip } from './models/tip'
-import { getTipBookMark } from './models/tip_bookmark'
 import { getTipComment } from './models/tip_comment'
 import { getTipFile } from './models/tip_file'
 import { getTipLike } from './models/tip_like'
@@ -46,7 +45,6 @@ async function sync(): Promise<void> {
   await (await comment()).sync(alter)
   await (await getTip()).sync(alter)
   await (await getTipLike()).sync(alter)
-  await (await getTipBookMark()).sync(alter)
   await (await getTipComment()).sync(alter)
   await (await getTipFile()).sync(alter)
   await (await getTipView()).sync(alter)
