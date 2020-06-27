@@ -1,5 +1,5 @@
 import { DataTypes, Model } from 'sequelize'
-import { TipBookmark, TipLike, TipTopic } from '@prisma/client'
+import { TipLike, TipTopic } from '@prisma/client'
 
 import { FileResponse } from './file'
 import { PrimaryAIAttribute } from '../utils/model-attributes'
@@ -34,7 +34,6 @@ export type TipAttrs = {
   createdAt: Date
   editedAt: Date
   tipLikes: TipLike[]
-  tipBookmarks: TipBookmark[]
 }
 
 export type TipResponse = {
@@ -48,9 +47,7 @@ export type TipResponse = {
   createdAt: Date
   editedAt: Date
   isLiked: boolean
-  isBookmarked: boolean
   tipLikes: number
-  tipBookmarks: number
   tipFiles: FileResponse[]
 }
 
@@ -63,9 +60,7 @@ export type TipListResponse = {
   createdAt: Date
   editedAt: Date
   isLiked: boolean
-  isBookmarked: boolean
   tipLikes: number
-  tipBookmarks: number
 }
 
 export class Tip extends Model {
