@@ -37,7 +37,6 @@ export class TipRepository {
       },
       include: {
         tipLikes: true,
-        tipBookmarks: true,
       },
     })
     return tip
@@ -55,7 +54,6 @@ export class TipRepository {
       },
       include: {
         tipLikes: true,
-        tipBookmarks: true,
       },
       take: -pageSize,
       skip: (page - 1) * pageSize,
@@ -75,7 +73,6 @@ export class TipRepository {
       },
       include: {
         tipLikes: true,
-        tipBookmarks: true,
       },
       take: -pageSize,
       skip: (page - 1) * pageSize,
@@ -91,7 +88,6 @@ export class TipRepository {
       },
       include: {
         tipLikes: true,
-        tipBookmarks: true,
       },
       take: -pageSize,
       skip: (page - 1) * pageSize,
@@ -125,7 +121,6 @@ export class TipRepository {
       },
       include: {
         tipLikes: true,
-        tipBookmarks: true,
       },
       take: -pageSize,
       skip: (page - 1) * pageSize,
@@ -157,7 +152,6 @@ export class TipRepository {
       },
       include: {
         tipLikes: true,
-        tipBookmarks: true,
       },
       take: -pageSize,
       skip: (page - 1) * pageSize,
