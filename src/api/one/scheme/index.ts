@@ -107,6 +107,9 @@ export type DeleteTip = DeleteTipRaw & { action: 'deleteTip' }
 import { Action as GetArchivedTipsRaw } from './tip/get-archived-tips.action/interface'
 export type GetArchivedTips = GetArchivedTipsRaw & { action: 'getArchivedTips' }
 
+import { Action as GetLikedTipsRaw } from './tip/get-liked-tips.action/interface'
+export type GetLikedTips = GetLikedTipsRaw & { action: 'getLikedTips' }
+
 import { Action as GetTipCommentsRaw } from './tip/get-tip-comments.action/interface'
 export type GetTipComments = GetTipCommentsRaw & { action: 'getTipComments' }
 
