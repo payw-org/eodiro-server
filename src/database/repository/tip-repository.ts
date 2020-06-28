@@ -55,7 +55,7 @@ export class TipRepository {
       include: {
         tipLikes: true,
       },
-      take: -pageSize,
+      take: pageSize,
       skip: (page - 1) * pageSize,
       orderBy: { createdAt: 'desc' },
     })
@@ -74,7 +74,7 @@ export class TipRepository {
       include: {
         tipLikes: true,
       },
-      take: -pageSize,
+      take: pageSize,
       skip: (page - 1) * pageSize,
       orderBy: { createdAt: 'desc' },
     })
@@ -89,7 +89,7 @@ export class TipRepository {
       include: {
         tipLikes: true,
       },
-      take: -pageSize,
+      take: pageSize,
       skip: (page - 1) * pageSize,
       orderBy: { createdAt: 'desc' },
     })
@@ -122,7 +122,7 @@ export class TipRepository {
       include: {
         tipLikes: true,
       },
-      take: -pageSize,
+      take: pageSize,
       skip: (page - 1) * pageSize,
       orderBy: { createdAt: 'desc' },
     })
@@ -153,7 +153,7 @@ export class TipRepository {
       include: {
         tipLikes: true,
       },
-      take: -pageSize,
+      take: pageSize,
       skip: (page - 1) * pageSize,
       orderBy: { createdAt: 'desc' },
     })
