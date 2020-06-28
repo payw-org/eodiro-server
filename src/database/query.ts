@@ -8,6 +8,7 @@ import {
 
 import { Database } from './index'
 import { SqlBInstance } from '@/modules/sqlb'
+
 export { QueryTypes } from 'sequelize'
 
 /**
@@ -65,7 +66,7 @@ export function query(
 
 export function query<M extends Model>(
   sql: string | SqlBInstance | { query: string; values: unknown[] },
-  options: QueryOptionsWithModel
+  options: QueryOptionsWithModel<M>
 ): Promise<M[]>
 
 export function query<T extends Record<string, unknown>>(
