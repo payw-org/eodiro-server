@@ -35,7 +35,9 @@ const func: OneApiFunc<Action> = async (data) => {
   })
 
   const totalPage =
-    totalCount % 10 === 0 ? totalCount / 10 : Math.floor(totalCount / 10) + 1
+    totalCount % pageSize === 0
+      ? totalCount / pageSize
+      : Math.floor(totalCount / pageSize) + 1
 
   return oneApiResponse<Action>({
     tips: prismaTimeMod(tips),
