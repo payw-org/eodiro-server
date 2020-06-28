@@ -69,6 +69,7 @@ export class TipRepository {
   ): Promise<TipAttrs[]> {
     const tipList = await prisma.tip.findMany({
       where: {
+        isRemoved: false,
         tipLikes: {
           some: {
             userId,
