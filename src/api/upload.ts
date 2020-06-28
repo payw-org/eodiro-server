@@ -1,4 +1,8 @@
 import { EodiroQueryType, eodiroQuery } from '@/database/eodiro-query'
+import {
+  getPublicUserContentPath,
+  getStoragePath,
+} from '@/cdn/get-storage-path'
 
 import { FileType } from '@/database/models/file'
 import SqlB from '@/modules/sqlb'
@@ -7,7 +11,6 @@ import { availableMimeTypes } from '@/config/available-mime-types'
 import dayjs from 'dayjs'
 import express from 'express'
 import fs from 'fs'
-import { getStoragePath } from '@/cdn/get-storage-path'
 import multer from 'multer'
 import { v4 as uuidv4 } from 'uuid'
 
@@ -17,10 +20,9 @@ const upload = multer({
     fileSize: 1024 * 1024 * 3,
   },
 }).array('file')
-const publicContentUrl = 'public-user-content'
 
 router.post('/upload', async (req, res) => {
-  upload(req, res, async (err) => {
+  upload(req, res, async () => {
     const storagePath = getStoragePath()
 
     if (!fs.existsSync(storagePath)) {
@@ -35,75 +37,45 @@ router.post('/upload', async (req, res) => {
       fileId: number
     }[]
 
+    const today = dayjs()
+    const todayDate = dayjs().toDate()
+    const dateDirectory = getPublicUserContentPath({ date: todayDate })
+
     for (let i = 0; i < files.length; i++) {
       const file = files[i]
       const originalName = file.originalname
       const uuid = uuidv4()
-      // TODO: validate mimetype also on the server side
       const mimeType = file.mimetype
       const buffer = file.buffer
 
-      let available = false
+      let isMimeTypeavailable = false
       let errored = false
-      let errMsg = ''
-      let dateDirectory = ''
-      let insertId: number
+      let errMsg = null
+      let insertId: number = null
 
       for (let i = 0; i < availableMimeTypes.length; i += 1) {
         const availableMime = availableMimeTypes[i]
         if (mimeType.startsWith(availableMime)) {
-          available = true
+          isMimeTypeavailable = true
           break
         }
       }
 
-      if (!available) {
+      if (!isMimeTypeavailable) {
         res.status(200).json({
           err: 'Unsupported MIME Type',
         })
-        result
-        return
         errored = true
         errMsg = 'Unsupported MIME Type'
       } else if (file.size > 1024 * 1024 * 3) {
         errored = true
         errMsg = 'File Too Large'
       } else {
-        // Check directory existence
-        if (!fs.existsSync(`${storagePath}/${publicContentUrl}`)) {
-          fs.mkdirSync(`${storagePath}/${publicContentUrl}`)
-        }
-
-        const today = dayjs()
-        dateDirectory = today.format('YYYYMMDD')
-
-        if (
-          !fs.existsSync(`${storagePath}/${publicContentUrl}/${dateDirectory}`)
-        ) {
-          fs.mkdirSync(`${storagePath}/${publicContentUrl}/${dateDirectory}`)
-        }
-
         // Create a uuid directory
-        try {
-          fs.mkdirSync(
-            `${storagePath}/${publicContentUrl}/${dateDirectory}/${uuid}`
-          )
-        } catch (error) {
-          res.sendStatus(500)
-          return
-        }
+        fs.mkdirSync(`${dateDirectory}/${uuid}`)
 
         // Save file
-        try {
-          fs.writeFileSync(
-            `${storagePath}/${publicContentUrl}/${dateDirectory}/${uuid}/${originalName}`,
-            buffer
-          )
-        } catch (error) {
-          console.log(error)
-          res.sendStatus(500)
-          return
-        }
+        fs.writeFileSync(`${dateDirectory}/${uuid}/${originalName}`, buffer)
 
         // Record to DB
         const insertResult = await eodiroQuery(
@@ -120,10 +92,13 @@ router.post('/upload', async (req, res) => {
 
       result.push({
         index: i,
-        path: `/${publicContentUrl}/${dateDirectory}/${uuid}/${encodeURIComponent(
-          originalName
-        )}`,
-        fileId: insertId,
+        path: !errored
+          ? `${getPublicUserContentPath({
+              date: todayDate,
+              forClient: true,
+            })}/${uuid}/${encodeURIComponent(originalName)}`
+          : null,
+        fileId: errored ? insertId : null,
         err: errored ? errMsg : null,
       })
     }
