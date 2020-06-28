@@ -1,5 +1,6 @@
 import { File } from '@prisma/client'
 import prisma from '@/modules/prisma'
+import { prismaTimeMod } from '@/modules/time'
 
 export class FileRepository {
   static async findTipFiles(tipId: number): Promise<File[]> {
@@ -13,6 +14,6 @@ export class FileRepository {
       },
     })
 
-    return fileList
+    return prismaTimeMod(fileList)
   }
 }
