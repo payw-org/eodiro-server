@@ -1,3 +1,5 @@
+// TODO: garbage collect files which are not connected to tips
+
 import { EodiroQueryType, eodiroQuery } from '@/database/eodiro-query'
 
 import { FileType } from '@/database/models/file'
