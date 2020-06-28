@@ -12,11 +12,18 @@ const func: OneApiFunc<Action> = async (data) => {
   const pageSize = 10
   let tipList: TipAttrs[]
 
-  const totalCount = await prisma.tip.count({ where: { isRemoved: false } })
+  let totalCount = 0
 
   if (!topic) {
+    totalCount = await prisma.tip.count({ where: { isRemoved: false } })
     tipList = await TipRepository.findAll(pageSize, page)
   } else {
+    totalCount = await prisma.tip.count({
+      where: {
+        isRemoved: false,
+        topic,
+      },
+    })
     tipList = await TipRepository.findByTopic(topic, pageSize, page)
   }
 
