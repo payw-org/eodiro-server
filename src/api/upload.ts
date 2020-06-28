@@ -98,7 +98,7 @@ router.post('/upload', async (req, res) => {
               forClient: true,
             })}/${uuid}/${encodeURIComponent(originalName)}`
           : null,
-        fileId: errored ? insertId : null,
+        fileId: errored ? null : insertId,
         err: errored ? errMsg : null,
       })
     }
