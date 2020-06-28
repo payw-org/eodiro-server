@@ -48,7 +48,7 @@ router.post('/upload', async (req, res) => {
       const mimeType = file.mimetype
       const buffer = file.buffer
 
-      let isMimeTypeAvailable = false
+      let isAvailableMimeType = false
       let errored = false
       let errMsg = null
       let insertId: number = null
@@ -56,12 +56,12 @@ router.post('/upload', async (req, res) => {
       for (let i = 0; i < availableMimeTypes.length; i += 1) {
         const availableMime = availableMimeTypes[i]
         if (mimeType.startsWith(availableMime)) {
-          isMimeTypeAvailable = true
+          isAvailableMimeType = true
           break
         }
       }
 
-      if (!isMimeTypeAvailable) {
+      if (!isAvailableMimeType) {
         res.status(200).json({
           err: 'Unsupported MIME Type',
         })
