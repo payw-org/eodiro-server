@@ -62,6 +62,30 @@ export class TipRepository {
     return tipList
   }
 
+  static async findLiked(
+    userId: number,
+    pageSize: number,
+    page: number
+  ): Promise<TipAttrs[]> {
+    const tipList = await prisma.tip.findMany({
+      where: {
+        isRemoved: false,
+        tipLikes: {
+          some: {
+            userId,
+          },
+        },
+      },
+      include: {
+        tipLikes: true,
+      },
+      take: pageSize,
+      skip: (page - 1) * pageSize,
+      orderBy: { createdAt: 'desc' },
+    })
+    return tipList
+  }
+
   static async findArchived(
     pageSize: number,
     page: number
