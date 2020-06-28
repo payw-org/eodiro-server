@@ -12,5 +12,8 @@ export type Action = OneApiActionTemplate<
     body: string
     fileIds: number[]
   }>,
-  OneApiActionTemplatePayload<OneApiError, { isUpdated: boolean }>
+  OneApiActionTemplatePayload<
+    OneApiError | 'No Title' | 'No Body',
+    { isUpdated: boolean }
+  >
 >

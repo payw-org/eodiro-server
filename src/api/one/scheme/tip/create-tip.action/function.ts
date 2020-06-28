@@ -6,14 +6,17 @@ import { oneApiResponse } from '@/api/one/utils'
 import prisma from '@/modules/prisma'
 
 const func: OneApiFunc<Action> = async (data) => {
-  const { authPayload, title, topic, body, fileIds } = data
+  const { authPayload, topic, fileIds } = data
   const { userId } = authPayload
 
-  if (title.trim().length === 0) {
+  const title = data.title.trim()
+  const body = data.body.trim()
+
+  if (title.length === 0) {
     return oneApiResponse<Action>('No Title')
   }
 
-  if (body.trim().length === 0) {
+  if (body.length === 0) {
     return oneApiResponse<Action>('No Body')
   }
 
