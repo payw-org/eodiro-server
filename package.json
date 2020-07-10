@@ -36,7 +36,7 @@
     "cdn:dev": "npm run ts-node:dev -- src/cdn/serve.ts",
     "cdn": "node --harmony build/src/cdn/serve.js",
     "pm2:cdn": "pm2 start npm --name 'eodiro-cdn' -- run 'cdn'",
-    "one-api:refresh:watch": "nodemon --watch src/api/one/scheme --exec \"npm run one-api:refresh\"",
+    "one-api:refresh:watch": "nodemon --watch 'src/api/one/scheme/**/*' -e ts --ignore 'src/api/one/scheme/*.ts' --exec \"npm run one-api:refresh\"",
     "one-api:refresh": "npm run --prefix src/api/one refresh",
     "one-api:deploy": "npm run one-api:refresh && npm run build && npm run --prefix src/api/one copy-packagejson && npm run --prefix build/src deploy",
     "one-api:deploy:next": "npm run one-api:refresh && npm run build && npm run --prefix src/api/one copy-packagejson && npm run --prefix build/src deploy:next",
