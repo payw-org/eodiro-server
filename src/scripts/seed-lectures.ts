@@ -79,6 +79,7 @@ async function main(): Promise<void> {
   log(`[ ${chalk.blue('seeding')} ] Done seeding lectures`)
 
   quit()
+  process.exit()
 }
 
 main()

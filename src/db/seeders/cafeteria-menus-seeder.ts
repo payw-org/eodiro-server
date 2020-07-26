@@ -96,6 +96,7 @@ err: ${err.message}
   }
 
   quit()
+  process.exit()
 }
 
 export default CafeteriaMenusSeeder

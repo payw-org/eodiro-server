@@ -19,6 +19,7 @@ async function run() {
   await feed.run()
 
   quit()
+  process.exit()
 }
 
 run()

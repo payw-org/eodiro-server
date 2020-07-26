@@ -68,6 +68,7 @@ export const run = async (): Promise<void> => {
   }
 
   quit()
+  process.exit()
 }
 
 run()
