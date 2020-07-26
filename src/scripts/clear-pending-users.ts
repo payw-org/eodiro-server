@@ -35,6 +35,7 @@ const run = async () => {
   }
 
   quit()
+  process.exit()
 }
 
 run()

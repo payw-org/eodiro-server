@@ -10,6 +10,7 @@ async function run() {
   await User.updateRandomNickname()
 
   quit()
+  process.exit()
 }
 
 run()
