@@ -136,7 +136,7 @@ export class CauNoticeWatcher {
       try {
         await this.processSubscriber(page, subscriber)
       } catch (err) {
-        console.log(err)
+        throw new Error(err)
       }
     }
 

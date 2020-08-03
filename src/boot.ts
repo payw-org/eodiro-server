@@ -132,11 +132,17 @@ export async function boot(options: {
   }
 
   function quit() {
+    // Disconnect from database
     DbConnector.getConnConfident().destroy()
     prisma.disconnect()
+
     if (server) {
+      // close the server
       server.close()
     }
+
+    // kill the process to make sure to retrieve memory
+    process.exit()
   }
 
   return quit

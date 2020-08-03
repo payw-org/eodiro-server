@@ -22,4 +22,9 @@ async function run() {
   process.exit()
 }
 
-run()
+try {
+  run()
+} catch (error) {
+  console.log(error)
+  process.exit()
+}
