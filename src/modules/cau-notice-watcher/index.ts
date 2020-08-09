@@ -167,7 +167,11 @@ export class CauNoticeWatcher {
   }
 
   private async processSubscriber(page: Page, subscriber: Subscriber) {
-    const notices = Array.from(await this.visit(page, subscriber))
+    const noticesSet = await this.visit(page, subscriber).catch((err) => {
+      console.log(err)
+      process.exit()
+    })
+    const notices = Array.from(noticesSet)
 
     if (notices.length === 0) {
       return
