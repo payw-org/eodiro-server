@@ -16,15 +16,13 @@ async function run() {
   feed.subscribe(Subscribers.cse)
   feed.subscribe(Subscribers.log)
 
-  await feed.run()
+  try {
+    await feed.run()
+  } catch (error) {
+    console.log(error)
+    process.exit()
+  }
 
   quit()
-  process.exit()
-}
-
-try {
-  run()
-} catch (error) {
-  console.log(error)
   process.exit()
 }
