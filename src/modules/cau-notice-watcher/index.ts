@@ -257,9 +257,13 @@ ${notices[i].noticeItemUrl}`,
   > {
     const pendingXHR = new PendingXHR(page)
 
-    await page.goto(subscriber.url)
-    await pendingXHR.waitForAllXhrFinished()
-    await page.waitForSelector(subscriber.noticeItemSelector)
+    try {
+      await page.goto(subscriber.url)
+      await pendingXHR.waitForAllXhrFinished()
+      await page.waitForSelector(subscriber.noticeItemSelector)
+    } catch (err) {
+      throw new Error(err)
+    }
 
     const bodyHtml = await page.$eval('body', (body) => body.innerHTML)
 
