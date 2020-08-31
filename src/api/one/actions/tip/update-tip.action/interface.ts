@@ -2,7 +2,6 @@ import {
   AuthRequired,
   OneApiActionTemplate,
   OneApiActionTemplatePayload,
-  OneApiError,
 } from '@/api/one/types'
 
 export type Action = OneApiActionTemplate<
@@ -12,8 +11,5 @@ export type Action = OneApiActionTemplate<
     body: string
     fileIds: number[]
   }>,
-  OneApiActionTemplatePayload<
-    OneApiError | 'No Title' | 'No Body',
-    { isUpdated: boolean }
-  >
+  OneApiActionTemplatePayload<{ isUpdated: boolean }, 'No Title' | 'No Body'>
 >

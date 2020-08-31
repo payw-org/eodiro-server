@@ -17,8 +17,8 @@ export type AuthRequired<T> = T & AuthOnly
  * Payload of One API Action Template
  */
 export type OneApiActionTemplatePayload<
-  E,
-  D extends Record<string, unknown>
+  D extends Record<string, unknown>,
+  E = OneApiError
 > = {
   err: OneApiError | E
   data: D | null
@@ -29,14 +29,14 @@ export type OneApiActionTemplatePayload<
  */
 export type OneApiActionTemplate<
   D = Record<string, unknown>,
-  P = OneApiActionTemplatePayload<unknown, Record<string, unknown>>
+  P = OneApiActionTemplatePayload<Record<string, unknown>, unknown>
 > = {
   data: D
   payload: P
 }
 
 export type OneApiActionTemplateWithoutReqeustData<
-  P = OneApiActionTemplatePayload<unknown, Record<string, unknown>>
+  P = OneApiActionTemplatePayload<Record<string, unknown>, unknown>
 > = {
   payload: P
 }
