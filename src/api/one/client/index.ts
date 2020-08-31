@@ -35,7 +35,7 @@ import {
   UpdateTip,
   UploadComment,
   UploadPost,
-} from '../scheme'
+} from '../actions'
 
 import { OneApiError } from '../types'
 import axios from 'axios'

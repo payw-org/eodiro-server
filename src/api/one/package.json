@@ -6,7 +6,7 @@
   "main": "index.js",
   "scripts": {
     "copy-packagejson": "node scripts/copy-packagejson.js",
-    "refresh": "node scripts/refresh",
+    "generate": "node scripts/generate",
     "versioning": "",
     "!!! Run deploy scripts inside build directory !!!": "",
     "deploy": "npm publish --access public",
@@ -15,7 +15,7 @@
   },
   "files": [
     "api/one/client",
-    "api/one/scheme",
+    "api/one/actions",
     "api/one/types",
     "database/models",
     "index.d.ts",
@@ -24,7 +24,7 @@
   "author": "PAYW",
   "license": "MIT",
   "peerDependencies": {
-    "axios": "0.19.x",
+    "axios": "0.20.x",
     "@prisma/cli": "2.x"
   }
 }
