@@ -1,4 +1,4 @@
-import { deletePost, editPost } from '../scheme/functions'
+import { deletePost, editPost } from '../actions/functions'
 
 editPost({
   accessToken: '',

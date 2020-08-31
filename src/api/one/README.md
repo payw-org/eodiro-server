@@ -6,7 +6,7 @@ One API distinguishes each API with an **action** instead of url and request met
 
 ## Structure
 
-Actions are placed under `src/api/one/scheme`.
+Actions are placed under `src/api/one/actions`.
 
 ### Folder
 
@@ -14,10 +14,10 @@ You can create an action by creating a folder which name is in a form of `[actio
 
 For example,
 
-- `scheme/square/get-posts.action`
-- `scheme/square/upload-post.action`
-- `scheme/square/comments/get-comments.action`
-- `scheme/cafeteria/get-today-meals.action`
+- `actions/square/get-posts.action`
+- `actions/square/upload-post.action`
+- `actions/square/comments/get-comments.action`
+- `actions/cafeteria/get-today-meals.action`
 
 Then you have to create two files [`interface.ts`](#interface), [`function.ts`](#function).
 

@@ -1,4 +1,4 @@
-import * as funcs from './scheme/functions'
+import * as funcs from './actions/functions'
 
 import { Payload } from '@/modules/jwt'
 
