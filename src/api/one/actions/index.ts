@@ -85,9 +85,6 @@ export type SavePost = SavePostRaw & { action: 'savePost' }
 import { Action as UploadCommentRaw } from './square/upload-comment.action/interface'
 export type UploadComment = UploadCommentRaw & { action: 'uploadComment' }
 
-import { Action as TestRaw } from './test.action/interface'
-export type Test = TestRaw & { action: 'test' }
-
 import { Action as CreateTipCommentRaw } from './tip/create-tip-comment.action/interface'
 export type CreateTipComment = CreateTipCommentRaw & {
   action: 'createTipComment'

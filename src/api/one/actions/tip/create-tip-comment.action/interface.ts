@@ -10,10 +10,7 @@ export type Action = OneApiActionTemplate<
     tipId: number
     body: string
   }>,
-  OneApiActionTemplatePayload<
-    OneApiError,
-    {
-      tipCommentId: number
-    }
-  >
+  OneApiActionTemplatePayload<{
+    tipCommentId: number
+  }>
 >

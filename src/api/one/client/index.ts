@@ -30,7 +30,6 @@ import {
   LikeTip,
   SavePost,
   SearchTip,
-  Test,
   UpdateNoticeSubscription,
   UpdateTip,
   UploadComment,
@@ -165,10 +164,6 @@ export async function oneApiClient(
   host: string,
   request: Omit<SearchTip, 'payload'>
 ): Promise<SearchTip['payload']>
-export async function oneApiClient(
-  host: string,
-  request: Omit<Test, 'payload'>
-): Promise<Test['payload']>
 export async function oneApiClient(
   host: string,
   request: Omit<UpdateNoticeSubscription, 'payload'>
