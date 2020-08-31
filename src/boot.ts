@@ -53,7 +53,8 @@ export async function boot(options: {
           'error'
         )} ] stop the application due to db connection failure`
       )
-      return null
+
+      process.exit()
     }
   } else {
     log(`[ ${chalk.green('DB')} ] skip db connection`)
@@ -69,7 +70,8 @@ export async function boot(options: {
           'error'
         )} ] stop the application due to email server connection failure`
       )
-      return null
+
+      process.exit()
     }
   }
 
