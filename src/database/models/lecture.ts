@@ -1,11 +1,13 @@
 import { DataTypes, Model } from 'sequelize'
 import { createInitModelFunction } from '../create-init-model'
-import { PrimaryAIAttribute } from '../utils/model-attributes'
 
 class Lecture extends Model {}
 
 export const lecture = createInitModelFunction(Lecture, 'lecture', {
-  id: PrimaryAIAttribute,
+  id: {
+    type: DataTypes.CHAR(36),
+    primaryKey: true,
+  },
   year: DataTypes.SMALLINT,
   semester: DataTypes.STRING(10),
   campus: DataTypes.STRING(10),
