@@ -1,8 +1,8 @@
+import { LectureModelAttr } from '@/database/models/lecture'
+import { PeriodModelAttr } from '@/database/models/period'
 import Db from '@/db'
-import { LectureType } from '@/database/models/lecture'
-import { PeriodType } from '@/database/models/period'
-import { Q } from '@/modules/sqlb'
 import dayIndexToString from '@/modules/day-index-to-string'
+import { Q } from '@/modules/sqlb'
 import dayjs from 'dayjs'
 import express from 'express'
 
@@ -163,7 +163,7 @@ router.get(
             Q().join('lecture', 'period').on('lecture.id = period.lecture_id')
           )
           .where(
-            Q<LectureType & PeriodType>()
+            Q<LectureModelAttr & PeriodModelAttr>()
               .equal('year', year)
               .andEqual('semester', semester)
               .andEqual('campus', campus)

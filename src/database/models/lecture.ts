@@ -26,8 +26,8 @@ export const lecture = createInitModelFunction(Lecture, 'lecture', {
   note: DataTypes.TEXT,
 })
 
-export type LectureType = {
-  id: number
+export type LectureModelAttr = {
+  id: string
   year: number
   semester: string
   campus: string
