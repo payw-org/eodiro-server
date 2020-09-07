@@ -1,16 +1,16 @@
-import Auth from './modules/auth'
-import Config from './config'
-import DbConnector from './modules/db-connector'
-import EodiroMailer from './modules/eodiro-mailer'
-import { User } from './database/models/user'
-import api from './api'
 import bodyParser from 'body-parser'
 import chalk from 'chalk'
 import cors from 'cors'
 import express from 'express'
 import http from 'http'
-import prisma from './modules/prisma'
 import socketIO from 'socket.io'
+import api from './api'
+import Config from './config'
+import { User } from './database/models/user'
+import Auth from './modules/auth'
+import DbConnector from './modules/db-connector'
+import EodiroMailer from './modules/eodiro-mailer'
+import prisma from './modules/prisma'
 
 const log = console.log
 
@@ -136,7 +136,7 @@ export async function boot(options: {
   function quit() {
     // Disconnect from database
     DbConnector.getConnConfident().destroy()
-    prisma.disconnect()
+    prisma.$disconnect()
 
     if (server) {
       // close the server
