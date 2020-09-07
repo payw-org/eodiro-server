@@ -1,38 +1,30 @@
 import { CoverageMajorLectureType } from '@/database/models/coverage_major_lecture'
+import { LectureModelAttr } from '@/database/models/lecture'
+import { PeriodModelAttr } from '@/database/models/period'
+import { TableNames } from '@/database/table-names'
 import Db from '@/db'
-import { LectureType } from '@/database/models/lecture'
-import { PeriodType } from '@/database/models/period'
 import { Q } from '@/modules/sqlb'
 import { RefinedLectures } from '@payw/cau-timetable-scraper-types'
-import { TableNames } from '@/database/table-names'
+import { v4 as uuidv4 } from 'uuid'
 
 export default async function (lectures: RefinedLectures): Promise<void> {
   console.log('🌱 Seeding lectures')
 
   const firstLecture = lectures[0]
+
   if (!firstLecture) {
     console.log(`🌱 Stop seeding, first lecture doesn't exist`)
     return
   }
 
   // Update college coverage data
-  const dbLectures: LectureType[] = []
-  const dbPeriods: PeriodType[] = []
+  const dbLectures: LectureModelAttr[] = []
+  const dbPeriods: PeriodModelAttr[] = []
   const dbCoverageMajorLectures: CoverageMajorLectureType[] = []
-
-  const [err, results] = await Db.query<{ maxID: number }[]>(
-    Q().select('max(id) as maxID').from('lecture').build()
-  )
-
-  if (err) {
-    throw err
-  }
-
-  let maxID = results[0].maxID || 0
 
   for (let i = 0; i < lectures.length; i += 1) {
     const lecture = lectures[i]
-    const lectureId = ++maxID
+    const lectureId = uuidv4()
 
     dbLectures.push({
       id: lectureId,
