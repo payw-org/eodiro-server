@@ -14,10 +14,10 @@ export const coverageMajor = createInitModelFunction(
     name: {
       type: DataTypes.STRING(50),
       allowNull: false,
-      primaryKey: true,
     },
     code: {
       type: DataTypes.STRING(20),
+      primaryKey: true,
     },
   }
 )
