@@ -3,15 +3,15 @@ import { TableNames } from '@/database/table-names'
 import SqlB from '@/modules/sqlb'
 import Db from '..'
 
-const collegesMajorsSeeder = async (
-  colleges: {
-    college: string
-    majors: {
-      majorName: string
-      majorCode: string
-    }[]
+export type College = {
+  college: string
+  majors: {
+    majorName: string
+    majorCode: string
   }[]
-) => {
+}
+
+const collegesMajorsSeeder = async (colleges: College[]): Promise<void> => {
   for (const college of colleges) {
     const collegeName = college.college
 
