@@ -2,17 +2,17 @@
  * npm run ts-node:[prod|dev] src/scripts/seed-lectures -- --lecturesFile data/lectures-2020-하계-1592711940996.json
  */
 
-import { CTTS } from '@payw/cau-timetable-scraper'
-import Config from '@/config'
-import { Semester } from '@/types'
-import argv from '@/dev/argv'
 import { boot } from '@/boot'
-import chalk from 'chalk'
+import Config from '@/config'
 import collegesMajorsSeeder from '@/db/seeders/colleges-majors-seeder'
+import timetableSeeder from '@/db/seeders/timetable-seeder'
+import argv from '@/dev/argv'
+import getSemester from '@/modules/get-semester'
+import { Semester } from '@/types'
+import { CTTS } from '@payw/cau-timetable-scraper'
+import chalk from 'chalk'
 import dayjs from 'dayjs'
 import fs from 'fs'
-import getSemester from '@/modules/get-semester'
-import timetableSeeder from '@/db/seeders/timetable-seeder'
 
 const log = console.log
 
@@ -50,7 +50,7 @@ async function main(): Promise<void> {
       }
     )
 
-    const timestamp = new Date().getTime()
+    const timestamp = `${dayjs().format('YYYY-MM-DD_HH:mm:ss')}`
 
     fs.writeFileSync(
       `data/colleges-${timestamp}.json`,
