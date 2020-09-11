@@ -1,6 +1,5 @@
 import { DataTypes, Model } from 'sequelize'
 import { createInitModelFunction } from '../create-init-model'
-import { PrimaryAIAttribute } from '../utils/model-attributes'
 
 class CoverageMajorLecture extends Model {}
 
@@ -8,10 +7,9 @@ export const coverageMajorLecture = createInitModelFunction(
   CoverageMajorLecture,
   'coverage_major_lecture',
   {
-    id: PrimaryAIAttribute,
     lecture_id: {
       type: DataTypes.CHAR(36),
-      allowNull: false,
+      primaryKey: true,
       references: {
         model: 'lecture',
         key: 'id',
@@ -19,12 +17,12 @@ export const coverageMajorLecture = createInitModelFunction(
       onDelete: 'cascade',
       onUpdate: 'cascade',
     },
-    coverage_major: {
-      type: DataTypes.STRING(50),
-      allowNull: false,
+    major_code: {
+      type: DataTypes.STRING(20),
+      primaryKey: true,
       references: {
         model: 'coverage_major',
-        key: 'name',
+        key: 'code',
       },
       onDelete: 'cascade',
       onUpdate: 'cascade',
@@ -33,12 +31,10 @@ export const coverageMajorLecture = createInitModelFunction(
   {
     indexes: [
       {
-        unique: false,
         fields: ['lecture_id'],
       },
       {
-        unique: false,
-        fields: ['coverage_major'],
+        fields: ['major_code'],
       },
     ],
   }
@@ -46,5 +42,5 @@ export const coverageMajorLecture = createInitModelFunction(
 
 export type CoverageMajorLectureType = {
   lecture_id: string
-  coverage_major: string
+  major_code: string
 }
