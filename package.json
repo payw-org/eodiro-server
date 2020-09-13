@@ -51,7 +51,7 @@
   },
   "dependencies": {
     "@payw/cau-cafeteria-menus-scraper": "^2.1.9",
-    "@payw/cau-timetable-scraper": "^2.1.4",
+    "@payw/cau-timetable-scraper": "^2.2.0",
     "@prisma/client": "^2.6.2",
     "axios": "^0.20.0",
     "bcrypt": "^5.0.0",
@@ -79,7 +79,6 @@
     "zombie": "^6.1.4"
   },
   "devDependencies": {
-    "@payw/cau-timetable-scraper-types": "^2.1.1",
     "@prisma/cli": "^2.6.2",
     "@types/app-root-path": "^1.2.4",
     "@types/bcrypt": "^3.0.0",
