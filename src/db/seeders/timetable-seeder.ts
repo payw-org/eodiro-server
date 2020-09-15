@@ -62,9 +62,13 @@ export default async function (lectures: RefinedLectures): Promise<void> {
     for (let j = 0; j < lecture.coverages.length; j += 1) {
       const coverage = lecture.coverages[j]
 
+      if (!coverage.majorCode) {
+        continue
+      }
+
       dbCoverageMajorLectures.push({
         lecture_id: lectureId,
-        coverage_major: coverage.major,
+        major_code: coverage.majorCode,
       })
     }
   }
