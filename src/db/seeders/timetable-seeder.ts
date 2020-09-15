@@ -32,7 +32,7 @@ export default async function (lectures: RefinedLectures): Promise<void> {
       semester: lecture.semester,
       campus: lecture.campus,
       college: lecture.college,
-      major: lecture.major,
+      major: lecture.major || null,
       grade: lecture.grade,
       credit: lecture.credit,
       course: lecture.course,
