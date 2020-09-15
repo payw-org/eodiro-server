@@ -4,7 +4,7 @@ import { PeriodModelAttr } from '@/database/models/period'
 import { TableNames } from '@/database/table-names'
 import Db from '@/db'
 import { Q } from '@/modules/sqlb'
-import { RefinedLectures } from '@payw/cau-timetable-scraper-types'
+import { RefinedLectures } from '@payw/cau-timetable-scraper/build/types'
 import { v4 as uuidv4 } from 'uuid'
 
 export default async function (lectures: RefinedLectures): Promise<void> {
