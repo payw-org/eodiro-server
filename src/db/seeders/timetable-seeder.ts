@@ -41,7 +41,7 @@ export default async function (lectures: RefinedLectures): Promise<void> {
       name: lecture.name,
       professor: lecture.professor,
       schedule: lecture.schedule,
-      building: Number(lecture.building) || null,
+      building: parseInt(lecture.building) || null,
       room: lecture.room || null,
       note: lecture.note,
     })
