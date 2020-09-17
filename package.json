@@ -19,7 +19,7 @@
     "dev-ts": "cross-env NODE_ENV=development tsnd --no-notify --respawn --transpile-only -r tsconfig-paths/register src/main.ts",
     "type-check": "tsc --noEmit",
     "type-check:watch": "tsc --noEmit --watch --preserveWatchOutput",
-    "prebuild": "npm run clear && npm run generate",
+    "prebuild": "npm run clear && npm run prisma:generate",
     "build-fix-sequelize": "node fix-sequelize-type.js && ttsc",
     "build": "ttsc",
     "postbuild": "node prisma/utils/copy-schema-to-build",
@@ -42,7 +42,7 @@
     "one-api:deploy:next": "npm run one-api:generate && npm run build && npm run --prefix src/api/one copy-packagejson && npm run --prefix build/src deploy:next",
     "prisma:introspect": "prisma introspect && node prisma/utils/map-and-pluralize",
     "prisma:generate": "prisma generate",
-    "prisma:all": "npm run introspect && npm run generate"
+    "prisma:all": "npm run prisma:introspect && npm run prisma:generate"
   },
   "husky": {
     "hooks": {
