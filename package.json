@@ -52,7 +52,7 @@
   "dependencies": {
     "@payw/cau-cafeteria-menus-scraper": "^2.1.9",
     "@payw/cau-timetable-scraper": "^2.4.0",
-    "@prisma/client": "^2.6.2",
+    "@prisma/client": "^2.7.1",
     "axios": "^0.20.0",
     "bcrypt": "^5.0.0",
     "body-parser": "^1.19.0",
@@ -79,7 +79,7 @@
     "zombie": "^6.1.4"
   },
   "devDependencies": {
-    "@prisma/cli": "^2.6.2",
+    "@prisma/cli": "^2.7.1",
     "@types/app-root-path": "^1.2.4",
     "@types/bcrypt": "^3.0.0",
     "@types/bluebird": "^3.5.32",
