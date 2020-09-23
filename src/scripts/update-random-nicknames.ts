@@ -1,5 +1,5 @@
-import { User } from '@/database/models/user'
 import { boot } from '@/boot'
+import { User } from '@/database/models/user'
 
 async function run() {
   const quit = await boot({
@@ -13,4 +13,6 @@ async function run() {
   process.exit()
 }
 
-run()
+run().catch(() => {
+  process.exit()
+})
