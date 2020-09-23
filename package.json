@@ -50,7 +50,7 @@
     }
   },
   "dependencies": {
-    "@payw/cau-cafeteria-menus-scraper": "^2.1.9",
+    "@payw/cau-cafeteria-menus-scraper": "^2.1.10",
     "@payw/cau-timetable-scraper": "^2.4.0",
     "@prisma/client": "^2.7.1",
     "axios": "^0.20.0",
