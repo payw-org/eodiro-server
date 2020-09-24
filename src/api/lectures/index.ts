@@ -1,6 +1,6 @@
+import { TableNames } from '@/database/table-names'
 import Db from '@/db'
 import SqlB from '@/modules/sqlb'
-import { TableNames } from '@/database/table-names'
 import express from 'express'
 
 const router = express.Router()
