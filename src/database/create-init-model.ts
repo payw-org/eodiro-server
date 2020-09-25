@@ -16,7 +16,7 @@ export const createInitModelFunction = <T extends typeof ExtendedModel>(
   modelAttributes: ModelAttributes,
   initOptions?: Omit<InitOptions, 'modelName' | 'sequelize'>
 ) => {
-  return async function () {
+  return async function (): Promise<T> {
     if (modelClass.options) {
       return modelClass
     } else {
