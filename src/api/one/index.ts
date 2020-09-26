@@ -1,6 +1,5 @@
-import * as funcs from './actions/functions'
-
 import { Payload } from '@/modules/jwt'
+import * as funcs from './actions/functions'
 
 const apiFunctions: Record<
   string,
@@ -9,6 +8,9 @@ const apiFunctions: Record<
   ...funcs,
 }
 
+/**
+ * @deprecated
+ */
 export async function oneApi(request: Record<string, any>): Promise<unknown> {
   const apiF = apiFunctions[request.action]
 

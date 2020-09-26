@@ -57,18 +57,18 @@ We have multiple periodic jobs. Those are including clearing pending users, garb
 
 ## 📚 API References
 
-**REST API (Legacy)**
+**REST**
 
 - [Common](#Common)
 - [Lectures](#Lectures)
 - [Vacant](#Vacant)
 - [Cafeteria](#Cafeteria)
 
-**[One API](#One-API)**
+**[One API (deprecated)](#One-API)**
 
 ---
 
-## One API
+## One API (deprecated)
 
 Introducing a new way to create APIs on server side and to use them on client side.
 
