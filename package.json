@@ -106,7 +106,7 @@
     "@types/socket.io": "^2.1.11",
     "@types/uuid": "^8.3.0",
     "@types/validator": "^13.1.0",
-    "@typescript-eslint/eslint-plugin": "^4.1.0",
+    "@typescript-eslint/eslint-plugin": "^4.3.0",
     "@typescript-eslint/parser": "^4.1.0",
     "@zerollup/ts-transform-paths": "^1.7.18",
     "app-root-path": "^3.0.0",
