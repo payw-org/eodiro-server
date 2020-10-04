@@ -8,6 +8,7 @@
   "license": "MIT",
   "scripts": {
     "lint": "eslint . --ext .ts,.tsx",
+    "lint:fix": "eslint . --ext .ts,.tsx --fix",
     "sync-db:prod": "ts-node -r tsconfig-paths/register src/database/sync.ts",
     "sync-db:dev": "cross-env NODE_ENV=development ts-node -r tsconfig-paths/register src/database/sync.ts",
     "ts-node:prod": "ts-node -r tsconfig-paths/register",
