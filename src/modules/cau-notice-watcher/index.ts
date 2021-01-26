@@ -1,15 +1,14 @@
-import puppeteer, { Page } from 'puppeteer'
-
-import EodiroMailer from '../eodiro-mailer'
-import { JSDOM } from 'jsdom'
-import { PendingXHR } from 'pending-xhr-puppeteer'
-import Push from '../push'
 import appRoot from 'app-root-path'
 import chalk from 'chalk'
-import config from '@/config'
 import fs from 'fs'
-import { isDev } from '../utils/is-dev'
+import { JSDOM } from 'jsdom'
+import { PendingXHR } from 'pending-xhr-puppeteer'
+import puppeteer, { Page } from 'puppeteer'
+import EodiroMailer from '../eodiro-mailer'
 import prisma from '../prisma'
+import Push from '../push'
+import { isDev } from '../utils/is-dev'
+
 
 export type TitleBuilder = (
   /** A single notice item */ noticeItemElement: HTMLElement | Element
@@ -38,6 +37,12 @@ export interface Subscriber {
   titleBuilder: TitleBuilder
   urlBuilder?: UrlBuilder
 }
+
+export type SubscriberBuilder = (siteInformation: {
+  name: string
+  key :string
+  url: string
+}) => Subscriber
 
 export type LastNotice = Record<
   string,
