@@ -1,11 +1,14 @@
-import { Sequelize } from 'sequelize'
-import chalk from 'chalk'
 import config from '@/config'
 import wait from '@/modules/wait'
+import chalk from 'chalk'
+import { Sequelize } from 'sequelize'
 
 const database =
   process.env.NODE_ENV === 'development' ? config.DB_NAME_DEV : config.DB_NAME
 
+/**
+ * @deprecated Use Prisma
+ */
 export class Database {
   private static sequelize: Sequelize
   private static initializing: boolean

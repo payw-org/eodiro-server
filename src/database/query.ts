@@ -1,3 +1,4 @@
+import { SqlBInstance } from '@/modules/sqlb'
 import {
   Model,
   QueryOptions,
@@ -5,9 +6,7 @@ import {
   QueryOptionsWithType,
   QueryTypes,
 } from 'sequelize'
-
 import { Database } from './index'
-import { SqlBInstance } from '@/modules/sqlb'
 
 export { QueryTypes } from 'sequelize'
 
@@ -91,6 +90,9 @@ export function query(
   options?: QueryOptions | QueryOptionsWithType<QueryTypes.RAW>
 ): Promise<[unknown[], unknown]>
 
+/**
+ * @deprecated Use Prisma
+ */
 export async function query(sql: any, options?: any): Promise<any> {
   if (sql instanceof SqlBInstance) {
     sql = sql.build()
