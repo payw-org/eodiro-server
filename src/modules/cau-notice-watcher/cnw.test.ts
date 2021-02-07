@@ -1,10 +1,9 @@
-import { cau, cse } from './subscribers'
-
 import { CauNoticeWatcher } from './index'
+import { cau, cse } from './publishers'
 
 const watcher = new CauNoticeWatcher()
 
-watcher.subscribe(cau)
-watcher.subscribe(cse)
+watcher.register(cau)
+watcher.register(cse)
 
 watcher.run().then()

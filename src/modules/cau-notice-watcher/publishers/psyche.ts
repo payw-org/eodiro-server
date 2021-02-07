@@ -1,6 +1,6 @@
-import { Subscriber } from '..'
+import { Publisher } from '..'
 
-export const psyche: Subscriber = {
+export const psyche: Publisher = {
   name: '심리학과',
   key: 'psyche',
   url: 'http://psyche.cau.ac.kr/notice/sub01.asp',

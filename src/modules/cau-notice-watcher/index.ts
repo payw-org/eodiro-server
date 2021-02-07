@@ -1,13 +1,13 @@
+import { prisma } from '@/modules/prisma'
+import Push, { PushInformation } from '@/modules/push'
 import appRoot from 'app-root-path'
 import chalk from 'chalk'
 import fs from 'fs'
 import { JSDOM } from 'jsdom'
 import { PendingXHR } from 'pending-xhr-puppeteer'
-import puppeteer, { Page } from 'puppeteer'
-import EodiroMailer from '../eodiro-mailer'
-import prisma from '../prisma'
-import Push from '../push'
-import { isDev } from '../utils/is-dev'
+import puppeteer from 'puppeteer'
+import { Browser } from 'puppeteer/lib/cjs/puppeteer/common/Browser'
+import { Page } from 'puppeteer/lib/cjs/puppeteer/common/Page'
 
 export type TitleBuilder = (
   /** A single notice item */ noticeItemElement: HTMLElement | Element
@@ -25,7 +25,7 @@ export type FeedOptions = {
   interval?: number
 }
 
-export interface Subscriber {
+export interface Publisher {
   /** Notice name which will be displayed on the end users */
   name: string
   /** Unique key(id) for differentiating each subscriber */
@@ -37,12 +37,11 @@ export interface Subscriber {
   urlBuilder?: UrlBuilder
 }
 
-export type SubscriberBuilder = (siteInformation: {
+export type PublisherBuilder = (siteInformation: {
   name: string
   key: string
   url: string
-}) => Subscriber
-
+}) => Publisher
 export type LastNotice = Record<
   string,
   {
@@ -51,11 +50,12 @@ export type LastNotice = Record<
   }
 >
 
+const eodiroTempDir = appRoot.resolve('/.eodiro')
 const lastNoticeFilePath = appRoot.resolve('/.eodiro/last_notice.json')
 
 export class CauNoticeWatcher {
   private feedOptions: FeedOptions
-  private subscribers: Subscriber[] = []
+  private publishers: Publisher[] = []
   private lastNotice: LastNotice
 
   constructor(feedOptions?: FeedOptions) {
@@ -68,24 +68,24 @@ export class CauNoticeWatcher {
     }
 
     this.feedOptions = feedOptions
-    this.lastNotice = this.loadLastNoticeFile()
+    this.lastNotice = CauNoticeWatcher.loadLastNoticeFile()
   }
 
-  public subscribe(subscriber: Subscriber): void {
-    for (const registeredSubscriber of this.subscribers) {
-      if (registeredSubscriber.key === subscriber.key) {
+  public register(publisher: Publisher): void {
+    for (const registeredSubscriber of this.publishers) {
+      if (registeredSubscriber.key === publisher.key) {
         throw new Error(
           `${chalk.blueBright(
             '[Notice Watcher]'
-          )} Duplicate subscriber key detected: ${subscriber.key}`
+          )} Duplicate subscriber key detected: ${publisher.key}`
         )
       }
     }
-    this.subscribers.push(subscriber)
+    this.publishers.push(publisher)
 
-    if (!this.lastNotice[subscriber.key]) {
-      this.lastNotice[subscriber.key] = {
-        displayName: subscriber.name,
+    if (!this.lastNotice[publisher.key]) {
+      this.lastNotice[publisher.key] = {
+        displayName: publisher.name,
         title: '',
       }
     }
@@ -94,8 +94,12 @@ export class CauNoticeWatcher {
   /**
    * Get the `last_notice.json` file inside '.eodiro' directory
    */
-  public loadLastNoticeFile(): LastNotice {
+  public static loadLastNoticeFile(): LastNotice {
     let lastNotice: LastNotice
+
+    if (!fs.existsSync(eodiroTempDir)) {
+      fs.mkdirSync(eodiroTempDir)
+    }
 
     if (!fs.existsSync(lastNoticeFilePath)) {
       lastNotice = {}
@@ -114,144 +118,122 @@ export class CauNoticeWatcher {
     )
   }
 
-  private getLastNoticeTitle(subscriber: Subscriber) {
-    return this.lastNotice[subscriber.key].title
+  private getLastNoticeTitle(publisher: Publisher) {
+    return this.lastNotice[publisher.key].title
   }
 
-  private updateLastNotice(subscriber: Subscriber, title: string) {
-    this.lastNotice[subscriber.key] = {
-      displayName: subscriber.name,
+  private updateLastNotice(publisher: Publisher, title: string) {
+    this.lastNotice[publisher.key] = {
+      displayName: publisher.name,
       title,
     }
   }
 
   public async run(): Promise<void> {
     const browser = await puppeteer.launch()
-    const page = await browser.newPage()
 
-    page.setMaxListeners(Infinity)
+    const processResults = []
 
-    page.setViewport({
-      width: 1280,
-      height: 800,
-    })
-
-    for (const subscriber of this.subscribers) {
-      try {
-        await this.processSubscriber(page, subscriber)
-      } catch (err) {
-        throw new Error(err)
-      }
+    for (const subscriber of this.publishers) {
+      processResults.push(this.processPublisher(browser, subscriber))
     }
 
-    // Dispose the page and the browser
-    await page.close()
+    await Promise.all(processResults)
+
+    // Dispose the browser
     await browser.close()
   }
 
-  /**
-   * Send an Email to all subscribed users
-   *
-   * @deprecated Send App push instead
-   */
-  private sendMail(subject: string, body: string, subscriber: Subscriber) {
-    const emailAddrs = ['io@jhaemin.com']
+  private async processPublisher(browser: Browser, publisher: Publisher) {
+    const page = await browser.newPage()
 
-    return emailAddrs.map((address) => {
-      return EodiroMailer.sendMail({
-        from: {
-          name: `[어디로 알림] ${subscriber.name}`,
-          alias: 'notifications',
-        },
-        to: address,
-        subject,
-        html: body,
-      })
-    })
-  }
+    page.setViewport({ width: 1280, height: 800 })
 
-  private async processSubscriber(page: Page, subscriber: Subscriber) {
-    const noticesSet = await this.visit(page, subscriber).catch((err) => {
-      console.log(err)
-      process.exit()
-    })
+    // page.setMaxListeners(Infinity)
+
+    const noticesSet = await CauNoticeWatcher.visit(page, publisher).catch(
+      (err) => {
+        console.error(err)
+        process.exit()
+      }
+    )
     const notices = Array.from(noticesSet)
 
     if (notices.length === 0) {
       return
     }
 
-    const lastNoticeIndex = notices.findIndex(
-      (notice) => notice.title === this.getLastNoticeTitle(subscriber)
-    )
-
-    if (lastNoticeIndex > 0) {
-      for (let i = lastNoticeIndex - 1; i >= 0; i--) {
-        if (isDev()) {
-          console.log(`\n새로운 ${subscriber.name} 공지사항이 올라왔습니다.`)
-          console.log(notices[i])
-        }
-
-        // Push Notifications
-        const subscriptionsInfo = await prisma.noticeNotificationsSubscription.findMany(
-          {
-            where: {
-              noticeKey: subscriber.key,
-            },
-            include: {
-              user: {
+    // Get subscriptions
+    const subscriptions = await prisma.noticeNotificationsSubscription.findMany(
+      {
+        where: {
+          noticeKey: publisher.key,
+        },
+        select: {
+          user: {
+            select: {
+              pushes: {
                 select: {
-                  devices: true,
+                  expoPushToken: true,
                 },
               },
             },
+          },
+        },
+      }
+    )
+
+    const expoPushTokens = subscriptions
+      .map((sub) => sub.user.pushes.map((push) => push.expoPushToken))
+      .flat()
+
+    const shouldSendPush = expoPushTokens.length > 0
+
+    const lastNoticeIndex = notices.findIndex(
+      (notice) => notice.title === this.getLastNoticeTitle(publisher)
+    )
+
+    const pushes: PushInformation[] = []
+
+    if (lastNoticeIndex > 0) {
+      for (let i = lastNoticeIndex - 1; i >= 0; i -= 1) {
+        const notice = notices[i]
+
+        console.info(`\n새로운 ${publisher.name} 공지사항이 올라왔습니다.`)
+        console.info(notices[i])
+
+        if (shouldSendPush) {
+          const pushInformation: PushInformation = {
+            to: expoPushTokens,
+            title: `새로운 ${publisher.name} 공지사항이 올라왔습니다.`,
+            body: notice.title,
+            data: {
+              type: 'notice',
+              url: notice.noticeItemUrl,
+            },
+            sound: 'default',
+            _displayInForeground: true,
           }
-        )
 
-        const pushTokens = subscriptionsInfo.reduce(
-          (accum, curr) => [
-            ...accum,
-            ...curr.user.devices.map((device) => device.pushToken),
-          ],
-          [] as string[]
-        )
-
-        // Send push or email only in production mode
-        if (!isDev()) {
-          // Send push notifications
-          await Push.notify(
-            pushTokens.map((pushToken) => ({
-              to: pushToken,
-              title: `새로운 ${subscriber.name} 공지사항이 올라왔습니다.`,
-              body: notices[i].title,
-              data: {
-                type: 'notice',
-                url: notices[i].noticeItemUrl,
-              },
-            }))
-          )
-
-          this.sendMail(
-            `새로운 ${subscriber.name} 공지사항이 올라왔습니다.`,
-            `${notices[i].title}
-${notices[i].noticeItemUrl}`,
-            subscriber
-          )
+          pushes.push(pushInformation)
         }
       }
     } else {
-      if (isDev()) {
-        console.log(`${subscriber.name}: there is no new notice`)
-      }
+      console.info(`${publisher.name}: there is no new notice`)
     }
 
-    this.updateLastNotice(subscriber, notices[0].title)
+    if (shouldSendPush) {
+      const results = await Push.notify(pushes)
+    }
+
+    await page.close()
+    this.updateLastNotice(publisher, notices[0].title)
     this.writeLastNoticeFile()
   }
 
-  private async visit(
+  static async visit(
     page: Page,
-    subscriber: Subscriber,
+    publisher: Publisher,
     pageNumber?: number
   ): Promise<
     {
@@ -262,28 +244,28 @@ ${notices[i].noticeItemUrl}`,
     const pendingXHR = new PendingXHR(page)
 
     try {
-      await page.goto(subscriber.url)
+      await page.goto(publisher.url)
       await pendingXHR.waitForAllXhrFinished()
-      await page.waitForSelector(subscriber.noticeItemSelector)
+      await page.waitForSelector(publisher.noticeItemSelector)
     } catch (err) {
       throw new Error(err)
     }
 
     const bodyHtml = await page.$eval('body', (body) => body.innerHTML)
 
-    const body = new JSDOM(bodyHtml).window.document.body
+    const { body } = new JSDOM(bodyHtml).window.document
 
     const notices: {
       title: string
       noticeItemUrl: string
     }[] = []
-    const noticeElms = body.querySelectorAll(subscriber.noticeItemSelector)
+    const noticeElms = body.querySelectorAll(publisher.noticeItemSelector)
 
     for (const noticeElm of Array.from(noticeElms)) {
-      const title = subscriber.titleBuilder(noticeElm)
-      const noticeItemUrl = subscriber.urlBuilder
-        ? subscriber.urlBuilder(noticeElm)
-        : subscriber.url
+      const title = publisher.titleBuilder(noticeElm)
+      const noticeItemUrl = publisher.urlBuilder
+        ? publisher.urlBuilder(noticeElm)
+        : publisher.url
 
       notices.push({
         title,

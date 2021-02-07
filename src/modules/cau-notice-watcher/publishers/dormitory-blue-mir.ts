@@ -1,6 +1,6 @@
-import { Subscriber } from '..'
+import { Publisher } from '..'
 
-export const dormitoryBlueMir: Subscriber = {
+export const dormitoryBlueMir: Publisher = {
   name: '생활관(블루미르홀)',
   key: 'dormitory-blue-mir',
   url: 'http://dormitory.cau.ac.kr/bbs/bbs_list.php?bbsID=notice',

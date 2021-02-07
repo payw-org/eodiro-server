@@ -1,6 +1,6 @@
-import { Subscriber } from '..'
+import { Publisher } from '..'
 
-export const planning: Subscriber = {
+export const planning: Publisher = {
   name: '도시계획부동산학과',
   key: 'planning',
   url: 'http://planning.cau.ac.kr/bbs/board.php?tbl=notice',
