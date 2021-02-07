@@ -4,6 +4,9 @@ import mysql from 'mysql'
 
 const log = console.log
 
+/**
+ * @deprecated
+ */
 export default class DbConnector {
   private static connection: mysql.Connection | undefined
 
