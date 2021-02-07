@@ -26,10 +26,7 @@ async function main(): Promise<void> {
     lecturesFile: string
   }>()
 
-  const quit = await boot({
-    db: true,
-    listen: false,
-  })
+  const quit = await boot()
 
   const year = Number(args.year) || Number(args.y) || dayjs().year()
   const semester =
