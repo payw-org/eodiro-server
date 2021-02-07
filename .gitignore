@@ -24,3 +24,5 @@ src/api/eodiro-one-api/db-schema
 /data
 **/config/index.ts
 generated
+**/config/index.ts
+**/env/index.ts
