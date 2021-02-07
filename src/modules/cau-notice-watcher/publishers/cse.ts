@@ -1,8 +1,8 @@
-import { Subscriber } from '..'
+import { Publisher } from '..'
 
 const url = 'https://cse.cau.ac.kr/sub05/sub0501.php'
 
-export const cse: Subscriber = {
+export const cse: Publisher = {
   name: '소프트웨어학부',
   key: 'cse',
   url,

@@ -9,7 +9,7 @@ Subscriber is an **object** containing the information of a notice target.
 Here is an example for the notice of CAU CSE(소프트웨어학부).
 
 ```ts
-export const cse: Subscriber = {
+export const cse: Publisher = {
   name: '소프트웨어학부',
   key: 'cse',
   url: 'https://cse.cau.ac.kr/sub05/sub0501.php',

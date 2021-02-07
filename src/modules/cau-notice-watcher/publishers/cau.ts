@@ -1,8 +1,8 @@
-import { Subscriber } from '..'
+import { Publisher } from '..'
 
 const url = 'https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100#page1'
 
-export const cau: Subscriber = {
+export const cau: Publisher = {
   name: 'CAU Notice',
   key: 'cau',
   url,
