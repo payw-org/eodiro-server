@@ -1,8 +1,7 @@
-import { FieldInfo, MysqlError } from 'mysql'
-
 import DbConnector from '@/modules/db-connector'
 import { SqlBInstance } from '@/modules/sqlb'
 import chalk from 'chalk'
+import { FieldInfo, MysqlError } from 'mysql'
 
 export type MysqlResult = any[] | Record<string, any>
 export type MysqlInsertOrUpdateResult = {
@@ -19,6 +18,9 @@ export type MysqlInsertOrUpdateResult = {
 export type MysqlQueryReturn<ResultType> = [MysqlError, ResultType, FieldInfo[]]
 export type QueryValues = (string | number)[] | string | number
 
+/**
+ * @deprecated Use Prisma
+ */
 export default class Db {
   static query<ResultType = MysqlResult>(
     query: SqlBInstance
