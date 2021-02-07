@@ -1,5 +1,8 @@
+// TODO: Make npm module (CLI)
+
 const fs = require('fs')
 const pluralize = require('pluralize')
+const { formatSchema } = require('@prisma/sdk')
 const { pascalCase, camelCase } = require('change-case')
 const prismaSchema = require('./prisma-schema-path').file
 const schemaPath = require('./prisma-schema-path').prismaSchemaPath
@@ -138,4 +141,10 @@ const modelProcessedSchema = enumProcessedSchema.replace(
 
 fs.writeFileSync(schemaPath, modelProcessedSchema, {
   encoding: 'utf8',
+})
+
+formatSchema({ schemaPath }).then((formatted) => {
+  fs.writeFileSync(schemaPath, formatted, {
+    encoding: 'utf8',
+  })
 })
