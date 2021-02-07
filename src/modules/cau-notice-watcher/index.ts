@@ -9,7 +9,6 @@ import prisma from '../prisma'
 import Push from '../push'
 import { isDev } from '../utils/is-dev'
 
-
 export type TitleBuilder = (
   /** A single notice item */ noticeItemElement: HTMLElement | Element
 ) => string
@@ -40,7 +39,7 @@ export interface Subscriber {
 
 export type SubscriberBuilder = (siteInformation: {
   name: string
-  key :string
+  key: string
   url: string
 }) => Subscriber
 
