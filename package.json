@@ -41,14 +41,14 @@
     "one-api:generate": "npm run --prefix src/api/one generate",
     "one-api:deploy": "npm run one-api:generate && npm run build && npm run --prefix src/api/one copy-packagejson && npm run --prefix build/src deploy",
     "one-api:deploy:next": "npm run one-api:generate && npm run build && npm run --prefix src/api/one copy-packagejson && npm run --prefix build/src deploy:next",
-    "prisma:introspect": "prisma introspect && node prisma/utils/map-and-pluralize",
-    "prisma:generate": "prisma generate",
-    "prisma:all": "npm run prisma:introspect && npm run prisma:generate"
-  },
-  "husky": {
-    "hooks": {
-      "pre-push": "npm run lint && npm run type-check"
-    }
+    "introspect": "prisma introspect --schema prisma/schema.prisma",
+    "introspect:dev": "prisma introspect --schema prisma/schema.dev.prisma && prismap --schema prisma/schema.dev.prisma",
+    "generate": "prisma generate --schema prisma/schema.prisma",
+    "generate:dev": "prisma generate --schema prisma/schema.dev.prisma",
+    "db:push": "prisma db push --schema prisma/schema.prisma --preview-feature",
+    "db:push:dev": "prisma db push --schema prisma/schema.dev.prisma --preview-feature",
+    "migrate": "prisma migrate dev --preview-feature --schema prisma/schema.prisma",
+    "migrate:dev": "prisma migrate dev --preview-feature --schema prisma/schema.dev.prisma"
   },
   "dependencies": {
     "@payw/cau-cafeteria-menus-scraper": "^2.1.10",
