@@ -1,8 +1,8 @@
-import Config from '@/config'
-import NodeMailer from 'nodemailer'
+import { env } from '@/env'
 import chalk from 'chalk'
+import NodeMailer from 'nodemailer'
 
-const log = console.log
+const { log } = console
 
 interface MailOption {
   /**
@@ -18,14 +18,14 @@ interface MailOption {
 }
 
 export default class EodiroMailer {
-  private static transporter = NodeMailer.createTransport({
-    service: Config.MAIL_SERVICE,
-    host: Config.MAIL_HOST,
-    port: Config.MAIL_PORT,
+  private static transporter = NodeMailer?.createTransport({
+    service: env.MAIL_SERVICE,
+    host: env.MAIL_HOST,
+    port: env.MAIL_PORT,
     secure: true,
     auth: {
-      user: Config.MAIL_USERNAME,
-      pass: Config.MAIL_PASSWORD,
+      user: env.MAIL_USERNAME,
+      pass: env.MAIL_PASSWORD,
     },
   })
 
@@ -54,6 +54,12 @@ export default class EodiroMailer {
   static async sendMail(options: MailOption): Promise<any> {
     if (!this.isReady) {
       log(`[ ${chalk.yellow('email')} ] not connected to an email server`)
+      log(
+        `[ ${chalk.yellow(
+          'email'
+        )} ] connecing to the email server for the first time`
+      )
+      await this.verify()
     }
 
     const defaultFrom = this.createFrom('어디로', 'no-reply')
@@ -65,6 +71,6 @@ export default class EodiroMailer {
         : defaultFrom,
     }
 
-    return await this.transporter.sendMail(sendOptions)
+    return this.transporter.sendMail(sendOptions)
   }
 }
