@@ -1,51 +1,47 @@
-import Axios, { AxiosResponse } from 'axios'
+/* eslint-disable no-underscore-dangle */
 
-import Config from '@/config'
+import Axios from 'axios'
 
-type PushInformation = {
+export type PushInformation = {
   /**
    * ExpoPushToken
    */
-  to: string
+  to: string | string[]
   title: string
+  subtitle?: string
   body: string
-  data?: Record<string, unknown>
+  badge?: number
+  data?:
+    | {
+        type: 'notice'
+        url: string
+      }
+    | {
+        type: 'comment'
+        boardId: number
+        postId: number
+        commentId?: number
+        subcommentId?: number
+      }
+    | Record<string, unknown>
   sound?: 'default'
-  /**
-   * @default true
-   */
   _displayInForeground?: boolean
 }
 
-type PushPayload = PushInformation | PushInformation[]
+type PushOk = { status: 'ok'; id: string }
+type PushError = {
+  status: 'error'
+  message: string
+  details: { error: string }
+}
 
 export default class Push {
-  private static initPayload(payload: PushPayload) {
-    function initInfo(info: PushInformation) {
-      if (!info.sound) {
-        info.sound = 'default'
-      }
-
-      if (!info._displayInForeground) {
-        info._displayInForeground = true
-      }
-    }
-
-    if (Array.isArray(payload)) {
-      payload.forEach((p) => {
-        initInfo(p)
-      })
-    } else {
-      initInfo(payload)
-    }
-  }
-
-  static async notify(payload: PushPayload): Promise<AxiosResponse> {
-    this.initPayload(payload)
-
+  static async notify(
+    payload: PushInformation | PushInformation[]
+  ): Promise<{ data: (PushOk | PushError)[] }> {
     const response = await Axios({
       method: 'POST',
-      url: Config.PUSH_API_URL,
+      url: 'https://exp.host/--/api/v2/push/send',
       headers: {
         Accept: 'application/json',
         'Accept-encoding': 'gzip, deflate',
@@ -54,6 +50,6 @@ export default class Push {
       data: JSON.stringify(payload),
     })
 
-    return response
+    return response.data
   }
 }
