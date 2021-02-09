@@ -1,17 +1,17 @@
+import { CauNoticeWatcher } from '@/modules/cau-notice-watcher'
+import * as Publishers from '@/modules/cau-notice-watcher/publishers'
 import { prisma } from '@/modules/prisma'
-import { CauNoticeWatcher } from '@/modules/server/cau-notice-watcher'
-import * as Vendors from '@/modules/server/cau-notice-watcher/vendors'
 
 async function run() {
-  const feed = new CauNoticeWatcher()
+  const watcher = new CauNoticeWatcher()
 
-  feed.watch(Vendors.cau)
-  feed.watch(Vendors.dormitoryBlueMir)
-  feed.watch(Vendors.cse)
-  feed.watch(Vendors.log)
+  watcher.register(Publishers.cau)
+  watcher.register(Publishers.dormitoryBlueMir)
+  watcher.register(Publishers.cse)
+  watcher.register(Publishers.log)
 
   try {
-    await feed.run()
+    await watcher.run()
   } catch (error) {
     console.error(error)
   }
