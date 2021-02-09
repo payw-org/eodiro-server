@@ -1,121 +1,88 @@
-import {
-  DecodeTokenOption,
-  Jwt,
-  JwtToken,
-  RefreshToken,
-  RefreshTokenOption,
-  TokenOption,
-  Tokens,
-} from 'jwt-token'
+import { env } from '@/env'
+import jwt from 'jsonwebtoken'
+import { prisma } from './prisma'
 
-import config from '@/config'
-import { refreshToken as refreshTokenTable } from '@/database/models/refresh_token'
-
-export interface Payload {
+export type AuthData = {
   userId: number
-  isAdmin: boolean
 }
 
-export default class EodiroJwt {
-  private static RefreshTokenOption = {
-    secret: config.REFRESH_TOKEN_SECRET,
-    expire: config.REFRESH_TOKEN_EXPIRE,
-    refreshTokenOption: {
-      refreshRefreshTokenAllowedUnit: config.REFRESH_TOKEN_REFRESH_ALLOWED_UNIT,
-      refreshRefreshTokenAllowedValue:
-        config.REFRESH_TOKEN_REFRESH_ALLOWED_VALUE,
+export const signAccessToken = (authData: AuthData): string =>
+  jwt.sign(authData, env.ACCESS_TOKEN_SECRET, {
+    expiresIn: env.ACCESS_TOKEN_LIFETIME,
+    // expiresIn: '10s',
+  })
+
+export const signRefreshToken = (authData: AuthData): string =>
+  jwt.sign(authData, env.REFRESH_TOKEN_SECRET)
+
+export const revokeRefreshToken = async (
+  authData: AuthData
+): Promise<string> => {
+  const refreshToken = signRefreshToken(authData)
+
+  await prisma.user.update({
+    data: {
+      refreshToken,
     },
-  }
-  private static AccessTokenOption = {
-    secret: config.ACCESS_TOKEN_SECRET,
-    expire: config.ACCESS_TOKEN_EXPIRE,
-  }
+    where: {
+      id: authData.userId,
+    },
+  })
 
-  private static async getRefreshTokenFromDb(userId: number) {
-    const RefreshTokenTable = await refreshTokenTable()
-    const row = await RefreshTokenTable.findWithUserId(userId)
-    if (row === false || row === undefined) {
-      return undefined
-    }
-    return row
-  }
-
-  static async getTokenOrCreate(
-    payload: Payload,
-    refreshTokenOption: RefreshTokenOption<Payload> = this.RefreshTokenOption,
-    accessTokenOption: TokenOption<Payload> = this.AccessTokenOption
-  ): Promise<Tokens<Payload>> {
-    return Jwt.getTokenOrCreateTokens(
-      payload,
-      refreshTokenOption,
-      {
-        payload,
-        ...accessTokenOption,
-      },
-      async (): Promise<string | undefined> => {
-        const row = await this.getRefreshTokenFromDb(payload.userId)
-        return row === undefined ? undefined : row.token
-      },
-      async (refreshToken: RefreshToken<Payload>) => {
-        const RefreshTokenTable = await refreshTokenTable()
-        await RefreshTokenTable.addRefreshToken(refreshToken)
-      },
-      async (refreshToken: RefreshToken<Payload>) => {
-        const RefreshTokenTable = await refreshTokenTable()
-        await RefreshTokenTable.updateRefreshToken(refreshToken)
-      }
-    )
-  }
-
-  static async verify(
-    token: string,
-    accessTokenOption: TokenOption<Payload> = this.AccessTokenOption
-  ): Promise<Payload | false> {
-    let result = {} as Payload
-    try {
-      result = await Jwt.verifyAccessToken<Payload>(
-        {
-          token,
-          ...accessTokenOption,
-        } as DecodeTokenOption,
-        async (accessToken: JwtToken<Payload>): Promise<number> => {
-          const row = await this.getRefreshTokenFromDb(
-            accessToken.decoded.payload.userId
-          )
-          return row === undefined ? undefined : row.manually_changed_at
-        }
-      )
-    } catch (err) {
-      return false
-    }
-    return result
-  }
-
-  static async refresh(
-    token: string,
-    refreshTokenOption: RefreshTokenOption<Payload> = this.RefreshTokenOption,
-    accessTokenOption: TokenOption<Payload> = this.AccessTokenOption
-  ): Promise<Tokens<Payload>> {
-    const result = Jwt.refresh(
-      token,
-      refreshTokenOption,
-      accessTokenOption,
-      async (refreshToken: RefreshToken<Payload>) => {
-        const row = await this.getRefreshTokenFromDb(
-          refreshToken.decoded.payload.userId
-        )
-        return row === undefined
-          ? undefined
-          : {
-              manuallyChangedAt: row.manually_changed_at,
-              refreshToken: row.token,
-            }
-      },
-      async (refreshToken: RefreshToken<Payload>) => {
-        const RefreshTokenTable = await refreshTokenTable()
-        await RefreshTokenTable.updateRefreshToken(refreshToken)
-      }
-    )
-    return result
-  }
+  return refreshToken
 }
+
+export enum JwtErrorName {
+  TokenExpiredError = 'TokenExpiredError',
+  JsonWebTokenError = 'JsonWebTokenError',
+  NotBeforeError = 'NotBeforeError',
+  RefreshTokenRevokedError = 'RefreshTokenRevokedError',
+}
+
+export type JwtError = {
+  name: JwtErrorName
+  message: string
+}
+
+/**
+ * Validates refresh token itself and also checks DB.
+ */
+export const verifyToken = (
+  token: string | null | undefined,
+  type: 'access' | 'refresh'
+): Promise<[JwtError | null, AuthData | undefined]> =>
+  new Promise((resolve) => {
+    const secret =
+      type === 'access' ? env.ACCESS_TOKEN_SECRET : env.REFRESH_TOKEN_SECRET
+
+    jwt.verify(token ?? '', secret, async (jwtErr, decoded) => {
+      if (decoded) {
+        const authData = decoded as AuthData & { iat?: number; exp?: number }
+
+        delete authData.iat
+        delete authData.exp
+
+        // Check DB and compare the refresh token
+        if (authData?.userId && type === 'refresh') {
+          const user = await prisma.user.findUnique({
+            where: {
+              id: authData.userId,
+            },
+          })
+
+          if (user?.refreshToken !== token) {
+            const err = new Error('Revoked Refresh Token') as JwtError
+
+            err.name = JwtErrorName.RefreshTokenRevokedError
+
+            resolve([err, undefined])
+            return
+          }
+        }
+
+        resolve([jwtErr as JwtError, authData as AuthData])
+      } else {
+        resolve([jwtErr as JwtError, decoded as undefined])
+      }
+    })
+  })
