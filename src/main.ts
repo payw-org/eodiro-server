@@ -1,5 +1,4 @@
 import 'reflect-metadata'
-
 import { boot } from './boot'
 
 async function main() {
@@ -7,3 +6,7 @@ async function main() {
 }
 
 main()
+
+process.on('SIGTERM', () => {
+  process.exit()
+})
