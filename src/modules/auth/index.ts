@@ -15,18 +15,18 @@ import {
   validatePortalId,
 } from './validation'
 
-export type SignInInfo = {
+export type LogInInfo = {
   portalId: string
   password: string
 }
 
-export type SignUpInfo = {
+export type JoinInfo = {
   portalId: string
   password: string
   nickname: string
 }
 
-export type SignUpResult = {
+export type JoinResult = {
   hasJoined: boolean
   validations: {
     portalId: AuthValidationResult
@@ -59,7 +59,7 @@ export default class Auth {
     return crypto.randomBytes(20).toString('hex')
   }
 
-  static async signUp(info: SignUpInfo): Promise<SignUpResult> {
+  static async signUp(info: JoinInfo): Promise<JoinResult> {
     const { portalId, nickname, password } = info
 
     const portalIdValidation = await validatePortalId(portalId)
