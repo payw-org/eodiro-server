@@ -6,16 +6,16 @@
 # > sudo service cron start
 
 # update random nicknames at 00:00
-0 0 * * * /home/ubuntu/.nvm/versions/node/v13.14.0/bin/node /home/ubuntu/eodiro/web/build/scripts/cron/update-random-nicknames
+0 0 * * * /home/ubuntu/.nvm/versions/node/v13.14.0/bin/node /home/ubuntu/eodiro/server/build/src/scripts/cron/update-random-nicknames
 
 # check board candidate votes at 00:00
-0 0 * * * /home/ubuntu/.nvm/versions/node/v13.14.0/bin/node /home/ubuntu/eodiro/web/build/scripts/cron/check-board-candidate-votes
+0 0 * * * /home/ubuntu/.nvm/versions/node/v13.14.0/bin/node /home/ubuntu/eodiro/server/build/src/scripts/cron/check-board-candidate-votes
 
 # check notice every 15 minutes
-*/15 * * * * /home/ubuntu/.nvm/versions/node/v13.14.0/bin/node /home/ubuntu/eodiro/web/build/scripts/cron/check-notice
+*/15 * * * * /home/ubuntu/.nvm/versions/node/v13.14.0/bin/node /home/ubuntu/eodiro/server/build/src/scripts/cron/check-notice
 
 # clear pending users every 30 minutes
-*/30 * * * * /home/ubuntu/.nvm/versions/node/v13.14.0/bin/node /home/ubuntu/eodiro/web/build/scripts/cron/clear-pending-users
+*/30 * * * * /home/ubuntu/.nvm/versions/node/v13.14.0/bin/node /home/ubuntu/eodiro/server/build/src/scripts/cron/clear-pending-users
 
 # seed cafeteria menus at 03:00 everyday
-# 0 3 * * * NODE_ENV=production /home/ubuntu/.nvm/versions/node/v13.14.0/bin/node /home/ubuntu/eodiro/web/build/scripts/cron/seed-cafeteria-menus
+# 0 3 * * * NODE_ENV=production /home/ubuntu/.nvm/versions/node/v13.14.0/bin/node /home/ubuntu/eodiro/server/build/src/scripts/cron/seed-cafeteria-menus
