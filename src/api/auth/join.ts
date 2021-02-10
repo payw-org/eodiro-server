@@ -1,8 +1,8 @@
-import Auth, { SignUpInfo, SignUpResult } from '@/modules/auth'
+import Auth, { JoinInfo, JoinResult } from '@/modules/auth'
 import express from 'express'
 
-export type ApiAuthJoinRequestBody = SignUpInfo
-export type ApiAuthJoinResponseData = SignUpResult
+export type ApiAuthJoinRequestBody = JoinInfo
+export type ApiAuthJoinResponseData = JoinResult
 
 const router = express.Router()
 
