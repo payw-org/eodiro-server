@@ -1,7 +1,6 @@
 {
   "editor.formatOnSave": true,
   "files.insertFinalNewline": true,
-  "eslint.enable": true,
   "files.trimTrailingWhitespace": true,
   "javascript.format.semicolons": "remove",
   "typescript.format.semicolons": "remove",
