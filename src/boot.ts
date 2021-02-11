@@ -1,12 +1,16 @@
 import bodyParser from 'body-parser'
 import chalk from 'chalk'
+import cookieParser from 'cookie-parser'
 import cors from 'cors'
 import express from 'express'
 import http from 'http'
+import morgan from 'morgan'
 import api from './api'
 import Config from './config'
 import { prisma } from './modules/prisma'
+import { isDev } from './modules/utils/is-dev'
 
+const dev = isDev()
 const log = console.log
 
 type QuitFunction = () => void
@@ -15,9 +19,15 @@ export async function boot(): Promise<QuitFunction> {
   // Create Express app
   const app = express()
 
-  app.use(cors())
-
-  // Use middlewares
+  // Use middleware
+  app.use(
+    cors({
+      credentials: true,
+      origin: dev ? ['http://localhost:3020'] : ['https://eodiro.com'],
+    })
+  )
+  app.use(morgan('tiny'))
+  app.use(cookieParser())
   app.use(bodyParser.json({ limit: '100mb' }))
   app.use(bodyParser.urlencoded({ limit: '100mb', extended: true }))
   app.use(api)
