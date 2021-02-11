@@ -2,6 +2,7 @@
   "compilerOptions": {
     "strict": false,
     "declaration": true,
+    "declarationDir": "./types",
     "moduleResolution": "node",
     "target": "ES2018",
     "allowJs": true,
@@ -25,10 +26,10 @@
   "exclude": [
     "node_modules",
     "build",
-    "**/generated",
     "src/api/cafeteria",
     "src/api/lectures",
     "src/api/my",
-    "src/api/vacant"
+    "src/api/vacant",
+    "types"
   ]
 }
