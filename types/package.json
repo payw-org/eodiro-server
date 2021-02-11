@@ -1,0 +1,8 @@
+{
+  "name": "@payw/eodiro-server-types",
+  "version": "1.0.1",
+  "description": "eodiro server type declarations",
+  "repository": "https://github.com/payw-org/eodiro-server.git",
+  "author": "jhaemin",
+  "license": "MIT"
+}
