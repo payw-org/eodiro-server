@@ -1,52 +1,38 @@
-import Auth from '@/modules/auth'
+import {
+  AuthValidationResult,
+  validateNickname,
+  validatePassword,
+  validatePortalId,
+} from '@/modules/auth/validation'
 import express from 'express'
 
 const router = express.Router()
 
-// Validate portal email id
-router.post('/validate/portal-id', async (req, res) => {
-  let portalId: string = req.body.portalId
-  const existence: boolean = req.body.existence
+export type ApiAuthValidateRequestBody = {
+  portalId?: string
+  nickname?: string
+  password?: string
+}
 
-  portalId = portalId.trim()
+export type ApiAuthValidateResponseData = {
+  [K in keyof ApiAuthValidateRequestBody]?: AuthValidationResult
+}
 
-  if (!portalId.includes('@')) {
-    portalId += '@cau.ac.kr'
+// Validate join information
+router.post('/auth/validate', async (req) => {
+  const body = req.body as ApiAuthValidateRequestBody
+  const responseData: ApiAuthValidateResponseData = {}
+
+  if ('portalId' in body && body.portalId) {
+    responseData.portalId = await validatePortalId(body.portalId)
   }
 
-  if (existence) {
-    res.json(
-      !(await Auth.isValidPortalId(portalId)) &&
-        Auth.isValidPortalIdFormat(portalId)
-    )
-  } else {
-    res.json(
-      (await Auth.isValidPortalId(portalId)) &&
-        Auth.isValidPortalIdFormat(portalId)
-    )
+  if ('nickname' in body && body.nickname) {
+    responseData.nickname = await validateNickname(body.nickname)
   }
-})
 
-// Validate nickname
-router.post('/validate/nickname', async (req, res) => {
-  const nickname = req.body.nickname
-  if (
-    (await Auth.isValidNickname(nickname)) &&
-    Auth.isValidNicknameFormat(nickname)
-  ) {
-    res.json(true)
-  } else {
-    res.json(false)
-  }
-})
-
-// Validate password
-router.post('/validate/password', async (req, res) => {
-  const password = req.body.password
-  if (Auth.isValidPassword(password)) {
-    res.json(true)
-  } else {
-    res.json(false)
+  if ('password' in body && body.password) {
+    responseData.password = await validatePassword(body.password)
   }
 })
 

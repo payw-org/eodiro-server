@@ -1,13 +1,15 @@
-import { eodiroConsts } from '@/constants'
-import { SignInInfo } from '@/modules/auth'
+import { eodiroConst } from '@/constant'
+import { LogInInfo } from '@/modules/auth'
 import { setCookie } from '@/modules/cookie'
 import EodiroEncrypt from '@/modules/eodiro-encrypt'
 import { AuthData, signAccessToken, signRefreshToken } from '@/modules/jwt'
 import { prisma } from '@/modules/prisma'
-import { sanitizePoralId } from '@/modules/sanitize-portal-id'
+import { sanitizePortalId } from '@/modules/sanitize-portal-id'
 import express from 'express'
+import { refreshRouterPath } from './refresh'
+import { revokeRouterPath } from './revoke'
 
-export type ApiAuthLoginReqBody = SignInInfo
+export type ApiAuthLoginReqBody = LogInInfo
 export type ApiAuthLoginResData = {
   isSigned: boolean
   refreshToken?: string
@@ -18,7 +20,7 @@ const router = express.Router()
 
 // Sign in
 router.post('/auth/log-in', async (req, res) => {
-  const { portalId, password } = req.body as SignInInfo
+  const { portalId, password } = req.body as LogInInfo
   const resData: ApiAuthLoginResData = { isSigned: false }
 
   if (!portalId || !password) {
@@ -26,7 +28,7 @@ router.post('/auth/log-in', async (req, res) => {
     return
   }
 
-  const sanitizedPortalId = sanitizePoralId(portalId)
+  const sanitizedPortalId = sanitizePortalId(portalId)
   const user = await prisma.user.findUnique({
     where: { portalId: sanitizedPortalId },
   })
@@ -59,17 +61,17 @@ router.post('/auth/log-in', async (req, res) => {
     resData.accessToken = accessToken
 
     const expires = new Date('2038-01-01').toUTCString()
-    const refreshTokenPaths = ['/api/auth/refresh', '/api/auth/revoke']
+    const refreshTokenPaths = [refreshRouterPath, revokeRouterPath]
 
     setCookie(req, res, [
       {
-        name: eodiroConsts.EDR_ACCESS_TOKEN_NAME,
+        name: eodiroConst.EDR_ACCESS_TOKEN_NAME,
         value: accessToken,
         expires,
         path: '/',
       },
       ...refreshTokenPaths.map((path) => ({
-        name: eodiroConsts.EDR_REFRESH_TOKEN_NAME,
+        name: eodiroConst.EDR_REFRESH_TOKEN_NAME,
         value: refreshToken,
         expires,
         path,
