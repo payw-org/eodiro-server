@@ -2,7 +2,7 @@
 // https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
 
 export const httpStatus = {
-  // Successfull
+  // Successful
   OK: 200,
   // Client errors
   BAD_REQUEST: 400,
