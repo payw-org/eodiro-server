@@ -1,18 +1,30 @@
-import Auth from '@/modules/auth'
+import { httpStatus } from '@/constant/http-status'
+import { extractJwt } from '@/modules/auth/extract-token'
+import { JwtError, verifyJwt } from '@/modules/jwt'
 import express from 'express'
 
 const router = express.Router()
 
-// Verify pending user
-router.post('/verify', async (req, res) => {
-  const requestData = req.body
-  const isVerified = await Auth.verifyPendingUser(requestData.token)
+export type ApiAuthGeneralErrResData = {
+  error: JwtError | null
+}
 
-  if (isVerified) {
-    res.sendStatus(201)
-  } else {
-    res.sendStatus(404)
+export type ApiAuthVerifyResData = ApiAuthGeneralErrResData
+
+// Verify pending user
+router.post('/auth/verify', async (req, res) => {
+  const accessToken = extractJwt(req, res, 'access')
+
+  const [error] = await verifyJwt(accessToken, 'access')
+
+  // If error, set the status code to 401
+  if (error) {
+    console.error(error)
+    res.sendStatus(httpStatus.UNAUTHORIZED)
+    return
   }
+
+  res.sendStatus(httpStatus.OK)
 })
 
 export default router

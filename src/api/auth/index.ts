@@ -1,22 +1,20 @@
 import express from 'express'
-import changePassowrd from './change-password'
-import information from './information'
-import isSignedIn from './is-signed-in'
-import refresh from './refresh-token'
-import signIn from './sign-in'
-import signUp from './sign-up'
+import changePassword from './change-password'
+import forgot from './forgot'
+import join from './join'
+import signIn from './log-in'
+import refresh from './refresh'
 import validate from './validate'
 import verify from './verify'
 
 const router = express.Router()
 
-router.use(information)
-router.use(isSignedIn)
-router.use(signUp)
-router.use(verify)
+router.use(changePassword)
+router.use(forgot)
+router.use(join)
 router.use(signIn)
-router.use(validate)
+router.use(verify)
 router.use(refresh)
-router.use(changePassowrd)
+router.use(validate)
 
 export default router
