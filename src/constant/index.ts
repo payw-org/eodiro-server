@@ -1,4 +1,4 @@
-export const eodiroConsts = {
+export const eodiroConst = {
   MIN_NICKNAME_LENGTH: 2,
   MAX_NICKNAME_LENGTH: 20,
   MIN_PASSWORD_LENGTH: 8,

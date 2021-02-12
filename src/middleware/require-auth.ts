@@ -1,4 +1,4 @@
-import { httpStatus } from '@/constants/http-status'
+import { httpStatus } from '@/constant/http-status'
 import { extractJwt } from '@/modules/auth/extract-token'
 import { JwtError, verifyJwt } from '@/modules/jwt'
 import { prisma } from '@/modules/prisma'
@@ -27,12 +27,11 @@ export async function requireAuth(
     })
 
     if (!user) {
-      res.statusCode = 401
-      res.end()
+      res.sendStatus(httpStatus.UNAUTHORIZED)
       return
     }
 
-    res.locals.user = user
+    req.user = user
     next()
   }
 }
