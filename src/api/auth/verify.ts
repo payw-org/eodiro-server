@@ -12,19 +12,17 @@ export type ApiAuthGeneralErrResData = {
 export type ApiAuthVerifyResData = ApiAuthGeneralErrResData
 
 // Verify pending user
-router.post('/auth/verify', async (req, res) => {
+router.post<any, ApiAuthGeneralErrResData>('/auth/verify', async (req, res) => {
   const accessToken = extractJwt(req, res, 'access')
 
   const [error] = await verifyJwt(accessToken, 'access')
 
   // If error, set the status code to 401
   if (error) {
-    console.error(error)
-    res.sendStatus(httpStatus.UNAUTHORIZED)
-    return
+    return res.status(httpStatus.UNAUTHORIZED).json({ error })
   }
 
-  res.sendStatus(httpStatus.OK)
+  res.status(httpStatus.OK).json({ error })
 })
 
 export default router
