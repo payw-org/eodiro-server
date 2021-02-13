@@ -39,7 +39,7 @@ model CommunityBoard {
   name               String              @default("") @db.VarChar(50)
   description        String?             @db.VarChar(100)
   priority           Int                 @default(0) @db.UnsignedSmallInt
-  isDeleted          Int                 @default(0) @map("is_deleted") @db.TinyInt
+  isDeleted          Boolean             @default(false) @map("is_deleted")
   createdBy          Int                 @map("created_by") @db.UnsignedInt
   createdAt          DateTime            @map("created_at") @db.DateTime(0)
   activeAt           DateTime?           @map("active_at") @db.DateTime(0)
@@ -93,7 +93,7 @@ model CommunityComment {
   randomNickname       String                @default("") @map("random_nickname") @db.VarChar(30)
   body                 String                @db.Text
   commentedAt          DateTime              @map("commented_at") @db.DateTime(0)
-  isDeleted            Int                   @default(0) @map("is_deleted") @db.TinyInt
+  isDeleted            Boolean               @default(false) @map("is_deleted")
   communityPost        CommunityPost         @relation(fields: [postId], references: [id])
   user                 User                  @relation(fields: [userId], references: [id])
   communitySubcomments CommunitySubcomment[]
@@ -116,7 +116,7 @@ model CommunityPost {
   bookmarksCount         Int                     @default(0) @map("bookmarks_count") @db.UnsignedMediumInt
   postedAt               DateTime                @map("posted_at") @db.DateTime(0)
   editedAt               DateTime?               @map("edited_at") @db.DateTime(0)
-  isDeleted              Int                     @default(0) @map("is_deleted") @db.TinyInt
+  isDeleted              Boolean                 @default(false) @map("is_deleted")
   communityBoard         CommunityBoard          @relation(fields: [boardId], references: [id])
   user                   User                    @relation(fields: [userId], references: [id])
   communityComments      CommunityComment[]
@@ -160,7 +160,7 @@ model CommunitySubcomment {
   randomNickname    String             @default("") @map("random_nickname") @db.VarChar(30)
   body              String             @db.Text
   subcommentedAt    DateTime           @map("subcommented_at") @db.DateTime(0)
-  isDeleted         Int                @default(0) @map("is_deleted") @db.TinyInt
+  isDeleted         Boolean            @default(false) @map("is_deleted")
   communityComment  CommunityComment   @relation(fields: [commentId], references: [id])
   communityPost     CommunityPost      @relation(fields: [postId], references: [id])
   user              User               @relation(fields: [userId], references: [id])
