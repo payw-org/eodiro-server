@@ -47,7 +47,7 @@ export type JwtError = {
 /**
  * Validates refresh token itself and also checks DB.
  */
-export const verifyToken = (
+export const verifyJwt = (
   token: string | null | undefined,
   type: 'access' | 'refresh'
 ): Promise<[JwtError | null, AuthData | undefined]> =>
