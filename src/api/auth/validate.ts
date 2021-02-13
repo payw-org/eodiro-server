@@ -19,21 +19,26 @@ export type ApiAuthValidateResponseData = {
 }
 
 // Validate join information
-router.post('/auth/validate', async (req) => {
-  const body = req.body as ApiAuthValidateRequestBody
-  const responseData: ApiAuthValidateResponseData = {}
+router.post<any, ApiAuthValidateResponseData>(
+  '/auth/validate',
+  async (req, res) => {
+    const body = req.body as ApiAuthValidateRequestBody
+    const responseData: ApiAuthValidateResponseData = {}
 
-  if ('portalId' in body && body.portalId) {
-    responseData.portalId = await validatePortalId(body.portalId)
-  }
+    if ('portalId' in body && body.portalId) {
+      responseData.portalId = await validatePortalId(body.portalId)
+    }
 
-  if ('nickname' in body && body.nickname) {
-    responseData.nickname = await validateNickname(body.nickname)
-  }
+    if ('nickname' in body && body.nickname) {
+      responseData.nickname = await validateNickname(body.nickname)
+    }
 
-  if ('password' in body && body.password) {
-    responseData.password = await validatePassword(body.password)
+    if ('password' in body && body.password) {
+      responseData.password = await validatePassword(body.password)
+    }
+
+    res.json(responseData)
   }
-})
+)
 
 export default router
