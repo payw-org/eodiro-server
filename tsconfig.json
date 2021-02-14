@@ -2,7 +2,7 @@
   "compilerOptions": {
     "strict": false,
     "declaration": true,
-    "declarationDir": "./types",
+    "declarationDir": "eodiro-server-types",
     "moduleResolution": "node",
     "target": "ES2018",
     "allowJs": true,
@@ -29,7 +29,6 @@
     "src/api/cafeteria",
     "src/api/lectures",
     "src/api/my",
-    "src/api/vacant",
-    "types"
+    "src/api/vacant"
   ]
 }
