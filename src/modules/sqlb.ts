@@ -3,7 +3,6 @@
  * Copyright 2020 jhaemin
  */
 
-import { TableNames } from '@/database/table-names'
 import mysql from 'mysql'
 import sqlFormatter from 'sql-formatter'
 
@@ -216,9 +215,9 @@ export class SqlBInstance<T = any> {
    */
   from(): SqlBInstance<T>
   from(target: string): SqlBInstance<T>
-  from(target: TableNames): SqlBInstance<T>
+  from(target: string): SqlBInstance<T>
   from(target: SqlBInstance<T>): SqlBInstance<T>
-  from(target?: SqlBInstance<T> | string | TableNames): SqlBInstance<T> {
+  from(target?: SqlBInstance<T> | string): SqlBInstance<T> {
     if (!target) {
       this.append(`FROM`)
     } else if (typeof target === 'string') {
@@ -254,8 +253,8 @@ export class SqlBInstance<T = any> {
    * `schema1 JOIN schema2`
    */
   join(
-    schema1: TableNames | string,
-    schema2: TableNames | string,
+    schema1: string,
+    schema2: string,
     outer?: 'left' | 'right'
   ): SqlBInstance<T> {
     this.append(
@@ -488,7 +487,7 @@ export class SqlBInstance<T = any> {
   }
 
   bulkInsert(
-    schema: TableNames,
+    schema: string,
     items: {
       [K in keyof T]?: T[K]
     }[],
