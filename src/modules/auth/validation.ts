@@ -1,6 +1,6 @@
-import { eodiroConsts } from '@/constants'
+import { eodiroConst } from '@/constant'
 import { prisma } from '@/modules/prisma'
-import { sanitizePoralId } from '@/modules/sanitize-portal-id'
+import { sanitizePortalId } from '@/modules/sanitize-portal-id'
 
 export type AuthValidationResult = {
   isValid: boolean
@@ -20,7 +20,7 @@ export async function validatePortalId(
     }
   }
 
-  const sanitizedPortalId = sanitizePoralId(portalId)
+  const sanitizedPortalId = sanitizePortalId(portalId)
 
   if (sanitizedPortalId.includes(' ')) {
     return {
@@ -69,14 +69,14 @@ export async function validateNickname(
     }
   }
 
-  if (nickname.length < eodiroConsts.MIN_NICKNAME_LENGTH) {
+  if (nickname.length < eodiroConst.MIN_NICKNAME_LENGTH) {
     return {
       isValid: false,
       error: { message: '닉네임은 두 자 이상입니다.' },
     }
   }
 
-  if (nickname.length > eodiroConsts.MAX_NICKNAME_LENGTH) {
+  if (nickname.length > eodiroConst.MAX_NICKNAME_LENGTH) {
     return {
       isValid: false,
       error: { message: '닉네임은 20자 이하입니다.' },
@@ -120,7 +120,7 @@ export async function validatePassword(
     }
   }
 
-  if (password.length < eodiroConsts.MIN_PASSWORD_LENGTH) {
+  if (password.length < eodiroConst.MIN_PASSWORD_LENGTH) {
     return {
       isValid: false,
       error: { message: '암호는 최소 8자입니다.' },

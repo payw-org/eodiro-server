@@ -6,7 +6,7 @@ import crypto from 'crypto'
 import Mustache from 'mustache'
 import { prisma } from '../prisma'
 import { rng } from '../random-name-generator'
-import { sanitizePoralId } from '../sanitize-portal-id'
+import { sanitizePortalId } from '../sanitize-portal-id'
 import { dbNow } from '../time'
 import {
   AuthValidationResult,
@@ -80,7 +80,7 @@ export default class Auth {
       return { hasJoined: false, validations }
     }
 
-    const sanitizedPortalId = sanitizePoralId(portalId)
+    const sanitizedPortalId = sanitizePortalId(portalId)
 
     // Available
     // There's no user with this portal ID yet
@@ -120,7 +120,7 @@ export default class Auth {
   }
 
   static async changePassword(portalId: string): Promise<boolean> {
-    const sanitizedPortalId = sanitizePoralId(portalId)
+    const sanitizedPortalId = sanitizePortalId(portalId)
     const user = await prisma.user.findUnique({
       where: { portalId: sanitizedPortalId },
     })
