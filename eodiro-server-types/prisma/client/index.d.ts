@@ -3,7 +3,7 @@
  * Client
 **/
 
-import * as runtime from './runtime';
+import * as runtime from '@prisma/client/runtime';
 
 
 /**
