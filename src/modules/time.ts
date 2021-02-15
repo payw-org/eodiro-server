@@ -1,4 +1,5 @@
 import dayjs from 'dayjs'
+import { isPrimitive } from './utils/is-primitive'
 
 /**
  * @deprecated
@@ -69,10 +70,8 @@ export default class Time {
   }
 }
 
-export const dbNow = () => dayjs().add(9, 'hour').toDate()
-export const dbTime = (time: Date) => dayjs(time).add(9, 'hour').toDate()
-
-const isPrimitive = (test: any) => test !== Object(test)
+export const dbNow = (): Date => dayjs().add(9, 'hour').toDate()
+export const dbTime = (time: Date): Date => dayjs(time).add(9, 'hour').toDate()
 
 export function friendlyTime(time: Date | string): string {
   if (!time) return ''
