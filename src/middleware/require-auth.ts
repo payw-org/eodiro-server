@@ -18,7 +18,6 @@ export async function requireAuth(
   const resData: MiddlewareRequireAuthResData = { error: err }
 
   if (err) {
-    res.sendStatus(httpStatus.UNAUTHORIZED)
     res.status(httpStatus.UNAUTHORIZED).json(resData)
   } else if (authData) {
     // Find user
