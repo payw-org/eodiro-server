@@ -6,23 +6,26 @@ import express from 'express'
 const router = express.Router()
 
 export type ApiAuthChangePasswordReqData = {
-  userId: number
-  password: string
+  newPassword: string
 }
 
-router.post('/auth/change-password', requireAuth, async (req, res) => {
-  const { userId, password } = req.body as ApiAuthChangePasswordReqData
+router.post<any, any, ApiAuthChangePasswordReqData>(
+  '/auth/change-password',
+  requireAuth,
+  async (req, res) => {
+    const { newPassword } = req.body
+    const userId = req.user.id
 
-  await prisma.changePassword.delete({ where: { userId } })
+    await prisma.changePassword.delete({ where: { userId } })
+    await prisma.user.update({
+      where: { id: userId },
+      data: {
+        password: await Auth.encryptPw(newPassword),
+      },
+    })
 
-  await prisma.user.update({
-    where: { id: userId },
-    data: {
-      password: await Auth.encryptPw(password),
-    },
-  })
-
-  res.sendStatus(200)
-})
+    res.sendStatus(200)
+  }
+)
 
 export default router
