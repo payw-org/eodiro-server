@@ -5,9 +5,7 @@ import chalk from 'chalk'
 import fs from 'fs'
 import { JSDOM } from 'jsdom'
 import { PendingXHR } from 'pending-xhr-puppeteer'
-import puppeteer from 'puppeteer'
-import { Browser } from 'puppeteer/lib/cjs/puppeteer/common/Browser'
-import { Page } from 'puppeteer/lib/cjs/puppeteer/common/Page'
+import puppeteer, { Browser, Page } from 'puppeteer'
 
 export type TitleBuilder = (
   /** A single notice item */ noticeItemElement: HTMLElement | Element
