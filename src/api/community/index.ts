@@ -2,6 +2,7 @@ import { requireAuth } from '@/middleware/require-auth'
 import express from 'express'
 import allBoards from './all-boards'
 import boardName from './board-name'
+import bookmarkPost from './bookmark-post'
 import pinnedBoards from './pinned-boards'
 import post from './post'
 import postsList from './posts-list'
@@ -14,6 +15,7 @@ router.use(requireAuth)
 
 router.use(allBoards)
 router.use(boardName)
+router.use(bookmarkPost)
 router.use(pinnedBoards)
 router.use(post)
 router.use(postsList)
