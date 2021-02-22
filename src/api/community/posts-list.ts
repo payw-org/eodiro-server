@@ -3,12 +3,7 @@ import { handleExpressValidation } from '@/middleware/handle-express-validation'
 import { makeQueryValidator } from '@/modules/express-validator-utils'
 import { prisma } from '@/modules/prisma'
 import { secureTable } from '@/modules/secure-table'
-import {
-  SafeCommunityComment,
-  SafeCommunityPost,
-  SafeCommunitySubcomment,
-} from '@/types/schema'
-import { CommunityPostBookmark, CommunityPostLike } from '@prisma/client'
+import { CommunityPostsList } from '@/types/schema'
 import express from 'express'
 
 const router = express.Router()
@@ -21,13 +16,7 @@ export type ApiCommunityPostsListReqQuery = {
 export type ApiCommunityPostsListResData = {
   totalPage: number
   page: number
-  posts: (SafeCommunityPost & {
-    communityComments: (SafeCommunityComment & {
-      communitySubcomments: SafeCommunitySubcomment[]
-    })[]
-    communityPostLikes: CommunityPostLike[]
-    communityPostBookmarks: CommunityPostBookmark[]
-  })[]
+  posts: CommunityPostsList
 }
 
 const query = makeQueryValidator<ApiCommunityPostsListReqQuery>()
@@ -76,7 +65,7 @@ router.get<
         },
       }),
       req.user.id
-    ) as unknown) as ApiCommunityPostsListResData['posts']
+    ) as unknown) as CommunityPostsList
 
     res.json({
       totalPage,
