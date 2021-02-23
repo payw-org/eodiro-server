@@ -2,8 +2,6 @@ import EodiroEncrypt from '@/modules/eodiro-encrypt'
 import { prisma } from '@/modules/prisma'
 import { sanitizePortalId } from '@/modules/sanitize-portal-id'
 import { telegramBot as bot } from '@/modules/telegram-bot'
-import { User } from '@prisma/client'
-import TelegramBot from 'node-telegram-bot-api'
 
 bot.onText(/\/(start|help)/, (msg) => {
   const chatId = msg.chat.id
@@ -14,7 +12,10 @@ bot.onText(/\/(start|help)/, (msg) => {
     `
 자랑스러운 중앙인, 환영합니다!
 
-*/login* 커맨드를 입력하여 로그인하면 설정 끝~
+/login : 로그인 후 알림을 받을 수 있습니다.
+/logout : 로그아웃하여 알림받기를 종료할 수 있습니다.
+
+기타 문의사항은 support@eodiro.com 으로 보내주십시오.
   `,
     { parse_mode: 'Markdown' }
   )
@@ -49,51 +50,17 @@ ${telegramRegistration.user.portalId}`
   `
   )
 
-  let user: User
-
-  async function pwInputListener(pw: TelegramBot.Message) {
-    const chatId = pw.chat.id
-    const password = pw.text
-
-    const loggedIn = await EodiroEncrypt.isSame(password, user.password)
-
-    if (loggedIn) {
-      await prisma.telegram.upsert({
-        where: {
-          userId_chatId: {
-            userId: user.id,
-            chatId,
-          },
-        },
-        create: {
-          userId: user.id,
-          chatId,
-        },
-        update: {
-          userId: user.id,
-          chatId,
-        },
-      })
-
-      await bot.sendMessage(chatId, '로그인되었습니다.')
-    } else {
-      await bot.sendMessage(chatId, '패스워드가 틀렸습니다.')
-    }
-
-    bot.off('text', pwInputListener)
-  }
-
-  async function idInputListener(id: TelegramBot.Message) {
+  bot.once('text', async (id) => {
     const chatId = id.chat.id
     const portalId = id.text
 
     await bot.sendMessage(chatId, '아이디를 확인중입니다...')
 
-    const foundUser = await prisma.user.findUnique({
+    const user = await prisma.user.findUnique({
       where: { portalId: sanitizePortalId(portalId) },
     })
 
-    if (foundUser === null) {
+    if (user === null) {
       await bot.sendMessage(
         chatId,
         `
@@ -105,7 +72,6 @@ https://eodiro.com/join
 `
       )
     } else {
-      user = foundUser
       await bot.sendMessage(
         chatId,
         `
@@ -116,13 +82,38 @@ p.s.
 `,
         { parse_mode: 'Markdown' }
       )
-      bot.on('text', pwInputListener)
+
+      bot.once('text', async (pw) => {
+        const chatId = pw.chat.id
+        const password = pw.text
+
+        const loggedIn = await EodiroEncrypt.isSame(password, user.password)
+
+        if (loggedIn) {
+          await prisma.telegram.upsert({
+            where: {
+              userId_chatId: {
+                userId: user.id,
+                chatId,
+              },
+            },
+            create: {
+              userId: user.id,
+              chatId,
+            },
+            update: {
+              userId: user.id,
+              chatId,
+            },
+          })
+
+          await bot.sendMessage(chatId, '로그인되었습니다.')
+        } else {
+          await bot.sendMessage(chatId, '로그인에 실패했습니다.')
+        }
+      })
     }
-
-    bot.off('text', idInputListener)
-  }
-
-  bot.on('text', idInputListener)
+  })
 })
 
 bot.onText(/\/logout/, async (msg) => {
