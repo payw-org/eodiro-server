@@ -304,6 +304,7 @@ model User {
   reportComments                   ReportComment[]                   @relation("report_commentTouser")
   reportPosts                      ReportPost[]                      @relation("report_postTouser")
   reportSubcomments                ReportSubcomment[]                @relation("report_subcommentTouser")
+  telegrams                        Telegram[]                        @relation("telegramTouser")
 
   @@map("user")
 }
@@ -351,4 +352,13 @@ model ReportSubcomment {
   @@index([subcommentId], name: "post_id")
   @@index([userId], name: "user_id")
   @@map("report_subcomment")
+}
+
+model Telegram {
+  userId Int  @map("user_id") @db.UnsignedInt
+  chatId Int  @map("chat_id") @db.UnsignedInt
+  user   User @relation("telegramTouser", fields: [userId], references: [id])
+
+  @@id([userId, chatId])
+  @@map("telegram")
 }
