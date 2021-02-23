@@ -28,4 +28,7 @@ export const env = {
   // Imgur
   IMGUR_HOST: '',
   IMGUR_CLIENT_ID: '',
+
+  // Telegram
+  TELEGRAM_BOT_TOKEN: '',
 }
