@@ -1,3 +1,4 @@
+import '@/service/telegram'
 import chalk from 'chalk'
 import cookieParser from 'cookie-parser'
 import cors from 'cors'
