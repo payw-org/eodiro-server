@@ -6,25 +6,36 @@ import { boot } from '@/boot'
 import Config from '@/config'
 import collegesMajorsSeeder from '@/db/seeders/colleges-majors-seeder'
 import timetableSeeder from '@/db/seeders/timetable-seeder'
-import argv from '@/dev/argv'
 import getSemester from '@/modules/get-semester'
 import { Semester } from '@/types'
 import { CTTS } from '@payw/cau-timetable-scraper'
 import chalk from 'chalk'
 import dayjs from 'dayjs'
 import fs from 'fs'
+import yargs from 'yargs'
 
 const log = console.log
 
 async function main(): Promise<void> {
-  const args = argv<{
-    y: string
-    year: string
-    semester: string
-    s: string
-    collegesFile: string
-    lecturesFile: string
-  }>()
+  const args = yargs
+    .option('year', {
+      alias: 'y',
+      type: 'string',
+      demandOption: true,
+    })
+    .option('semester', {
+      alias: 's',
+      type: 'string',
+      demandOption: true,
+    })
+    .option('collegesFile', {
+      type: 'string',
+      demandOption: false,
+    })
+    .option('lecturesFile', {
+      type: 'string',
+      demandOption: false,
+    }).argv
 
   const quit = await boot()
 
