@@ -35,6 +35,9 @@ type PushError = {
   details: { error: string }
 }
 
+/**
+ * @deprecated Use Telegram Bot instead.
+ */
 export default class Push {
   static async notify(
     payload: PushInformation | PushInformation[]
