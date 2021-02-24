@@ -302,6 +302,15 @@ export type ReportSubcomment = {
   reportedAt: Date
 }
 
+/**
+ * Model Telegram
+ */
+
+export type Telegram = {
+  userId: number
+  chatId: number
+}
+
 
 /**
  * ##  Prisma Client ʲˢ
@@ -662,6 +671,16 @@ export class PrismaClient<
     * ```
     */
   get reportSubcomment(): Prisma.ReportSubcommentDelegate<GlobalReject>;
+
+  /**
+   * `prisma.telegram`: Exposes CRUD operations for the **Telegram** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Telegrams
+    * const telegrams = await prisma.telegram.findMany()
+    * ```
+    */
+  get telegram(): Prisma.TelegramDelegate<GlobalReject>;
 }
 
 export namespace Prisma {
@@ -1041,7 +1060,8 @@ export namespace Prisma {
     User: 'User',
     ReportComment: 'ReportComment',
     ReportPost: 'ReportPost',
-    ReportSubcomment: 'ReportSubcomment'
+    ReportSubcomment: 'ReportSubcomment',
+    Telegram: 'Telegram'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -15269,6 +15289,7 @@ export namespace Prisma {
     reportComments?: boolean | ReportCommentFindManyArgs
     reportPosts?: boolean | ReportPostFindManyArgs
     reportSubcomments?: boolean | ReportSubcommentFindManyArgs
+    telegrams?: boolean | TelegramFindManyArgs
   }
 
   export type UserInclude = {
@@ -15289,6 +15310,7 @@ export namespace Prisma {
     reportComments?: boolean | ReportCommentFindManyArgs
     reportPosts?: boolean | ReportPostFindManyArgs
     reportSubcomments?: boolean | ReportSubcommentFindManyArgs
+    telegrams?: boolean | TelegramFindManyArgs
   }
 
   export type UserGetPayload<
@@ -15335,7 +15357,9 @@ export namespace Prisma {
         P extends 'reportPosts'
         ? Array < ReportPostGetPayload<S['include'][P]>>  :
         P extends 'reportSubcomments'
-        ? Array < ReportSubcommentGetPayload<S['include'][P]>>  : never
+        ? Array < ReportSubcommentGetPayload<S['include'][P]>>  :
+        P extends 'telegrams'
+        ? Array < TelegramGetPayload<S['include'][P]>>  : never
   } 
     : 'select' extends U
     ? {
@@ -15374,7 +15398,9 @@ export namespace Prisma {
         P extends 'reportPosts'
         ? Array < ReportPostGetPayload<S['select'][P]>>  :
         P extends 'reportSubcomments'
-        ? Array < ReportSubcommentGetPayload<S['select'][P]>>  : never
+        ? Array < ReportSubcommentGetPayload<S['select'][P]>>  :
+        P extends 'telegrams'
+        ? Array < TelegramGetPayload<S['select'][P]>>  : never
   } 
     : User
   : User
@@ -15645,6 +15671,8 @@ export namespace Prisma {
     reportPosts<T extends ReportPostFindManyArgs = {}>(args?: Subset<T, ReportPostFindManyArgs>): CheckSelect<T, Promise<Array<ReportPost>>, Promise<Array<ReportPostGetPayload<T>>>>;
 
     reportSubcomments<T extends ReportSubcommentFindManyArgs = {}>(args?: Subset<T, ReportSubcommentFindManyArgs>): CheckSelect<T, Promise<Array<ReportSubcomment>>, Promise<Array<ReportSubcommentGetPayload<T>>>>;
+
+    telegrams<T extends TelegramFindManyArgs = {}>(args?: Subset<T, TelegramFindManyArgs>): CheckSelect<T, Promise<Array<Telegram>>, Promise<Array<TelegramGetPayload<T>>>>;
 
     private get _document();
     /**
@@ -18049,6 +18077,678 @@ export namespace Prisma {
 
 
   /**
+   * Model Telegram
+   */
+
+
+  export type AggregateTelegram = {
+    count: TelegramCountAggregateOutputType | null
+    avg: TelegramAvgAggregateOutputType | null
+    sum: TelegramSumAggregateOutputType | null
+    min: TelegramMinAggregateOutputType | null
+    max: TelegramMaxAggregateOutputType | null
+  }
+
+  export type TelegramAvgAggregateOutputType = {
+    userId: number
+    chatId: number
+  }
+
+  export type TelegramSumAggregateOutputType = {
+    userId: number
+    chatId: number
+  }
+
+  export type TelegramMinAggregateOutputType = {
+    userId: number
+    chatId: number
+  }
+
+  export type TelegramMaxAggregateOutputType = {
+    userId: number
+    chatId: number
+  }
+
+  export type TelegramCountAggregateOutputType = {
+    userId: number
+    chatId: number
+    _all: number
+  }
+
+
+  export type TelegramAvgAggregateInputType = {
+    userId?: true
+    chatId?: true
+  }
+
+  export type TelegramSumAggregateInputType = {
+    userId?: true
+    chatId?: true
+  }
+
+  export type TelegramMinAggregateInputType = {
+    userId?: true
+    chatId?: true
+  }
+
+  export type TelegramMaxAggregateInputType = {
+    userId?: true
+    chatId?: true
+  }
+
+  export type TelegramCountAggregateInputType = {
+    userId?: true
+    chatId?: true
+    _all?: true
+  }
+
+  export type TelegramAggregateArgs = {
+    /**
+     * Filter which Telegram to aggregate.
+    **/
+    where?: TelegramWhereInput
+    /**
+     * @link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs
+     * 
+     * Determine the order of Telegrams to fetch.
+    **/
+    orderBy?: Enumerable<TelegramOrderByInput>
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+    **/
+    cursor?: TelegramWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Telegrams from the position of the cursor.
+    **/
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Telegrams.
+    **/
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned Telegrams
+    **/
+    count?: true | TelegramCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    avg?: TelegramAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    sum?: TelegramSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    min?: TelegramMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    max?: TelegramMaxAggregateInputType
+  }
+
+  export type GetTelegramAggregateType<T extends TelegramAggregateArgs> = {
+    [P in keyof T & keyof AggregateTelegram]: P extends 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateTelegram[P]>
+      : GetScalarType<T[P], AggregateTelegram[P]>
+  }
+
+
+
+  export type TelegramSelect = {
+    userId?: boolean
+    chatId?: boolean
+    user?: boolean | UserArgs
+  }
+
+  export type TelegramInclude = {
+    user?: boolean | UserArgs
+  }
+
+  export type TelegramGetPayload<
+    S extends boolean | null | undefined | TelegramArgs,
+    U = keyof S
+      > = S extends true
+        ? Telegram
+    : S extends undefined
+    ? never
+    : S extends TelegramArgs | TelegramFindManyArgs
+    ?'include' extends U
+    ? Telegram  & {
+    [P in TrueKeys<S['include']>]: 
+          P extends 'user'
+        ? UserGetPayload<S['include'][P]> : never
+  } 
+    : 'select' extends U
+    ? {
+    [P in TrueKeys<S['select']>]: P extends keyof Telegram ?Telegram [P]
+  : 
+          P extends 'user'
+        ? UserGetPayload<S['select'][P]> : never
+  } 
+    : Telegram
+  : Telegram
+
+
+  type TelegramCountArgs = Merge<
+    Omit<TelegramFindManyArgs, 'select' | 'include'> & {
+      select?: TelegramCountAggregateInputType | true
+    }
+  >
+
+  export interface TelegramDelegate<GlobalRejectSettings> {
+    /**
+     * Find zero or one Telegram that matches the filter.
+     * @param {TelegramFindUniqueArgs} args - Arguments to find a Telegram
+     * @example
+     * // Get one Telegram
+     * const telegram = await prisma.telegram.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+    **/
+    findUnique<T extends TelegramFindUniqueArgs,  LocalRejectSettings = T["rejectOnNotFound"] extends RejectOnNotFound ? T['rejectOnNotFound'] : undefined>(
+      args: SelectSubset<T, TelegramFindUniqueArgs>
+    ): HasReject<GlobalRejectSettings, LocalRejectSettings, 'findUnique', 'Telegram'> extends True ? CheckSelect<T, Prisma__TelegramClient<Telegram>, Prisma__TelegramClient<TelegramGetPayload<T>>> : CheckSelect<T, Prisma__TelegramClient<Telegram | null >, Prisma__TelegramClient<TelegramGetPayload<T> | null >>
+
+    /**
+     * Find the first Telegram that matches the filter.
+     * @param {TelegramFindFirstArgs} args - Arguments to find a Telegram
+     * @example
+     * // Get one Telegram
+     * const telegram = await prisma.telegram.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+    **/
+    findFirst<T extends TelegramFindFirstArgs,  LocalRejectSettings = T["rejectOnNotFound"] extends RejectOnNotFound ? T['rejectOnNotFound'] : undefined>(
+      args?: SelectSubset<T, TelegramFindFirstArgs>
+    ): HasReject<GlobalRejectSettings, LocalRejectSettings, 'findFirst', 'Telegram'> extends True ? CheckSelect<T, Prisma__TelegramClient<Telegram>, Prisma__TelegramClient<TelegramGetPayload<T>>> : CheckSelect<T, Prisma__TelegramClient<Telegram | null >, Prisma__TelegramClient<TelegramGetPayload<T> | null >>
+
+    /**
+     * Find zero or more Telegrams that matches the filter.
+     * @param {TelegramFindManyArgs=} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all Telegrams
+     * const telegrams = await prisma.telegram.findMany()
+     * 
+     * // Get first 10 Telegrams
+     * const telegrams = await prisma.telegram.findMany({ take: 10 })
+     * 
+     * // Only select the `userId`
+     * const telegramWithUserIdOnly = await prisma.telegram.findMany({ select: { userId: true } })
+     * 
+    **/
+    findMany<T extends TelegramFindManyArgs>(
+      args?: SelectSubset<T, TelegramFindManyArgs>
+    ): CheckSelect<T, Promise<Array<Telegram>>, Promise<Array<TelegramGetPayload<T>>>>
+
+    /**
+     * Create a Telegram.
+     * @param {TelegramCreateArgs} args - Arguments to create a Telegram.
+     * @example
+     * // Create one Telegram
+     * const Telegram = await prisma.telegram.create({
+     *   data: {
+     *     // ... data to create a Telegram
+     *   }
+     * })
+     * 
+    **/
+    create<T extends TelegramCreateArgs>(
+      args: SelectSubset<T, TelegramCreateArgs>
+    ): CheckSelect<T, Prisma__TelegramClient<Telegram>, Prisma__TelegramClient<TelegramGetPayload<T>>>
+
+    /**
+     * Delete a Telegram.
+     * @param {TelegramDeleteArgs} args - Arguments to delete one Telegram.
+     * @example
+     * // Delete one Telegram
+     * const Telegram = await prisma.telegram.delete({
+     *   where: {
+     *     // ... filter to delete one Telegram
+     *   }
+     * })
+     * 
+    **/
+    delete<T extends TelegramDeleteArgs>(
+      args: SelectSubset<T, TelegramDeleteArgs>
+    ): CheckSelect<T, Prisma__TelegramClient<Telegram>, Prisma__TelegramClient<TelegramGetPayload<T>>>
+
+    /**
+     * Update one Telegram.
+     * @param {TelegramUpdateArgs} args - Arguments to update one Telegram.
+     * @example
+     * // Update one Telegram
+     * const telegram = await prisma.telegram.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+    **/
+    update<T extends TelegramUpdateArgs>(
+      args: SelectSubset<T, TelegramUpdateArgs>
+    ): CheckSelect<T, Prisma__TelegramClient<Telegram>, Prisma__TelegramClient<TelegramGetPayload<T>>>
+
+    /**
+     * Delete zero or more Telegrams.
+     * @param {TelegramDeleteManyArgs} args - Arguments to filter Telegrams to delete.
+     * @example
+     * // Delete a few Telegrams
+     * const { count } = await prisma.telegram.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+    **/
+    deleteMany<T extends TelegramDeleteManyArgs>(
+      args?: SelectSubset<T, TelegramDeleteManyArgs>
+    ): Promise<BatchPayload>
+
+    /**
+     * Update zero or more Telegrams.
+     * @param {TelegramUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many Telegrams
+     * const telegram = await prisma.telegram.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+    **/
+    updateMany<T extends TelegramUpdateManyArgs>(
+      args: SelectSubset<T, TelegramUpdateManyArgs>
+    ): Promise<BatchPayload>
+
+    /**
+     * Create or update one Telegram.
+     * @param {TelegramUpsertArgs} args - Arguments to update or create a Telegram.
+     * @example
+     * // Update or create a Telegram
+     * const telegram = await prisma.telegram.upsert({
+     *   create: {
+     *     // ... data to create a Telegram
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the Telegram we want to update
+     *   }
+     * })
+    **/
+    upsert<T extends TelegramUpsertArgs>(
+      args: SelectSubset<T, TelegramUpsertArgs>
+    ): CheckSelect<T, Prisma__TelegramClient<Telegram>, Prisma__TelegramClient<TelegramGetPayload<T>>>
+
+    /**
+     * Count the number of Telegrams.
+     * @param {TelegramCountArgs} args - Arguments to filter Telegrams to count.
+     * @example
+     * // Count the number of Telegrams
+     * const count = await prisma.telegram.count({
+     *   where: {
+     *     // ... the filter for the Telegrams we want to count
+     *   }
+     * })
+    **/
+    count<T extends TelegramCountArgs>(
+      args?: Subset<T, TelegramCountArgs>,
+    ): Promise<
+      T extends Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], TelegramCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a Telegram.
+     * @param {TelegramAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends TelegramAggregateArgs>(args: Subset<T, TelegramAggregateArgs>): Promise<GetTelegramAggregateType<T>>
+
+
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for Telegram.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in 
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export class Prisma__TelegramClient<T> implements Promise<T> {
+    private readonly _dmmf;
+    private readonly _fetcher;
+    private readonly _queryType;
+    private readonly _rootField;
+    private readonly _clientMethod;
+    private readonly _args;
+    private readonly _dataPath;
+    private readonly _errorFormat;
+    private readonly _measurePerformance?;
+    private _isList;
+    private _callsite;
+    private _requestPromise?;
+    constructor(_dmmf: runtime.DMMFClass, _fetcher: PrismaClientFetcher, _queryType: 'query' | 'mutation', _rootField: string, _clientMethod: string, _args: any, _dataPath: string[], _errorFormat: ErrorFormat, _measurePerformance?: boolean | undefined, _isList?: boolean);
+    readonly [Symbol.toStringTag]: 'PrismaClientPromise';
+
+    user<T extends UserArgs = {}>(args?: Subset<T, UserArgs>): CheckSelect<T, Prisma__UserClient<User | null >, Prisma__UserClient<UserGetPayload<T> | null >>;
+
+    private get _document();
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | Promise<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | Promise<TResult2>) | undefined | null): Promise<TResult1 | TResult2>;
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | Promise<TResult>) | undefined | null): Promise<T | TResult>;
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): Promise<T>;
+  }
+
+  // Custom InputTypes
+
+  /**
+   * Telegram findUnique
+   */
+  export type TelegramFindUniqueArgs = {
+    /**
+     * Select specific fields to fetch from the Telegram
+    **/
+    select?: TelegramSelect | null
+    /**
+     * Choose, which related nodes to fetch as well.
+    **/
+    include?: TelegramInclude | null
+    /**
+     * Throw an Error if a Telegram can't be found
+    **/
+    rejectOnNotFound?: RejectOnNotFound
+    /**
+     * Filter, which Telegram to fetch.
+    **/
+    where: TelegramWhereUniqueInput
+  }
+
+
+  /**
+   * Telegram findFirst
+   */
+  export type TelegramFindFirstArgs = {
+    /**
+     * Select specific fields to fetch from the Telegram
+    **/
+    select?: TelegramSelect | null
+    /**
+     * Choose, which related nodes to fetch as well.
+    **/
+    include?: TelegramInclude | null
+    /**
+     * Throw an Error if a Telegram can't be found
+    **/
+    rejectOnNotFound?: RejectOnNotFound
+    /**
+     * Filter, which Telegram to fetch.
+    **/
+    where?: TelegramWhereInput
+    /**
+     * @link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs
+     * 
+     * Determine the order of Telegrams to fetch.
+    **/
+    orderBy?: Enumerable<TelegramOrderByInput>
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Telegrams.
+    **/
+    cursor?: TelegramWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Telegrams from the position of the cursor.
+    **/
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Telegrams.
+    **/
+    skip?: number
+    /**
+     * @link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs
+     * 
+     * Filter by unique combinations of Telegrams.
+    **/
+    distinct?: Enumerable<TelegramScalarFieldEnum>
+  }
+
+
+  /**
+   * Telegram findMany
+   */
+  export type TelegramFindManyArgs = {
+    /**
+     * Select specific fields to fetch from the Telegram
+    **/
+    select?: TelegramSelect | null
+    /**
+     * Choose, which related nodes to fetch as well.
+    **/
+    include?: TelegramInclude | null
+    /**
+     * Filter, which Telegrams to fetch.
+    **/
+    where?: TelegramWhereInput
+    /**
+     * @link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs
+     * 
+     * Determine the order of Telegrams to fetch.
+    **/
+    orderBy?: Enumerable<TelegramOrderByInput>
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing Telegrams.
+    **/
+    cursor?: TelegramWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Telegrams from the position of the cursor.
+    **/
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Telegrams.
+    **/
+    skip?: number
+    distinct?: Enumerable<TelegramScalarFieldEnum>
+  }
+
+
+  /**
+   * Telegram create
+   */
+  export type TelegramCreateArgs = {
+    /**
+     * Select specific fields to fetch from the Telegram
+    **/
+    select?: TelegramSelect | null
+    /**
+     * Choose, which related nodes to fetch as well.
+    **/
+    include?: TelegramInclude | null
+    /**
+     * The data needed to create a Telegram.
+    **/
+    data: XOR<TelegramUncheckedCreateInput, TelegramCreateInput>
+  }
+
+
+  /**
+   * Telegram update
+   */
+  export type TelegramUpdateArgs = {
+    /**
+     * Select specific fields to fetch from the Telegram
+    **/
+    select?: TelegramSelect | null
+    /**
+     * Choose, which related nodes to fetch as well.
+    **/
+    include?: TelegramInclude | null
+    /**
+     * The data needed to update a Telegram.
+    **/
+    data: XOR<TelegramUncheckedUpdateInput, TelegramUpdateInput>
+    /**
+     * Choose, which Telegram to update.
+    **/
+    where: TelegramWhereUniqueInput
+  }
+
+
+  /**
+   * Telegram updateMany
+   */
+  export type TelegramUpdateManyArgs = {
+    data: XOR<TelegramUncheckedUpdateManyInput, TelegramUpdateManyMutationInput>
+    where?: TelegramWhereInput
+  }
+
+
+  /**
+   * Telegram upsert
+   */
+  export type TelegramUpsertArgs = {
+    /**
+     * Select specific fields to fetch from the Telegram
+    **/
+    select?: TelegramSelect | null
+    /**
+     * Choose, which related nodes to fetch as well.
+    **/
+    include?: TelegramInclude | null
+    /**
+     * The filter to search for the Telegram to update in case it exists.
+    **/
+    where: TelegramWhereUniqueInput
+    /**
+     * In case the Telegram found by the `where` argument doesn't exist, create a new Telegram with this data.
+    **/
+    create: XOR<TelegramUncheckedCreateInput, TelegramCreateInput>
+    /**
+     * In case the Telegram was found with the provided `where` argument, update it with this data.
+    **/
+    update: XOR<TelegramUncheckedUpdateInput, TelegramUpdateInput>
+  }
+
+
+  /**
+   * Telegram delete
+   */
+  export type TelegramDeleteArgs = {
+    /**
+     * Select specific fields to fetch from the Telegram
+    **/
+    select?: TelegramSelect | null
+    /**
+     * Choose, which related nodes to fetch as well.
+    **/
+    include?: TelegramInclude | null
+    /**
+     * Filter which Telegram to delete.
+    **/
+    where: TelegramWhereUniqueInput
+  }
+
+
+  /**
+   * Telegram deleteMany
+   */
+  export type TelegramDeleteManyArgs = {
+    where?: TelegramWhereInput
+  }
+
+
+  /**
+   * Telegram without action
+   */
+  export type TelegramArgs = {
+    /**
+     * Select specific fields to fetch from the Telegram
+    **/
+    select?: TelegramSelect | null
+    /**
+     * Choose, which related nodes to fetch as well.
+    **/
+    include?: TelegramInclude | null
+  }
+
+
+
+  /**
    * Enums
    */
 
@@ -18325,6 +19025,14 @@ export namespace Prisma {
   };
 
   export type ReportSubcommentScalarFieldEnum = (typeof ReportSubcommentScalarFieldEnum)[keyof typeof ReportSubcommentScalarFieldEnum]
+
+
+  export const TelegramScalarFieldEnum: {
+    userId: 'userId',
+    chatId: 'chatId'
+  };
+
+  export type TelegramScalarFieldEnum = (typeof TelegramScalarFieldEnum)[keyof typeof TelegramScalarFieldEnum]
 
 
   export const SortOrder: {
@@ -18900,6 +19608,7 @@ export namespace Prisma {
     reportComments?: ReportCommentListRelationFilter
     reportPosts?: ReportPostListRelationFilter
     reportSubcomments?: ReportSubcommentListRelationFilter
+    telegrams?: TelegramListRelationFilter
   }
 
   export type UserOrderByInput = {
@@ -19005,6 +19714,25 @@ export namespace Prisma {
 
   export type ReportSubcommentWhereUniqueInput = {
     id?: number
+  }
+
+  export type TelegramWhereInput = {
+    AND?: Enumerable<TelegramWhereInput>
+    OR?: Enumerable<TelegramWhereInput>
+    NOT?: Enumerable<TelegramWhereInput>
+    userId?: IntFilter | number
+    chatId?: IntFilter | number
+    user?: XOR<UserWhereInput, UserRelationFilter>
+  }
+
+  export type TelegramOrderByInput = {
+    userId?: SortOrder
+    chatId?: SortOrder
+    user?: UserOrderByInput
+  }
+
+  export type TelegramWhereUniqueInput = {
+    userId_chatId?: TelegramUserIdChatIdCompoundUniqueInput
   }
 
   export type AdminCreateInput = {
@@ -20025,6 +20753,7 @@ export namespace Prisma {
     reportComments?: ReportCommentCreateNestedManyWithoutUserInput
     reportPosts?: ReportPostCreateNestedManyWithoutUserInput
     reportSubcomments?: ReportSubcommentCreateNestedManyWithoutUserInput
+    telegrams?: TelegramCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateInput = {
@@ -20052,6 +20781,7 @@ export namespace Prisma {
     reportComments?: ReportCommentUncheckedCreateNestedManyWithoutUserInput
     reportPosts?: ReportPostUncheckedCreateNestedManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUncheckedCreateNestedManyWithoutUserInput
+    telegrams?: TelegramUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserUpdateInput = {
@@ -20078,6 +20808,7 @@ export namespace Prisma {
     reportComments?: ReportCommentUpdateManyWithoutUserInput
     reportPosts?: ReportPostUpdateManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUpdateManyWithoutUserInput
+    telegrams?: TelegramUpdateManyWithoutUserInput
   }
 
   export type UserUncheckedUpdateInput = {
@@ -20105,6 +20836,7 @@ export namespace Prisma {
     reportComments?: ReportCommentUncheckedUpdateManyWithoutUserInput
     reportPosts?: ReportPostUncheckedUpdateManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUncheckedUpdateManyWithoutUserInput
+    telegrams?: TelegramUncheckedUpdateManyWithoutUserInput
   }
 
   export type UserUpdateManyMutationInput = {
@@ -20271,6 +21003,35 @@ export namespace Prisma {
     title?: StringFieldUpdateOperationsInput | string
     body?: NullableStringFieldUpdateOperationsInput | string | null
     reportedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TelegramCreateInput = {
+    chatId: number
+    user: UserCreateNestedOneWithoutTelegramsInput
+  }
+
+  export type TelegramUncheckedCreateInput = {
+    userId: number
+    chatId: number
+  }
+
+  export type TelegramUpdateInput = {
+    chatId?: IntFieldUpdateOperationsInput | number
+    user?: UserUpdateOneRequiredWithoutTelegramsInput
+  }
+
+  export type TelegramUncheckedUpdateInput = {
+    userId?: IntFieldUpdateOperationsInput | number
+    chatId?: IntFieldUpdateOperationsInput | number
+  }
+
+  export type TelegramUpdateManyMutationInput = {
+    chatId?: IntFieldUpdateOperationsInput | number
+  }
+
+  export type TelegramUncheckedUpdateManyInput = {
+    userId?: IntFieldUpdateOperationsInput | number
+    chatId?: IntFieldUpdateOperationsInput | number
   }
 
   export type IntFilter = {
@@ -20546,9 +21307,20 @@ export namespace Prisma {
     none?: PushWhereInput
   }
 
+  export type TelegramListRelationFilter = {
+    every?: TelegramWhereInput
+    some?: TelegramWhereInput
+    none?: TelegramWhereInput
+  }
+
   export type CommunitySubcommentRelationFilter = {
     is?: CommunitySubcommentWhereInput
     isNot?: CommunitySubcommentWhereInput
+  }
+
+  export type TelegramUserIdChatIdCompoundUniqueInput = {
+    userId: number
+    chatId: number
   }
 
   export type UserCreateNestedOneWithoutAdminInput = {
@@ -21571,6 +22343,12 @@ export namespace Prisma {
     connect?: Enumerable<ReportSubcommentWhereUniqueInput>
   }
 
+  export type TelegramCreateNestedManyWithoutUserInput = {
+    create?: XOR<Enumerable<TelegramUncheckedCreateWithoutUserInput>, Enumerable<TelegramCreateWithoutUserInput>>
+    connectOrCreate?: Enumerable<TelegramCreateOrConnectWithoutuserInput>
+    connect?: Enumerable<TelegramWhereUniqueInput>
+  }
+
   export type AdminUncheckedCreateNestedOneWithoutUserInput = {
     create?: XOR<AdminUncheckedCreateWithoutUserInput, AdminCreateWithoutUserInput>
     connectOrCreate?: AdminCreateOrConnectWithoutuserInput
@@ -21671,6 +22449,12 @@ export namespace Prisma {
     create?: XOR<Enumerable<ReportSubcommentUncheckedCreateWithoutUserInput>, Enumerable<ReportSubcommentCreateWithoutUserInput>>
     connectOrCreate?: Enumerable<ReportSubcommentCreateOrConnectWithoutuserInput>
     connect?: Enumerable<ReportSubcommentWhereUniqueInput>
+  }
+
+  export type TelegramUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<Enumerable<TelegramUncheckedCreateWithoutUserInput>, Enumerable<TelegramCreateWithoutUserInput>>
+    connectOrCreate?: Enumerable<TelegramCreateOrConnectWithoutuserInput>
+    connect?: Enumerable<TelegramWhereUniqueInput>
   }
 
   export type AdminUpdateOneWithoutUserInput = {
@@ -21887,6 +22671,19 @@ export namespace Prisma {
     deleteMany?: Enumerable<ReportSubcommentScalarWhereInput>
   }
 
+  export type TelegramUpdateManyWithoutUserInput = {
+    create?: XOR<Enumerable<TelegramUncheckedCreateWithoutUserInput>, Enumerable<TelegramCreateWithoutUserInput>>
+    connectOrCreate?: Enumerable<TelegramCreateOrConnectWithoutuserInput>
+    upsert?: Enumerable<TelegramUpsertWithWhereUniqueWithoutUserInput>
+    connect?: Enumerable<TelegramWhereUniqueInput>
+    set?: Enumerable<TelegramWhereUniqueInput>
+    disconnect?: Enumerable<TelegramWhereUniqueInput>
+    delete?: Enumerable<TelegramWhereUniqueInput>
+    update?: Enumerable<TelegramUpdateWithWhereUniqueWithoutUserInput>
+    updateMany?: Enumerable<TelegramUpdateManyWithWhereWithoutUserInput>
+    deleteMany?: Enumerable<TelegramScalarWhereInput>
+  }
+
   export type AdminUncheckedUpdateOneWithoutUserInput = {
     create?: XOR<AdminUncheckedCreateWithoutUserInput, AdminCreateWithoutUserInput>
     connectOrCreate?: AdminCreateOrConnectWithoutuserInput
@@ -22101,6 +22898,19 @@ export namespace Prisma {
     deleteMany?: Enumerable<ReportSubcommentScalarWhereInput>
   }
 
+  export type TelegramUncheckedUpdateManyWithoutUserInput = {
+    create?: XOR<Enumerable<TelegramUncheckedCreateWithoutUserInput>, Enumerable<TelegramCreateWithoutUserInput>>
+    connectOrCreate?: Enumerable<TelegramCreateOrConnectWithoutuserInput>
+    upsert?: Enumerable<TelegramUpsertWithWhereUniqueWithoutUserInput>
+    connect?: Enumerable<TelegramWhereUniqueInput>
+    set?: Enumerable<TelegramWhereUniqueInput>
+    disconnect?: Enumerable<TelegramWhereUniqueInput>
+    delete?: Enumerable<TelegramWhereUniqueInput>
+    update?: Enumerable<TelegramUpdateWithWhereUniqueWithoutUserInput>
+    updateMany?: Enumerable<TelegramUpdateManyWithWhereWithoutUserInput>
+    deleteMany?: Enumerable<TelegramScalarWhereInput>
+  }
+
   export type CommunityCommentCreateNestedOneWithoutReportCommentsInput = {
     create?: XOR<CommunityCommentUncheckedCreateWithoutReportCommentsInput, CommunityCommentCreateWithoutReportCommentsInput>
     connectOrCreate?: CommunityCommentCreateOrConnectWithoutreportCommentsInput
@@ -22183,6 +22993,20 @@ export namespace Prisma {
     upsert?: UserUpsertWithoutReportSubcommentsInput
     connect?: UserWhereUniqueInput
     update?: XOR<UserUncheckedUpdateWithoutReportSubcommentsInput, UserUpdateWithoutReportSubcommentsInput>
+  }
+
+  export type UserCreateNestedOneWithoutTelegramsInput = {
+    create?: XOR<UserUncheckedCreateWithoutTelegramsInput, UserCreateWithoutTelegramsInput>
+    connectOrCreate?: UserCreateOrConnectWithouttelegramsInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type UserUpdateOneRequiredWithoutTelegramsInput = {
+    create?: XOR<UserUncheckedCreateWithoutTelegramsInput, UserCreateWithoutTelegramsInput>
+    connectOrCreate?: UserCreateOrConnectWithouttelegramsInput
+    upsert?: UserUpsertWithoutTelegramsInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<UserUncheckedUpdateWithoutTelegramsInput, UserUpdateWithoutTelegramsInput>
   }
 
   export type NestedIntFilter = {
@@ -22285,6 +23109,7 @@ export namespace Prisma {
     reportComments?: ReportCommentCreateNestedManyWithoutUserInput
     reportPosts?: ReportPostCreateNestedManyWithoutUserInput
     reportSubcomments?: ReportSubcommentCreateNestedManyWithoutUserInput
+    telegrams?: TelegramCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutAdminInput = {
@@ -22311,6 +23136,7 @@ export namespace Prisma {
     reportComments?: ReportCommentUncheckedCreateNestedManyWithoutUserInput
     reportPosts?: ReportPostUncheckedCreateNestedManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUncheckedCreateNestedManyWithoutUserInput
+    telegrams?: TelegramUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutadminInput = {
@@ -22346,6 +23172,7 @@ export namespace Prisma {
     reportComments?: ReportCommentUpdateManyWithoutUserInput
     reportPosts?: ReportPostUpdateManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUpdateManyWithoutUserInput
+    telegrams?: TelegramUpdateManyWithoutUserInput
   }
 
   export type UserUncheckedUpdateWithoutAdminInput = {
@@ -22372,6 +23199,7 @@ export namespace Prisma {
     reportComments?: ReportCommentUncheckedUpdateManyWithoutUserInput
     reportPosts?: ReportPostUncheckedUpdateManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUncheckedUpdateManyWithoutUserInput
+    telegrams?: TelegramUncheckedUpdateManyWithoutUserInput
   }
 
   export type UserCreateWithoutChangePasswordInput = {
@@ -22397,6 +23225,7 @@ export namespace Prisma {
     reportComments?: ReportCommentCreateNestedManyWithoutUserInput
     reportPosts?: ReportPostCreateNestedManyWithoutUserInput
     reportSubcomments?: ReportSubcommentCreateNestedManyWithoutUserInput
+    telegrams?: TelegramCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutChangePasswordInput = {
@@ -22423,6 +23252,7 @@ export namespace Prisma {
     reportComments?: ReportCommentUncheckedCreateNestedManyWithoutUserInput
     reportPosts?: ReportPostUncheckedCreateNestedManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUncheckedCreateNestedManyWithoutUserInput
+    telegrams?: TelegramUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutchangePasswordInput = {
@@ -22458,6 +23288,7 @@ export namespace Prisma {
     reportComments?: ReportCommentUpdateManyWithoutUserInput
     reportPosts?: ReportPostUpdateManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUpdateManyWithoutUserInput
+    telegrams?: TelegramUpdateManyWithoutUserInput
   }
 
   export type UserUncheckedUpdateWithoutChangePasswordInput = {
@@ -22484,6 +23315,7 @@ export namespace Prisma {
     reportComments?: ReportCommentUncheckedUpdateManyWithoutUserInput
     reportPosts?: ReportPostUncheckedUpdateManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUncheckedUpdateManyWithoutUserInput
+    telegrams?: TelegramUncheckedUpdateManyWithoutUserInput
   }
 
   export type UserCreateWithoutCommunityBoardsInput = {
@@ -22509,6 +23341,7 @@ export namespace Prisma {
     reportComments?: ReportCommentCreateNestedManyWithoutUserInput
     reportPosts?: ReportPostCreateNestedManyWithoutUserInput
     reportSubcomments?: ReportSubcommentCreateNestedManyWithoutUserInput
+    telegrams?: TelegramCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutCommunityBoardsInput = {
@@ -22535,6 +23368,7 @@ export namespace Prisma {
     reportComments?: ReportCommentUncheckedCreateNestedManyWithoutUserInput
     reportPosts?: ReportPostUncheckedCreateNestedManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUncheckedCreateNestedManyWithoutUserInput
+    telegrams?: TelegramUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutcommunityBoardsInput = {
@@ -22625,6 +23459,7 @@ export namespace Prisma {
     reportComments?: ReportCommentUpdateManyWithoutUserInput
     reportPosts?: ReportPostUpdateManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUpdateManyWithoutUserInput
+    telegrams?: TelegramUpdateManyWithoutUserInput
   }
 
   export type UserUncheckedUpdateWithoutCommunityBoardsInput = {
@@ -22651,6 +23486,7 @@ export namespace Prisma {
     reportComments?: ReportCommentUncheckedUpdateManyWithoutUserInput
     reportPosts?: ReportPostUncheckedUpdateManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUncheckedUpdateManyWithoutUserInput
+    telegrams?: TelegramUncheckedUpdateManyWithoutUserInput
   }
 
   export type CommunityBoardPinUpsertWithWhereUniqueWithoutCommunityBoardInput = {
@@ -22734,6 +23570,7 @@ export namespace Prisma {
     reportComments?: ReportCommentCreateNestedManyWithoutUserInput
     reportPosts?: ReportPostCreateNestedManyWithoutUserInput
     reportSubcomments?: ReportSubcommentCreateNestedManyWithoutUserInput
+    telegrams?: TelegramCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutCommunityBoardCandidatesInput = {
@@ -22760,6 +23597,7 @@ export namespace Prisma {
     reportComments?: ReportCommentUncheckedCreateNestedManyWithoutUserInput
     reportPosts?: ReportPostUncheckedCreateNestedManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUncheckedCreateNestedManyWithoutUserInput
+    telegrams?: TelegramUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutcommunityBoardCandidatesInput = {
@@ -22808,6 +23646,7 @@ export namespace Prisma {
     reportComments?: ReportCommentUpdateManyWithoutUserInput
     reportPosts?: ReportPostUpdateManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUpdateManyWithoutUserInput
+    telegrams?: TelegramUpdateManyWithoutUserInput
   }
 
   export type UserUncheckedUpdateWithoutCommunityBoardCandidatesInput = {
@@ -22834,6 +23673,7 @@ export namespace Prisma {
     reportComments?: ReportCommentUncheckedUpdateManyWithoutUserInput
     reportPosts?: ReportPostUncheckedUpdateManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUncheckedUpdateManyWithoutUserInput
+    telegrams?: TelegramUncheckedUpdateManyWithoutUserInput
   }
 
   export type CommunityBoardCandidateVoteUpsertWithWhereUniqueWithoutCommunityBoardCandidateInput = {
@@ -22903,6 +23743,7 @@ export namespace Prisma {
     reportComments?: ReportCommentCreateNestedManyWithoutUserInput
     reportPosts?: ReportPostCreateNestedManyWithoutUserInput
     reportSubcomments?: ReportSubcommentCreateNestedManyWithoutUserInput
+    telegrams?: TelegramCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutCommunityBoardCandidateVotesInput = {
@@ -22929,6 +23770,7 @@ export namespace Prisma {
     reportComments?: ReportCommentUncheckedCreateNestedManyWithoutUserInput
     reportPosts?: ReportPostUncheckedCreateNestedManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUncheckedCreateNestedManyWithoutUserInput
+    telegrams?: TelegramUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutcommunityBoardCandidateVotesInput = {
@@ -22984,6 +23826,7 @@ export namespace Prisma {
     reportComments?: ReportCommentUpdateManyWithoutUserInput
     reportPosts?: ReportPostUpdateManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUpdateManyWithoutUserInput
+    telegrams?: TelegramUpdateManyWithoutUserInput
   }
 
   export type UserUncheckedUpdateWithoutCommunityBoardCandidateVotesInput = {
@@ -23010,6 +23853,7 @@ export namespace Prisma {
     reportComments?: ReportCommentUncheckedUpdateManyWithoutUserInput
     reportPosts?: ReportPostUncheckedUpdateManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUncheckedUpdateManyWithoutUserInput
+    telegrams?: TelegramUncheckedUpdateManyWithoutUserInput
   }
 
   export type CommunityBoardCreateWithoutCommunityBoardPinsInput = {
@@ -23063,6 +23907,7 @@ export namespace Prisma {
     reportComments?: ReportCommentCreateNestedManyWithoutUserInput
     reportPosts?: ReportPostCreateNestedManyWithoutUserInput
     reportSubcomments?: ReportSubcommentCreateNestedManyWithoutUserInput
+    telegrams?: TelegramCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutCommunityBoardPinsInput = {
@@ -23089,6 +23934,7 @@ export namespace Prisma {
     reportComments?: ReportCommentUncheckedCreateNestedManyWithoutUserInput
     reportPosts?: ReportPostUncheckedCreateNestedManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUncheckedCreateNestedManyWithoutUserInput
+    telegrams?: TelegramUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutcommunityBoardPinsInput = {
@@ -23152,6 +23998,7 @@ export namespace Prisma {
     reportComments?: ReportCommentUpdateManyWithoutUserInput
     reportPosts?: ReportPostUpdateManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUpdateManyWithoutUserInput
+    telegrams?: TelegramUpdateManyWithoutUserInput
   }
 
   export type UserUncheckedUpdateWithoutCommunityBoardPinsInput = {
@@ -23178,6 +24025,7 @@ export namespace Prisma {
     reportComments?: ReportCommentUncheckedUpdateManyWithoutUserInput
     reportPosts?: ReportPostUncheckedUpdateManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUncheckedUpdateManyWithoutUserInput
+    telegrams?: TelegramUncheckedUpdateManyWithoutUserInput
   }
 
   export type CommunityPostCreateWithoutCommunityCommentsInput = {
@@ -23245,6 +24093,7 @@ export namespace Prisma {
     reportComments?: ReportCommentCreateNestedManyWithoutUserInput
     reportPosts?: ReportPostCreateNestedManyWithoutUserInput
     reportSubcomments?: ReportSubcommentCreateNestedManyWithoutUserInput
+    telegrams?: TelegramCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutCommunityCommentsInput = {
@@ -23271,6 +24120,7 @@ export namespace Prisma {
     reportComments?: ReportCommentUncheckedCreateNestedManyWithoutUserInput
     reportPosts?: ReportPostUncheckedCreateNestedManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUncheckedCreateNestedManyWithoutUserInput
+    telegrams?: TelegramUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutcommunityCommentsInput = {
@@ -23394,6 +24244,7 @@ export namespace Prisma {
     reportComments?: ReportCommentUpdateManyWithoutUserInput
     reportPosts?: ReportPostUpdateManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUpdateManyWithoutUserInput
+    telegrams?: TelegramUpdateManyWithoutUserInput
   }
 
   export type UserUncheckedUpdateWithoutCommunityCommentsInput = {
@@ -23420,6 +24271,7 @@ export namespace Prisma {
     reportComments?: ReportCommentUncheckedUpdateManyWithoutUserInput
     reportPosts?: ReportPostUncheckedUpdateManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUncheckedUpdateManyWithoutUserInput
+    telegrams?: TelegramUncheckedUpdateManyWithoutUserInput
   }
 
   export type CommunitySubcommentUpsertWithWhereUniqueWithoutCommunityCommentInput = {
@@ -23531,6 +24383,7 @@ export namespace Prisma {
     reportComments?: ReportCommentCreateNestedManyWithoutUserInput
     reportPosts?: ReportPostCreateNestedManyWithoutUserInput
     reportSubcomments?: ReportSubcommentCreateNestedManyWithoutUserInput
+    telegrams?: TelegramCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutCommunityPostsInput = {
@@ -23557,6 +24410,7 @@ export namespace Prisma {
     reportComments?: ReportCommentUncheckedCreateNestedManyWithoutUserInput
     reportPosts?: ReportPostUncheckedCreateNestedManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUncheckedCreateNestedManyWithoutUserInput
+    telegrams?: TelegramUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutcommunityPostsInput = {
@@ -23718,6 +24572,7 @@ export namespace Prisma {
     reportComments?: ReportCommentUpdateManyWithoutUserInput
     reportPosts?: ReportPostUpdateManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUpdateManyWithoutUserInput
+    telegrams?: TelegramUpdateManyWithoutUserInput
   }
 
   export type UserUncheckedUpdateWithoutCommunityPostsInput = {
@@ -23744,6 +24599,7 @@ export namespace Prisma {
     reportComments?: ReportCommentUncheckedUpdateManyWithoutUserInput
     reportPosts?: ReportPostUncheckedUpdateManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUncheckedUpdateManyWithoutUserInput
+    telegrams?: TelegramUncheckedUpdateManyWithoutUserInput
   }
 
   export type CommunityCommentUpsertWithWhereUniqueWithoutCommunityPostInput = {
@@ -23932,6 +24788,7 @@ export namespace Prisma {
     reportComments?: ReportCommentCreateNestedManyWithoutUserInput
     reportPosts?: ReportPostCreateNestedManyWithoutUserInput
     reportSubcomments?: ReportSubcommentCreateNestedManyWithoutUserInput
+    telegrams?: TelegramCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutCommunityPostBookmarksInput = {
@@ -23958,6 +24815,7 @@ export namespace Prisma {
     reportComments?: ReportCommentUncheckedCreateNestedManyWithoutUserInput
     reportPosts?: ReportPostUncheckedCreateNestedManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUncheckedCreateNestedManyWithoutUserInput
+    telegrams?: TelegramUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutcommunityPostBookmarksInput = {
@@ -24035,6 +24893,7 @@ export namespace Prisma {
     reportComments?: ReportCommentUpdateManyWithoutUserInput
     reportPosts?: ReportPostUpdateManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUpdateManyWithoutUserInput
+    telegrams?: TelegramUpdateManyWithoutUserInput
   }
 
   export type UserUncheckedUpdateWithoutCommunityPostBookmarksInput = {
@@ -24061,6 +24920,7 @@ export namespace Prisma {
     reportComments?: ReportCommentUncheckedUpdateManyWithoutUserInput
     reportPosts?: ReportPostUncheckedUpdateManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUncheckedUpdateManyWithoutUserInput
+    telegrams?: TelegramUncheckedUpdateManyWithoutUserInput
   }
 
   export type CommunityPostCreateWithoutCommunityPostLikesInput = {
@@ -24128,6 +24988,7 @@ export namespace Prisma {
     reportComments?: ReportCommentCreateNestedManyWithoutUserInput
     reportPosts?: ReportPostCreateNestedManyWithoutUserInput
     reportSubcomments?: ReportSubcommentCreateNestedManyWithoutUserInput
+    telegrams?: TelegramCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutCommunityPostLikesInput = {
@@ -24154,6 +25015,7 @@ export namespace Prisma {
     reportComments?: ReportCommentUncheckedCreateNestedManyWithoutUserInput
     reportPosts?: ReportPostUncheckedCreateNestedManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUncheckedCreateNestedManyWithoutUserInput
+    telegrams?: TelegramUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutcommunityPostLikesInput = {
@@ -24231,6 +25093,7 @@ export namespace Prisma {
     reportComments?: ReportCommentUpdateManyWithoutUserInput
     reportPosts?: ReportPostUpdateManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUpdateManyWithoutUserInput
+    telegrams?: TelegramUpdateManyWithoutUserInput
   }
 
   export type UserUncheckedUpdateWithoutCommunityPostLikesInput = {
@@ -24257,6 +25120,7 @@ export namespace Prisma {
     reportComments?: ReportCommentUncheckedUpdateManyWithoutUserInput
     reportPosts?: ReportPostUncheckedUpdateManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUncheckedUpdateManyWithoutUserInput
+    telegrams?: TelegramUncheckedUpdateManyWithoutUserInput
   }
 
   export type CommunityCommentCreateWithoutCommunitySubcommentsInput = {
@@ -24350,6 +25214,7 @@ export namespace Prisma {
     reportComments?: ReportCommentCreateNestedManyWithoutUserInput
     reportPosts?: ReportPostCreateNestedManyWithoutUserInput
     reportSubcomments?: ReportSubcommentCreateNestedManyWithoutUserInput
+    telegrams?: TelegramCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutCommunitySubcommentsInput = {
@@ -24376,6 +25241,7 @@ export namespace Prisma {
     reportComments?: ReportCommentUncheckedCreateNestedManyWithoutUserInput
     reportPosts?: ReportPostUncheckedCreateNestedManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUncheckedCreateNestedManyWithoutUserInput
+    telegrams?: TelegramUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutcommunitySubcommentsInput = {
@@ -24499,6 +25365,7 @@ export namespace Prisma {
     reportComments?: ReportCommentUpdateManyWithoutUserInput
     reportPosts?: ReportPostUpdateManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUpdateManyWithoutUserInput
+    telegrams?: TelegramUpdateManyWithoutUserInput
   }
 
   export type UserUncheckedUpdateWithoutCommunitySubcommentsInput = {
@@ -24525,6 +25392,7 @@ export namespace Prisma {
     reportComments?: ReportCommentUncheckedUpdateManyWithoutUserInput
     reportPosts?: ReportPostUncheckedUpdateManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUncheckedUpdateManyWithoutUserInput
+    telegrams?: TelegramUncheckedUpdateManyWithoutUserInput
   }
 
   export type ReportSubcommentUpsertWithWhereUniqueWithoutCommunitySubcommentInput = {
@@ -24821,6 +25689,7 @@ export namespace Prisma {
     reportComments?: ReportCommentCreateNestedManyWithoutUserInput
     reportPosts?: ReportPostCreateNestedManyWithoutUserInput
     reportSubcomments?: ReportSubcommentCreateNestedManyWithoutUserInput
+    telegrams?: TelegramCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutLiveChatsInput = {
@@ -24847,6 +25716,7 @@ export namespace Prisma {
     reportComments?: ReportCommentUncheckedCreateNestedManyWithoutUserInput
     reportPosts?: ReportPostUncheckedCreateNestedManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUncheckedCreateNestedManyWithoutUserInput
+    telegrams?: TelegramUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutliveChatsInput = {
@@ -24882,6 +25752,7 @@ export namespace Prisma {
     reportComments?: ReportCommentUpdateManyWithoutUserInput
     reportPosts?: ReportPostUpdateManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUpdateManyWithoutUserInput
+    telegrams?: TelegramUpdateManyWithoutUserInput
   }
 
   export type UserUncheckedUpdateWithoutLiveChatsInput = {
@@ -24908,6 +25779,7 @@ export namespace Prisma {
     reportComments?: ReportCommentUncheckedUpdateManyWithoutUserInput
     reportPosts?: ReportPostUncheckedUpdateManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUncheckedUpdateManyWithoutUserInput
+    telegrams?: TelegramUncheckedUpdateManyWithoutUserInput
   }
 
   export type UserCreateWithoutNoticeNotificationsSubscriptionsInput = {
@@ -24933,6 +25805,7 @@ export namespace Prisma {
     reportComments?: ReportCommentCreateNestedManyWithoutUserInput
     reportPosts?: ReportPostCreateNestedManyWithoutUserInput
     reportSubcomments?: ReportSubcommentCreateNestedManyWithoutUserInput
+    telegrams?: TelegramCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutNoticeNotificationsSubscriptionsInput = {
@@ -24959,6 +25832,7 @@ export namespace Prisma {
     reportComments?: ReportCommentUncheckedCreateNestedManyWithoutUserInput
     reportPosts?: ReportPostUncheckedCreateNestedManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUncheckedCreateNestedManyWithoutUserInput
+    telegrams?: TelegramUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutnoticeNotificationsSubscriptionsInput = {
@@ -24994,6 +25868,7 @@ export namespace Prisma {
     reportComments?: ReportCommentUpdateManyWithoutUserInput
     reportPosts?: ReportPostUpdateManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUpdateManyWithoutUserInput
+    telegrams?: TelegramUpdateManyWithoutUserInput
   }
 
   export type UserUncheckedUpdateWithoutNoticeNotificationsSubscriptionsInput = {
@@ -25020,6 +25895,7 @@ export namespace Prisma {
     reportComments?: ReportCommentUncheckedUpdateManyWithoutUserInput
     reportPosts?: ReportPostUncheckedUpdateManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUncheckedUpdateManyWithoutUserInput
+    telegrams?: TelegramUncheckedUpdateManyWithoutUserInput
   }
 
   export type LectureCreateWithoutPeriodsInput = {
@@ -25139,6 +26015,7 @@ export namespace Prisma {
     reportComments?: ReportCommentCreateNestedManyWithoutUserInput
     reportPosts?: ReportPostCreateNestedManyWithoutUserInput
     reportSubcomments?: ReportSubcommentCreateNestedManyWithoutUserInput
+    telegrams?: TelegramCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutPushesInput = {
@@ -25165,6 +26042,7 @@ export namespace Prisma {
     reportComments?: ReportCommentUncheckedCreateNestedManyWithoutUserInput
     reportPosts?: ReportPostUncheckedCreateNestedManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUncheckedCreateNestedManyWithoutUserInput
+    telegrams?: TelegramUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutpushesInput = {
@@ -25200,6 +26078,7 @@ export namespace Prisma {
     reportComments?: ReportCommentUpdateManyWithoutUserInput
     reportPosts?: ReportPostUpdateManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUpdateManyWithoutUserInput
+    telegrams?: TelegramUpdateManyWithoutUserInput
   }
 
   export type UserUncheckedUpdateWithoutPushesInput = {
@@ -25226,6 +26105,7 @@ export namespace Prisma {
     reportComments?: ReportCommentUncheckedUpdateManyWithoutUserInput
     reportPosts?: ReportPostUncheckedUpdateManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUncheckedUpdateManyWithoutUserInput
+    telegrams?: TelegramUncheckedUpdateManyWithoutUserInput
   }
 
   export type AdminCreateWithoutUserInput = {
@@ -25562,6 +26442,19 @@ export namespace Prisma {
     create: XOR<ReportSubcommentUncheckedCreateWithoutUserInput, ReportSubcommentCreateWithoutUserInput>
   }
 
+  export type TelegramCreateWithoutUserInput = {
+    chatId: number
+  }
+
+  export type TelegramUncheckedCreateWithoutUserInput = {
+    chatId: number
+  }
+
+  export type TelegramCreateOrConnectWithoutuserInput = {
+    where: TelegramWhereUniqueInput
+    create: XOR<TelegramUncheckedCreateWithoutUserInput, TelegramCreateWithoutUserInput>
+  }
+
   export type AdminUpdateWithoutUserInput = {
 
   }
@@ -25881,6 +26774,30 @@ export namespace Prisma {
     data: XOR<ReportSubcommentUncheckedUpdateManyWithoutReportSubcommentsInput, ReportSubcommentUpdateManyMutationInput>
   }
 
+  export type TelegramUpsertWithWhereUniqueWithoutUserInput = {
+    where: TelegramWhereUniqueInput
+    update: XOR<TelegramUncheckedUpdateWithoutUserInput, TelegramUpdateWithoutUserInput>
+    create: XOR<TelegramUncheckedCreateWithoutUserInput, TelegramCreateWithoutUserInput>
+  }
+
+  export type TelegramUpdateWithWhereUniqueWithoutUserInput = {
+    where: TelegramWhereUniqueInput
+    data: XOR<TelegramUncheckedUpdateWithoutUserInput, TelegramUpdateWithoutUserInput>
+  }
+
+  export type TelegramUpdateManyWithWhereWithoutUserInput = {
+    where: TelegramScalarWhereInput
+    data: XOR<TelegramUncheckedUpdateManyWithoutTelegramsInput, TelegramUpdateManyMutationInput>
+  }
+
+  export type TelegramScalarWhereInput = {
+    AND?: Enumerable<TelegramScalarWhereInput>
+    OR?: Enumerable<TelegramScalarWhereInput>
+    NOT?: Enumerable<TelegramScalarWhereInput>
+    userId?: IntFilter | number
+    chatId?: IntFilter | number
+  }
+
   export type CommunityCommentCreateWithoutReportCommentsInput = {
     randomNickname?: string
     body: string
@@ -25930,6 +26847,7 @@ export namespace Prisma {
     pushes?: PushCreateNestedManyWithoutUserInput
     reportPosts?: ReportPostCreateNestedManyWithoutUserInput
     reportSubcomments?: ReportSubcommentCreateNestedManyWithoutUserInput
+    telegrams?: TelegramCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutReportCommentsInput = {
@@ -25956,6 +26874,7 @@ export namespace Prisma {
     pushes?: PushUncheckedCreateNestedManyWithoutUserInput
     reportPosts?: ReportPostUncheckedCreateNestedManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUncheckedCreateNestedManyWithoutUserInput
+    telegrams?: TelegramUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutreportCommentsInput = {
@@ -26017,6 +26936,7 @@ export namespace Prisma {
     pushes?: PushUpdateManyWithoutUserInput
     reportPosts?: ReportPostUpdateManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUpdateManyWithoutUserInput
+    telegrams?: TelegramUpdateManyWithoutUserInput
   }
 
   export type UserUncheckedUpdateWithoutReportCommentsInput = {
@@ -26043,6 +26963,7 @@ export namespace Prisma {
     pushes?: PushUncheckedUpdateManyWithoutUserInput
     reportPosts?: ReportPostUncheckedUpdateManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUncheckedUpdateManyWithoutUserInput
+    telegrams?: TelegramUncheckedUpdateManyWithoutUserInput
   }
 
   export type CommunityPostCreateWithoutReportPostsInput = {
@@ -26110,6 +27031,7 @@ export namespace Prisma {
     pushes?: PushCreateNestedManyWithoutUserInput
     reportComments?: ReportCommentCreateNestedManyWithoutUserInput
     reportSubcomments?: ReportSubcommentCreateNestedManyWithoutUserInput
+    telegrams?: TelegramCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutReportPostsInput = {
@@ -26136,6 +27058,7 @@ export namespace Prisma {
     pushes?: PushUncheckedCreateNestedManyWithoutUserInput
     reportComments?: ReportCommentUncheckedCreateNestedManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUncheckedCreateNestedManyWithoutUserInput
+    telegrams?: TelegramUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutreportPostsInput = {
@@ -26213,6 +27136,7 @@ export namespace Prisma {
     pushes?: PushUpdateManyWithoutUserInput
     reportComments?: ReportCommentUpdateManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUpdateManyWithoutUserInput
+    telegrams?: TelegramUpdateManyWithoutUserInput
   }
 
   export type UserUncheckedUpdateWithoutReportPostsInput = {
@@ -26239,6 +27163,7 @@ export namespace Prisma {
     pushes?: PushUncheckedUpdateManyWithoutUserInput
     reportComments?: ReportCommentUncheckedUpdateManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUncheckedUpdateManyWithoutUserInput
+    telegrams?: TelegramUncheckedUpdateManyWithoutUserInput
   }
 
   export type CommunitySubcommentCreateWithoutReportSubcommentsInput = {
@@ -26290,6 +27215,7 @@ export namespace Prisma {
     pushes?: PushCreateNestedManyWithoutUserInput
     reportComments?: ReportCommentCreateNestedManyWithoutUserInput
     reportPosts?: ReportPostCreateNestedManyWithoutUserInput
+    telegrams?: TelegramCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutReportSubcommentsInput = {
@@ -26316,6 +27242,7 @@ export namespace Prisma {
     pushes?: PushUncheckedCreateNestedManyWithoutUserInput
     reportComments?: ReportCommentUncheckedCreateNestedManyWithoutUserInput
     reportPosts?: ReportPostUncheckedCreateNestedManyWithoutUserInput
+    telegrams?: TelegramUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutreportSubcommentsInput = {
@@ -26377,6 +27304,7 @@ export namespace Prisma {
     pushes?: PushUpdateManyWithoutUserInput
     reportComments?: ReportCommentUpdateManyWithoutUserInput
     reportPosts?: ReportPostUpdateManyWithoutUserInput
+    telegrams?: TelegramUpdateManyWithoutUserInput
   }
 
   export type UserUncheckedUpdateWithoutReportSubcommentsInput = {
@@ -26403,6 +27331,123 @@ export namespace Prisma {
     pushes?: PushUncheckedUpdateManyWithoutUserInput
     reportComments?: ReportCommentUncheckedUpdateManyWithoutUserInput
     reportPosts?: ReportPostUncheckedUpdateManyWithoutUserInput
+    telegrams?: TelegramUncheckedUpdateManyWithoutUserInput
+  }
+
+  export type UserCreateWithoutTelegramsInput = {
+    portalId: string
+    password: string
+    nickname: string
+    randomNickname: string
+    joinedAt: Date | string
+    refreshToken?: string | null
+    admin?: AdminCreateNestedOneWithoutUserInput
+    changePassword?: ChangePasswordCreateNestedOneWithoutUserInput
+    communityBoards?: CommunityBoardCreateNestedManyWithoutUserInput
+    communityBoardCandidates?: CommunityBoardCandidateCreateNestedManyWithoutUserInput
+    communityBoardCandidateVotes?: CommunityBoardCandidateVoteCreateNestedManyWithoutUserInput
+    communityBoardPins?: CommunityBoardPinCreateNestedManyWithoutUserInput
+    communityComments?: CommunityCommentCreateNestedManyWithoutUserInput
+    communityPosts?: CommunityPostCreateNestedManyWithoutUserInput
+    communityPostBookmarks?: CommunityPostBookmarkCreateNestedManyWithoutUserInput
+    communityPostLikes?: CommunityPostLikeCreateNestedManyWithoutUserInput
+    communitySubcomments?: CommunitySubcommentCreateNestedManyWithoutUserInput
+    liveChats?: LiveChatCreateNestedManyWithoutUserInput
+    noticeNotificationsSubscriptions?: NoticeNotificationsSubscriptionCreateNestedManyWithoutUserInput
+    pushes?: PushCreateNestedManyWithoutUserInput
+    reportComments?: ReportCommentCreateNestedManyWithoutUserInput
+    reportPosts?: ReportPostCreateNestedManyWithoutUserInput
+    reportSubcomments?: ReportSubcommentCreateNestedManyWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutTelegramsInput = {
+    id?: number
+    portalId: string
+    password: string
+    nickname: string
+    randomNickname: string
+    joinedAt: Date | string
+    refreshToken?: string | null
+    admin?: AdminUncheckedCreateNestedOneWithoutUserInput
+    changePassword?: ChangePasswordUncheckedCreateNestedOneWithoutUserInput
+    communityBoards?: CommunityBoardUncheckedCreateNestedManyWithoutUserInput
+    communityBoardCandidates?: CommunityBoardCandidateUncheckedCreateNestedManyWithoutUserInput
+    communityBoardCandidateVotes?: CommunityBoardCandidateVoteUncheckedCreateNestedManyWithoutUserInput
+    communityBoardPins?: CommunityBoardPinUncheckedCreateNestedManyWithoutUserInput
+    communityComments?: CommunityCommentUncheckedCreateNestedManyWithoutUserInput
+    communityPosts?: CommunityPostUncheckedCreateNestedManyWithoutUserInput
+    communityPostBookmarks?: CommunityPostBookmarkUncheckedCreateNestedManyWithoutUserInput
+    communityPostLikes?: CommunityPostLikeUncheckedCreateNestedManyWithoutUserInput
+    communitySubcomments?: CommunitySubcommentUncheckedCreateNestedManyWithoutUserInput
+    liveChats?: LiveChatUncheckedCreateNestedManyWithoutUserInput
+    noticeNotificationsSubscriptions?: NoticeNotificationsSubscriptionUncheckedCreateNestedManyWithoutUserInput
+    pushes?: PushUncheckedCreateNestedManyWithoutUserInput
+    reportComments?: ReportCommentUncheckedCreateNestedManyWithoutUserInput
+    reportPosts?: ReportPostUncheckedCreateNestedManyWithoutUserInput
+    reportSubcomments?: ReportSubcommentUncheckedCreateNestedManyWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithouttelegramsInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserUncheckedCreateWithoutTelegramsInput, UserCreateWithoutTelegramsInput>
+  }
+
+  export type UserUpsertWithoutTelegramsInput = {
+    update: XOR<UserUncheckedUpdateWithoutTelegramsInput, UserUpdateWithoutTelegramsInput>
+    create: XOR<UserUncheckedCreateWithoutTelegramsInput, UserCreateWithoutTelegramsInput>
+  }
+
+  export type UserUpdateWithoutTelegramsInput = {
+    portalId?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    nickname?: StringFieldUpdateOperationsInput | string
+    randomNickname?: StringFieldUpdateOperationsInput | string
+    joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    refreshToken?: NullableStringFieldUpdateOperationsInput | string | null
+    admin?: AdminUpdateOneWithoutUserInput
+    changePassword?: ChangePasswordUpdateOneWithoutUserInput
+    communityBoards?: CommunityBoardUpdateManyWithoutUserInput
+    communityBoardCandidates?: CommunityBoardCandidateUpdateManyWithoutUserInput
+    communityBoardCandidateVotes?: CommunityBoardCandidateVoteUpdateManyWithoutUserInput
+    communityBoardPins?: CommunityBoardPinUpdateManyWithoutUserInput
+    communityComments?: CommunityCommentUpdateManyWithoutUserInput
+    communityPosts?: CommunityPostUpdateManyWithoutUserInput
+    communityPostBookmarks?: CommunityPostBookmarkUpdateManyWithoutUserInput
+    communityPostLikes?: CommunityPostLikeUpdateManyWithoutUserInput
+    communitySubcomments?: CommunitySubcommentUpdateManyWithoutUserInput
+    liveChats?: LiveChatUpdateManyWithoutUserInput
+    noticeNotificationsSubscriptions?: NoticeNotificationsSubscriptionUpdateManyWithoutUserInput
+    pushes?: PushUpdateManyWithoutUserInput
+    reportComments?: ReportCommentUpdateManyWithoutUserInput
+    reportPosts?: ReportPostUpdateManyWithoutUserInput
+    reportSubcomments?: ReportSubcommentUpdateManyWithoutUserInput
+  }
+
+  export type UserUncheckedUpdateWithoutTelegramsInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    portalId?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    nickname?: StringFieldUpdateOperationsInput | string
+    randomNickname?: StringFieldUpdateOperationsInput | string
+    joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    refreshToken?: NullableStringFieldUpdateOperationsInput | string | null
+    admin?: AdminUncheckedUpdateOneWithoutUserInput
+    changePassword?: ChangePasswordUncheckedUpdateOneWithoutUserInput
+    communityBoards?: CommunityBoardUncheckedUpdateManyWithoutUserInput
+    communityBoardCandidates?: CommunityBoardCandidateUncheckedUpdateManyWithoutUserInput
+    communityBoardCandidateVotes?: CommunityBoardCandidateVoteUncheckedUpdateManyWithoutUserInput
+    communityBoardPins?: CommunityBoardPinUncheckedUpdateManyWithoutUserInput
+    communityComments?: CommunityCommentUncheckedUpdateManyWithoutUserInput
+    communityPosts?: CommunityPostUncheckedUpdateManyWithoutUserInput
+    communityPostBookmarks?: CommunityPostBookmarkUncheckedUpdateManyWithoutUserInput
+    communityPostLikes?: CommunityPostLikeUncheckedUpdateManyWithoutUserInput
+    communitySubcomments?: CommunitySubcommentUncheckedUpdateManyWithoutUserInput
+    liveChats?: LiveChatUncheckedUpdateManyWithoutUserInput
+    noticeNotificationsSubscriptions?: NoticeNotificationsSubscriptionUncheckedUpdateManyWithoutUserInput
+    pushes?: PushUncheckedUpdateManyWithoutUserInput
+    reportComments?: ReportCommentUncheckedUpdateManyWithoutUserInput
+    reportPosts?: ReportPostUncheckedUpdateManyWithoutUserInput
+    reportSubcomments?: ReportSubcommentUncheckedUpdateManyWithoutUserInput
   }
 
   export type CommunityBoardPinUpdateWithoutCommunityBoardInput = {
@@ -26964,6 +28009,18 @@ export namespace Prisma {
     title?: StringFieldUpdateOperationsInput | string
     body?: NullableStringFieldUpdateOperationsInput | string | null
     reportedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TelegramUpdateWithoutUserInput = {
+    chatId?: IntFieldUpdateOperationsInput | number
+  }
+
+  export type TelegramUncheckedUpdateWithoutUserInput = {
+    chatId?: IntFieldUpdateOperationsInput | number
+  }
+
+  export type TelegramUncheckedUpdateManyWithoutTelegramsInput = {
+    chatId?: IntFieldUpdateOperationsInput | number
   }
 
 
