@@ -35,11 +35,12 @@
     "introspect": "prisma introspect --schema prisma/schema.prisma",
     "introspect:dev": "prisma introspect --schema prisma/schema.dev.prisma && prismap --schema prisma/schema.dev.prisma",
     "generate": "prisma generate --schema prisma/schema.prisma && npm run copy:prisma:types",
-    "generate:dev": "prisma generate --schema prisma/schema.dev.prisma",
+    "generate:dev": "prisma generate --schema prisma/schema.dev.prisma && npm run copy:prisma:types",
     "db:push": "prisma db push --schema prisma/schema.prisma --preview-feature",
     "db:push:dev": "prisma db push --schema prisma/schema.dev.prisma --preview-feature",
     "migrate": "prisma migrate dev --preview-feature --schema prisma/schema.prisma",
     "migrate:dev": "prisma migrate dev --preview-feature --schema prisma/schema.dev.prisma",
+    "copy:prisma:types": "cp node_modules/.prisma/client/index.d.ts src/prisma/client/index.d.ts",
     "update:server-types": "zsh ./update-types.sh"
   },
   "dependencies": {
