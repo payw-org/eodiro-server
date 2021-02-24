@@ -1,11 +1,11 @@
 import { prisma } from '@/modules/prisma'
-import Push, { PushInformation } from '@/modules/push'
 import appRoot from 'app-root-path'
 import chalk from 'chalk'
 import fs from 'fs'
 import { JSDOM } from 'jsdom'
 import { PendingXHR } from 'pending-xhr-puppeteer'
 import puppeteer, { Browser, Page } from 'puppeteer'
+import { telegramBot } from '../telegram-bot'
 
 export type TitleBuilder = (
   /** A single notice item */ noticeItemElement: HTMLElement | Element
@@ -170,9 +170,9 @@ export class CauNoticeWatcher {
         select: {
           user: {
             select: {
-              pushes: {
+              telegrams: {
                 select: {
-                  expoPushToken: true,
+                  chatId: true,
                 },
               },
             },
@@ -181,47 +181,37 @@ export class CauNoticeWatcher {
       }
     )
 
-    const expoPushTokens = subscriptions
-      .map((sub) => sub.user.pushes.map((push) => push.expoPushToken))
+    const chatIds = subscriptions
+      .map((sub) => sub.user.telegrams.map((tel) => tel.chatId))
       .flat()
 
-    const shouldSendPush = expoPushTokens.length > 0
+    console.log(chatIds)
+
+    const shouldSendPush = chatIds.length > 0
 
     const lastNoticeIndex = notices.findIndex(
       (notice) => notice.title === this.getLastNoticeTitle(publisher)
     )
 
-    const pushes: PushInformation[] = []
-
-    if (lastNoticeIndex > 0) {
+    if (lastNoticeIndex > 0 && shouldSendPush) {
       for (let i = lastNoticeIndex - 1; i >= 0; i -= 1) {
         const notice = notices[i]
 
-        console.info(`\n새로운 ${publisher.name} 공지사항이 올라왔습니다.`)
-        console.info(notices[i])
+        // Send Telegram notifications
+        chatIds.forEach((chatId) => {
+          return telegramBot.sendMessage(
+            chatId,
+            `
+새로운 <b>${publisher.name}</b> 공지사항이 올라왔습니다.
 
-        if (shouldSendPush) {
-          const pushInformation: PushInformation = {
-            to: expoPushTokens,
-            title: `새로운 ${publisher.name} 공지사항이 올라왔습니다.`,
-            body: notice.title,
-            data: {
-              type: 'notice',
-              url: notice.noticeItemUrl,
-            },
-            sound: 'default',
-            _displayInForeground: true,
-          }
+<b>${notice.title}</b>
 
-          pushes.push(pushInformation)
-        }
+${notice.noticeItemUrl}
+        `,
+            { parse_mode: 'HTML' }
+          )
+        })
       }
-    } else {
-      console.info(`${publisher.name}: there is no new notice`)
-    }
-
-    if (shouldSendPush) {
-      const results = await Push.notify(pushes)
     }
 
     await page.close()
