@@ -31,6 +31,9 @@ declare type PushError = {
         error: string;
     };
 };
+/**
+ * @deprecated Use Telegram Bot instead.
+ */
 export default class Push {
     static notify(payload: PushInformation | PushInformation[]): Promise<{
         data: (PushOk | PushError)[];
