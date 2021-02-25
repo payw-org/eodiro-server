@@ -15,4 +15,5 @@ export declare const env: {
     TIME_ZONE: string;
     IMGUR_HOST: string;
     IMGUR_CLIENT_ID: string;
+    TELEGRAM_BOT_TOKEN: string;
 };
