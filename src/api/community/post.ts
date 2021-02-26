@@ -16,6 +16,9 @@ export type ApiCommunityGetPostResData = SafeCommunityPost & {
   likedByMe: boolean
   bookmarkedByMe: boolean
   hasBeenEdited: boolean
+  communityBoard: {
+    name: string
+  }
 }
 
 const query = makeQueryValidator<ApiCommunityGetPostReqQuery>()
@@ -32,16 +35,24 @@ router.get<any, ApiCommunityGetPostResData, any, ApiCommunityGetPostReqQuery>(
       where: {
         id: postId,
       },
+      include: {
+        communityBoard: {
+          select: {
+            name: true,
+          },
+        },
+      },
     })
 
     if (!post || post.isDeleted) {
       return res.sendStatus(httpStatus.NOT_FOUND)
     }
 
-    const safePost = (secureTable(
-      post,
-      req.user.id
-    ) as unknown) as SafeCommunityPost
+    const safePost = secureTable(post, req.user.id) as SafeCommunityPost & {
+      communityBoard: {
+        name: string
+      }
+    }
 
     const likedByMe = !!(await prisma.communityPostLike.findUnique({
       where: {
