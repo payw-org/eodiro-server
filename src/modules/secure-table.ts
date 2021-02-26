@@ -1,6 +1,6 @@
 import { isPrimitive } from './utils/is-primitive'
 
-export function secureTable<Obj = any>(obj: Obj, userId: number): Obj {
+export function secureTable<Obj = any>(obj: Obj, userId: number): unknown {
   for (const key of Object.keys(obj)) {
     const val = obj[key]
     if (key === 'userId') {

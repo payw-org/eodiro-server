@@ -7,5 +7,8 @@ export declare type ApiCommunityGetPostResData = SafeCommunityPost & {
     likedByMe: boolean;
     bookmarkedByMe: boolean;
     hasBeenEdited: boolean;
+    communityBoard: {
+        name: string;
+    };
 };
 export default router;
