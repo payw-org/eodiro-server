@@ -1,9 +1,9 @@
-import { CoverageMajorLectureType } from '@/database/models/coverage_major_lecture'
-import { LectureModelAttr } from '@/database/models/lecture'
-import { PeriodModelAttr } from '@/database/models/period'
-import { TableNames } from '@/database/table-names'
+// TODO: Rewrite the script with Prisma
+// current script won't work due to the different attribute names
+
 import Db from '@/db'
 import { Q } from '@/modules/sqlb'
+import { CoverageMajorLecture, Lecture, Period } from '@/prisma/client'
 import { RefinedLectures } from '@payw/cau-timetable-scraper/build/types'
 import { v4 as uuidv4 } from 'uuid'
 
@@ -18,9 +18,9 @@ export default async function (lectures: RefinedLectures): Promise<void> {
   }
 
   // Update college coverage data
-  const dbLectures: LectureModelAttr[] = []
-  const dbPeriods: PeriodModelAttr[] = []
-  const dbCoverageMajorLectures: CoverageMajorLectureType[] = []
+  const dbLectures: Lecture[] = []
+  const dbPeriods: Period[] = []
+  const dbCoverageMajorLectures: CoverageMajorLecture[] = []
 
   for (let i = 0; i < lectures.length; i += 1) {
     const lecture = lectures[i]
@@ -51,11 +51,11 @@ export default async function (lectures: RefinedLectures): Promise<void> {
 
       dbPeriods.push({
         day: period.day,
-        lecture_id: lectureId,
-        start_h: period.startH,
-        start_m: period.startM,
-        end_h: period.endH,
-        end_m: period.endM,
+        lectureId: lectureId,
+        startH: period.startH,
+        startM: period.startM,
+        endH: period.endH,
+        endM: period.endM,
       })
     }
 
@@ -67,8 +67,8 @@ export default async function (lectures: RefinedLectures): Promise<void> {
       }
 
       dbCoverageMajorLectures.push({
-        lecture_id: lectureId,
-        major_code: coverage.majorCode,
+        lectureId: lectureId,
+        majorCode: coverage.majorCode,
       })
     }
   }
@@ -89,7 +89,7 @@ export default async function (lectures: RefinedLectures): Promise<void> {
 
   console.log('Inserting lectures...')
   const [insertLecturesErr] = await Db.query(
-    Q().bulkInsert(TableNames.lecture, dbLectures).build()
+    Q().bulkInsert('lecture', dbLectures).build()
   )
   if (insertLecturesErr) {
     console.error('Failed to insert lectures')
@@ -99,7 +99,7 @@ export default async function (lectures: RefinedLectures): Promise<void> {
 
   console.log('Inserting periods...')
   const [insertPeriodsErr] = await Db.query(
-    Q().bulkInsert(TableNames.period, dbPeriods).build()
+    Q().bulkInsert('period', dbPeriods).build()
   )
   if (insertPeriodsErr) {
     console.error('Failed to insert periods')
@@ -109,9 +109,7 @@ export default async function (lectures: RefinedLectures): Promise<void> {
 
   console.log('Inserting coverage major lecture relations...')
   const [insertRelationsErr] = await Db.query(
-    Q()
-      .bulkInsert(TableNames.coverage_major_lecture, dbCoverageMajorLectures)
-      .build()
+    Q().bulkInsert('coverage_major_lecture', dbCoverageMajorLectures).build()
   )
   if (insertRelationsErr) {
     console.log('Failed to insert relations')
