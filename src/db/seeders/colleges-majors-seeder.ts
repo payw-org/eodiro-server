@@ -1,6 +1,8 @@
-import { CoverageMajorType } from '@/database/models/coverage_major'
-import { TableNames } from '@/database/table-names'
+// TODO: Rewrite the script with Prisma
+// current script won't work due to the different attribute names
+
 import SqlB from '@/modules/sqlb'
+import { CoverageMajor } from '@/prisma/client'
 import Db from '..'
 
 export type College = {
@@ -27,8 +29,8 @@ const collegesMajorsSeeder = async (colleges: College[]): Promise<void> => {
       }
     })
 
-    const sqlB = SqlB<CoverageMajorType>().bulkInsert(
-      TableNames.coverage_major,
+    const sqlB = SqlB<CoverageMajor>().bulkInsert(
+      'coverage_major',
       majors,
       'update'
     )

@@ -1,12 +1,16 @@
-import { CCMS } from '@payw/cau-cafeteria-menus-scraper'
-import { CafeteriaMenuType } from '@/database/models/cafeteria_menu'
+// TODO: Rewrite the script with Prisma
+// current script won't work due to the different attribute names
+
+import { boot } from '@/boot'
 import Config from '@/config'
 import Db from '@/db'
+import convertCampusName from '@/modules/convert-campus-name'
 import EodiroMailer from '@/modules/eodiro-mailer'
 import SqlB from '@/modules/sqlb'
-import { TableNames } from '@/database/table-names'
-import { boot } from '@/boot'
-import convertCampusName from '@/modules/convert-campus-name'
+import { dbTime } from '@/modules/time'
+import { CafeteriaMenu } from '@/prisma/client'
+import { CCMS } from '@payw/cau-cafeteria-menus-scraper'
+import dayjs from 'dayjs'
 
 const CafeteriaMenusSeeder = (): void => {
   return
@@ -16,7 +20,7 @@ const CafeteriaMenusSeeder = (): void => {
  * Seed 5 days of cafeteria menus starting from today
  */
 CafeteriaMenusSeeder.seed = async (): Promise<void> => {
-  const quit = await boot({ db: true })
+  const quit = await boot()
   try {
     console.log(`🌱 Seeding cafeteria menus...`)
 
@@ -26,14 +30,14 @@ CafeteriaMenusSeeder.seed = async (): Promise<void> => {
       days: 5,
     })
 
-    const dbCafeteriaMenus: CafeteriaMenuType[] = []
+    const dbCafeteriaMenus: CafeteriaMenu[] = []
     const daysList: string[] = []
 
     menus.days.forEach((day) => {
       daysList.push(day.date)
       dbCafeteriaMenus.push({
         campus: convertCampusName(menus.campus),
-        served_at: day.date,
+        servedAt: dbTime(dayjs(day.date).toDate()),
         data: JSON.stringify({
           breakfast: day.breakfast,
           lunch: day.lunch,
@@ -71,7 +75,7 @@ err: ${err.message}
     }
 
     const [err2] = await Db.query(
-      SqlB().bulkInsert(TableNames.cafeteria_menu, dbCafeteriaMenus).build()
+      SqlB().bulkInsert('cafeteria_menu', dbCafeteriaMenus).build()
     )
 
     if (err2) {
