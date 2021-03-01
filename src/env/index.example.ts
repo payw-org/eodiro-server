@@ -1,4 +1,10 @@
 export const env = {
+  // Ports
+  PORT: 0,
+  DEV_PORT: 0,
+  CLIENT_PORT: 0,
+  CLIENT_DEV_PORT: 0,
+
   // GitHub
   GITHUB_OAUTH_TOKEN: '',
 
