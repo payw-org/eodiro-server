@@ -6,7 +6,7 @@ import express from 'express'
 import http from 'http'
 import morgan from 'morgan'
 import api from './api'
-import Config from './config'
+import { env } from './env'
 import { prisma } from './modules/prisma'
 import { isDev } from './modules/utils/is-dev'
 
@@ -32,10 +32,9 @@ export async function boot(): Promise<QuitFunction> {
   app.use(express.urlencoded({ limit: '100mb', extended: true }))
   app.use(api)
 
-  let server: http.Server = undefined
+  let server: http.Server | undefined = undefined
 
-  const port =
-    process.env.NODE_ENV === 'development' ? Config.DEV_PORT : Config.PORT
+  const port = dev ? env.DEV_PORT : env.PORT
   const expressServer = app.listen(port, () => {
     log(`[${chalk.magentaBright('eodiro')}] Listening on port ${port}`)
   })
