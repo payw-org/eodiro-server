@@ -14,10 +14,16 @@ export const php1: PublisherBuilder = ({ name, key, url }) => {
     noticeItemSelector:
       'table.tbl-list_new tr td.line_bottom[align="left"]:not(.bg_color1)',
     titleBuilder: (noticeElm) =>
-      noticeElm.querySelector('a').textContent.trim(),
-    urlBuilder: (noticeElm) =>
-      url +
-      '?p_mode=view&p_idx=' +
-      /view\('([0-9]+)'\)/.exec(noticeElm.querySelector('a').href)[1],
+      noticeElm.querySelector('a')?.textContent?.trim() ?? '',
+    urlBuilder: (noticeElm) => {
+      const href = noticeElm.querySelector('a')?.href
+
+      if (!href) return ''
+
+      const result = /view\('([0-9]+)'\)/.exec(href)
+      if (!result) return ''
+
+      return url + '?p_mode=view&p_idx=' + result[1]
+    },
   }
 }

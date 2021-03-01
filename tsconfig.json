@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "strict": false,
+    "strict": true,
     "declaration": true,
     "declarationDir": "eodiro-server-types",
     "moduleResolution": "node",

@@ -52,7 +52,7 @@ ${telegramRegistration.user.portalId}`
 
   bot.once('text', async (id) => {
     const chatId = id.chat.id
-    const portalId = id.text
+    const portalId = id.text ?? ''
 
     await bot.sendMessage(chatId, '아이디를 확인중입니다...')
 
@@ -85,7 +85,7 @@ p.s.
 
       bot.once('text', async (pw) => {
         const chatId = pw.chat.id
-        const password = pw.text
+        const password = pw.text ?? ''
 
         const loggedIn = await EodiroEncrypt.isSame(password, user.password)
 

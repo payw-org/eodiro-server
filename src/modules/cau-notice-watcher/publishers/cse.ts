@@ -8,6 +8,10 @@ export const cse: Publisher = {
   url,
   noticeItemSelector: '.table-basic tbody tr',
   titleBuilder: (noticeElm) =>
-    noticeElm.querySelector('a').textContent.trim().replace(/NEW$/, '').trim(),
-  urlBuilder: (noticeElm) => url + noticeElm.querySelector('a').href,
+    noticeElm
+      .querySelector('a')
+      ?.textContent?.trim()
+      ?.replace(/NEW$/, '')
+      ?.trim() ?? '',
+  urlBuilder: (noticeElm) => url + noticeElm.querySelector('a')?.href ?? '',
 }

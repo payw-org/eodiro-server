@@ -8,23 +8,23 @@ type ChainFunction<T> = (
 export function makeBodyValidator<
   BodyType extends Record<string, unknown>
 >(): ChainFunction<BodyType> {
-  return body
+  return body as ChainFunction<BodyType>
 }
 
 export function makeQueryValidator<
   QueryType extends Record<string, unknown>
 >(): ChainFunction<QueryType> {
-  return query
+  return query as ChainFunction<QueryType>
 }
 
 export function makeParamValidator<
   ParamType extends Record<string, unknown>
 >(): ChainFunction<ParamType> {
-  return param
+  return param as ChainFunction<ParamType>
 }
 
 export function makeHeaderValidator<
   HeaderType extends Record<string, unknown>
 >(): ChainFunction<HeaderType> {
-  return header
+  return header as ChainFunction<HeaderType>
 }
