@@ -62,16 +62,17 @@ export default class DbConnector {
                 log(`[ ${chalk.green('DB')} ] connected to db <${database}>`)
 
                 // handle connection error
-                this.connection.on('error', () => {
-                  log(
-                    `[ ${chalk.green(
-                      'DB ↺'
-                    )} ] reconnect to db due to connection error`
-                  )
+                this.connection &&
+                  this.connection.on('error', () => {
+                    log(
+                      `[ ${chalk.green(
+                        'DB ↺'
+                      )} ] reconnect to db due to connection error`
+                    )
 
-                  this.connection = undefined
-                  this.connect()
-                })
+                    this.connection = undefined
+                    this.connect()
+                  })
 
                 resolve(true)
               }
@@ -87,7 +88,7 @@ export default class DbConnector {
       await this.connect()
     }
 
-    return this.connection
+    return this.connection as mysql.Connection
   }
 
   /**

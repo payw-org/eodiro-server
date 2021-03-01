@@ -15,8 +15,12 @@ export type MysqlInsertOrUpdateResult = {
   changedRows: number
 }
 
-export type MysqlQueryReturn<ResultType> = [MysqlError, ResultType, FieldInfo[]]
-export type QueryValues = (string | number)[] | string | number
+export type MysqlQueryReturn<ResultType> = [
+  MysqlError | null,
+  ResultType | null,
+  FieldInfo[] | null | undefined
+]
+export type QueryValues = (string | number)[] | string | number | null
 
 /**
  * @deprecated Use Prisma

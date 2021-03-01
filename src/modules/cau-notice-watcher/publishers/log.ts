@@ -6,6 +6,6 @@ export const log: Publisher = {
   url: 'http://log.cau.ac.kr/graduate/notice_list.php',
   noticeItemSelector: '.noticeList tbody tr',
   titleBuilder: (noticeElm) =>
-    noticeElm.querySelector('.tit').textContent.trim(),
-  urlBuilder: (noticeElm) => noticeElm.querySelector('a').href,
+    noticeElm.querySelector('.tit')?.textContent?.trim() ?? '',
+  urlBuilder: (noticeElm) => noticeElm.querySelector('a')?.href ?? '',
 }

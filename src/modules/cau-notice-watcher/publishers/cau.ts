@@ -8,13 +8,17 @@ export const cau: Publisher = {
   url,
   noticeItemSelector: '.typeNoti',
   titleBuilder: (noticeElm) => {
-    const mark = noticeElm.querySelector('.mark_noti').textContent.trim()
-    const title = noticeElm.querySelector('a').textContent.trim()
+    const mark =
+      noticeElm.querySelector('.mark_noti')?.textContent?.trim() ?? ''
+    const title = noticeElm.querySelector('a')?.textContent?.trim() ?? ''
 
     return `${mark} ${title}`
   },
   urlBuilder: (noticeElm) => {
-    const href = noticeElm.querySelector('a').href
+    const href = noticeElm.querySelector('a')?.href
+
+    if (!href) return ''
+
     const matched = /goDetail\('([0-9]*)'/g.exec(href)
     const noticeItemId = matched ? matched[1] : null
 

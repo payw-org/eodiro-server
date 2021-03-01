@@ -522,7 +522,7 @@ export class SqlBInstance<T = any> {
         .map((item) => {
           return `(${keys
             .map((key) => {
-              return this.convert(item[key])
+              return this.convert((item[key as keyof T] as unknown) as string)
             })
             .join(', ')})`
         })
@@ -554,7 +554,9 @@ export class SqlBInstance<T = any> {
   ): SqlBInstance<T> {
     const setQuery = Object.keys(items)
       .map((key) => {
-        return `${key} = ${this.convert(items[key])}`
+        return `${key} = ${this.convert(
+          (items[key as keyof T] as unknown) as string
+        )}`
       })
       .join(', ')
 

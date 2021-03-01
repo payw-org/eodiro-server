@@ -5,6 +5,7 @@ export const dormitoryBlueMir: Publisher = {
   key: 'dormitory-blue-mir',
   url: 'http://dormitory.cau.ac.kr/bbs/bbs_list.php?bbsID=notice',
   noticeItemSelector: '#content table tr[bgcolor="#fffcdb"]',
-  titleBuilder: (noticeElm) => noticeElm.querySelector('span').textContent,
-  urlBuilder: (noticeElm) => noticeElm.querySelector('a').href,
+  titleBuilder: (noticeElm) =>
+    noticeElm.querySelector('span')?.textContent ?? '',
+  urlBuilder: (noticeElm) => noticeElm.querySelector('a')?.href ?? '',
 }

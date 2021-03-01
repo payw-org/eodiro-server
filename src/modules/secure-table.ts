@@ -1,17 +1,27 @@
+import { DeepOmit } from '@/types/deep-omit'
+import { ReplaceKey } from '@/types/replace-key'
 import { isPrimitive } from './utils/is-primitive'
 
-export function secureTable<Obj = any>(obj: Obj, userId: number): unknown {
+export function secureTable<T = any>(
+  obj: T,
+  userId: number
+): ReplaceKey<DeepOmit<T, 'isDeleted'>, 'userId', { isMine: boolean }> {
   for (const key of Object.keys(obj)) {
-    const val = obj[key]
+    const objObj = (obj as unknown) as Record<string, unknown>
+    const val = objObj[key]
     if (key === 'userId') {
-      obj['isMine'] = val === userId
-      delete obj[key]
+      objObj['isMine'] = val === userId
+      delete objObj[key]
     } else if (key === 'isDeleted') {
-      delete obj[key]
+      delete objObj[key]
     } else if (!isPrimitive(val)) {
       secureTable(val, userId)
     }
   }
 
-  return obj
+  return obj as ReplaceKey<
+    DeepOmit<T, 'isDeleted'>,
+    'userId',
+    { isMine: boolean }
+  >
 }
