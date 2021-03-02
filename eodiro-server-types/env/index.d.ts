@@ -1,4 +1,8 @@
 export declare const env: {
+    PORT: number;
+    DEV_PORT: number;
+    CLIENT_PORT: number;
+    CLIENT_DEV_PORT: number;
     GITHUB_OAUTH_TOKEN: string;
     ACCESS_TOKEN_SECRET: string;
     REFRESH_TOKEN_SECRET: string;
