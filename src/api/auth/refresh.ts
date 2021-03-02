@@ -23,7 +23,7 @@ router.post(refreshRouterPath, async (req, res) => {
 
   const [err, authData] = await verifyJwt(refreshToken, 'refresh')
 
-  if (err) {
+  if (err || authData === undefined) {
     return res.status(httpStatus.UNAUTHORIZED).json({ error: err })
   }
 
