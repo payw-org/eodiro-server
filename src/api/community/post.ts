@@ -48,11 +48,7 @@ router.get<any, ApiCommunityGetPostResData, any, ApiCommunityGetPostReqQuery>(
       return res.sendStatus(httpStatus.NOT_FOUND)
     }
 
-    const safePost = secureTable(post, req.user.id) as SafeCommunityPost & {
-      communityBoard: {
-        name: string
-      }
-    }
+    const safePost = secureTable(post, req.user.id)
 
     const likedByMe = !!(await prisma.communityPostLike.findUnique({
       where: {
