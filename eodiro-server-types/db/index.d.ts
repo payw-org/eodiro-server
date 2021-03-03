@@ -11,8 +11,12 @@ export declare type MysqlInsertOrUpdateResult = {
     protocol41: boolean;
     changedRows: number;
 };
-export declare type MysqlQueryReturn<ResultType> = [MysqlError, ResultType, FieldInfo[]];
-export declare type QueryValues = (string | number)[] | string | number;
+export declare type MysqlQueryReturn<ResultType> = [
+    MysqlError | null,
+    ResultType | null,
+    FieldInfo[] | null | undefined
+];
+export declare type QueryValues = (string | number)[] | string | number | null;
 /**
  * @deprecated Use Prisma
  */

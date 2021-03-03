@@ -4,16 +4,16 @@ export declare type ApiCommunityAllBoardsResData = {
     isPinned: boolean;
     id: number;
     name: string;
-    description: string;
+    description: string | null;
     priority: number;
     isDeleted: boolean;
     createdAt: Date;
-    activeAt: Date;
+    activeAt: Date | null;
 }[];
 export declare type ApiCommunityAllBoardCandidatesResData = {
     id: number;
     name: string;
-    description: string;
+    description: string | null;
     createdAt: Date;
     isMine: boolean;
     votesCount: number;

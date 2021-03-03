@@ -1,2 +1,2 @@
-declare const dayIndexToString: (dayIndex: number, upperCase?: false) => string;
+declare const dayIndexToString: (dayIndex: number, upperCase?: false | undefined) => string;
 export default dayIndexToString;
