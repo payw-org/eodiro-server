@@ -15,4 +15,17 @@ export declare type ApiCommunityCreateCommentReqBody = {
 export declare type ApiCommunityDeleteCommentReqBody = {
     commentId: number;
 };
+export declare type ApiCommunityGetSubcommentsReqQuery = {
+    commentId: number;
+    /** Subcomment ID */
+    cursor?: number;
+};
+export declare type ApiCommunitySubcommentsResData = SafeCommunitySubcomment[];
+export declare type ApiCommunityCreateSubcommentReqBody = {
+    body: string;
+    commentId: number;
+};
+export declare type ApiCommunityDeleteSubcommentReqBody = {
+    subcommentId: number;
+};
 export default router;

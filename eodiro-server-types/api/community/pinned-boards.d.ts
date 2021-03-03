@@ -6,7 +6,7 @@ export declare function getPinnedBoards({ userId }: {
 }): Promise<{
     id: number;
     name: string;
-    description: string;
+    description: string | null;
     createdAt: Date;
 }[]>;
 export default router;
