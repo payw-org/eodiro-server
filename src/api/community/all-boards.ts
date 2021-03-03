@@ -8,11 +8,11 @@ export type ApiCommunityAllBoardsResData = {
   isPinned: boolean
   id: number
   name: string
-  description: string
+  description: string | null
   priority: number
   isDeleted: boolean
   createdAt: Date
-  activeAt: Date
+  activeAt: Date | null
 }[]
 
 router.get<any, ApiCommunityAllBoardsResData>(
@@ -53,7 +53,7 @@ router.get<any, ApiCommunityAllBoardsResData>(
 export type ApiCommunityAllBoardCandidatesResData = {
   id: number
   name: string
-  description: string
+  description: string | null
   createdAt: Date
   isMine: boolean
   votesCount: number
