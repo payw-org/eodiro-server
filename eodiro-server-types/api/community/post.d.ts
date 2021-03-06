@@ -11,4 +11,16 @@ export declare type ApiCommunityGetPostResData = SafeCommunityPost & {
         name: string;
     };
 };
+export declare type ApiCommunityUpsertPostReqBody = {
+    postId?: number;
+    boardId: number;
+    title: string;
+    body: string;
+};
+export declare type ApiCommunityUpsertPostResData = {
+    postId: number;
+};
+export declare type ApiCommunityDeletePostReqBody = {
+    postId: number;
+};
 export default router;
