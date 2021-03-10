@@ -3,7 +3,7 @@ import { handleExpressValidation } from '@/middleware/handle-express-validation'
 import { makeQueryValidator } from '@/modules/express-validator-utils'
 import { prisma } from '@/modules/prisma'
 import { secureTable } from '@/modules/secure-table'
-import { CommunityPostsList } from '@/types/schema'
+import { SafeCommunityPost } from '@/types/schema'
 import express from 'express'
 
 const router = express.Router()
@@ -16,7 +16,7 @@ export type ApiCommunityPostsListReqQuery = {
 export type ApiCommunityPostsListResData = {
   totalPage: number
   page: number
-  posts: CommunityPostsList
+  posts: SafeCommunityPost[]
 }
 
 const query = makeQueryValidator<ApiCommunityPostsListReqQuery>()
@@ -42,7 +42,7 @@ router.get<
       })) / take
     )
 
-    const posts = (secureTable(
+    const posts = secureTable(
       await prisma.communityPost.findMany({
         where: {
           isDeleted: false,
@@ -51,21 +51,9 @@ router.get<
         orderBy: { id: 'desc' },
         skip,
         take,
-        include: {
-          communityComments: {
-            where: { isDeleted: false },
-            include: {
-              communitySubcomments: {
-                where: { isDeleted: false },
-              },
-            },
-          },
-          communityPostLikes: true,
-          communityPostBookmarks: true,
-        },
       }),
       req.user.id
-    ) as unknown) as CommunityPostsList
+    )
 
     res.json({
       totalPage,
