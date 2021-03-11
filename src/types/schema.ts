@@ -2,8 +2,6 @@ import {
   CommunityBoard,
   CommunityComment,
   CommunityPost,
-  CommunityPostBookmark,
-  CommunityPostLike,
   CommunitySubcomment,
 } from '@/prisma/client'
 
@@ -27,12 +25,3 @@ export type SafeCommunityBoard = Omit<
 export type SafeCommunityPost = Safe<CommunityPost>
 export type SafeCommunityComment = Safe<CommunityComment>
 export type SafeCommunitySubcomment = Safe<CommunitySubcomment>
-
-// Packed
-export type CommunityPostsList = (SafeCommunityPost & {
-  communityComments: (SafeCommunityComment & {
-    communitySubcomments: SafeCommunitySubcomment[]
-  })[]
-  communityPostLikes: CommunityPostLike[]
-  communityPostBookmarks: CommunityPostBookmark[]
-})[]
