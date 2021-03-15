@@ -10,7 +10,7 @@ export type ApiAuthChangePasswordReqData = {
 }
 
 router.post<any, any, ApiAuthChangePasswordReqData>(
-  '/auth/change-password',
+  '/change-password',
   requireAuth,
   async (req, res) => {
     const { newPassword } = req.body

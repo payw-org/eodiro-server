@@ -27,7 +27,7 @@ export async function getPinnedBoards({ userId }: { userId: number }) {
 }
 
 router.get<any, ApiCommunityPinnedBoardsResData>(
-  '/community/pinned-boards',
+  '/pinned-boards',
   async (req, res) => {
     const pinnedBoards = await getPinnedBoards({ userId: req.user.id })
     res.json(pinnedBoards)

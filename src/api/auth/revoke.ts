@@ -5,7 +5,7 @@ import { prisma } from '@/modules/prisma'
 import express from 'express'
 
 const router = express.Router()
-export const revokeRouterPath = '/auth/revoke'
+export const revokeRouterPath = '/revoke'
 
 router.post(revokeRouterPath, async (req, res) => {
   const refreshToken = extractJwt(req, res, 'refresh')

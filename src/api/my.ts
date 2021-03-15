@@ -10,7 +10,7 @@ router.use(requireAuth)
 
 export type SafeUser = Omit<User, 'id' | 'password' | 'refreshToken'>
 
-router.get<any, SafeUser>('/my/information', async (req, res) => {
+router.get<any, SafeUser>('/information', async (req, res) => {
   const { user } = req
 
   const safeUser: SafeUser | null = await prisma.user.findUnique({

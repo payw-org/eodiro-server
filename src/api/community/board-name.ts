@@ -22,7 +22,7 @@ router.get<
   any,
   ApiCommunityBoardNameReqQuery
 >(
-  '/community/board-name',
+  '/board-name',
   query('boardId').isNumeric().toInt(),
   handleExpressValidation,
   async (req, res) => {

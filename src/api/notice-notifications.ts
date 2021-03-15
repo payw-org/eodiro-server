@@ -15,7 +15,7 @@ export type ApiNoticeNotificationsGetPublishers = {
   name: string
 }[]
 
-router.get('/notice-notifications/publishers', async (_, res) => {
+router.get('/publishers', async (_, res) => {
   res.json(availablePublishers)
 })
 
@@ -25,7 +25,7 @@ router.use(requireAuth)
 
 export type ApiNoticeNotificationsGetResData = string[] // key[]
 
-router.get('/notice-notifications', async (req, res) => {
+router.get('/', async (req, res) => {
   const { user } = req
 
   const subscriptions = await prisma.noticeNotificationsSubscription.findMany({
@@ -55,7 +55,7 @@ router.post<
   ApiNoticeNotificationsSubscribeResData,
   ApiNoticeNotificationsSubscribeReqBody
 >(
-  '/notice-notifications',
+  '/',
   subscribeBody('key').isString(),
   handleExpressValidation,
   async (req, res) => {

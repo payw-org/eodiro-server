@@ -11,7 +11,7 @@ const upload = multer({
   dest: './',
 })
 
-router.post('/upload-image', upload.single('image'), async (req, res) => {
+router.post('/', upload.single('image'), async (req, res) => {
   console.log(req.file)
   const file = req.file
   const stream = fs.createReadStream(file.path)

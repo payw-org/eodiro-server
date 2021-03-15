@@ -21,7 +21,7 @@ router.post<
   ApiCommunityBookmarkPostResData,
   ApiCommunityBookmarkPostReqBody
 >(
-  '/community/bookmark-post',
+  '/bookmark-post',
   body('postId').isNumeric(),
   handleExpressValidation,
   async (req, res) => {

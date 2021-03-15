@@ -19,7 +19,7 @@ export type ApiAuthLoginResData = {
 const router = express.Router()
 
 // Sign in
-router.post('/auth/log-in', async (req, res) => {
+router.post('/log-in', async (req, res) => {
   const { portalId, password } = req.body as LogInInfo
   const resData: ApiAuthLoginResData = { isSigned: false }
 

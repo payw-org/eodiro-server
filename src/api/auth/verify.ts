@@ -12,7 +12,7 @@ export type ApiAuthGeneralErrResData = {
 export type ApiAuthVerifyResData = ApiAuthGeneralErrResData
 
 // Verify pending user
-router.post<any, ApiAuthGeneralErrResData>('/auth/verify', async (req, res) => {
+router.post<any, ApiAuthGeneralErrResData>('/verify', async (req, res) => {
   const accessToken = extractJwt(req, res, 'access')
 
   const [error] = await verifyJwt(accessToken, 'access')

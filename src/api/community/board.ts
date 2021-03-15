@@ -16,7 +16,7 @@ export type ApiCommunityCreateNewBoardReqBody = {
 const createBoardBody = makeBodyValidator<ApiCommunityCreateNewBoardReqBody>()
 
 router.post(
-  '/community/board',
+  '/board',
   createBoardBody('name').isString().trim().isLength({
     min: eodiroConst.MIN_BOARD_TITLE_LENGTH,
     max: eodiroConst.MAX_BOARD_TITLE_LENGTH,
@@ -68,7 +68,7 @@ export type ApiCommunityPinBoardResData = {
 const pinBoardBody = makeBodyValidator<ApiCommunityPinBoardReqBody>()
 
 router.post<any, ApiCommunityPinBoardResData, ApiCommunityPinBoardReqBody>(
-  '/community/board/pin',
+  '/board/pin',
   pinBoardBody('boardId').isNumeric(),
   handleExpressValidation,
   async (req, res) => {

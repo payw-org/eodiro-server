@@ -12,7 +12,7 @@ import { SafeCommunityPost } from '@/types/schema'
 import express from 'express'
 
 const router = express.Router()
-const postRouterPath = '/community/post'
+const postRouterPath = '/post'
 
 /* ------ Get a post ------ */
 
