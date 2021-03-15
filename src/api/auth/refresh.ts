@@ -7,7 +7,7 @@ import express from 'express'
 
 const router = express.Router()
 
-export const refreshRouterPath = '/auth/refresh'
+export const refreshRouterPath = '/refresh'
 
 export type ApiAuthRefreshResData = {
   accessToken: string

@@ -26,7 +26,7 @@ router.get<
   any,
   ApiCommunityGetPopularPostsReqQuery
 >(
-  '/community/posts/popular',
+  '/posts/popular',
   getPopularPostsQuery('page').isNumeric().toInt().optional(),
   handleExpressValidation,
   async (req, res) => {

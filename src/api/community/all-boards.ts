@@ -16,7 +16,7 @@ export type ApiCommunityAllBoardsResData = {
 }[]
 
 router.get<any, ApiCommunityAllBoardsResData>(
-  '/community/all-boards',
+  '/all-boards',
   async (req, res) => {
     const allBoards = await prisma.communityBoard.findMany({
       orderBy: [{ priority: 'desc' }, { name: 'asc' }],
@@ -60,7 +60,7 @@ export type ApiCommunityAllBoardCandidatesResData = {
 }[]
 
 router.get<any, ApiCommunityAllBoardCandidatesResData>(
-  '/community/all-board-candidates',
+  '/all-board-candidates',
   async (req, res) => {
     const boardCandidates = (
       await prisma.communityBoardCandidate.findMany({

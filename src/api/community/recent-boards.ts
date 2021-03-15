@@ -19,7 +19,7 @@ router.get<
   any,
   ApiCommunityRecentBoardsReqQuery,
   ApiCommunityRecentBoardsReqQuery
->('/community/recent-boards', async (req, res) => {
+>('/recent-boards', async (req, res) => {
   const { excludePins, onlyNames } = req.query
 
   const recentBoards = await prisma.communityBoard.findMany({

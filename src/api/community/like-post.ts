@@ -13,7 +13,7 @@ export type ApiCommunityLikePostResData = {
 }
 
 router.post<any, ApiCommunityLikePostResData, ApiCommunityLikePostReqBody>(
-  '/community/like-post',
+  '/like-post',
   async (req, res) => {
     const { postId } = req.body
     const { user } = req

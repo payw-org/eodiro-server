@@ -28,7 +28,7 @@ router.get<
   any,
   ApiCommunityPostsListReqQuery
 >(
-  '/community/posts-list',
+  '/posts-list',
   query('boardId').optional().isNumeric().toInt(),
   query('page').optional().isNumeric().toInt(),
   query('my').optional().isString(),

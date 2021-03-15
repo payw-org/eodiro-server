@@ -34,7 +34,7 @@ router.get<
   any,
   ApiCommunityGetCommentsReqQuery
 >(
-  '/community/comments',
+  '/comments',
   getCommentsQuery('postId').isNumeric().toInt(),
   getCommentsQuery('cursor').optional().isNumeric().toInt(),
   handleExpressValidation,
@@ -99,7 +99,7 @@ export type ApiCommunityCreateCommentReqBody = {
 const createCommentBody = makeBodyValidator<ApiCommunityCreateCommentReqBody>()
 
 router.post<any, any, ApiCommunityCreateCommentReqBody>(
-  '/community/comment',
+  '/comment',
   createCommentBody('postId').isNumeric(),
   createCommentBody('body').isString().trim().isLength({
     min: eodiroConst.MIN_COMMENT_BODY_LENGTH,
@@ -176,7 +176,7 @@ export type ApiCommunityDeleteCommentReqBody = {
 }
 
 router.delete<any, any, ApiCommunityDeleteCommentReqBody>(
-  '/community/comment',
+  '/comment',
   async (req, res) => {
     const { user } = req
     const { commentId } = req.body
@@ -234,7 +234,7 @@ router.get<
   any,
   ApiCommunityGetSubcommentsReqQuery
 >(
-  '/community/subcomments',
+  '/subcomments',
   getSubcommentsQuery('commentId').isNumeric().toInt(),
   getSubcommentsQuery('cursor').optional().isNumeric().toInt(),
   handleExpressValidation,
@@ -275,7 +275,7 @@ export type ApiCommunityCreateSubcommentReqBody = {
 const createSubcommentBody = makeBodyValidator<ApiCommunityCreateSubcommentReqBody>()
 
 router.post<any, any, ApiCommunityCreateSubcommentReqBody>(
-  '/community/subcomment',
+  '/subcomment',
   createSubcommentBody('body')
     .isString()
     .isLength({
@@ -380,7 +380,7 @@ export type ApiCommunityDeleteSubcommentReqBody = {
 const deleteSubcommentBody = makeBodyValidator<ApiCommunityDeleteSubcommentReqBody>()
 
 router.delete<any, any, ApiCommunityDeleteSubcommentReqBody>(
-  '/community/subcomment',
+  '/subcomment',
   deleteSubcommentBody('subcommentId').isNumeric(),
   handleExpressValidation,
   async (req, res) => {

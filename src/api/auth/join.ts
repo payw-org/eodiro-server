@@ -7,7 +7,7 @@ export type ApiAuthJoinResponseData = JoinResult
 const router = express.Router()
 
 // Sign up
-router.post('/auth/join', async (req, res) => {
+router.post('/join', async (req, res) => {
   const signUpInfo = req.body as ApiAuthJoinRequestBody
   const signUpResult = await Auth.signUp(signUpInfo)
 

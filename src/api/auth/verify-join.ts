@@ -11,7 +11,7 @@ export type ApiAuthVerifyJoinReqBody = {
 const router = express.Router()
 
 router.post<any, any, ApiAuthVerifyJoinReqBody>(
-  '/auth/verify-join',
+  '/verify-join',
   body('token').isString(),
   handleExpressValidation,
   async (req, res) => {

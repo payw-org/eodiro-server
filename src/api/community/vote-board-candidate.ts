@@ -22,7 +22,7 @@ router.post<
   ApiCommunityVoteBoardCandidateResData,
   ApiCommunityVoteBoardCandidateReqBody
 >(
-  '/community/vote-board-candidate',
+  '/vote-board-candidate',
   body('boardCandidateId').isNumeric(),
   handleExpressValidation,
   async (req, res) => {

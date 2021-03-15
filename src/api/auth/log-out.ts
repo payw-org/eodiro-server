@@ -7,7 +7,7 @@ import { revokeRouterPath } from './revoke'
 
 const router = express.Router()
 
-router.post('/auth/log-out', async (req, res) => {
+router.post('/log-out', async (req, res) => {
   const refreshTokenPaths = [refreshRouterPath, revokeRouterPath]
 
   const cookies: Cookies = [

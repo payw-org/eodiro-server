@@ -8,7 +8,7 @@ export type ApiAuthForgotReqBody = {
   portalId: string
 }
 
-router.post('/auth/forgot', async (req, res) => {
+router.post('/forgot', async (req, res) => {
   const { portalId } = req.body as ApiAuthForgotReqBody
   const result = await Auth.changePassword(portalId)
 
