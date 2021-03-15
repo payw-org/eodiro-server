@@ -1,6 +1,5 @@
 generator client {
-  provider        = "prisma-client-js"
-  previewFeatures = ["nativeTypes"]
+  provider = "prisma-client-js"
 }
 
 datasource db {
@@ -268,17 +267,6 @@ model Period {
   @@map("period")
 }
 
-model Push {
-  userId        Int       @map("user_id") @db.UnsignedInt
-  expoPushToken String    @id @default("") @map("expo_push_token") @db.VarChar(255)
-  registeredAt  DateTime  @map("registered_at") @db.DateTime(0)
-  activeAt      DateTime? @map("active_at") @db.DateTime(0)
-  user          User      @relation(fields: [userId], references: [id])
-
-  @@index([userId], name: "user_id")
-  @@map("push")
-}
-
 model User {
   id                               Int                               @id @default(autoincrement()) @db.UnsignedInt
   portalId                         String                            @unique @map("portal_id") @db.VarChar(320)
@@ -300,7 +288,6 @@ model User {
   communitySubcomments             CommunitySubcomment[]
   liveChats                        LiveChat[]
   noticeNotificationsSubscriptions NoticeNotificationsSubscription[]
-  pushes                           Push[]
   reportComments                   ReportComment[]                   @relation("report_commentTouser")
   reportPosts                      ReportPost[]                      @relation("report_postTouser")
   reportSubcomments                ReportSubcomment[]                @relation("report_subcommentTouser")
