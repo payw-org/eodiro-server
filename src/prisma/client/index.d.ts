@@ -4,6 +4,12 @@
 **/
 
 import * as runtime from '@prisma/client/runtime';
+declare const prisma: unique symbol
+export type PrismaPromise<A> = Promise<A> & {[prisma]: true}
+type UnwrapPromise<P extends any> = P extends Promise<infer R> ? R : P
+type UnwrapTuple<Tuple extends readonly unknown[]> = {
+  [K in keyof Tuple]: K extends `${number}` ? Tuple[K] extends PrismaPromise<infer X> ? X : UnwrapPromise<Tuple[K]> : UnwrapPromise<Tuple[K]>
+};
 
 
 /**
@@ -239,17 +245,6 @@ export type Period = {
 }
 
 /**
- * Model Push
- */
-
-export type Push = {
-  userId: number
-  expoPushToken: string
-  registeredAt: Date
-  activeAt: Date | null
-}
-
-/**
  * Model User
  */
 
@@ -403,7 +398,7 @@ export class PrismaClient<
   * 
   * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client/raw-database-access).
   */
-  $executeRaw < T = any > (query: string | TemplateStringsArray | Prisma.Sql, ...values: any[]): Promise<number>;
+  $executeRaw < T = any > (query: string | TemplateStringsArray | Prisma.Sql, ...values: any[]): PrismaPromise<number>;
 
   /**
    * Performs a raw query and returns the SELECT data
@@ -417,10 +412,10 @@ export class PrismaClient<
   * 
   * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client/raw-database-access).
   */
-  $queryRaw < T = any > (query: string | TemplateStringsArray | Prisma.Sql, ...values: any[]): Promise<T>;
+  $queryRaw < T = any > (query: string | TemplateStringsArray | Prisma.Sql, ...values: any[]): PrismaPromise<T>;
 
   /**
-   * Execute queries in a transaction
+   * Allows the running of a sequence of read/write operations that are guaranteed to either succeed or fail as a whole.
    * @example
    * ```
    * const [george, bob, alice] = await prisma.transaction([
@@ -429,8 +424,10 @@ export class PrismaClient<
    *   prisma.user.create({ data: { name: 'Alice' } }),
    * ])
    * ```
+   * 
+   * Read more in our [docs](https://www.prisma.io/docs/concepts/components/prisma-client/transactions).
    */
-  $transaction: PromiseConstructor['all']
+  $transaction<P extends PrismaPromise<any>[]>(arg: [...P]): Promise<UnwrapTuple<P>>
 
       /**
    * `prisma.admin`: Exposes CRUD operations for the **Admin** model.
@@ -623,16 +620,6 @@ export class PrismaClient<
   get period(): Prisma.PeriodDelegate<GlobalReject>;
 
   /**
-   * `prisma.push`: Exposes CRUD operations for the **Push** model.
-    * Example usage:
-    * ```ts
-    * // Fetch zero or more Pushes
-    * const pushes = await prisma.push.findMany()
-    * ```
-    */
-  get push(): Prisma.PushDelegate<GlobalReject>;
-
-  /**
    * `prisma.user`: Exposes CRUD operations for the **User** model.
     * Example usage:
     * ```ts
@@ -710,8 +697,8 @@ export namespace Prisma {
   export import Decimal = runtime.Decimal
 
   /**
-   * Prisma Client JS version: 2.16.1
-   * Query Engine version: 8b74ad57aaf2cc6c155f382a18a8e3ba95aceb03
+   * Prisma Client JS version: 2.18.0
+   * Query Engine version: da6fafb57b24e0b61ca20960c64e2d41f9e8cff1
    */
   export type PrismaVersion = {
     client: string
@@ -895,7 +882,11 @@ export namespace Prisma {
     [K in keyof O]?: O[K];
   } & {};
 
-  type _Strict<U, _U = U> = U extends unknown ? U & OptionalFlat<Record<Exclude<Keys<_U>, keyof U>, never>> : never;
+  type _Record<K extends keyof any, T> = {
+    [P in K]: T;
+  };
+
+  type _Strict<U, _U = U> = U extends unknown ? U & OptionalFlat<_Record<Exclude<Keys<_U>, keyof U>, never>> : never;
 
   export type Strict<U extends object> = ComputeRaw<_Strict<U>>;
   /** End Helper Types for "Merge" **/
@@ -945,43 +936,19 @@ export namespace Prisma {
 
   export type Keys<U extends Union> = U extends unknown ? keyof U : never
 
-  /**
-   * Allows creating `select` or `include` outside of the main statement
-   * From https://github.com/prisma/prisma/issues/3372#issuecomment-762296484
-   */
+  type Exact<A, W = unknown> = 
+  W extends unknown ? A extends Narrowable ? Cast<A, W> : Cast<
+  {[K in keyof A]: K extends keyof W ? Exact<A[K], W[K]> : never},
+  {[K in keyof W]: K extends keyof A ? Exact<A[K], W[K]> : W[K]}>
+  : never;
 
-  type Cast<A1, A2> = A1 extends A2 ? A1 : A2;
+  type Narrowable = string | number | boolean | bigint;
 
-  /**
-   * `Exact` forces a type to comply by another type. It will need to be a subset
-   * and must have exactly the same properties, no more, no less.
-   */
-  type Exact<A, W> = A & Cast<{
-    [K in keyof A]: K extends keyof W ? A[K] : never
-  }, W>;
-
-  type Narrow<A, W = unknown> =
-      A & {[K in keyof A]: NarrowAt<A, W, K>};
-
-  type NarrowAt<A, W, K extends keyof A, AK = A[K], WK = Att<W, K>> =
-      WK extends Widen<infer T> ? T :
-      AK extends Narrowable ? AK & WK :
-      Narrow<AK, WK>;
-
-  type Att<O, K> = K extends keyof O ? O[K] : unknown;
-
-  type Widen<A> = {[type]: A};
-
-  type Narrowable =
-  | string
-  | number
-  | bigint
-  | boolean
-  | [];
+  type Cast<A, B> = A extends B ? A : B;
 
   export const type: unique symbol;
 
-  export function validator<V>(): <S>(select: Exact<Narrow<S, V>, V>) => S;
+  export function validator<V>(): <S>(select: Exact<S, V>) => S;
 
   /**
    * Used by group by
@@ -1056,7 +1023,6 @@ export namespace Prisma {
     NoticeNotificationsSubscription: 'NoticeNotificationsSubscription',
     PendingUser: 'PendingUser',
     Period: 'Period',
-    Push: 'Push',
     User: 'User',
     ReportComment: 'ReportComment',
     ReportPost: 'ReportPost',
@@ -1274,7 +1240,7 @@ export namespace Prisma {
     **/
     where?: AdminWhereInput
     /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
      * Determine the order of Admins to fetch.
     **/
@@ -1397,6 +1363,8 @@ export namespace Prisma {
 
     /**
      * Find the first Admin that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {AdminFindFirstArgs} args - Arguments to find a Admin
      * @example
      * // Get one Admin
@@ -1412,6 +1380,8 @@ export namespace Prisma {
 
     /**
      * Find zero or more Admins that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {AdminFindManyArgs=} args - Arguments to filter and select certain fields only.
      * @example
      * // Get all Admins
@@ -1426,7 +1396,7 @@ export namespace Prisma {
     **/
     findMany<T extends AdminFindManyArgs>(
       args?: SelectSubset<T, AdminFindManyArgs>
-    ): CheckSelect<T, Promise<Array<Admin>>, Promise<Array<AdminGetPayload<T>>>>
+    ): CheckSelect<T, PrismaPromise<Array<Admin>>, PrismaPromise<Array<AdminGetPayload<T>>>>
 
     /**
      * Create a Admin.
@@ -1493,10 +1463,12 @@ export namespace Prisma {
     **/
     deleteMany<T extends AdminDeleteManyArgs>(
       args?: SelectSubset<T, AdminDeleteManyArgs>
-    ): Promise<BatchPayload>
+    ): PrismaPromise<BatchPayload>
 
     /**
      * Update zero or more Admins.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {AdminUpdateManyArgs} args - Arguments to update one or more rows.
      * @example
      * // Update many Admins
@@ -1512,7 +1484,7 @@ export namespace Prisma {
     **/
     updateMany<T extends AdminUpdateManyArgs>(
       args: SelectSubset<T, AdminUpdateManyArgs>
-    ): Promise<BatchPayload>
+    ): PrismaPromise<BatchPayload>
 
     /**
      * Create or update one Admin.
@@ -1537,6 +1509,8 @@ export namespace Prisma {
 
     /**
      * Count the number of Admins.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {AdminCountArgs} args - Arguments to filter Admins to count.
      * @example
      * // Count the number of Admins
@@ -1548,8 +1522,8 @@ export namespace Prisma {
     **/
     count<T extends AdminCountArgs>(
       args?: Subset<T, AdminCountArgs>,
-    ): Promise<
-      T extends Record<'select', any>
+    ): PrismaPromise<
+      T extends _Record<'select', any>
         ? T['select'] extends true
           ? number
           : GetScalarType<T['select'], AdminCountAggregateOutputType>
@@ -1558,6 +1532,8 @@ export namespace Prisma {
 
     /**
      * Allows you to perform aggregations operations on a Admin.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {AdminAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
      * @example
      * // Ordered by age ascending
@@ -1578,7 +1554,7 @@ export namespace Prisma {
      *   take: 10,
      * })
     **/
-    aggregate<T extends AdminAggregateArgs>(args: Subset<T, AdminAggregateArgs>): Promise<GetAdminAggregateType<T>>
+    aggregate<T extends AdminAggregateArgs>(args: Subset<T, AdminAggregateArgs>): PrismaPromise<GetAdminAggregateType<T>>
 
 
   }
@@ -1589,7 +1565,8 @@ export namespace Prisma {
    * Because we want to prevent naming conflicts as mentioned in 
    * https://github.com/prisma/prisma-client-js/issues/707
    */
-  export class Prisma__AdminClient<T> implements Promise<T> {
+  export class Prisma__AdminClient<T> implements PrismaPromise<T> {
+    [prisma]: true;
     private readonly _dmmf;
     private readonly _fetcher;
     private readonly _queryType;
@@ -1614,13 +1591,13 @@ export namespace Prisma {
      * @param onrejected The callback to execute when the Promise is rejected.
      * @returns A Promise for the completion of which ever callback is executed.
      */
-    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | Promise<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | Promise<TResult2>) | undefined | null): Promise<TResult1 | TResult2>;
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): Promise<TResult1 | TResult2>;
     /**
      * Attaches a callback for only the rejection of the Promise.
      * @param onrejected The callback to execute when the Promise is rejected.
      * @returns A Promise for the completion of the callback.
      */
-    catch<TResult = never>(onrejected?: ((reason: any) => TResult | Promise<TResult>) | undefined | null): Promise<T | TResult>;
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): Promise<T | TResult>;
     /**
      * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
      * resolved value cannot be modified from the callback.
@@ -1676,7 +1653,7 @@ export namespace Prisma {
     **/
     where?: AdminWhereInput
     /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
      * Determine the order of Admins to fetch.
     **/
@@ -1700,7 +1677,7 @@ export namespace Prisma {
     **/
     skip?: number
     /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
      * 
      * Filter by unique combinations of Admins.
     **/
@@ -1725,7 +1702,7 @@ export namespace Prisma {
     **/
     where?: AdminWhereInput
     /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
      * Determine the order of Admins to fetch.
     **/
@@ -1767,7 +1744,7 @@ export namespace Prisma {
     /**
      * The data needed to create a Admin.
     **/
-    data: XOR<AdminUncheckedCreateInput, AdminCreateInput>
+    data: XOR<AdminCreateInput, AdminUncheckedCreateInput>
   }
 
 
@@ -1786,7 +1763,7 @@ export namespace Prisma {
     /**
      * The data needed to update a Admin.
     **/
-    data: XOR<AdminUncheckedUpdateInput, AdminUpdateInput>
+    data: XOR<AdminUpdateInput, AdminUncheckedUpdateInput>
     /**
      * Choose, which Admin to update.
     **/
@@ -1798,7 +1775,7 @@ export namespace Prisma {
    * Admin updateMany
    */
   export type AdminUpdateManyArgs = {
-    data: XOR<AdminUncheckedUpdateManyInput, AdminUpdateManyMutationInput>
+    data: XOR<AdminUpdateManyMutationInput, AdminUncheckedUpdateManyInput>
     where?: AdminWhereInput
   }
 
@@ -1822,11 +1799,11 @@ export namespace Prisma {
     /**
      * In case the Admin found by the `where` argument doesn't exist, create a new Admin with this data.
     **/
-    create: XOR<AdminUncheckedCreateInput, AdminCreateInput>
+    create: XOR<AdminCreateInput, AdminUncheckedCreateInput>
     /**
      * In case the Admin was found with the provided `where` argument, update it with this data.
     **/
-    update: XOR<AdminUncheckedUpdateInput, AdminUpdateInput>
+    update: XOR<AdminUpdateInput, AdminUncheckedUpdateInput>
   }
 
 
@@ -1925,7 +1902,7 @@ export namespace Prisma {
     **/
     where?: CafeteriaMenuWhereInput
     /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
      * Determine the order of CafeteriaMenus to fetch.
     **/
@@ -2028,6 +2005,8 @@ export namespace Prisma {
 
     /**
      * Find the first CafeteriaMenu that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {CafeteriaMenuFindFirstArgs} args - Arguments to find a CafeteriaMenu
      * @example
      * // Get one CafeteriaMenu
@@ -2043,6 +2022,8 @@ export namespace Prisma {
 
     /**
      * Find zero or more CafeteriaMenus that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {CafeteriaMenuFindManyArgs=} args - Arguments to filter and select certain fields only.
      * @example
      * // Get all CafeteriaMenus
@@ -2057,7 +2038,7 @@ export namespace Prisma {
     **/
     findMany<T extends CafeteriaMenuFindManyArgs>(
       args?: SelectSubset<T, CafeteriaMenuFindManyArgs>
-    ): CheckSelect<T, Promise<Array<CafeteriaMenu>>, Promise<Array<CafeteriaMenuGetPayload<T>>>>
+    ): CheckSelect<T, PrismaPromise<Array<CafeteriaMenu>>, PrismaPromise<Array<CafeteriaMenuGetPayload<T>>>>
 
     /**
      * Create a CafeteriaMenu.
@@ -2124,10 +2105,12 @@ export namespace Prisma {
     **/
     deleteMany<T extends CafeteriaMenuDeleteManyArgs>(
       args?: SelectSubset<T, CafeteriaMenuDeleteManyArgs>
-    ): Promise<BatchPayload>
+    ): PrismaPromise<BatchPayload>
 
     /**
      * Update zero or more CafeteriaMenus.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {CafeteriaMenuUpdateManyArgs} args - Arguments to update one or more rows.
      * @example
      * // Update many CafeteriaMenus
@@ -2143,7 +2126,7 @@ export namespace Prisma {
     **/
     updateMany<T extends CafeteriaMenuUpdateManyArgs>(
       args: SelectSubset<T, CafeteriaMenuUpdateManyArgs>
-    ): Promise<BatchPayload>
+    ): PrismaPromise<BatchPayload>
 
     /**
      * Create or update one CafeteriaMenu.
@@ -2168,6 +2151,8 @@ export namespace Prisma {
 
     /**
      * Count the number of CafeteriaMenus.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {CafeteriaMenuCountArgs} args - Arguments to filter CafeteriaMenus to count.
      * @example
      * // Count the number of CafeteriaMenus
@@ -2179,8 +2164,8 @@ export namespace Prisma {
     **/
     count<T extends CafeteriaMenuCountArgs>(
       args?: Subset<T, CafeteriaMenuCountArgs>,
-    ): Promise<
-      T extends Record<'select', any>
+    ): PrismaPromise<
+      T extends _Record<'select', any>
         ? T['select'] extends true
           ? number
           : GetScalarType<T['select'], CafeteriaMenuCountAggregateOutputType>
@@ -2189,6 +2174,8 @@ export namespace Prisma {
 
     /**
      * Allows you to perform aggregations operations on a CafeteriaMenu.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {CafeteriaMenuAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
      * @example
      * // Ordered by age ascending
@@ -2209,7 +2196,7 @@ export namespace Prisma {
      *   take: 10,
      * })
     **/
-    aggregate<T extends CafeteriaMenuAggregateArgs>(args: Subset<T, CafeteriaMenuAggregateArgs>): Promise<GetCafeteriaMenuAggregateType<T>>
+    aggregate<T extends CafeteriaMenuAggregateArgs>(args: Subset<T, CafeteriaMenuAggregateArgs>): PrismaPromise<GetCafeteriaMenuAggregateType<T>>
 
 
   }
@@ -2220,7 +2207,8 @@ export namespace Prisma {
    * Because we want to prevent naming conflicts as mentioned in 
    * https://github.com/prisma/prisma-client-js/issues/707
    */
-  export class Prisma__CafeteriaMenuClient<T> implements Promise<T> {
+  export class Prisma__CafeteriaMenuClient<T> implements PrismaPromise<T> {
+    [prisma]: true;
     private readonly _dmmf;
     private readonly _fetcher;
     private readonly _queryType;
@@ -2244,13 +2232,13 @@ export namespace Prisma {
      * @param onrejected The callback to execute when the Promise is rejected.
      * @returns A Promise for the completion of which ever callback is executed.
      */
-    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | Promise<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | Promise<TResult2>) | undefined | null): Promise<TResult1 | TResult2>;
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): Promise<TResult1 | TResult2>;
     /**
      * Attaches a callback for only the rejection of the Promise.
      * @param onrejected The callback to execute when the Promise is rejected.
      * @returns A Promise for the completion of the callback.
      */
-    catch<TResult = never>(onrejected?: ((reason: any) => TResult | Promise<TResult>) | undefined | null): Promise<T | TResult>;
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): Promise<T | TResult>;
     /**
      * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
      * resolved value cannot be modified from the callback.
@@ -2298,7 +2286,7 @@ export namespace Prisma {
     **/
     where?: CafeteriaMenuWhereInput
     /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
      * Determine the order of CafeteriaMenus to fetch.
     **/
@@ -2322,7 +2310,7 @@ export namespace Prisma {
     **/
     skip?: number
     /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
      * 
      * Filter by unique combinations of CafeteriaMenus.
     **/
@@ -2343,7 +2331,7 @@ export namespace Prisma {
     **/
     where?: CafeteriaMenuWhereInput
     /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
      * Determine the order of CafeteriaMenus to fetch.
     **/
@@ -2381,7 +2369,7 @@ export namespace Prisma {
     /**
      * The data needed to create a CafeteriaMenu.
     **/
-    data: XOR<CafeteriaMenuUncheckedCreateInput, CafeteriaMenuCreateInput>
+    data: XOR<CafeteriaMenuCreateInput, CafeteriaMenuUncheckedCreateInput>
   }
 
 
@@ -2396,7 +2384,7 @@ export namespace Prisma {
     /**
      * The data needed to update a CafeteriaMenu.
     **/
-    data: XOR<CafeteriaMenuUncheckedUpdateInput, CafeteriaMenuUpdateInput>
+    data: XOR<CafeteriaMenuUpdateInput, CafeteriaMenuUncheckedUpdateInput>
     /**
      * Choose, which CafeteriaMenu to update.
     **/
@@ -2408,7 +2396,7 @@ export namespace Prisma {
    * CafeteriaMenu updateMany
    */
   export type CafeteriaMenuUpdateManyArgs = {
-    data: XOR<CafeteriaMenuUncheckedUpdateManyInput, CafeteriaMenuUpdateManyMutationInput>
+    data: XOR<CafeteriaMenuUpdateManyMutationInput, CafeteriaMenuUncheckedUpdateManyInput>
     where?: CafeteriaMenuWhereInput
   }
 
@@ -2428,11 +2416,11 @@ export namespace Prisma {
     /**
      * In case the CafeteriaMenu found by the `where` argument doesn't exist, create a new CafeteriaMenu with this data.
     **/
-    create: XOR<CafeteriaMenuUncheckedCreateInput, CafeteriaMenuCreateInput>
+    create: XOR<CafeteriaMenuCreateInput, CafeteriaMenuUncheckedCreateInput>
     /**
      * In case the CafeteriaMenu was found with the provided `where` argument, update it with this data.
     **/
-    update: XOR<CafeteriaMenuUncheckedUpdateInput, CafeteriaMenuUpdateInput>
+    update: XOR<CafeteriaMenuUpdateInput, CafeteriaMenuUncheckedUpdateInput>
   }
 
 
@@ -2545,7 +2533,7 @@ export namespace Prisma {
     **/
     where?: ChangePasswordWhereInput
     /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
      * Determine the order of ChangePasswords to fetch.
     **/
@@ -2670,6 +2658,8 @@ export namespace Prisma {
 
     /**
      * Find the first ChangePassword that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {ChangePasswordFindFirstArgs} args - Arguments to find a ChangePassword
      * @example
      * // Get one ChangePassword
@@ -2685,6 +2675,8 @@ export namespace Prisma {
 
     /**
      * Find zero or more ChangePasswords that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {ChangePasswordFindManyArgs=} args - Arguments to filter and select certain fields only.
      * @example
      * // Get all ChangePasswords
@@ -2699,7 +2691,7 @@ export namespace Prisma {
     **/
     findMany<T extends ChangePasswordFindManyArgs>(
       args?: SelectSubset<T, ChangePasswordFindManyArgs>
-    ): CheckSelect<T, Promise<Array<ChangePassword>>, Promise<Array<ChangePasswordGetPayload<T>>>>
+    ): CheckSelect<T, PrismaPromise<Array<ChangePassword>>, PrismaPromise<Array<ChangePasswordGetPayload<T>>>>
 
     /**
      * Create a ChangePassword.
@@ -2766,10 +2758,12 @@ export namespace Prisma {
     **/
     deleteMany<T extends ChangePasswordDeleteManyArgs>(
       args?: SelectSubset<T, ChangePasswordDeleteManyArgs>
-    ): Promise<BatchPayload>
+    ): PrismaPromise<BatchPayload>
 
     /**
      * Update zero or more ChangePasswords.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {ChangePasswordUpdateManyArgs} args - Arguments to update one or more rows.
      * @example
      * // Update many ChangePasswords
@@ -2785,7 +2779,7 @@ export namespace Prisma {
     **/
     updateMany<T extends ChangePasswordUpdateManyArgs>(
       args: SelectSubset<T, ChangePasswordUpdateManyArgs>
-    ): Promise<BatchPayload>
+    ): PrismaPromise<BatchPayload>
 
     /**
      * Create or update one ChangePassword.
@@ -2810,6 +2804,8 @@ export namespace Prisma {
 
     /**
      * Count the number of ChangePasswords.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {ChangePasswordCountArgs} args - Arguments to filter ChangePasswords to count.
      * @example
      * // Count the number of ChangePasswords
@@ -2821,8 +2817,8 @@ export namespace Prisma {
     **/
     count<T extends ChangePasswordCountArgs>(
       args?: Subset<T, ChangePasswordCountArgs>,
-    ): Promise<
-      T extends Record<'select', any>
+    ): PrismaPromise<
+      T extends _Record<'select', any>
         ? T['select'] extends true
           ? number
           : GetScalarType<T['select'], ChangePasswordCountAggregateOutputType>
@@ -2831,6 +2827,8 @@ export namespace Prisma {
 
     /**
      * Allows you to perform aggregations operations on a ChangePassword.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {ChangePasswordAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
      * @example
      * // Ordered by age ascending
@@ -2851,7 +2849,7 @@ export namespace Prisma {
      *   take: 10,
      * })
     **/
-    aggregate<T extends ChangePasswordAggregateArgs>(args: Subset<T, ChangePasswordAggregateArgs>): Promise<GetChangePasswordAggregateType<T>>
+    aggregate<T extends ChangePasswordAggregateArgs>(args: Subset<T, ChangePasswordAggregateArgs>): PrismaPromise<GetChangePasswordAggregateType<T>>
 
 
   }
@@ -2862,7 +2860,8 @@ export namespace Prisma {
    * Because we want to prevent naming conflicts as mentioned in 
    * https://github.com/prisma/prisma-client-js/issues/707
    */
-  export class Prisma__ChangePasswordClient<T> implements Promise<T> {
+  export class Prisma__ChangePasswordClient<T> implements PrismaPromise<T> {
+    [prisma]: true;
     private readonly _dmmf;
     private readonly _fetcher;
     private readonly _queryType;
@@ -2887,13 +2886,13 @@ export namespace Prisma {
      * @param onrejected The callback to execute when the Promise is rejected.
      * @returns A Promise for the completion of which ever callback is executed.
      */
-    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | Promise<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | Promise<TResult2>) | undefined | null): Promise<TResult1 | TResult2>;
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): Promise<TResult1 | TResult2>;
     /**
      * Attaches a callback for only the rejection of the Promise.
      * @param onrejected The callback to execute when the Promise is rejected.
      * @returns A Promise for the completion of the callback.
      */
-    catch<TResult = never>(onrejected?: ((reason: any) => TResult | Promise<TResult>) | undefined | null): Promise<T | TResult>;
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): Promise<T | TResult>;
     /**
      * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
      * resolved value cannot be modified from the callback.
@@ -2949,7 +2948,7 @@ export namespace Prisma {
     **/
     where?: ChangePasswordWhereInput
     /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
      * Determine the order of ChangePasswords to fetch.
     **/
@@ -2973,7 +2972,7 @@ export namespace Prisma {
     **/
     skip?: number
     /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
      * 
      * Filter by unique combinations of ChangePasswords.
     **/
@@ -2998,7 +2997,7 @@ export namespace Prisma {
     **/
     where?: ChangePasswordWhereInput
     /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
      * Determine the order of ChangePasswords to fetch.
     **/
@@ -3040,7 +3039,7 @@ export namespace Prisma {
     /**
      * The data needed to create a ChangePassword.
     **/
-    data: XOR<ChangePasswordUncheckedCreateInput, ChangePasswordCreateInput>
+    data: XOR<ChangePasswordCreateInput, ChangePasswordUncheckedCreateInput>
   }
 
 
@@ -3059,7 +3058,7 @@ export namespace Prisma {
     /**
      * The data needed to update a ChangePassword.
     **/
-    data: XOR<ChangePasswordUncheckedUpdateInput, ChangePasswordUpdateInput>
+    data: XOR<ChangePasswordUpdateInput, ChangePasswordUncheckedUpdateInput>
     /**
      * Choose, which ChangePassword to update.
     **/
@@ -3071,7 +3070,7 @@ export namespace Prisma {
    * ChangePassword updateMany
    */
   export type ChangePasswordUpdateManyArgs = {
-    data: XOR<ChangePasswordUncheckedUpdateManyInput, ChangePasswordUpdateManyMutationInput>
+    data: XOR<ChangePasswordUpdateManyMutationInput, ChangePasswordUncheckedUpdateManyInput>
     where?: ChangePasswordWhereInput
   }
 
@@ -3095,11 +3094,11 @@ export namespace Prisma {
     /**
      * In case the ChangePassword found by the `where` argument doesn't exist, create a new ChangePassword with this data.
     **/
-    create: XOR<ChangePasswordUncheckedCreateInput, ChangePasswordCreateInput>
+    create: XOR<ChangePasswordCreateInput, ChangePasswordUncheckedCreateInput>
     /**
      * In case the ChangePassword was found with the provided `where` argument, update it with this data.
     **/
-    update: XOR<ChangePasswordUncheckedUpdateInput, ChangePasswordUpdateInput>
+    update: XOR<ChangePasswordUpdateInput, ChangePasswordUncheckedUpdateInput>
   }
 
 
@@ -3258,7 +3257,7 @@ export namespace Prisma {
     **/
     where?: CommunityBoardWhereInput
     /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
      * Determine the order of CommunityBoards to fetch.
     **/
@@ -3400,6 +3399,8 @@ export namespace Prisma {
 
     /**
      * Find the first CommunityBoard that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {CommunityBoardFindFirstArgs} args - Arguments to find a CommunityBoard
      * @example
      * // Get one CommunityBoard
@@ -3415,6 +3416,8 @@ export namespace Prisma {
 
     /**
      * Find zero or more CommunityBoards that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {CommunityBoardFindManyArgs=} args - Arguments to filter and select certain fields only.
      * @example
      * // Get all CommunityBoards
@@ -3429,7 +3432,7 @@ export namespace Prisma {
     **/
     findMany<T extends CommunityBoardFindManyArgs>(
       args?: SelectSubset<T, CommunityBoardFindManyArgs>
-    ): CheckSelect<T, Promise<Array<CommunityBoard>>, Promise<Array<CommunityBoardGetPayload<T>>>>
+    ): CheckSelect<T, PrismaPromise<Array<CommunityBoard>>, PrismaPromise<Array<CommunityBoardGetPayload<T>>>>
 
     /**
      * Create a CommunityBoard.
@@ -3496,10 +3499,12 @@ export namespace Prisma {
     **/
     deleteMany<T extends CommunityBoardDeleteManyArgs>(
       args?: SelectSubset<T, CommunityBoardDeleteManyArgs>
-    ): Promise<BatchPayload>
+    ): PrismaPromise<BatchPayload>
 
     /**
      * Update zero or more CommunityBoards.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {CommunityBoardUpdateManyArgs} args - Arguments to update one or more rows.
      * @example
      * // Update many CommunityBoards
@@ -3515,7 +3520,7 @@ export namespace Prisma {
     **/
     updateMany<T extends CommunityBoardUpdateManyArgs>(
       args: SelectSubset<T, CommunityBoardUpdateManyArgs>
-    ): Promise<BatchPayload>
+    ): PrismaPromise<BatchPayload>
 
     /**
      * Create or update one CommunityBoard.
@@ -3540,6 +3545,8 @@ export namespace Prisma {
 
     /**
      * Count the number of CommunityBoards.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {CommunityBoardCountArgs} args - Arguments to filter CommunityBoards to count.
      * @example
      * // Count the number of CommunityBoards
@@ -3551,8 +3558,8 @@ export namespace Prisma {
     **/
     count<T extends CommunityBoardCountArgs>(
       args?: Subset<T, CommunityBoardCountArgs>,
-    ): Promise<
-      T extends Record<'select', any>
+    ): PrismaPromise<
+      T extends _Record<'select', any>
         ? T['select'] extends true
           ? number
           : GetScalarType<T['select'], CommunityBoardCountAggregateOutputType>
@@ -3561,6 +3568,8 @@ export namespace Prisma {
 
     /**
      * Allows you to perform aggregations operations on a CommunityBoard.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {CommunityBoardAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
      * @example
      * // Ordered by age ascending
@@ -3581,7 +3590,7 @@ export namespace Prisma {
      *   take: 10,
      * })
     **/
-    aggregate<T extends CommunityBoardAggregateArgs>(args: Subset<T, CommunityBoardAggregateArgs>): Promise<GetCommunityBoardAggregateType<T>>
+    aggregate<T extends CommunityBoardAggregateArgs>(args: Subset<T, CommunityBoardAggregateArgs>): PrismaPromise<GetCommunityBoardAggregateType<T>>
 
 
   }
@@ -3592,7 +3601,8 @@ export namespace Prisma {
    * Because we want to prevent naming conflicts as mentioned in 
    * https://github.com/prisma/prisma-client-js/issues/707
    */
-  export class Prisma__CommunityBoardClient<T> implements Promise<T> {
+  export class Prisma__CommunityBoardClient<T> implements PrismaPromise<T> {
+    [prisma]: true;
     private readonly _dmmf;
     private readonly _fetcher;
     private readonly _queryType;
@@ -3610,9 +3620,9 @@ export namespace Prisma {
 
     user<T extends UserArgs = {}>(args?: Subset<T, UserArgs>): CheckSelect<T, Prisma__UserClient<User | null >, Prisma__UserClient<UserGetPayload<T> | null >>;
 
-    communityBoardPins<T extends CommunityBoardPinFindManyArgs = {}>(args?: Subset<T, CommunityBoardPinFindManyArgs>): CheckSelect<T, Promise<Array<CommunityBoardPin>>, Promise<Array<CommunityBoardPinGetPayload<T>>>>;
+    communityBoardPins<T extends CommunityBoardPinFindManyArgs = {}>(args?: Subset<T, CommunityBoardPinFindManyArgs>): CheckSelect<T, PrismaPromise<Array<CommunityBoardPin>>, PrismaPromise<Array<CommunityBoardPinGetPayload<T>>>>;
 
-    communityPosts<T extends CommunityPostFindManyArgs = {}>(args?: Subset<T, CommunityPostFindManyArgs>): CheckSelect<T, Promise<Array<CommunityPost>>, Promise<Array<CommunityPostGetPayload<T>>>>;
+    communityPosts<T extends CommunityPostFindManyArgs = {}>(args?: Subset<T, CommunityPostFindManyArgs>): CheckSelect<T, PrismaPromise<Array<CommunityPost>>, PrismaPromise<Array<CommunityPostGetPayload<T>>>>;
 
     private get _document();
     /**
@@ -3621,13 +3631,13 @@ export namespace Prisma {
      * @param onrejected The callback to execute when the Promise is rejected.
      * @returns A Promise for the completion of which ever callback is executed.
      */
-    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | Promise<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | Promise<TResult2>) | undefined | null): Promise<TResult1 | TResult2>;
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): Promise<TResult1 | TResult2>;
     /**
      * Attaches a callback for only the rejection of the Promise.
      * @param onrejected The callback to execute when the Promise is rejected.
      * @returns A Promise for the completion of the callback.
      */
-    catch<TResult = never>(onrejected?: ((reason: any) => TResult | Promise<TResult>) | undefined | null): Promise<T | TResult>;
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): Promise<T | TResult>;
     /**
      * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
      * resolved value cannot be modified from the callback.
@@ -3683,7 +3693,7 @@ export namespace Prisma {
     **/
     where?: CommunityBoardWhereInput
     /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
      * Determine the order of CommunityBoards to fetch.
     **/
@@ -3707,7 +3717,7 @@ export namespace Prisma {
     **/
     skip?: number
     /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
      * 
      * Filter by unique combinations of CommunityBoards.
     **/
@@ -3732,7 +3742,7 @@ export namespace Prisma {
     **/
     where?: CommunityBoardWhereInput
     /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
      * Determine the order of CommunityBoards to fetch.
     **/
@@ -3774,7 +3784,7 @@ export namespace Prisma {
     /**
      * The data needed to create a CommunityBoard.
     **/
-    data: XOR<CommunityBoardUncheckedCreateInput, CommunityBoardCreateInput>
+    data: XOR<CommunityBoardCreateInput, CommunityBoardUncheckedCreateInput>
   }
 
 
@@ -3793,7 +3803,7 @@ export namespace Prisma {
     /**
      * The data needed to update a CommunityBoard.
     **/
-    data: XOR<CommunityBoardUncheckedUpdateInput, CommunityBoardUpdateInput>
+    data: XOR<CommunityBoardUpdateInput, CommunityBoardUncheckedUpdateInput>
     /**
      * Choose, which CommunityBoard to update.
     **/
@@ -3805,7 +3815,7 @@ export namespace Prisma {
    * CommunityBoard updateMany
    */
   export type CommunityBoardUpdateManyArgs = {
-    data: XOR<CommunityBoardUncheckedUpdateManyInput, CommunityBoardUpdateManyMutationInput>
+    data: XOR<CommunityBoardUpdateManyMutationInput, CommunityBoardUncheckedUpdateManyInput>
     where?: CommunityBoardWhereInput
   }
 
@@ -3829,11 +3839,11 @@ export namespace Prisma {
     /**
      * In case the CommunityBoard found by the `where` argument doesn't exist, create a new CommunityBoard with this data.
     **/
-    create: XOR<CommunityBoardUncheckedCreateInput, CommunityBoardCreateInput>
+    create: XOR<CommunityBoardCreateInput, CommunityBoardUncheckedCreateInput>
     /**
      * In case the CommunityBoard was found with the provided `where` argument, update it with this data.
     **/
-    update: XOR<CommunityBoardUncheckedUpdateInput, CommunityBoardUpdateInput>
+    update: XOR<CommunityBoardUpdateInput, CommunityBoardUncheckedUpdateInput>
   }
 
 
@@ -3970,7 +3980,7 @@ export namespace Prisma {
     **/
     where?: CommunityBoardCandidateWhereInput
     /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
      * Determine the order of CommunityBoardCandidates to fetch.
     **/
@@ -4103,6 +4113,8 @@ export namespace Prisma {
 
     /**
      * Find the first CommunityBoardCandidate that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {CommunityBoardCandidateFindFirstArgs} args - Arguments to find a CommunityBoardCandidate
      * @example
      * // Get one CommunityBoardCandidate
@@ -4118,6 +4130,8 @@ export namespace Prisma {
 
     /**
      * Find zero or more CommunityBoardCandidates that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {CommunityBoardCandidateFindManyArgs=} args - Arguments to filter and select certain fields only.
      * @example
      * // Get all CommunityBoardCandidates
@@ -4132,7 +4146,7 @@ export namespace Prisma {
     **/
     findMany<T extends CommunityBoardCandidateFindManyArgs>(
       args?: SelectSubset<T, CommunityBoardCandidateFindManyArgs>
-    ): CheckSelect<T, Promise<Array<CommunityBoardCandidate>>, Promise<Array<CommunityBoardCandidateGetPayload<T>>>>
+    ): CheckSelect<T, PrismaPromise<Array<CommunityBoardCandidate>>, PrismaPromise<Array<CommunityBoardCandidateGetPayload<T>>>>
 
     /**
      * Create a CommunityBoardCandidate.
@@ -4199,10 +4213,12 @@ export namespace Prisma {
     **/
     deleteMany<T extends CommunityBoardCandidateDeleteManyArgs>(
       args?: SelectSubset<T, CommunityBoardCandidateDeleteManyArgs>
-    ): Promise<BatchPayload>
+    ): PrismaPromise<BatchPayload>
 
     /**
      * Update zero or more CommunityBoardCandidates.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {CommunityBoardCandidateUpdateManyArgs} args - Arguments to update one or more rows.
      * @example
      * // Update many CommunityBoardCandidates
@@ -4218,7 +4234,7 @@ export namespace Prisma {
     **/
     updateMany<T extends CommunityBoardCandidateUpdateManyArgs>(
       args: SelectSubset<T, CommunityBoardCandidateUpdateManyArgs>
-    ): Promise<BatchPayload>
+    ): PrismaPromise<BatchPayload>
 
     /**
      * Create or update one CommunityBoardCandidate.
@@ -4243,6 +4259,8 @@ export namespace Prisma {
 
     /**
      * Count the number of CommunityBoardCandidates.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {CommunityBoardCandidateCountArgs} args - Arguments to filter CommunityBoardCandidates to count.
      * @example
      * // Count the number of CommunityBoardCandidates
@@ -4254,8 +4272,8 @@ export namespace Prisma {
     **/
     count<T extends CommunityBoardCandidateCountArgs>(
       args?: Subset<T, CommunityBoardCandidateCountArgs>,
-    ): Promise<
-      T extends Record<'select', any>
+    ): PrismaPromise<
+      T extends _Record<'select', any>
         ? T['select'] extends true
           ? number
           : GetScalarType<T['select'], CommunityBoardCandidateCountAggregateOutputType>
@@ -4264,6 +4282,8 @@ export namespace Prisma {
 
     /**
      * Allows you to perform aggregations operations on a CommunityBoardCandidate.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {CommunityBoardCandidateAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
      * @example
      * // Ordered by age ascending
@@ -4284,7 +4304,7 @@ export namespace Prisma {
      *   take: 10,
      * })
     **/
-    aggregate<T extends CommunityBoardCandidateAggregateArgs>(args: Subset<T, CommunityBoardCandidateAggregateArgs>): Promise<GetCommunityBoardCandidateAggregateType<T>>
+    aggregate<T extends CommunityBoardCandidateAggregateArgs>(args: Subset<T, CommunityBoardCandidateAggregateArgs>): PrismaPromise<GetCommunityBoardCandidateAggregateType<T>>
 
 
   }
@@ -4295,7 +4315,8 @@ export namespace Prisma {
    * Because we want to prevent naming conflicts as mentioned in 
    * https://github.com/prisma/prisma-client-js/issues/707
    */
-  export class Prisma__CommunityBoardCandidateClient<T> implements Promise<T> {
+  export class Prisma__CommunityBoardCandidateClient<T> implements PrismaPromise<T> {
+    [prisma]: true;
     private readonly _dmmf;
     private readonly _fetcher;
     private readonly _queryType;
@@ -4313,7 +4334,7 @@ export namespace Prisma {
 
     user<T extends UserArgs = {}>(args?: Subset<T, UserArgs>): CheckSelect<T, Prisma__UserClient<User | null >, Prisma__UserClient<UserGetPayload<T> | null >>;
 
-    communityBoardCandidateVotes<T extends CommunityBoardCandidateVoteFindManyArgs = {}>(args?: Subset<T, CommunityBoardCandidateVoteFindManyArgs>): CheckSelect<T, Promise<Array<CommunityBoardCandidateVote>>, Promise<Array<CommunityBoardCandidateVoteGetPayload<T>>>>;
+    communityBoardCandidateVotes<T extends CommunityBoardCandidateVoteFindManyArgs = {}>(args?: Subset<T, CommunityBoardCandidateVoteFindManyArgs>): CheckSelect<T, PrismaPromise<Array<CommunityBoardCandidateVote>>, PrismaPromise<Array<CommunityBoardCandidateVoteGetPayload<T>>>>;
 
     private get _document();
     /**
@@ -4322,13 +4343,13 @@ export namespace Prisma {
      * @param onrejected The callback to execute when the Promise is rejected.
      * @returns A Promise for the completion of which ever callback is executed.
      */
-    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | Promise<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | Promise<TResult2>) | undefined | null): Promise<TResult1 | TResult2>;
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): Promise<TResult1 | TResult2>;
     /**
      * Attaches a callback for only the rejection of the Promise.
      * @param onrejected The callback to execute when the Promise is rejected.
      * @returns A Promise for the completion of the callback.
      */
-    catch<TResult = never>(onrejected?: ((reason: any) => TResult | Promise<TResult>) | undefined | null): Promise<T | TResult>;
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): Promise<T | TResult>;
     /**
      * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
      * resolved value cannot be modified from the callback.
@@ -4384,7 +4405,7 @@ export namespace Prisma {
     **/
     where?: CommunityBoardCandidateWhereInput
     /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
      * Determine the order of CommunityBoardCandidates to fetch.
     **/
@@ -4408,7 +4429,7 @@ export namespace Prisma {
     **/
     skip?: number
     /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
      * 
      * Filter by unique combinations of CommunityBoardCandidates.
     **/
@@ -4433,7 +4454,7 @@ export namespace Prisma {
     **/
     where?: CommunityBoardCandidateWhereInput
     /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
      * Determine the order of CommunityBoardCandidates to fetch.
     **/
@@ -4475,7 +4496,7 @@ export namespace Prisma {
     /**
      * The data needed to create a CommunityBoardCandidate.
     **/
-    data: XOR<CommunityBoardCandidateUncheckedCreateInput, CommunityBoardCandidateCreateInput>
+    data: XOR<CommunityBoardCandidateCreateInput, CommunityBoardCandidateUncheckedCreateInput>
   }
 
 
@@ -4494,7 +4515,7 @@ export namespace Prisma {
     /**
      * The data needed to update a CommunityBoardCandidate.
     **/
-    data: XOR<CommunityBoardCandidateUncheckedUpdateInput, CommunityBoardCandidateUpdateInput>
+    data: XOR<CommunityBoardCandidateUpdateInput, CommunityBoardCandidateUncheckedUpdateInput>
     /**
      * Choose, which CommunityBoardCandidate to update.
     **/
@@ -4506,7 +4527,7 @@ export namespace Prisma {
    * CommunityBoardCandidate updateMany
    */
   export type CommunityBoardCandidateUpdateManyArgs = {
-    data: XOR<CommunityBoardCandidateUncheckedUpdateManyInput, CommunityBoardCandidateUpdateManyMutationInput>
+    data: XOR<CommunityBoardCandidateUpdateManyMutationInput, CommunityBoardCandidateUncheckedUpdateManyInput>
     where?: CommunityBoardCandidateWhereInput
   }
 
@@ -4530,11 +4551,11 @@ export namespace Prisma {
     /**
      * In case the CommunityBoardCandidate found by the `where` argument doesn't exist, create a new CommunityBoardCandidate with this data.
     **/
-    create: XOR<CommunityBoardCandidateUncheckedCreateInput, CommunityBoardCandidateCreateInput>
+    create: XOR<CommunityBoardCandidateCreateInput, CommunityBoardCandidateUncheckedCreateInput>
     /**
      * In case the CommunityBoardCandidate was found with the provided `where` argument, update it with this data.
     **/
-    update: XOR<CommunityBoardCandidateUncheckedUpdateInput, CommunityBoardCandidateUpdateInput>
+    update: XOR<CommunityBoardCandidateUpdateInput, CommunityBoardCandidateUncheckedUpdateInput>
   }
 
 
@@ -4653,7 +4674,7 @@ export namespace Prisma {
     **/
     where?: CommunityBoardCandidateVoteWhereInput
     /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
      * Determine the order of CommunityBoardCandidateVotes to fetch.
     **/
@@ -4783,6 +4804,8 @@ export namespace Prisma {
 
     /**
      * Find the first CommunityBoardCandidateVote that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {CommunityBoardCandidateVoteFindFirstArgs} args - Arguments to find a CommunityBoardCandidateVote
      * @example
      * // Get one CommunityBoardCandidateVote
@@ -4798,6 +4821,8 @@ export namespace Prisma {
 
     /**
      * Find zero or more CommunityBoardCandidateVotes that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {CommunityBoardCandidateVoteFindManyArgs=} args - Arguments to filter and select certain fields only.
      * @example
      * // Get all CommunityBoardCandidateVotes
@@ -4812,7 +4837,7 @@ export namespace Prisma {
     **/
     findMany<T extends CommunityBoardCandidateVoteFindManyArgs>(
       args?: SelectSubset<T, CommunityBoardCandidateVoteFindManyArgs>
-    ): CheckSelect<T, Promise<Array<CommunityBoardCandidateVote>>, Promise<Array<CommunityBoardCandidateVoteGetPayload<T>>>>
+    ): CheckSelect<T, PrismaPromise<Array<CommunityBoardCandidateVote>>, PrismaPromise<Array<CommunityBoardCandidateVoteGetPayload<T>>>>
 
     /**
      * Create a CommunityBoardCandidateVote.
@@ -4879,10 +4904,12 @@ export namespace Prisma {
     **/
     deleteMany<T extends CommunityBoardCandidateVoteDeleteManyArgs>(
       args?: SelectSubset<T, CommunityBoardCandidateVoteDeleteManyArgs>
-    ): Promise<BatchPayload>
+    ): PrismaPromise<BatchPayload>
 
     /**
      * Update zero or more CommunityBoardCandidateVotes.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {CommunityBoardCandidateVoteUpdateManyArgs} args - Arguments to update one or more rows.
      * @example
      * // Update many CommunityBoardCandidateVotes
@@ -4898,7 +4925,7 @@ export namespace Prisma {
     **/
     updateMany<T extends CommunityBoardCandidateVoteUpdateManyArgs>(
       args: SelectSubset<T, CommunityBoardCandidateVoteUpdateManyArgs>
-    ): Promise<BatchPayload>
+    ): PrismaPromise<BatchPayload>
 
     /**
      * Create or update one CommunityBoardCandidateVote.
@@ -4923,6 +4950,8 @@ export namespace Prisma {
 
     /**
      * Count the number of CommunityBoardCandidateVotes.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {CommunityBoardCandidateVoteCountArgs} args - Arguments to filter CommunityBoardCandidateVotes to count.
      * @example
      * // Count the number of CommunityBoardCandidateVotes
@@ -4934,8 +4963,8 @@ export namespace Prisma {
     **/
     count<T extends CommunityBoardCandidateVoteCountArgs>(
       args?: Subset<T, CommunityBoardCandidateVoteCountArgs>,
-    ): Promise<
-      T extends Record<'select', any>
+    ): PrismaPromise<
+      T extends _Record<'select', any>
         ? T['select'] extends true
           ? number
           : GetScalarType<T['select'], CommunityBoardCandidateVoteCountAggregateOutputType>
@@ -4944,6 +4973,8 @@ export namespace Prisma {
 
     /**
      * Allows you to perform aggregations operations on a CommunityBoardCandidateVote.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {CommunityBoardCandidateVoteAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
      * @example
      * // Ordered by age ascending
@@ -4964,7 +4995,7 @@ export namespace Prisma {
      *   take: 10,
      * })
     **/
-    aggregate<T extends CommunityBoardCandidateVoteAggregateArgs>(args: Subset<T, CommunityBoardCandidateVoteAggregateArgs>): Promise<GetCommunityBoardCandidateVoteAggregateType<T>>
+    aggregate<T extends CommunityBoardCandidateVoteAggregateArgs>(args: Subset<T, CommunityBoardCandidateVoteAggregateArgs>): PrismaPromise<GetCommunityBoardCandidateVoteAggregateType<T>>
 
 
   }
@@ -4975,7 +5006,8 @@ export namespace Prisma {
    * Because we want to prevent naming conflicts as mentioned in 
    * https://github.com/prisma/prisma-client-js/issues/707
    */
-  export class Prisma__CommunityBoardCandidateVoteClient<T> implements Promise<T> {
+  export class Prisma__CommunityBoardCandidateVoteClient<T> implements PrismaPromise<T> {
+    [prisma]: true;
     private readonly _dmmf;
     private readonly _fetcher;
     private readonly _queryType;
@@ -5002,13 +5034,13 @@ export namespace Prisma {
      * @param onrejected The callback to execute when the Promise is rejected.
      * @returns A Promise for the completion of which ever callback is executed.
      */
-    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | Promise<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | Promise<TResult2>) | undefined | null): Promise<TResult1 | TResult2>;
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): Promise<TResult1 | TResult2>;
     /**
      * Attaches a callback for only the rejection of the Promise.
      * @param onrejected The callback to execute when the Promise is rejected.
      * @returns A Promise for the completion of the callback.
      */
-    catch<TResult = never>(onrejected?: ((reason: any) => TResult | Promise<TResult>) | undefined | null): Promise<T | TResult>;
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): Promise<T | TResult>;
     /**
      * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
      * resolved value cannot be modified from the callback.
@@ -5064,7 +5096,7 @@ export namespace Prisma {
     **/
     where?: CommunityBoardCandidateVoteWhereInput
     /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
      * Determine the order of CommunityBoardCandidateVotes to fetch.
     **/
@@ -5088,7 +5120,7 @@ export namespace Prisma {
     **/
     skip?: number
     /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
      * 
      * Filter by unique combinations of CommunityBoardCandidateVotes.
     **/
@@ -5113,7 +5145,7 @@ export namespace Prisma {
     **/
     where?: CommunityBoardCandidateVoteWhereInput
     /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
      * Determine the order of CommunityBoardCandidateVotes to fetch.
     **/
@@ -5155,7 +5187,7 @@ export namespace Prisma {
     /**
      * The data needed to create a CommunityBoardCandidateVote.
     **/
-    data: XOR<CommunityBoardCandidateVoteUncheckedCreateInput, CommunityBoardCandidateVoteCreateInput>
+    data: XOR<CommunityBoardCandidateVoteCreateInput, CommunityBoardCandidateVoteUncheckedCreateInput>
   }
 
 
@@ -5174,7 +5206,7 @@ export namespace Prisma {
     /**
      * The data needed to update a CommunityBoardCandidateVote.
     **/
-    data: XOR<CommunityBoardCandidateVoteUncheckedUpdateInput, CommunityBoardCandidateVoteUpdateInput>
+    data: XOR<CommunityBoardCandidateVoteUpdateInput, CommunityBoardCandidateVoteUncheckedUpdateInput>
     /**
      * Choose, which CommunityBoardCandidateVote to update.
     **/
@@ -5186,7 +5218,7 @@ export namespace Prisma {
    * CommunityBoardCandidateVote updateMany
    */
   export type CommunityBoardCandidateVoteUpdateManyArgs = {
-    data: XOR<CommunityBoardCandidateVoteUncheckedUpdateManyInput, CommunityBoardCandidateVoteUpdateManyMutationInput>
+    data: XOR<CommunityBoardCandidateVoteUpdateManyMutationInput, CommunityBoardCandidateVoteUncheckedUpdateManyInput>
     where?: CommunityBoardCandidateVoteWhereInput
   }
 
@@ -5210,11 +5242,11 @@ export namespace Prisma {
     /**
      * In case the CommunityBoardCandidateVote found by the `where` argument doesn't exist, create a new CommunityBoardCandidateVote with this data.
     **/
-    create: XOR<CommunityBoardCandidateVoteUncheckedCreateInput, CommunityBoardCandidateVoteCreateInput>
+    create: XOR<CommunityBoardCandidateVoteCreateInput, CommunityBoardCandidateVoteUncheckedCreateInput>
     /**
      * In case the CommunityBoardCandidateVote was found with the provided `where` argument, update it with this data.
     **/
-    update: XOR<CommunityBoardCandidateVoteUncheckedUpdateInput, CommunityBoardCandidateVoteUpdateInput>
+    update: XOR<CommunityBoardCandidateVoteUpdateInput, CommunityBoardCandidateVoteUncheckedUpdateInput>
   }
 
 
@@ -5333,7 +5365,7 @@ export namespace Prisma {
     **/
     where?: CommunityBoardPinWhereInput
     /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
      * Determine the order of CommunityBoardPins to fetch.
     **/
@@ -5463,6 +5495,8 @@ export namespace Prisma {
 
     /**
      * Find the first CommunityBoardPin that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {CommunityBoardPinFindFirstArgs} args - Arguments to find a CommunityBoardPin
      * @example
      * // Get one CommunityBoardPin
@@ -5478,6 +5512,8 @@ export namespace Prisma {
 
     /**
      * Find zero or more CommunityBoardPins that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {CommunityBoardPinFindManyArgs=} args - Arguments to filter and select certain fields only.
      * @example
      * // Get all CommunityBoardPins
@@ -5492,7 +5528,7 @@ export namespace Prisma {
     **/
     findMany<T extends CommunityBoardPinFindManyArgs>(
       args?: SelectSubset<T, CommunityBoardPinFindManyArgs>
-    ): CheckSelect<T, Promise<Array<CommunityBoardPin>>, Promise<Array<CommunityBoardPinGetPayload<T>>>>
+    ): CheckSelect<T, PrismaPromise<Array<CommunityBoardPin>>, PrismaPromise<Array<CommunityBoardPinGetPayload<T>>>>
 
     /**
      * Create a CommunityBoardPin.
@@ -5559,10 +5595,12 @@ export namespace Prisma {
     **/
     deleteMany<T extends CommunityBoardPinDeleteManyArgs>(
       args?: SelectSubset<T, CommunityBoardPinDeleteManyArgs>
-    ): Promise<BatchPayload>
+    ): PrismaPromise<BatchPayload>
 
     /**
      * Update zero or more CommunityBoardPins.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {CommunityBoardPinUpdateManyArgs} args - Arguments to update one or more rows.
      * @example
      * // Update many CommunityBoardPins
@@ -5578,7 +5616,7 @@ export namespace Prisma {
     **/
     updateMany<T extends CommunityBoardPinUpdateManyArgs>(
       args: SelectSubset<T, CommunityBoardPinUpdateManyArgs>
-    ): Promise<BatchPayload>
+    ): PrismaPromise<BatchPayload>
 
     /**
      * Create or update one CommunityBoardPin.
@@ -5603,6 +5641,8 @@ export namespace Prisma {
 
     /**
      * Count the number of CommunityBoardPins.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {CommunityBoardPinCountArgs} args - Arguments to filter CommunityBoardPins to count.
      * @example
      * // Count the number of CommunityBoardPins
@@ -5614,8 +5654,8 @@ export namespace Prisma {
     **/
     count<T extends CommunityBoardPinCountArgs>(
       args?: Subset<T, CommunityBoardPinCountArgs>,
-    ): Promise<
-      T extends Record<'select', any>
+    ): PrismaPromise<
+      T extends _Record<'select', any>
         ? T['select'] extends true
           ? number
           : GetScalarType<T['select'], CommunityBoardPinCountAggregateOutputType>
@@ -5624,6 +5664,8 @@ export namespace Prisma {
 
     /**
      * Allows you to perform aggregations operations on a CommunityBoardPin.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {CommunityBoardPinAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
      * @example
      * // Ordered by age ascending
@@ -5644,7 +5686,7 @@ export namespace Prisma {
      *   take: 10,
      * })
     **/
-    aggregate<T extends CommunityBoardPinAggregateArgs>(args: Subset<T, CommunityBoardPinAggregateArgs>): Promise<GetCommunityBoardPinAggregateType<T>>
+    aggregate<T extends CommunityBoardPinAggregateArgs>(args: Subset<T, CommunityBoardPinAggregateArgs>): PrismaPromise<GetCommunityBoardPinAggregateType<T>>
 
 
   }
@@ -5655,7 +5697,8 @@ export namespace Prisma {
    * Because we want to prevent naming conflicts as mentioned in 
    * https://github.com/prisma/prisma-client-js/issues/707
    */
-  export class Prisma__CommunityBoardPinClient<T> implements Promise<T> {
+  export class Prisma__CommunityBoardPinClient<T> implements PrismaPromise<T> {
+    [prisma]: true;
     private readonly _dmmf;
     private readonly _fetcher;
     private readonly _queryType;
@@ -5682,13 +5725,13 @@ export namespace Prisma {
      * @param onrejected The callback to execute when the Promise is rejected.
      * @returns A Promise for the completion of which ever callback is executed.
      */
-    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | Promise<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | Promise<TResult2>) | undefined | null): Promise<TResult1 | TResult2>;
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): Promise<TResult1 | TResult2>;
     /**
      * Attaches a callback for only the rejection of the Promise.
      * @param onrejected The callback to execute when the Promise is rejected.
      * @returns A Promise for the completion of the callback.
      */
-    catch<TResult = never>(onrejected?: ((reason: any) => TResult | Promise<TResult>) | undefined | null): Promise<T | TResult>;
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): Promise<T | TResult>;
     /**
      * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
      * resolved value cannot be modified from the callback.
@@ -5744,7 +5787,7 @@ export namespace Prisma {
     **/
     where?: CommunityBoardPinWhereInput
     /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
      * Determine the order of CommunityBoardPins to fetch.
     **/
@@ -5768,7 +5811,7 @@ export namespace Prisma {
     **/
     skip?: number
     /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
      * 
      * Filter by unique combinations of CommunityBoardPins.
     **/
@@ -5793,7 +5836,7 @@ export namespace Prisma {
     **/
     where?: CommunityBoardPinWhereInput
     /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
      * Determine the order of CommunityBoardPins to fetch.
     **/
@@ -5835,7 +5878,7 @@ export namespace Prisma {
     /**
      * The data needed to create a CommunityBoardPin.
     **/
-    data: XOR<CommunityBoardPinUncheckedCreateInput, CommunityBoardPinCreateInput>
+    data: XOR<CommunityBoardPinCreateInput, CommunityBoardPinUncheckedCreateInput>
   }
 
 
@@ -5854,7 +5897,7 @@ export namespace Prisma {
     /**
      * The data needed to update a CommunityBoardPin.
     **/
-    data: XOR<CommunityBoardPinUncheckedUpdateInput, CommunityBoardPinUpdateInput>
+    data: XOR<CommunityBoardPinUpdateInput, CommunityBoardPinUncheckedUpdateInput>
     /**
      * Choose, which CommunityBoardPin to update.
     **/
@@ -5866,7 +5909,7 @@ export namespace Prisma {
    * CommunityBoardPin updateMany
    */
   export type CommunityBoardPinUpdateManyArgs = {
-    data: XOR<CommunityBoardPinUncheckedUpdateManyInput, CommunityBoardPinUpdateManyMutationInput>
+    data: XOR<CommunityBoardPinUpdateManyMutationInput, CommunityBoardPinUncheckedUpdateManyInput>
     where?: CommunityBoardPinWhereInput
   }
 
@@ -5890,11 +5933,11 @@ export namespace Prisma {
     /**
      * In case the CommunityBoardPin found by the `where` argument doesn't exist, create a new CommunityBoardPin with this data.
     **/
-    create: XOR<CommunityBoardPinUncheckedCreateInput, CommunityBoardPinCreateInput>
+    create: XOR<CommunityBoardPinCreateInput, CommunityBoardPinUncheckedCreateInput>
     /**
      * In case the CommunityBoardPin was found with the provided `where` argument, update it with this data.
     **/
-    update: XOR<CommunityBoardPinUncheckedUpdateInput, CommunityBoardPinUpdateInput>
+    update: XOR<CommunityBoardPinUpdateInput, CommunityBoardPinUncheckedUpdateInput>
   }
 
 
@@ -6047,7 +6090,7 @@ export namespace Prisma {
     **/
     where?: CommunityCommentWhereInput
     /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
      * Determine the order of CommunityComments to fetch.
     **/
@@ -6194,6 +6237,8 @@ export namespace Prisma {
 
     /**
      * Find the first CommunityComment that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {CommunityCommentFindFirstArgs} args - Arguments to find a CommunityComment
      * @example
      * // Get one CommunityComment
@@ -6209,6 +6254,8 @@ export namespace Prisma {
 
     /**
      * Find zero or more CommunityComments that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {CommunityCommentFindManyArgs=} args - Arguments to filter and select certain fields only.
      * @example
      * // Get all CommunityComments
@@ -6223,7 +6270,7 @@ export namespace Prisma {
     **/
     findMany<T extends CommunityCommentFindManyArgs>(
       args?: SelectSubset<T, CommunityCommentFindManyArgs>
-    ): CheckSelect<T, Promise<Array<CommunityComment>>, Promise<Array<CommunityCommentGetPayload<T>>>>
+    ): CheckSelect<T, PrismaPromise<Array<CommunityComment>>, PrismaPromise<Array<CommunityCommentGetPayload<T>>>>
 
     /**
      * Create a CommunityComment.
@@ -6290,10 +6337,12 @@ export namespace Prisma {
     **/
     deleteMany<T extends CommunityCommentDeleteManyArgs>(
       args?: SelectSubset<T, CommunityCommentDeleteManyArgs>
-    ): Promise<BatchPayload>
+    ): PrismaPromise<BatchPayload>
 
     /**
      * Update zero or more CommunityComments.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {CommunityCommentUpdateManyArgs} args - Arguments to update one or more rows.
      * @example
      * // Update many CommunityComments
@@ -6309,7 +6358,7 @@ export namespace Prisma {
     **/
     updateMany<T extends CommunityCommentUpdateManyArgs>(
       args: SelectSubset<T, CommunityCommentUpdateManyArgs>
-    ): Promise<BatchPayload>
+    ): PrismaPromise<BatchPayload>
 
     /**
      * Create or update one CommunityComment.
@@ -6334,6 +6383,8 @@ export namespace Prisma {
 
     /**
      * Count the number of CommunityComments.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {CommunityCommentCountArgs} args - Arguments to filter CommunityComments to count.
      * @example
      * // Count the number of CommunityComments
@@ -6345,8 +6396,8 @@ export namespace Prisma {
     **/
     count<T extends CommunityCommentCountArgs>(
       args?: Subset<T, CommunityCommentCountArgs>,
-    ): Promise<
-      T extends Record<'select', any>
+    ): PrismaPromise<
+      T extends _Record<'select', any>
         ? T['select'] extends true
           ? number
           : GetScalarType<T['select'], CommunityCommentCountAggregateOutputType>
@@ -6355,6 +6406,8 @@ export namespace Prisma {
 
     /**
      * Allows you to perform aggregations operations on a CommunityComment.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {CommunityCommentAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
      * @example
      * // Ordered by age ascending
@@ -6375,7 +6428,7 @@ export namespace Prisma {
      *   take: 10,
      * })
     **/
-    aggregate<T extends CommunityCommentAggregateArgs>(args: Subset<T, CommunityCommentAggregateArgs>): Promise<GetCommunityCommentAggregateType<T>>
+    aggregate<T extends CommunityCommentAggregateArgs>(args: Subset<T, CommunityCommentAggregateArgs>): PrismaPromise<GetCommunityCommentAggregateType<T>>
 
 
   }
@@ -6386,7 +6439,8 @@ export namespace Prisma {
    * Because we want to prevent naming conflicts as mentioned in 
    * https://github.com/prisma/prisma-client-js/issues/707
    */
-  export class Prisma__CommunityCommentClient<T> implements Promise<T> {
+  export class Prisma__CommunityCommentClient<T> implements PrismaPromise<T> {
+    [prisma]: true;
     private readonly _dmmf;
     private readonly _fetcher;
     private readonly _queryType;
@@ -6406,9 +6460,9 @@ export namespace Prisma {
 
     user<T extends UserArgs = {}>(args?: Subset<T, UserArgs>): CheckSelect<T, Prisma__UserClient<User | null >, Prisma__UserClient<UserGetPayload<T> | null >>;
 
-    communitySubcomments<T extends CommunitySubcommentFindManyArgs = {}>(args?: Subset<T, CommunitySubcommentFindManyArgs>): CheckSelect<T, Promise<Array<CommunitySubcomment>>, Promise<Array<CommunitySubcommentGetPayload<T>>>>;
+    communitySubcomments<T extends CommunitySubcommentFindManyArgs = {}>(args?: Subset<T, CommunitySubcommentFindManyArgs>): CheckSelect<T, PrismaPromise<Array<CommunitySubcomment>>, PrismaPromise<Array<CommunitySubcommentGetPayload<T>>>>;
 
-    reportComments<T extends ReportCommentFindManyArgs = {}>(args?: Subset<T, ReportCommentFindManyArgs>): CheckSelect<T, Promise<Array<ReportComment>>, Promise<Array<ReportCommentGetPayload<T>>>>;
+    reportComments<T extends ReportCommentFindManyArgs = {}>(args?: Subset<T, ReportCommentFindManyArgs>): CheckSelect<T, PrismaPromise<Array<ReportComment>>, PrismaPromise<Array<ReportCommentGetPayload<T>>>>;
 
     private get _document();
     /**
@@ -6417,13 +6471,13 @@ export namespace Prisma {
      * @param onrejected The callback to execute when the Promise is rejected.
      * @returns A Promise for the completion of which ever callback is executed.
      */
-    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | Promise<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | Promise<TResult2>) | undefined | null): Promise<TResult1 | TResult2>;
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): Promise<TResult1 | TResult2>;
     /**
      * Attaches a callback for only the rejection of the Promise.
      * @param onrejected The callback to execute when the Promise is rejected.
      * @returns A Promise for the completion of the callback.
      */
-    catch<TResult = never>(onrejected?: ((reason: any) => TResult | Promise<TResult>) | undefined | null): Promise<T | TResult>;
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): Promise<T | TResult>;
     /**
      * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
      * resolved value cannot be modified from the callback.
@@ -6479,7 +6533,7 @@ export namespace Prisma {
     **/
     where?: CommunityCommentWhereInput
     /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
      * Determine the order of CommunityComments to fetch.
     **/
@@ -6503,7 +6557,7 @@ export namespace Prisma {
     **/
     skip?: number
     /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
      * 
      * Filter by unique combinations of CommunityComments.
     **/
@@ -6528,7 +6582,7 @@ export namespace Prisma {
     **/
     where?: CommunityCommentWhereInput
     /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
      * Determine the order of CommunityComments to fetch.
     **/
@@ -6570,7 +6624,7 @@ export namespace Prisma {
     /**
      * The data needed to create a CommunityComment.
     **/
-    data: XOR<CommunityCommentUncheckedCreateInput, CommunityCommentCreateInput>
+    data: XOR<CommunityCommentCreateInput, CommunityCommentUncheckedCreateInput>
   }
 
 
@@ -6589,7 +6643,7 @@ export namespace Prisma {
     /**
      * The data needed to update a CommunityComment.
     **/
-    data: XOR<CommunityCommentUncheckedUpdateInput, CommunityCommentUpdateInput>
+    data: XOR<CommunityCommentUpdateInput, CommunityCommentUncheckedUpdateInput>
     /**
      * Choose, which CommunityComment to update.
     **/
@@ -6601,7 +6655,7 @@ export namespace Prisma {
    * CommunityComment updateMany
    */
   export type CommunityCommentUpdateManyArgs = {
-    data: XOR<CommunityCommentUncheckedUpdateManyInput, CommunityCommentUpdateManyMutationInput>
+    data: XOR<CommunityCommentUpdateManyMutationInput, CommunityCommentUncheckedUpdateManyInput>
     where?: CommunityCommentWhereInput
   }
 
@@ -6625,11 +6679,11 @@ export namespace Prisma {
     /**
      * In case the CommunityComment found by the `where` argument doesn't exist, create a new CommunityComment with this data.
     **/
-    create: XOR<CommunityCommentUncheckedCreateInput, CommunityCommentCreateInput>
+    create: XOR<CommunityCommentCreateInput, CommunityCommentUncheckedCreateInput>
     /**
      * In case the CommunityComment was found with the provided `where` argument, update it with this data.
     **/
-    update: XOR<CommunityCommentUncheckedUpdateInput, CommunityCommentUpdateInput>
+    update: XOR<CommunityCommentUpdateInput, CommunityCommentUncheckedUpdateInput>
   }
 
 
@@ -6824,7 +6878,7 @@ export namespace Prisma {
     **/
     where?: CommunityPostWhereInput
     /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
      * Determine the order of CommunityPosts to fetch.
     **/
@@ -6994,6 +7048,8 @@ export namespace Prisma {
 
     /**
      * Find the first CommunityPost that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {CommunityPostFindFirstArgs} args - Arguments to find a CommunityPost
      * @example
      * // Get one CommunityPost
@@ -7009,6 +7065,8 @@ export namespace Prisma {
 
     /**
      * Find zero or more CommunityPosts that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {CommunityPostFindManyArgs=} args - Arguments to filter and select certain fields only.
      * @example
      * // Get all CommunityPosts
@@ -7023,7 +7081,7 @@ export namespace Prisma {
     **/
     findMany<T extends CommunityPostFindManyArgs>(
       args?: SelectSubset<T, CommunityPostFindManyArgs>
-    ): CheckSelect<T, Promise<Array<CommunityPost>>, Promise<Array<CommunityPostGetPayload<T>>>>
+    ): CheckSelect<T, PrismaPromise<Array<CommunityPost>>, PrismaPromise<Array<CommunityPostGetPayload<T>>>>
 
     /**
      * Create a CommunityPost.
@@ -7090,10 +7148,12 @@ export namespace Prisma {
     **/
     deleteMany<T extends CommunityPostDeleteManyArgs>(
       args?: SelectSubset<T, CommunityPostDeleteManyArgs>
-    ): Promise<BatchPayload>
+    ): PrismaPromise<BatchPayload>
 
     /**
      * Update zero or more CommunityPosts.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {CommunityPostUpdateManyArgs} args - Arguments to update one or more rows.
      * @example
      * // Update many CommunityPosts
@@ -7109,7 +7169,7 @@ export namespace Prisma {
     **/
     updateMany<T extends CommunityPostUpdateManyArgs>(
       args: SelectSubset<T, CommunityPostUpdateManyArgs>
-    ): Promise<BatchPayload>
+    ): PrismaPromise<BatchPayload>
 
     /**
      * Create or update one CommunityPost.
@@ -7134,6 +7194,8 @@ export namespace Prisma {
 
     /**
      * Count the number of CommunityPosts.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {CommunityPostCountArgs} args - Arguments to filter CommunityPosts to count.
      * @example
      * // Count the number of CommunityPosts
@@ -7145,8 +7207,8 @@ export namespace Prisma {
     **/
     count<T extends CommunityPostCountArgs>(
       args?: Subset<T, CommunityPostCountArgs>,
-    ): Promise<
-      T extends Record<'select', any>
+    ): PrismaPromise<
+      T extends _Record<'select', any>
         ? T['select'] extends true
           ? number
           : GetScalarType<T['select'], CommunityPostCountAggregateOutputType>
@@ -7155,6 +7217,8 @@ export namespace Prisma {
 
     /**
      * Allows you to perform aggregations operations on a CommunityPost.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {CommunityPostAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
      * @example
      * // Ordered by age ascending
@@ -7175,7 +7239,7 @@ export namespace Prisma {
      *   take: 10,
      * })
     **/
-    aggregate<T extends CommunityPostAggregateArgs>(args: Subset<T, CommunityPostAggregateArgs>): Promise<GetCommunityPostAggregateType<T>>
+    aggregate<T extends CommunityPostAggregateArgs>(args: Subset<T, CommunityPostAggregateArgs>): PrismaPromise<GetCommunityPostAggregateType<T>>
 
 
   }
@@ -7186,7 +7250,8 @@ export namespace Prisma {
    * Because we want to prevent naming conflicts as mentioned in 
    * https://github.com/prisma/prisma-client-js/issues/707
    */
-  export class Prisma__CommunityPostClient<T> implements Promise<T> {
+  export class Prisma__CommunityPostClient<T> implements PrismaPromise<T> {
+    [prisma]: true;
     private readonly _dmmf;
     private readonly _fetcher;
     private readonly _queryType;
@@ -7206,15 +7271,15 @@ export namespace Prisma {
 
     user<T extends UserArgs = {}>(args?: Subset<T, UserArgs>): CheckSelect<T, Prisma__UserClient<User | null >, Prisma__UserClient<UserGetPayload<T> | null >>;
 
-    communityComments<T extends CommunityCommentFindManyArgs = {}>(args?: Subset<T, CommunityCommentFindManyArgs>): CheckSelect<T, Promise<Array<CommunityComment>>, Promise<Array<CommunityCommentGetPayload<T>>>>;
+    communityComments<T extends CommunityCommentFindManyArgs = {}>(args?: Subset<T, CommunityCommentFindManyArgs>): CheckSelect<T, PrismaPromise<Array<CommunityComment>>, PrismaPromise<Array<CommunityCommentGetPayload<T>>>>;
 
-    communityPostBookmarks<T extends CommunityPostBookmarkFindManyArgs = {}>(args?: Subset<T, CommunityPostBookmarkFindManyArgs>): CheckSelect<T, Promise<Array<CommunityPostBookmark>>, Promise<Array<CommunityPostBookmarkGetPayload<T>>>>;
+    communityPostBookmarks<T extends CommunityPostBookmarkFindManyArgs = {}>(args?: Subset<T, CommunityPostBookmarkFindManyArgs>): CheckSelect<T, PrismaPromise<Array<CommunityPostBookmark>>, PrismaPromise<Array<CommunityPostBookmarkGetPayload<T>>>>;
 
-    communityPostLikes<T extends CommunityPostLikeFindManyArgs = {}>(args?: Subset<T, CommunityPostLikeFindManyArgs>): CheckSelect<T, Promise<Array<CommunityPostLike>>, Promise<Array<CommunityPostLikeGetPayload<T>>>>;
+    communityPostLikes<T extends CommunityPostLikeFindManyArgs = {}>(args?: Subset<T, CommunityPostLikeFindManyArgs>): CheckSelect<T, PrismaPromise<Array<CommunityPostLike>>, PrismaPromise<Array<CommunityPostLikeGetPayload<T>>>>;
 
-    communitySubcomments<T extends CommunitySubcommentFindManyArgs = {}>(args?: Subset<T, CommunitySubcommentFindManyArgs>): CheckSelect<T, Promise<Array<CommunitySubcomment>>, Promise<Array<CommunitySubcommentGetPayload<T>>>>;
+    communitySubcomments<T extends CommunitySubcommentFindManyArgs = {}>(args?: Subset<T, CommunitySubcommentFindManyArgs>): CheckSelect<T, PrismaPromise<Array<CommunitySubcomment>>, PrismaPromise<Array<CommunitySubcommentGetPayload<T>>>>;
 
-    reportPosts<T extends ReportPostFindManyArgs = {}>(args?: Subset<T, ReportPostFindManyArgs>): CheckSelect<T, Promise<Array<ReportPost>>, Promise<Array<ReportPostGetPayload<T>>>>;
+    reportPosts<T extends ReportPostFindManyArgs = {}>(args?: Subset<T, ReportPostFindManyArgs>): CheckSelect<T, PrismaPromise<Array<ReportPost>>, PrismaPromise<Array<ReportPostGetPayload<T>>>>;
 
     private get _document();
     /**
@@ -7223,13 +7288,13 @@ export namespace Prisma {
      * @param onrejected The callback to execute when the Promise is rejected.
      * @returns A Promise for the completion of which ever callback is executed.
      */
-    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | Promise<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | Promise<TResult2>) | undefined | null): Promise<TResult1 | TResult2>;
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): Promise<TResult1 | TResult2>;
     /**
      * Attaches a callback for only the rejection of the Promise.
      * @param onrejected The callback to execute when the Promise is rejected.
      * @returns A Promise for the completion of the callback.
      */
-    catch<TResult = never>(onrejected?: ((reason: any) => TResult | Promise<TResult>) | undefined | null): Promise<T | TResult>;
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): Promise<T | TResult>;
     /**
      * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
      * resolved value cannot be modified from the callback.
@@ -7285,7 +7350,7 @@ export namespace Prisma {
     **/
     where?: CommunityPostWhereInput
     /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
      * Determine the order of CommunityPosts to fetch.
     **/
@@ -7309,7 +7374,7 @@ export namespace Prisma {
     **/
     skip?: number
     /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
      * 
      * Filter by unique combinations of CommunityPosts.
     **/
@@ -7334,7 +7399,7 @@ export namespace Prisma {
     **/
     where?: CommunityPostWhereInput
     /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
      * Determine the order of CommunityPosts to fetch.
     **/
@@ -7376,7 +7441,7 @@ export namespace Prisma {
     /**
      * The data needed to create a CommunityPost.
     **/
-    data: XOR<CommunityPostUncheckedCreateInput, CommunityPostCreateInput>
+    data: XOR<CommunityPostCreateInput, CommunityPostUncheckedCreateInput>
   }
 
 
@@ -7395,7 +7460,7 @@ export namespace Prisma {
     /**
      * The data needed to update a CommunityPost.
     **/
-    data: XOR<CommunityPostUncheckedUpdateInput, CommunityPostUpdateInput>
+    data: XOR<CommunityPostUpdateInput, CommunityPostUncheckedUpdateInput>
     /**
      * Choose, which CommunityPost to update.
     **/
@@ -7407,7 +7472,7 @@ export namespace Prisma {
    * CommunityPost updateMany
    */
   export type CommunityPostUpdateManyArgs = {
-    data: XOR<CommunityPostUncheckedUpdateManyInput, CommunityPostUpdateManyMutationInput>
+    data: XOR<CommunityPostUpdateManyMutationInput, CommunityPostUncheckedUpdateManyInput>
     where?: CommunityPostWhereInput
   }
 
@@ -7431,11 +7496,11 @@ export namespace Prisma {
     /**
      * In case the CommunityPost found by the `where` argument doesn't exist, create a new CommunityPost with this data.
     **/
-    create: XOR<CommunityPostUncheckedCreateInput, CommunityPostCreateInput>
+    create: XOR<CommunityPostCreateInput, CommunityPostUncheckedCreateInput>
     /**
      * In case the CommunityPost was found with the provided `where` argument, update it with this data.
     **/
-    update: XOR<CommunityPostUncheckedUpdateInput, CommunityPostUpdateInput>
+    update: XOR<CommunityPostUpdateInput, CommunityPostUncheckedUpdateInput>
   }
 
 
@@ -7554,7 +7619,7 @@ export namespace Prisma {
     **/
     where?: CommunityPostBookmarkWhereInput
     /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
      * Determine the order of CommunityPostBookmarks to fetch.
     **/
@@ -7684,6 +7749,8 @@ export namespace Prisma {
 
     /**
      * Find the first CommunityPostBookmark that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {CommunityPostBookmarkFindFirstArgs} args - Arguments to find a CommunityPostBookmark
      * @example
      * // Get one CommunityPostBookmark
@@ -7699,6 +7766,8 @@ export namespace Prisma {
 
     /**
      * Find zero or more CommunityPostBookmarks that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {CommunityPostBookmarkFindManyArgs=} args - Arguments to filter and select certain fields only.
      * @example
      * // Get all CommunityPostBookmarks
@@ -7713,7 +7782,7 @@ export namespace Prisma {
     **/
     findMany<T extends CommunityPostBookmarkFindManyArgs>(
       args?: SelectSubset<T, CommunityPostBookmarkFindManyArgs>
-    ): CheckSelect<T, Promise<Array<CommunityPostBookmark>>, Promise<Array<CommunityPostBookmarkGetPayload<T>>>>
+    ): CheckSelect<T, PrismaPromise<Array<CommunityPostBookmark>>, PrismaPromise<Array<CommunityPostBookmarkGetPayload<T>>>>
 
     /**
      * Create a CommunityPostBookmark.
@@ -7780,10 +7849,12 @@ export namespace Prisma {
     **/
     deleteMany<T extends CommunityPostBookmarkDeleteManyArgs>(
       args?: SelectSubset<T, CommunityPostBookmarkDeleteManyArgs>
-    ): Promise<BatchPayload>
+    ): PrismaPromise<BatchPayload>
 
     /**
      * Update zero or more CommunityPostBookmarks.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {CommunityPostBookmarkUpdateManyArgs} args - Arguments to update one or more rows.
      * @example
      * // Update many CommunityPostBookmarks
@@ -7799,7 +7870,7 @@ export namespace Prisma {
     **/
     updateMany<T extends CommunityPostBookmarkUpdateManyArgs>(
       args: SelectSubset<T, CommunityPostBookmarkUpdateManyArgs>
-    ): Promise<BatchPayload>
+    ): PrismaPromise<BatchPayload>
 
     /**
      * Create or update one CommunityPostBookmark.
@@ -7824,6 +7895,8 @@ export namespace Prisma {
 
     /**
      * Count the number of CommunityPostBookmarks.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {CommunityPostBookmarkCountArgs} args - Arguments to filter CommunityPostBookmarks to count.
      * @example
      * // Count the number of CommunityPostBookmarks
@@ -7835,8 +7908,8 @@ export namespace Prisma {
     **/
     count<T extends CommunityPostBookmarkCountArgs>(
       args?: Subset<T, CommunityPostBookmarkCountArgs>,
-    ): Promise<
-      T extends Record<'select', any>
+    ): PrismaPromise<
+      T extends _Record<'select', any>
         ? T['select'] extends true
           ? number
           : GetScalarType<T['select'], CommunityPostBookmarkCountAggregateOutputType>
@@ -7845,6 +7918,8 @@ export namespace Prisma {
 
     /**
      * Allows you to perform aggregations operations on a CommunityPostBookmark.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {CommunityPostBookmarkAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
      * @example
      * // Ordered by age ascending
@@ -7865,7 +7940,7 @@ export namespace Prisma {
      *   take: 10,
      * })
     **/
-    aggregate<T extends CommunityPostBookmarkAggregateArgs>(args: Subset<T, CommunityPostBookmarkAggregateArgs>): Promise<GetCommunityPostBookmarkAggregateType<T>>
+    aggregate<T extends CommunityPostBookmarkAggregateArgs>(args: Subset<T, CommunityPostBookmarkAggregateArgs>): PrismaPromise<GetCommunityPostBookmarkAggregateType<T>>
 
 
   }
@@ -7876,7 +7951,8 @@ export namespace Prisma {
    * Because we want to prevent naming conflicts as mentioned in 
    * https://github.com/prisma/prisma-client-js/issues/707
    */
-  export class Prisma__CommunityPostBookmarkClient<T> implements Promise<T> {
+  export class Prisma__CommunityPostBookmarkClient<T> implements PrismaPromise<T> {
+    [prisma]: true;
     private readonly _dmmf;
     private readonly _fetcher;
     private readonly _queryType;
@@ -7903,13 +7979,13 @@ export namespace Prisma {
      * @param onrejected The callback to execute when the Promise is rejected.
      * @returns A Promise for the completion of which ever callback is executed.
      */
-    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | Promise<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | Promise<TResult2>) | undefined | null): Promise<TResult1 | TResult2>;
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): Promise<TResult1 | TResult2>;
     /**
      * Attaches a callback for only the rejection of the Promise.
      * @param onrejected The callback to execute when the Promise is rejected.
      * @returns A Promise for the completion of the callback.
      */
-    catch<TResult = never>(onrejected?: ((reason: any) => TResult | Promise<TResult>) | undefined | null): Promise<T | TResult>;
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): Promise<T | TResult>;
     /**
      * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
      * resolved value cannot be modified from the callback.
@@ -7965,7 +8041,7 @@ export namespace Prisma {
     **/
     where?: CommunityPostBookmarkWhereInput
     /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
      * Determine the order of CommunityPostBookmarks to fetch.
     **/
@@ -7989,7 +8065,7 @@ export namespace Prisma {
     **/
     skip?: number
     /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
      * 
      * Filter by unique combinations of CommunityPostBookmarks.
     **/
@@ -8014,7 +8090,7 @@ export namespace Prisma {
     **/
     where?: CommunityPostBookmarkWhereInput
     /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
      * Determine the order of CommunityPostBookmarks to fetch.
     **/
@@ -8056,7 +8132,7 @@ export namespace Prisma {
     /**
      * The data needed to create a CommunityPostBookmark.
     **/
-    data: XOR<CommunityPostBookmarkUncheckedCreateInput, CommunityPostBookmarkCreateInput>
+    data: XOR<CommunityPostBookmarkCreateInput, CommunityPostBookmarkUncheckedCreateInput>
   }
 
 
@@ -8075,7 +8151,7 @@ export namespace Prisma {
     /**
      * The data needed to update a CommunityPostBookmark.
     **/
-    data: XOR<CommunityPostBookmarkUncheckedUpdateInput, CommunityPostBookmarkUpdateInput>
+    data: XOR<CommunityPostBookmarkUpdateInput, CommunityPostBookmarkUncheckedUpdateInput>
     /**
      * Choose, which CommunityPostBookmark to update.
     **/
@@ -8087,7 +8163,7 @@ export namespace Prisma {
    * CommunityPostBookmark updateMany
    */
   export type CommunityPostBookmarkUpdateManyArgs = {
-    data: XOR<CommunityPostBookmarkUncheckedUpdateManyInput, CommunityPostBookmarkUpdateManyMutationInput>
+    data: XOR<CommunityPostBookmarkUpdateManyMutationInput, CommunityPostBookmarkUncheckedUpdateManyInput>
     where?: CommunityPostBookmarkWhereInput
   }
 
@@ -8111,11 +8187,11 @@ export namespace Prisma {
     /**
      * In case the CommunityPostBookmark found by the `where` argument doesn't exist, create a new CommunityPostBookmark with this data.
     **/
-    create: XOR<CommunityPostBookmarkUncheckedCreateInput, CommunityPostBookmarkCreateInput>
+    create: XOR<CommunityPostBookmarkCreateInput, CommunityPostBookmarkUncheckedCreateInput>
     /**
      * In case the CommunityPostBookmark was found with the provided `where` argument, update it with this data.
     **/
-    update: XOR<CommunityPostBookmarkUncheckedUpdateInput, CommunityPostBookmarkUpdateInput>
+    update: XOR<CommunityPostBookmarkUpdateInput, CommunityPostBookmarkUncheckedUpdateInput>
   }
 
 
@@ -8234,7 +8310,7 @@ export namespace Prisma {
     **/
     where?: CommunityPostLikeWhereInput
     /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
      * Determine the order of CommunityPostLikes to fetch.
     **/
@@ -8364,6 +8440,8 @@ export namespace Prisma {
 
     /**
      * Find the first CommunityPostLike that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {CommunityPostLikeFindFirstArgs} args - Arguments to find a CommunityPostLike
      * @example
      * // Get one CommunityPostLike
@@ -8379,6 +8457,8 @@ export namespace Prisma {
 
     /**
      * Find zero or more CommunityPostLikes that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {CommunityPostLikeFindManyArgs=} args - Arguments to filter and select certain fields only.
      * @example
      * // Get all CommunityPostLikes
@@ -8393,7 +8473,7 @@ export namespace Prisma {
     **/
     findMany<T extends CommunityPostLikeFindManyArgs>(
       args?: SelectSubset<T, CommunityPostLikeFindManyArgs>
-    ): CheckSelect<T, Promise<Array<CommunityPostLike>>, Promise<Array<CommunityPostLikeGetPayload<T>>>>
+    ): CheckSelect<T, PrismaPromise<Array<CommunityPostLike>>, PrismaPromise<Array<CommunityPostLikeGetPayload<T>>>>
 
     /**
      * Create a CommunityPostLike.
@@ -8460,10 +8540,12 @@ export namespace Prisma {
     **/
     deleteMany<T extends CommunityPostLikeDeleteManyArgs>(
       args?: SelectSubset<T, CommunityPostLikeDeleteManyArgs>
-    ): Promise<BatchPayload>
+    ): PrismaPromise<BatchPayload>
 
     /**
      * Update zero or more CommunityPostLikes.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {CommunityPostLikeUpdateManyArgs} args - Arguments to update one or more rows.
      * @example
      * // Update many CommunityPostLikes
@@ -8479,7 +8561,7 @@ export namespace Prisma {
     **/
     updateMany<T extends CommunityPostLikeUpdateManyArgs>(
       args: SelectSubset<T, CommunityPostLikeUpdateManyArgs>
-    ): Promise<BatchPayload>
+    ): PrismaPromise<BatchPayload>
 
     /**
      * Create or update one CommunityPostLike.
@@ -8504,6 +8586,8 @@ export namespace Prisma {
 
     /**
      * Count the number of CommunityPostLikes.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {CommunityPostLikeCountArgs} args - Arguments to filter CommunityPostLikes to count.
      * @example
      * // Count the number of CommunityPostLikes
@@ -8515,8 +8599,8 @@ export namespace Prisma {
     **/
     count<T extends CommunityPostLikeCountArgs>(
       args?: Subset<T, CommunityPostLikeCountArgs>,
-    ): Promise<
-      T extends Record<'select', any>
+    ): PrismaPromise<
+      T extends _Record<'select', any>
         ? T['select'] extends true
           ? number
           : GetScalarType<T['select'], CommunityPostLikeCountAggregateOutputType>
@@ -8525,6 +8609,8 @@ export namespace Prisma {
 
     /**
      * Allows you to perform aggregations operations on a CommunityPostLike.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {CommunityPostLikeAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
      * @example
      * // Ordered by age ascending
@@ -8545,7 +8631,7 @@ export namespace Prisma {
      *   take: 10,
      * })
     **/
-    aggregate<T extends CommunityPostLikeAggregateArgs>(args: Subset<T, CommunityPostLikeAggregateArgs>): Promise<GetCommunityPostLikeAggregateType<T>>
+    aggregate<T extends CommunityPostLikeAggregateArgs>(args: Subset<T, CommunityPostLikeAggregateArgs>): PrismaPromise<GetCommunityPostLikeAggregateType<T>>
 
 
   }
@@ -8556,7 +8642,8 @@ export namespace Prisma {
    * Because we want to prevent naming conflicts as mentioned in 
    * https://github.com/prisma/prisma-client-js/issues/707
    */
-  export class Prisma__CommunityPostLikeClient<T> implements Promise<T> {
+  export class Prisma__CommunityPostLikeClient<T> implements PrismaPromise<T> {
+    [prisma]: true;
     private readonly _dmmf;
     private readonly _fetcher;
     private readonly _queryType;
@@ -8583,13 +8670,13 @@ export namespace Prisma {
      * @param onrejected The callback to execute when the Promise is rejected.
      * @returns A Promise for the completion of which ever callback is executed.
      */
-    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | Promise<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | Promise<TResult2>) | undefined | null): Promise<TResult1 | TResult2>;
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): Promise<TResult1 | TResult2>;
     /**
      * Attaches a callback for only the rejection of the Promise.
      * @param onrejected The callback to execute when the Promise is rejected.
      * @returns A Promise for the completion of the callback.
      */
-    catch<TResult = never>(onrejected?: ((reason: any) => TResult | Promise<TResult>) | undefined | null): Promise<T | TResult>;
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): Promise<T | TResult>;
     /**
      * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
      * resolved value cannot be modified from the callback.
@@ -8645,7 +8732,7 @@ export namespace Prisma {
     **/
     where?: CommunityPostLikeWhereInput
     /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
      * Determine the order of CommunityPostLikes to fetch.
     **/
@@ -8669,7 +8756,7 @@ export namespace Prisma {
     **/
     skip?: number
     /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
      * 
      * Filter by unique combinations of CommunityPostLikes.
     **/
@@ -8694,7 +8781,7 @@ export namespace Prisma {
     **/
     where?: CommunityPostLikeWhereInput
     /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
      * Determine the order of CommunityPostLikes to fetch.
     **/
@@ -8736,7 +8823,7 @@ export namespace Prisma {
     /**
      * The data needed to create a CommunityPostLike.
     **/
-    data: XOR<CommunityPostLikeUncheckedCreateInput, CommunityPostLikeCreateInput>
+    data: XOR<CommunityPostLikeCreateInput, CommunityPostLikeUncheckedCreateInput>
   }
 
 
@@ -8755,7 +8842,7 @@ export namespace Prisma {
     /**
      * The data needed to update a CommunityPostLike.
     **/
-    data: XOR<CommunityPostLikeUncheckedUpdateInput, CommunityPostLikeUpdateInput>
+    data: XOR<CommunityPostLikeUpdateInput, CommunityPostLikeUncheckedUpdateInput>
     /**
      * Choose, which CommunityPostLike to update.
     **/
@@ -8767,7 +8854,7 @@ export namespace Prisma {
    * CommunityPostLike updateMany
    */
   export type CommunityPostLikeUpdateManyArgs = {
-    data: XOR<CommunityPostLikeUncheckedUpdateManyInput, CommunityPostLikeUpdateManyMutationInput>
+    data: XOR<CommunityPostLikeUpdateManyMutationInput, CommunityPostLikeUncheckedUpdateManyInput>
     where?: CommunityPostLikeWhereInput
   }
 
@@ -8791,11 +8878,11 @@ export namespace Prisma {
     /**
      * In case the CommunityPostLike found by the `where` argument doesn't exist, create a new CommunityPostLike with this data.
     **/
-    create: XOR<CommunityPostLikeUncheckedCreateInput, CommunityPostLikeCreateInput>
+    create: XOR<CommunityPostLikeCreateInput, CommunityPostLikeUncheckedCreateInput>
     /**
      * In case the CommunityPostLike was found with the provided `where` argument, update it with this data.
     **/
-    update: XOR<CommunityPostLikeUncheckedUpdateInput, CommunityPostLikeUpdateInput>
+    update: XOR<CommunityPostLikeUpdateInput, CommunityPostLikeUncheckedUpdateInput>
   }
 
 
@@ -8958,7 +9045,7 @@ export namespace Prisma {
     **/
     where?: CommunitySubcommentWhereInput
     /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
      * Determine the order of CommunitySubcomments to fetch.
     **/
@@ -9106,6 +9193,8 @@ export namespace Prisma {
 
     /**
      * Find the first CommunitySubcomment that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {CommunitySubcommentFindFirstArgs} args - Arguments to find a CommunitySubcomment
      * @example
      * // Get one CommunitySubcomment
@@ -9121,6 +9210,8 @@ export namespace Prisma {
 
     /**
      * Find zero or more CommunitySubcomments that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {CommunitySubcommentFindManyArgs=} args - Arguments to filter and select certain fields only.
      * @example
      * // Get all CommunitySubcomments
@@ -9135,7 +9226,7 @@ export namespace Prisma {
     **/
     findMany<T extends CommunitySubcommentFindManyArgs>(
       args?: SelectSubset<T, CommunitySubcommentFindManyArgs>
-    ): CheckSelect<T, Promise<Array<CommunitySubcomment>>, Promise<Array<CommunitySubcommentGetPayload<T>>>>
+    ): CheckSelect<T, PrismaPromise<Array<CommunitySubcomment>>, PrismaPromise<Array<CommunitySubcommentGetPayload<T>>>>
 
     /**
      * Create a CommunitySubcomment.
@@ -9202,10 +9293,12 @@ export namespace Prisma {
     **/
     deleteMany<T extends CommunitySubcommentDeleteManyArgs>(
       args?: SelectSubset<T, CommunitySubcommentDeleteManyArgs>
-    ): Promise<BatchPayload>
+    ): PrismaPromise<BatchPayload>
 
     /**
      * Update zero or more CommunitySubcomments.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {CommunitySubcommentUpdateManyArgs} args - Arguments to update one or more rows.
      * @example
      * // Update many CommunitySubcomments
@@ -9221,7 +9314,7 @@ export namespace Prisma {
     **/
     updateMany<T extends CommunitySubcommentUpdateManyArgs>(
       args: SelectSubset<T, CommunitySubcommentUpdateManyArgs>
-    ): Promise<BatchPayload>
+    ): PrismaPromise<BatchPayload>
 
     /**
      * Create or update one CommunitySubcomment.
@@ -9246,6 +9339,8 @@ export namespace Prisma {
 
     /**
      * Count the number of CommunitySubcomments.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {CommunitySubcommentCountArgs} args - Arguments to filter CommunitySubcomments to count.
      * @example
      * // Count the number of CommunitySubcomments
@@ -9257,8 +9352,8 @@ export namespace Prisma {
     **/
     count<T extends CommunitySubcommentCountArgs>(
       args?: Subset<T, CommunitySubcommentCountArgs>,
-    ): Promise<
-      T extends Record<'select', any>
+    ): PrismaPromise<
+      T extends _Record<'select', any>
         ? T['select'] extends true
           ? number
           : GetScalarType<T['select'], CommunitySubcommentCountAggregateOutputType>
@@ -9267,6 +9362,8 @@ export namespace Prisma {
 
     /**
      * Allows you to perform aggregations operations on a CommunitySubcomment.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {CommunitySubcommentAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
      * @example
      * // Ordered by age ascending
@@ -9287,7 +9384,7 @@ export namespace Prisma {
      *   take: 10,
      * })
     **/
-    aggregate<T extends CommunitySubcommentAggregateArgs>(args: Subset<T, CommunitySubcommentAggregateArgs>): Promise<GetCommunitySubcommentAggregateType<T>>
+    aggregate<T extends CommunitySubcommentAggregateArgs>(args: Subset<T, CommunitySubcommentAggregateArgs>): PrismaPromise<GetCommunitySubcommentAggregateType<T>>
 
 
   }
@@ -9298,7 +9395,8 @@ export namespace Prisma {
    * Because we want to prevent naming conflicts as mentioned in 
    * https://github.com/prisma/prisma-client-js/issues/707
    */
-  export class Prisma__CommunitySubcommentClient<T> implements Promise<T> {
+  export class Prisma__CommunitySubcommentClient<T> implements PrismaPromise<T> {
+    [prisma]: true;
     private readonly _dmmf;
     private readonly _fetcher;
     private readonly _queryType;
@@ -9320,7 +9418,7 @@ export namespace Prisma {
 
     user<T extends UserArgs = {}>(args?: Subset<T, UserArgs>): CheckSelect<T, Prisma__UserClient<User | null >, Prisma__UserClient<UserGetPayload<T> | null >>;
 
-    reportSubcomments<T extends ReportSubcommentFindManyArgs = {}>(args?: Subset<T, ReportSubcommentFindManyArgs>): CheckSelect<T, Promise<Array<ReportSubcomment>>, Promise<Array<ReportSubcommentGetPayload<T>>>>;
+    reportSubcomments<T extends ReportSubcommentFindManyArgs = {}>(args?: Subset<T, ReportSubcommentFindManyArgs>): CheckSelect<T, PrismaPromise<Array<ReportSubcomment>>, PrismaPromise<Array<ReportSubcommentGetPayload<T>>>>;
 
     private get _document();
     /**
@@ -9329,13 +9427,13 @@ export namespace Prisma {
      * @param onrejected The callback to execute when the Promise is rejected.
      * @returns A Promise for the completion of which ever callback is executed.
      */
-    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | Promise<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | Promise<TResult2>) | undefined | null): Promise<TResult1 | TResult2>;
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): Promise<TResult1 | TResult2>;
     /**
      * Attaches a callback for only the rejection of the Promise.
      * @param onrejected The callback to execute when the Promise is rejected.
      * @returns A Promise for the completion of the callback.
      */
-    catch<TResult = never>(onrejected?: ((reason: any) => TResult | Promise<TResult>) | undefined | null): Promise<T | TResult>;
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): Promise<T | TResult>;
     /**
      * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
      * resolved value cannot be modified from the callback.
@@ -9391,7 +9489,7 @@ export namespace Prisma {
     **/
     where?: CommunitySubcommentWhereInput
     /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
      * Determine the order of CommunitySubcomments to fetch.
     **/
@@ -9415,7 +9513,7 @@ export namespace Prisma {
     **/
     skip?: number
     /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
      * 
      * Filter by unique combinations of CommunitySubcomments.
     **/
@@ -9440,7 +9538,7 @@ export namespace Prisma {
     **/
     where?: CommunitySubcommentWhereInput
     /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
      * Determine the order of CommunitySubcomments to fetch.
     **/
@@ -9482,7 +9580,7 @@ export namespace Prisma {
     /**
      * The data needed to create a CommunitySubcomment.
     **/
-    data: XOR<CommunitySubcommentUncheckedCreateInput, CommunitySubcommentCreateInput>
+    data: XOR<CommunitySubcommentCreateInput, CommunitySubcommentUncheckedCreateInput>
   }
 
 
@@ -9501,7 +9599,7 @@ export namespace Prisma {
     /**
      * The data needed to update a CommunitySubcomment.
     **/
-    data: XOR<CommunitySubcommentUncheckedUpdateInput, CommunitySubcommentUpdateInput>
+    data: XOR<CommunitySubcommentUpdateInput, CommunitySubcommentUncheckedUpdateInput>
     /**
      * Choose, which CommunitySubcomment to update.
     **/
@@ -9513,7 +9611,7 @@ export namespace Prisma {
    * CommunitySubcomment updateMany
    */
   export type CommunitySubcommentUpdateManyArgs = {
-    data: XOR<CommunitySubcommentUncheckedUpdateManyInput, CommunitySubcommentUpdateManyMutationInput>
+    data: XOR<CommunitySubcommentUpdateManyMutationInput, CommunitySubcommentUncheckedUpdateManyInput>
     where?: CommunitySubcommentWhereInput
   }
 
@@ -9537,11 +9635,11 @@ export namespace Prisma {
     /**
      * In case the CommunitySubcomment found by the `where` argument doesn't exist, create a new CommunitySubcomment with this data.
     **/
-    create: XOR<CommunitySubcommentUncheckedCreateInput, CommunitySubcommentCreateInput>
+    create: XOR<CommunitySubcommentCreateInput, CommunitySubcommentUncheckedCreateInput>
     /**
      * In case the CommunitySubcomment was found with the provided `where` argument, update it with this data.
     **/
-    update: XOR<CommunitySubcommentUncheckedUpdateInput, CommunitySubcommentUpdateInput>
+    update: XOR<CommunitySubcommentUpdateInput, CommunitySubcommentUncheckedUpdateInput>
   }
 
 
@@ -9644,7 +9742,7 @@ export namespace Prisma {
     **/
     where?: CoverageMajorWhereInput
     /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
      * Determine the order of CoverageMajors to fetch.
     **/
@@ -9757,6 +9855,8 @@ export namespace Prisma {
 
     /**
      * Find the first CoverageMajor that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {CoverageMajorFindFirstArgs} args - Arguments to find a CoverageMajor
      * @example
      * // Get one CoverageMajor
@@ -9772,6 +9872,8 @@ export namespace Prisma {
 
     /**
      * Find zero or more CoverageMajors that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {CoverageMajorFindManyArgs=} args - Arguments to filter and select certain fields only.
      * @example
      * // Get all CoverageMajors
@@ -9786,7 +9888,7 @@ export namespace Prisma {
     **/
     findMany<T extends CoverageMajorFindManyArgs>(
       args?: SelectSubset<T, CoverageMajorFindManyArgs>
-    ): CheckSelect<T, Promise<Array<CoverageMajor>>, Promise<Array<CoverageMajorGetPayload<T>>>>
+    ): CheckSelect<T, PrismaPromise<Array<CoverageMajor>>, PrismaPromise<Array<CoverageMajorGetPayload<T>>>>
 
     /**
      * Create a CoverageMajor.
@@ -9853,10 +9955,12 @@ export namespace Prisma {
     **/
     deleteMany<T extends CoverageMajorDeleteManyArgs>(
       args?: SelectSubset<T, CoverageMajorDeleteManyArgs>
-    ): Promise<BatchPayload>
+    ): PrismaPromise<BatchPayload>
 
     /**
      * Update zero or more CoverageMajors.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {CoverageMajorUpdateManyArgs} args - Arguments to update one or more rows.
      * @example
      * // Update many CoverageMajors
@@ -9872,7 +9976,7 @@ export namespace Prisma {
     **/
     updateMany<T extends CoverageMajorUpdateManyArgs>(
       args: SelectSubset<T, CoverageMajorUpdateManyArgs>
-    ): Promise<BatchPayload>
+    ): PrismaPromise<BatchPayload>
 
     /**
      * Create or update one CoverageMajor.
@@ -9897,6 +10001,8 @@ export namespace Prisma {
 
     /**
      * Count the number of CoverageMajors.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {CoverageMajorCountArgs} args - Arguments to filter CoverageMajors to count.
      * @example
      * // Count the number of CoverageMajors
@@ -9908,8 +10014,8 @@ export namespace Prisma {
     **/
     count<T extends CoverageMajorCountArgs>(
       args?: Subset<T, CoverageMajorCountArgs>,
-    ): Promise<
-      T extends Record<'select', any>
+    ): PrismaPromise<
+      T extends _Record<'select', any>
         ? T['select'] extends true
           ? number
           : GetScalarType<T['select'], CoverageMajorCountAggregateOutputType>
@@ -9918,6 +10024,8 @@ export namespace Prisma {
 
     /**
      * Allows you to perform aggregations operations on a CoverageMajor.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {CoverageMajorAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
      * @example
      * // Ordered by age ascending
@@ -9938,7 +10046,7 @@ export namespace Prisma {
      *   take: 10,
      * })
     **/
-    aggregate<T extends CoverageMajorAggregateArgs>(args: Subset<T, CoverageMajorAggregateArgs>): Promise<GetCoverageMajorAggregateType<T>>
+    aggregate<T extends CoverageMajorAggregateArgs>(args: Subset<T, CoverageMajorAggregateArgs>): PrismaPromise<GetCoverageMajorAggregateType<T>>
 
 
   }
@@ -9949,7 +10057,8 @@ export namespace Prisma {
    * Because we want to prevent naming conflicts as mentioned in 
    * https://github.com/prisma/prisma-client-js/issues/707
    */
-  export class Prisma__CoverageMajorClient<T> implements Promise<T> {
+  export class Prisma__CoverageMajorClient<T> implements PrismaPromise<T> {
+    [prisma]: true;
     private readonly _dmmf;
     private readonly _fetcher;
     private readonly _queryType;
@@ -9965,7 +10074,7 @@ export namespace Prisma {
     constructor(_dmmf: runtime.DMMFClass, _fetcher: PrismaClientFetcher, _queryType: 'query' | 'mutation', _rootField: string, _clientMethod: string, _args: any, _dataPath: string[], _errorFormat: ErrorFormat, _measurePerformance?: boolean | undefined, _isList?: boolean);
     readonly [Symbol.toStringTag]: 'PrismaClientPromise';
 
-    coverageMajorLectures<T extends CoverageMajorLectureFindManyArgs = {}>(args?: Subset<T, CoverageMajorLectureFindManyArgs>): CheckSelect<T, Promise<Array<CoverageMajorLecture>>, Promise<Array<CoverageMajorLectureGetPayload<T>>>>;
+    coverageMajorLectures<T extends CoverageMajorLectureFindManyArgs = {}>(args?: Subset<T, CoverageMajorLectureFindManyArgs>): CheckSelect<T, PrismaPromise<Array<CoverageMajorLecture>>, PrismaPromise<Array<CoverageMajorLectureGetPayload<T>>>>;
 
     private get _document();
     /**
@@ -9974,13 +10083,13 @@ export namespace Prisma {
      * @param onrejected The callback to execute when the Promise is rejected.
      * @returns A Promise for the completion of which ever callback is executed.
      */
-    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | Promise<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | Promise<TResult2>) | undefined | null): Promise<TResult1 | TResult2>;
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): Promise<TResult1 | TResult2>;
     /**
      * Attaches a callback for only the rejection of the Promise.
      * @param onrejected The callback to execute when the Promise is rejected.
      * @returns A Promise for the completion of the callback.
      */
-    catch<TResult = never>(onrejected?: ((reason: any) => TResult | Promise<TResult>) | undefined | null): Promise<T | TResult>;
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): Promise<T | TResult>;
     /**
      * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
      * resolved value cannot be modified from the callback.
@@ -10036,7 +10145,7 @@ export namespace Prisma {
     **/
     where?: CoverageMajorWhereInput
     /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
      * Determine the order of CoverageMajors to fetch.
     **/
@@ -10060,7 +10169,7 @@ export namespace Prisma {
     **/
     skip?: number
     /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
      * 
      * Filter by unique combinations of CoverageMajors.
     **/
@@ -10085,7 +10194,7 @@ export namespace Prisma {
     **/
     where?: CoverageMajorWhereInput
     /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
      * Determine the order of CoverageMajors to fetch.
     **/
@@ -10127,7 +10236,7 @@ export namespace Prisma {
     /**
      * The data needed to create a CoverageMajor.
     **/
-    data: XOR<CoverageMajorUncheckedCreateInput, CoverageMajorCreateInput>
+    data: XOR<CoverageMajorCreateInput, CoverageMajorUncheckedCreateInput>
   }
 
 
@@ -10146,7 +10255,7 @@ export namespace Prisma {
     /**
      * The data needed to update a CoverageMajor.
     **/
-    data: XOR<CoverageMajorUncheckedUpdateInput, CoverageMajorUpdateInput>
+    data: XOR<CoverageMajorUpdateInput, CoverageMajorUncheckedUpdateInput>
     /**
      * Choose, which CoverageMajor to update.
     **/
@@ -10158,7 +10267,7 @@ export namespace Prisma {
    * CoverageMajor updateMany
    */
   export type CoverageMajorUpdateManyArgs = {
-    data: XOR<CoverageMajorUncheckedUpdateManyInput, CoverageMajorUpdateManyMutationInput>
+    data: XOR<CoverageMajorUpdateManyMutationInput, CoverageMajorUncheckedUpdateManyInput>
     where?: CoverageMajorWhereInput
   }
 
@@ -10182,11 +10291,11 @@ export namespace Prisma {
     /**
      * In case the CoverageMajor found by the `where` argument doesn't exist, create a new CoverageMajor with this data.
     **/
-    create: XOR<CoverageMajorUncheckedCreateInput, CoverageMajorCreateInput>
+    create: XOR<CoverageMajorCreateInput, CoverageMajorUncheckedCreateInput>
     /**
      * In case the CoverageMajor was found with the provided `where` argument, update it with this data.
     **/
-    update: XOR<CoverageMajorUncheckedUpdateInput, CoverageMajorUpdateInput>
+    update: XOR<CoverageMajorUpdateInput, CoverageMajorUncheckedUpdateInput>
   }
 
 
@@ -10283,7 +10392,7 @@ export namespace Prisma {
     **/
     where?: CoverageMajorLectureWhereInput
     /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
      * Determine the order of CoverageMajorLectures to fetch.
     **/
@@ -10401,6 +10510,8 @@ export namespace Prisma {
 
     /**
      * Find the first CoverageMajorLecture that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {CoverageMajorLectureFindFirstArgs} args - Arguments to find a CoverageMajorLecture
      * @example
      * // Get one CoverageMajorLecture
@@ -10416,6 +10527,8 @@ export namespace Prisma {
 
     /**
      * Find zero or more CoverageMajorLectures that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {CoverageMajorLectureFindManyArgs=} args - Arguments to filter and select certain fields only.
      * @example
      * // Get all CoverageMajorLectures
@@ -10430,7 +10543,7 @@ export namespace Prisma {
     **/
     findMany<T extends CoverageMajorLectureFindManyArgs>(
       args?: SelectSubset<T, CoverageMajorLectureFindManyArgs>
-    ): CheckSelect<T, Promise<Array<CoverageMajorLecture>>, Promise<Array<CoverageMajorLectureGetPayload<T>>>>
+    ): CheckSelect<T, PrismaPromise<Array<CoverageMajorLecture>>, PrismaPromise<Array<CoverageMajorLectureGetPayload<T>>>>
 
     /**
      * Create a CoverageMajorLecture.
@@ -10497,10 +10610,12 @@ export namespace Prisma {
     **/
     deleteMany<T extends CoverageMajorLectureDeleteManyArgs>(
       args?: SelectSubset<T, CoverageMajorLectureDeleteManyArgs>
-    ): Promise<BatchPayload>
+    ): PrismaPromise<BatchPayload>
 
     /**
      * Update zero or more CoverageMajorLectures.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {CoverageMajorLectureUpdateManyArgs} args - Arguments to update one or more rows.
      * @example
      * // Update many CoverageMajorLectures
@@ -10516,7 +10631,7 @@ export namespace Prisma {
     **/
     updateMany<T extends CoverageMajorLectureUpdateManyArgs>(
       args: SelectSubset<T, CoverageMajorLectureUpdateManyArgs>
-    ): Promise<BatchPayload>
+    ): PrismaPromise<BatchPayload>
 
     /**
      * Create or update one CoverageMajorLecture.
@@ -10541,6 +10656,8 @@ export namespace Prisma {
 
     /**
      * Count the number of CoverageMajorLectures.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {CoverageMajorLectureCountArgs} args - Arguments to filter CoverageMajorLectures to count.
      * @example
      * // Count the number of CoverageMajorLectures
@@ -10552,8 +10669,8 @@ export namespace Prisma {
     **/
     count<T extends CoverageMajorLectureCountArgs>(
       args?: Subset<T, CoverageMajorLectureCountArgs>,
-    ): Promise<
-      T extends Record<'select', any>
+    ): PrismaPromise<
+      T extends _Record<'select', any>
         ? T['select'] extends true
           ? number
           : GetScalarType<T['select'], CoverageMajorLectureCountAggregateOutputType>
@@ -10562,6 +10679,8 @@ export namespace Prisma {
 
     /**
      * Allows you to perform aggregations operations on a CoverageMajorLecture.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {CoverageMajorLectureAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
      * @example
      * // Ordered by age ascending
@@ -10582,7 +10701,7 @@ export namespace Prisma {
      *   take: 10,
      * })
     **/
-    aggregate<T extends CoverageMajorLectureAggregateArgs>(args: Subset<T, CoverageMajorLectureAggregateArgs>): Promise<GetCoverageMajorLectureAggregateType<T>>
+    aggregate<T extends CoverageMajorLectureAggregateArgs>(args: Subset<T, CoverageMajorLectureAggregateArgs>): PrismaPromise<GetCoverageMajorLectureAggregateType<T>>
 
 
   }
@@ -10593,7 +10712,8 @@ export namespace Prisma {
    * Because we want to prevent naming conflicts as mentioned in 
    * https://github.com/prisma/prisma-client-js/issues/707
    */
-  export class Prisma__CoverageMajorLectureClient<T> implements Promise<T> {
+  export class Prisma__CoverageMajorLectureClient<T> implements PrismaPromise<T> {
+    [prisma]: true;
     private readonly _dmmf;
     private readonly _fetcher;
     private readonly _queryType;
@@ -10620,13 +10740,13 @@ export namespace Prisma {
      * @param onrejected The callback to execute when the Promise is rejected.
      * @returns A Promise for the completion of which ever callback is executed.
      */
-    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | Promise<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | Promise<TResult2>) | undefined | null): Promise<TResult1 | TResult2>;
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): Promise<TResult1 | TResult2>;
     /**
      * Attaches a callback for only the rejection of the Promise.
      * @param onrejected The callback to execute when the Promise is rejected.
      * @returns A Promise for the completion of the callback.
      */
-    catch<TResult = never>(onrejected?: ((reason: any) => TResult | Promise<TResult>) | undefined | null): Promise<T | TResult>;
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): Promise<T | TResult>;
     /**
      * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
      * resolved value cannot be modified from the callback.
@@ -10682,7 +10802,7 @@ export namespace Prisma {
     **/
     where?: CoverageMajorLectureWhereInput
     /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
      * Determine the order of CoverageMajorLectures to fetch.
     **/
@@ -10706,7 +10826,7 @@ export namespace Prisma {
     **/
     skip?: number
     /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
      * 
      * Filter by unique combinations of CoverageMajorLectures.
     **/
@@ -10731,7 +10851,7 @@ export namespace Prisma {
     **/
     where?: CoverageMajorLectureWhereInput
     /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
      * Determine the order of CoverageMajorLectures to fetch.
     **/
@@ -10773,7 +10893,7 @@ export namespace Prisma {
     /**
      * The data needed to create a CoverageMajorLecture.
     **/
-    data: XOR<CoverageMajorLectureUncheckedCreateInput, CoverageMajorLectureCreateInput>
+    data: XOR<CoverageMajorLectureCreateInput, CoverageMajorLectureUncheckedCreateInput>
   }
 
 
@@ -10792,7 +10912,7 @@ export namespace Prisma {
     /**
      * The data needed to update a CoverageMajorLecture.
     **/
-    data: XOR<CoverageMajorLectureUncheckedUpdateInput, CoverageMajorLectureUpdateInput>
+    data: XOR<CoverageMajorLectureUpdateInput, CoverageMajorLectureUncheckedUpdateInput>
     /**
      * Choose, which CoverageMajorLecture to update.
     **/
@@ -10804,7 +10924,7 @@ export namespace Prisma {
    * CoverageMajorLecture updateMany
    */
   export type CoverageMajorLectureUpdateManyArgs = {
-    data: XOR<CoverageMajorLectureUncheckedUpdateManyInput, CoverageMajorLectureUpdateManyMutationInput>
+    data: XOR<CoverageMajorLectureUpdateManyMutationInput, CoverageMajorLectureUncheckedUpdateManyInput>
     where?: CoverageMajorLectureWhereInput
   }
 
@@ -10828,11 +10948,11 @@ export namespace Prisma {
     /**
      * In case the CoverageMajorLecture found by the `where` argument doesn't exist, create a new CoverageMajorLecture with this data.
     **/
-    create: XOR<CoverageMajorLectureUncheckedCreateInput, CoverageMajorLectureCreateInput>
+    create: XOR<CoverageMajorLectureCreateInput, CoverageMajorLectureUncheckedCreateInput>
     /**
      * In case the CoverageMajorLecture was found with the provided `where` argument, update it with this data.
     **/
-    update: XOR<CoverageMajorLectureUncheckedUpdateInput, CoverageMajorLectureUpdateInput>
+    update: XOR<CoverageMajorLectureUpdateInput, CoverageMajorLectureUncheckedUpdateInput>
   }
 
 
@@ -11049,7 +11169,7 @@ export namespace Prisma {
     **/
     where?: LectureWhereInput
     /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
      * Determine the order of Lectures to fetch.
     **/
@@ -11194,6 +11314,8 @@ export namespace Prisma {
 
     /**
      * Find the first Lecture that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {LectureFindFirstArgs} args - Arguments to find a Lecture
      * @example
      * // Get one Lecture
@@ -11209,6 +11331,8 @@ export namespace Prisma {
 
     /**
      * Find zero or more Lectures that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {LectureFindManyArgs=} args - Arguments to filter and select certain fields only.
      * @example
      * // Get all Lectures
@@ -11223,7 +11347,7 @@ export namespace Prisma {
     **/
     findMany<T extends LectureFindManyArgs>(
       args?: SelectSubset<T, LectureFindManyArgs>
-    ): CheckSelect<T, Promise<Array<Lecture>>, Promise<Array<LectureGetPayload<T>>>>
+    ): CheckSelect<T, PrismaPromise<Array<Lecture>>, PrismaPromise<Array<LectureGetPayload<T>>>>
 
     /**
      * Create a Lecture.
@@ -11290,10 +11414,12 @@ export namespace Prisma {
     **/
     deleteMany<T extends LectureDeleteManyArgs>(
       args?: SelectSubset<T, LectureDeleteManyArgs>
-    ): Promise<BatchPayload>
+    ): PrismaPromise<BatchPayload>
 
     /**
      * Update zero or more Lectures.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {LectureUpdateManyArgs} args - Arguments to update one or more rows.
      * @example
      * // Update many Lectures
@@ -11309,7 +11435,7 @@ export namespace Prisma {
     **/
     updateMany<T extends LectureUpdateManyArgs>(
       args: SelectSubset<T, LectureUpdateManyArgs>
-    ): Promise<BatchPayload>
+    ): PrismaPromise<BatchPayload>
 
     /**
      * Create or update one Lecture.
@@ -11334,6 +11460,8 @@ export namespace Prisma {
 
     /**
      * Count the number of Lectures.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {LectureCountArgs} args - Arguments to filter Lectures to count.
      * @example
      * // Count the number of Lectures
@@ -11345,8 +11473,8 @@ export namespace Prisma {
     **/
     count<T extends LectureCountArgs>(
       args?: Subset<T, LectureCountArgs>,
-    ): Promise<
-      T extends Record<'select', any>
+    ): PrismaPromise<
+      T extends _Record<'select', any>
         ? T['select'] extends true
           ? number
           : GetScalarType<T['select'], LectureCountAggregateOutputType>
@@ -11355,6 +11483,8 @@ export namespace Prisma {
 
     /**
      * Allows you to perform aggregations operations on a Lecture.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {LectureAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
      * @example
      * // Ordered by age ascending
@@ -11375,7 +11505,7 @@ export namespace Prisma {
      *   take: 10,
      * })
     **/
-    aggregate<T extends LectureAggregateArgs>(args: Subset<T, LectureAggregateArgs>): Promise<GetLectureAggregateType<T>>
+    aggregate<T extends LectureAggregateArgs>(args: Subset<T, LectureAggregateArgs>): PrismaPromise<GetLectureAggregateType<T>>
 
 
   }
@@ -11386,7 +11516,8 @@ export namespace Prisma {
    * Because we want to prevent naming conflicts as mentioned in 
    * https://github.com/prisma/prisma-client-js/issues/707
    */
-  export class Prisma__LectureClient<T> implements Promise<T> {
+  export class Prisma__LectureClient<T> implements PrismaPromise<T> {
+    [prisma]: true;
     private readonly _dmmf;
     private readonly _fetcher;
     private readonly _queryType;
@@ -11402,9 +11533,9 @@ export namespace Prisma {
     constructor(_dmmf: runtime.DMMFClass, _fetcher: PrismaClientFetcher, _queryType: 'query' | 'mutation', _rootField: string, _clientMethod: string, _args: any, _dataPath: string[], _errorFormat: ErrorFormat, _measurePerformance?: boolean | undefined, _isList?: boolean);
     readonly [Symbol.toStringTag]: 'PrismaClientPromise';
 
-    coverageMajorLectures<T extends CoverageMajorLectureFindManyArgs = {}>(args?: Subset<T, CoverageMajorLectureFindManyArgs>): CheckSelect<T, Promise<Array<CoverageMajorLecture>>, Promise<Array<CoverageMajorLectureGetPayload<T>>>>;
+    coverageMajorLectures<T extends CoverageMajorLectureFindManyArgs = {}>(args?: Subset<T, CoverageMajorLectureFindManyArgs>): CheckSelect<T, PrismaPromise<Array<CoverageMajorLecture>>, PrismaPromise<Array<CoverageMajorLectureGetPayload<T>>>>;
 
-    periods<T extends PeriodFindManyArgs = {}>(args?: Subset<T, PeriodFindManyArgs>): CheckSelect<T, Promise<Array<Period>>, Promise<Array<PeriodGetPayload<T>>>>;
+    periods<T extends PeriodFindManyArgs = {}>(args?: Subset<T, PeriodFindManyArgs>): CheckSelect<T, PrismaPromise<Array<Period>>, PrismaPromise<Array<PeriodGetPayload<T>>>>;
 
     private get _document();
     /**
@@ -11413,13 +11544,13 @@ export namespace Prisma {
      * @param onrejected The callback to execute when the Promise is rejected.
      * @returns A Promise for the completion of which ever callback is executed.
      */
-    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | Promise<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | Promise<TResult2>) | undefined | null): Promise<TResult1 | TResult2>;
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): Promise<TResult1 | TResult2>;
     /**
      * Attaches a callback for only the rejection of the Promise.
      * @param onrejected The callback to execute when the Promise is rejected.
      * @returns A Promise for the completion of the callback.
      */
-    catch<TResult = never>(onrejected?: ((reason: any) => TResult | Promise<TResult>) | undefined | null): Promise<T | TResult>;
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): Promise<T | TResult>;
     /**
      * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
      * resolved value cannot be modified from the callback.
@@ -11475,7 +11606,7 @@ export namespace Prisma {
     **/
     where?: LectureWhereInput
     /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
      * Determine the order of Lectures to fetch.
     **/
@@ -11499,7 +11630,7 @@ export namespace Prisma {
     **/
     skip?: number
     /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
      * 
      * Filter by unique combinations of Lectures.
     **/
@@ -11524,7 +11655,7 @@ export namespace Prisma {
     **/
     where?: LectureWhereInput
     /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
      * Determine the order of Lectures to fetch.
     **/
@@ -11566,7 +11697,7 @@ export namespace Prisma {
     /**
      * The data needed to create a Lecture.
     **/
-    data: XOR<LectureUncheckedCreateInput, LectureCreateInput>
+    data: XOR<LectureCreateInput, LectureUncheckedCreateInput>
   }
 
 
@@ -11585,7 +11716,7 @@ export namespace Prisma {
     /**
      * The data needed to update a Lecture.
     **/
-    data: XOR<LectureUncheckedUpdateInput, LectureUpdateInput>
+    data: XOR<LectureUpdateInput, LectureUncheckedUpdateInput>
     /**
      * Choose, which Lecture to update.
     **/
@@ -11597,7 +11728,7 @@ export namespace Prisma {
    * Lecture updateMany
    */
   export type LectureUpdateManyArgs = {
-    data: XOR<LectureUncheckedUpdateManyInput, LectureUpdateManyMutationInput>
+    data: XOR<LectureUpdateManyMutationInput, LectureUncheckedUpdateManyInput>
     where?: LectureWhereInput
   }
 
@@ -11621,11 +11752,11 @@ export namespace Prisma {
     /**
      * In case the Lecture found by the `where` argument doesn't exist, create a new Lecture with this data.
     **/
-    create: XOR<LectureUncheckedCreateInput, LectureCreateInput>
+    create: XOR<LectureCreateInput, LectureUncheckedCreateInput>
     /**
      * In case the Lecture was found with the provided `where` argument, update it with this data.
     **/
-    update: XOR<LectureUncheckedUpdateInput, LectureUpdateInput>
+    update: XOR<LectureUpdateInput, LectureUncheckedUpdateInput>
   }
 
 
@@ -11762,7 +11893,7 @@ export namespace Prisma {
     **/
     where?: LiveChatWhereInput
     /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
      * Determine the order of LiveChats to fetch.
     **/
@@ -11889,6 +12020,8 @@ export namespace Prisma {
 
     /**
      * Find the first LiveChat that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {LiveChatFindFirstArgs} args - Arguments to find a LiveChat
      * @example
      * // Get one LiveChat
@@ -11904,6 +12037,8 @@ export namespace Prisma {
 
     /**
      * Find zero or more LiveChats that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {LiveChatFindManyArgs=} args - Arguments to filter and select certain fields only.
      * @example
      * // Get all LiveChats
@@ -11918,7 +12053,7 @@ export namespace Prisma {
     **/
     findMany<T extends LiveChatFindManyArgs>(
       args?: SelectSubset<T, LiveChatFindManyArgs>
-    ): CheckSelect<T, Promise<Array<LiveChat>>, Promise<Array<LiveChatGetPayload<T>>>>
+    ): CheckSelect<T, PrismaPromise<Array<LiveChat>>, PrismaPromise<Array<LiveChatGetPayload<T>>>>
 
     /**
      * Create a LiveChat.
@@ -11985,10 +12120,12 @@ export namespace Prisma {
     **/
     deleteMany<T extends LiveChatDeleteManyArgs>(
       args?: SelectSubset<T, LiveChatDeleteManyArgs>
-    ): Promise<BatchPayload>
+    ): PrismaPromise<BatchPayload>
 
     /**
      * Update zero or more LiveChats.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {LiveChatUpdateManyArgs} args - Arguments to update one or more rows.
      * @example
      * // Update many LiveChats
@@ -12004,7 +12141,7 @@ export namespace Prisma {
     **/
     updateMany<T extends LiveChatUpdateManyArgs>(
       args: SelectSubset<T, LiveChatUpdateManyArgs>
-    ): Promise<BatchPayload>
+    ): PrismaPromise<BatchPayload>
 
     /**
      * Create or update one LiveChat.
@@ -12029,6 +12166,8 @@ export namespace Prisma {
 
     /**
      * Count the number of LiveChats.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {LiveChatCountArgs} args - Arguments to filter LiveChats to count.
      * @example
      * // Count the number of LiveChats
@@ -12040,8 +12179,8 @@ export namespace Prisma {
     **/
     count<T extends LiveChatCountArgs>(
       args?: Subset<T, LiveChatCountArgs>,
-    ): Promise<
-      T extends Record<'select', any>
+    ): PrismaPromise<
+      T extends _Record<'select', any>
         ? T['select'] extends true
           ? number
           : GetScalarType<T['select'], LiveChatCountAggregateOutputType>
@@ -12050,6 +12189,8 @@ export namespace Prisma {
 
     /**
      * Allows you to perform aggregations operations on a LiveChat.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {LiveChatAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
      * @example
      * // Ordered by age ascending
@@ -12070,7 +12211,7 @@ export namespace Prisma {
      *   take: 10,
      * })
     **/
-    aggregate<T extends LiveChatAggregateArgs>(args: Subset<T, LiveChatAggregateArgs>): Promise<GetLiveChatAggregateType<T>>
+    aggregate<T extends LiveChatAggregateArgs>(args: Subset<T, LiveChatAggregateArgs>): PrismaPromise<GetLiveChatAggregateType<T>>
 
 
   }
@@ -12081,7 +12222,8 @@ export namespace Prisma {
    * Because we want to prevent naming conflicts as mentioned in 
    * https://github.com/prisma/prisma-client-js/issues/707
    */
-  export class Prisma__LiveChatClient<T> implements Promise<T> {
+  export class Prisma__LiveChatClient<T> implements PrismaPromise<T> {
+    [prisma]: true;
     private readonly _dmmf;
     private readonly _fetcher;
     private readonly _queryType;
@@ -12106,13 +12248,13 @@ export namespace Prisma {
      * @param onrejected The callback to execute when the Promise is rejected.
      * @returns A Promise for the completion of which ever callback is executed.
      */
-    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | Promise<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | Promise<TResult2>) | undefined | null): Promise<TResult1 | TResult2>;
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): Promise<TResult1 | TResult2>;
     /**
      * Attaches a callback for only the rejection of the Promise.
      * @param onrejected The callback to execute when the Promise is rejected.
      * @returns A Promise for the completion of the callback.
      */
-    catch<TResult = never>(onrejected?: ((reason: any) => TResult | Promise<TResult>) | undefined | null): Promise<T | TResult>;
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): Promise<T | TResult>;
     /**
      * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
      * resolved value cannot be modified from the callback.
@@ -12168,7 +12310,7 @@ export namespace Prisma {
     **/
     where?: LiveChatWhereInput
     /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
      * Determine the order of LiveChats to fetch.
     **/
@@ -12192,7 +12334,7 @@ export namespace Prisma {
     **/
     skip?: number
     /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
      * 
      * Filter by unique combinations of LiveChats.
     **/
@@ -12217,7 +12359,7 @@ export namespace Prisma {
     **/
     where?: LiveChatWhereInput
     /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
      * Determine the order of LiveChats to fetch.
     **/
@@ -12259,7 +12401,7 @@ export namespace Prisma {
     /**
      * The data needed to create a LiveChat.
     **/
-    data: XOR<LiveChatUncheckedCreateInput, LiveChatCreateInput>
+    data: XOR<LiveChatCreateInput, LiveChatUncheckedCreateInput>
   }
 
 
@@ -12278,7 +12420,7 @@ export namespace Prisma {
     /**
      * The data needed to update a LiveChat.
     **/
-    data: XOR<LiveChatUncheckedUpdateInput, LiveChatUpdateInput>
+    data: XOR<LiveChatUpdateInput, LiveChatUncheckedUpdateInput>
     /**
      * Choose, which LiveChat to update.
     **/
@@ -12290,7 +12432,7 @@ export namespace Prisma {
    * LiveChat updateMany
    */
   export type LiveChatUpdateManyArgs = {
-    data: XOR<LiveChatUncheckedUpdateManyInput, LiveChatUpdateManyMutationInput>
+    data: XOR<LiveChatUpdateManyMutationInput, LiveChatUncheckedUpdateManyInput>
     where?: LiveChatWhereInput
   }
 
@@ -12314,11 +12456,11 @@ export namespace Prisma {
     /**
      * In case the LiveChat found by the `where` argument doesn't exist, create a new LiveChat with this data.
     **/
-    create: XOR<LiveChatUncheckedCreateInput, LiveChatCreateInput>
+    create: XOR<LiveChatCreateInput, LiveChatUncheckedCreateInput>
     /**
      * In case the LiveChat was found with the provided `where` argument, update it with this data.
     **/
-    update: XOR<LiveChatUncheckedUpdateInput, LiveChatUpdateInput>
+    update: XOR<LiveChatUpdateInput, LiveChatUncheckedUpdateInput>
   }
 
 
@@ -12449,7 +12591,7 @@ export namespace Prisma {
     **/
     where?: NoticeNotificationsSubscriptionWhereInput
     /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
      * Determine the order of NoticeNotificationsSubscriptions to fetch.
     **/
@@ -12575,6 +12717,8 @@ export namespace Prisma {
 
     /**
      * Find the first NoticeNotificationsSubscription that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {NoticeNotificationsSubscriptionFindFirstArgs} args - Arguments to find a NoticeNotificationsSubscription
      * @example
      * // Get one NoticeNotificationsSubscription
@@ -12590,6 +12734,8 @@ export namespace Prisma {
 
     /**
      * Find zero or more NoticeNotificationsSubscriptions that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {NoticeNotificationsSubscriptionFindManyArgs=} args - Arguments to filter and select certain fields only.
      * @example
      * // Get all NoticeNotificationsSubscriptions
@@ -12604,7 +12750,7 @@ export namespace Prisma {
     **/
     findMany<T extends NoticeNotificationsSubscriptionFindManyArgs>(
       args?: SelectSubset<T, NoticeNotificationsSubscriptionFindManyArgs>
-    ): CheckSelect<T, Promise<Array<NoticeNotificationsSubscription>>, Promise<Array<NoticeNotificationsSubscriptionGetPayload<T>>>>
+    ): CheckSelect<T, PrismaPromise<Array<NoticeNotificationsSubscription>>, PrismaPromise<Array<NoticeNotificationsSubscriptionGetPayload<T>>>>
 
     /**
      * Create a NoticeNotificationsSubscription.
@@ -12671,10 +12817,12 @@ export namespace Prisma {
     **/
     deleteMany<T extends NoticeNotificationsSubscriptionDeleteManyArgs>(
       args?: SelectSubset<T, NoticeNotificationsSubscriptionDeleteManyArgs>
-    ): Promise<BatchPayload>
+    ): PrismaPromise<BatchPayload>
 
     /**
      * Update zero or more NoticeNotificationsSubscriptions.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {NoticeNotificationsSubscriptionUpdateManyArgs} args - Arguments to update one or more rows.
      * @example
      * // Update many NoticeNotificationsSubscriptions
@@ -12690,7 +12838,7 @@ export namespace Prisma {
     **/
     updateMany<T extends NoticeNotificationsSubscriptionUpdateManyArgs>(
       args: SelectSubset<T, NoticeNotificationsSubscriptionUpdateManyArgs>
-    ): Promise<BatchPayload>
+    ): PrismaPromise<BatchPayload>
 
     /**
      * Create or update one NoticeNotificationsSubscription.
@@ -12715,6 +12863,8 @@ export namespace Prisma {
 
     /**
      * Count the number of NoticeNotificationsSubscriptions.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {NoticeNotificationsSubscriptionCountArgs} args - Arguments to filter NoticeNotificationsSubscriptions to count.
      * @example
      * // Count the number of NoticeNotificationsSubscriptions
@@ -12726,8 +12876,8 @@ export namespace Prisma {
     **/
     count<T extends NoticeNotificationsSubscriptionCountArgs>(
       args?: Subset<T, NoticeNotificationsSubscriptionCountArgs>,
-    ): Promise<
-      T extends Record<'select', any>
+    ): PrismaPromise<
+      T extends _Record<'select', any>
         ? T['select'] extends true
           ? number
           : GetScalarType<T['select'], NoticeNotificationsSubscriptionCountAggregateOutputType>
@@ -12736,6 +12886,8 @@ export namespace Prisma {
 
     /**
      * Allows you to perform aggregations operations on a NoticeNotificationsSubscription.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {NoticeNotificationsSubscriptionAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
      * @example
      * // Ordered by age ascending
@@ -12756,7 +12908,7 @@ export namespace Prisma {
      *   take: 10,
      * })
     **/
-    aggregate<T extends NoticeNotificationsSubscriptionAggregateArgs>(args: Subset<T, NoticeNotificationsSubscriptionAggregateArgs>): Promise<GetNoticeNotificationsSubscriptionAggregateType<T>>
+    aggregate<T extends NoticeNotificationsSubscriptionAggregateArgs>(args: Subset<T, NoticeNotificationsSubscriptionAggregateArgs>): PrismaPromise<GetNoticeNotificationsSubscriptionAggregateType<T>>
 
 
   }
@@ -12767,7 +12919,8 @@ export namespace Prisma {
    * Because we want to prevent naming conflicts as mentioned in 
    * https://github.com/prisma/prisma-client-js/issues/707
    */
-  export class Prisma__NoticeNotificationsSubscriptionClient<T> implements Promise<T> {
+  export class Prisma__NoticeNotificationsSubscriptionClient<T> implements PrismaPromise<T> {
+    [prisma]: true;
     private readonly _dmmf;
     private readonly _fetcher;
     private readonly _queryType;
@@ -12792,13 +12945,13 @@ export namespace Prisma {
      * @param onrejected The callback to execute when the Promise is rejected.
      * @returns A Promise for the completion of which ever callback is executed.
      */
-    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | Promise<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | Promise<TResult2>) | undefined | null): Promise<TResult1 | TResult2>;
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): Promise<TResult1 | TResult2>;
     /**
      * Attaches a callback for only the rejection of the Promise.
      * @param onrejected The callback to execute when the Promise is rejected.
      * @returns A Promise for the completion of the callback.
      */
-    catch<TResult = never>(onrejected?: ((reason: any) => TResult | Promise<TResult>) | undefined | null): Promise<T | TResult>;
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): Promise<T | TResult>;
     /**
      * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
      * resolved value cannot be modified from the callback.
@@ -12854,7 +13007,7 @@ export namespace Prisma {
     **/
     where?: NoticeNotificationsSubscriptionWhereInput
     /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
      * Determine the order of NoticeNotificationsSubscriptions to fetch.
     **/
@@ -12878,7 +13031,7 @@ export namespace Prisma {
     **/
     skip?: number
     /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
      * 
      * Filter by unique combinations of NoticeNotificationsSubscriptions.
     **/
@@ -12903,7 +13056,7 @@ export namespace Prisma {
     **/
     where?: NoticeNotificationsSubscriptionWhereInput
     /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
      * Determine the order of NoticeNotificationsSubscriptions to fetch.
     **/
@@ -12945,7 +13098,7 @@ export namespace Prisma {
     /**
      * The data needed to create a NoticeNotificationsSubscription.
     **/
-    data: XOR<NoticeNotificationsSubscriptionUncheckedCreateInput, NoticeNotificationsSubscriptionCreateInput>
+    data: XOR<NoticeNotificationsSubscriptionCreateInput, NoticeNotificationsSubscriptionUncheckedCreateInput>
   }
 
 
@@ -12964,7 +13117,7 @@ export namespace Prisma {
     /**
      * The data needed to update a NoticeNotificationsSubscription.
     **/
-    data: XOR<NoticeNotificationsSubscriptionUncheckedUpdateInput, NoticeNotificationsSubscriptionUpdateInput>
+    data: XOR<NoticeNotificationsSubscriptionUpdateInput, NoticeNotificationsSubscriptionUncheckedUpdateInput>
     /**
      * Choose, which NoticeNotificationsSubscription to update.
     **/
@@ -12976,7 +13129,7 @@ export namespace Prisma {
    * NoticeNotificationsSubscription updateMany
    */
   export type NoticeNotificationsSubscriptionUpdateManyArgs = {
-    data: XOR<NoticeNotificationsSubscriptionUncheckedUpdateManyInput, NoticeNotificationsSubscriptionUpdateManyMutationInput>
+    data: XOR<NoticeNotificationsSubscriptionUpdateManyMutationInput, NoticeNotificationsSubscriptionUncheckedUpdateManyInput>
     where?: NoticeNotificationsSubscriptionWhereInput
   }
 
@@ -13000,11 +13153,11 @@ export namespace Prisma {
     /**
      * In case the NoticeNotificationsSubscription found by the `where` argument doesn't exist, create a new NoticeNotificationsSubscription with this data.
     **/
-    create: XOR<NoticeNotificationsSubscriptionUncheckedCreateInput, NoticeNotificationsSubscriptionCreateInput>
+    create: XOR<NoticeNotificationsSubscriptionCreateInput, NoticeNotificationsSubscriptionUncheckedCreateInput>
     /**
      * In case the NoticeNotificationsSubscription was found with the provided `where` argument, update it with this data.
     **/
-    update: XOR<NoticeNotificationsSubscriptionUncheckedUpdateInput, NoticeNotificationsSubscriptionUpdateInput>
+    update: XOR<NoticeNotificationsSubscriptionUpdateInput, NoticeNotificationsSubscriptionUncheckedUpdateInput>
   }
 
 
@@ -13149,7 +13302,7 @@ export namespace Prisma {
     **/
     where?: PendingUserWhereInput
     /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
      * Determine the order of PendingUsers to fetch.
     **/
@@ -13268,6 +13421,8 @@ export namespace Prisma {
 
     /**
      * Find the first PendingUser that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {PendingUserFindFirstArgs} args - Arguments to find a PendingUser
      * @example
      * // Get one PendingUser
@@ -13283,6 +13438,8 @@ export namespace Prisma {
 
     /**
      * Find zero or more PendingUsers that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {PendingUserFindManyArgs=} args - Arguments to filter and select certain fields only.
      * @example
      * // Get all PendingUsers
@@ -13297,7 +13454,7 @@ export namespace Prisma {
     **/
     findMany<T extends PendingUserFindManyArgs>(
       args?: SelectSubset<T, PendingUserFindManyArgs>
-    ): CheckSelect<T, Promise<Array<PendingUser>>, Promise<Array<PendingUserGetPayload<T>>>>
+    ): CheckSelect<T, PrismaPromise<Array<PendingUser>>, PrismaPromise<Array<PendingUserGetPayload<T>>>>
 
     /**
      * Create a PendingUser.
@@ -13364,10 +13521,12 @@ export namespace Prisma {
     **/
     deleteMany<T extends PendingUserDeleteManyArgs>(
       args?: SelectSubset<T, PendingUserDeleteManyArgs>
-    ): Promise<BatchPayload>
+    ): PrismaPromise<BatchPayload>
 
     /**
      * Update zero or more PendingUsers.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {PendingUserUpdateManyArgs} args - Arguments to update one or more rows.
      * @example
      * // Update many PendingUsers
@@ -13383,7 +13542,7 @@ export namespace Prisma {
     **/
     updateMany<T extends PendingUserUpdateManyArgs>(
       args: SelectSubset<T, PendingUserUpdateManyArgs>
-    ): Promise<BatchPayload>
+    ): PrismaPromise<BatchPayload>
 
     /**
      * Create or update one PendingUser.
@@ -13408,6 +13567,8 @@ export namespace Prisma {
 
     /**
      * Count the number of PendingUsers.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {PendingUserCountArgs} args - Arguments to filter PendingUsers to count.
      * @example
      * // Count the number of PendingUsers
@@ -13419,8 +13580,8 @@ export namespace Prisma {
     **/
     count<T extends PendingUserCountArgs>(
       args?: Subset<T, PendingUserCountArgs>,
-    ): Promise<
-      T extends Record<'select', any>
+    ): PrismaPromise<
+      T extends _Record<'select', any>
         ? T['select'] extends true
           ? number
           : GetScalarType<T['select'], PendingUserCountAggregateOutputType>
@@ -13429,6 +13590,8 @@ export namespace Prisma {
 
     /**
      * Allows you to perform aggregations operations on a PendingUser.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {PendingUserAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
      * @example
      * // Ordered by age ascending
@@ -13449,7 +13612,7 @@ export namespace Prisma {
      *   take: 10,
      * })
     **/
-    aggregate<T extends PendingUserAggregateArgs>(args: Subset<T, PendingUserAggregateArgs>): Promise<GetPendingUserAggregateType<T>>
+    aggregate<T extends PendingUserAggregateArgs>(args: Subset<T, PendingUserAggregateArgs>): PrismaPromise<GetPendingUserAggregateType<T>>
 
 
   }
@@ -13460,7 +13623,8 @@ export namespace Prisma {
    * Because we want to prevent naming conflicts as mentioned in 
    * https://github.com/prisma/prisma-client-js/issues/707
    */
-  export class Prisma__PendingUserClient<T> implements Promise<T> {
+  export class Prisma__PendingUserClient<T> implements PrismaPromise<T> {
+    [prisma]: true;
     private readonly _dmmf;
     private readonly _fetcher;
     private readonly _queryType;
@@ -13484,13 +13648,13 @@ export namespace Prisma {
      * @param onrejected The callback to execute when the Promise is rejected.
      * @returns A Promise for the completion of which ever callback is executed.
      */
-    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | Promise<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | Promise<TResult2>) | undefined | null): Promise<TResult1 | TResult2>;
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): Promise<TResult1 | TResult2>;
     /**
      * Attaches a callback for only the rejection of the Promise.
      * @param onrejected The callback to execute when the Promise is rejected.
      * @returns A Promise for the completion of the callback.
      */
-    catch<TResult = never>(onrejected?: ((reason: any) => TResult | Promise<TResult>) | undefined | null): Promise<T | TResult>;
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): Promise<T | TResult>;
     /**
      * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
      * resolved value cannot be modified from the callback.
@@ -13538,7 +13702,7 @@ export namespace Prisma {
     **/
     where?: PendingUserWhereInput
     /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
      * Determine the order of PendingUsers to fetch.
     **/
@@ -13562,7 +13726,7 @@ export namespace Prisma {
     **/
     skip?: number
     /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
      * 
      * Filter by unique combinations of PendingUsers.
     **/
@@ -13583,7 +13747,7 @@ export namespace Prisma {
     **/
     where?: PendingUserWhereInput
     /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
      * Determine the order of PendingUsers to fetch.
     **/
@@ -13621,7 +13785,7 @@ export namespace Prisma {
     /**
      * The data needed to create a PendingUser.
     **/
-    data: XOR<PendingUserUncheckedCreateInput, PendingUserCreateInput>
+    data: XOR<PendingUserCreateInput, PendingUserUncheckedCreateInput>
   }
 
 
@@ -13636,7 +13800,7 @@ export namespace Prisma {
     /**
      * The data needed to update a PendingUser.
     **/
-    data: XOR<PendingUserUncheckedUpdateInput, PendingUserUpdateInput>
+    data: XOR<PendingUserUpdateInput, PendingUserUncheckedUpdateInput>
     /**
      * Choose, which PendingUser to update.
     **/
@@ -13648,7 +13812,7 @@ export namespace Prisma {
    * PendingUser updateMany
    */
   export type PendingUserUpdateManyArgs = {
-    data: XOR<PendingUserUncheckedUpdateManyInput, PendingUserUpdateManyMutationInput>
+    data: XOR<PendingUserUpdateManyMutationInput, PendingUserUncheckedUpdateManyInput>
     where?: PendingUserWhereInput
   }
 
@@ -13668,11 +13832,11 @@ export namespace Prisma {
     /**
      * In case the PendingUser found by the `where` argument doesn't exist, create a new PendingUser with this data.
     **/
-    create: XOR<PendingUserUncheckedCreateInput, PendingUserCreateInput>
+    create: XOR<PendingUserCreateInput, PendingUserUncheckedCreateInput>
     /**
      * In case the PendingUser was found with the provided `where` argument, update it with this data.
     **/
-    update: XOR<PendingUserUncheckedUpdateInput, PendingUserUpdateInput>
+    update: XOR<PendingUserUpdateInput, PendingUserUncheckedUpdateInput>
   }
 
 
@@ -13815,7 +13979,7 @@ export namespace Prisma {
     **/
     where?: PeriodWhereInput
     /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
      * Determine the order of Periods to fetch.
     **/
@@ -13943,6 +14107,8 @@ export namespace Prisma {
 
     /**
      * Find the first Period that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {PeriodFindFirstArgs} args - Arguments to find a Period
      * @example
      * // Get one Period
@@ -13958,6 +14124,8 @@ export namespace Prisma {
 
     /**
      * Find zero or more Periods that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {PeriodFindManyArgs=} args - Arguments to filter and select certain fields only.
      * @example
      * // Get all Periods
@@ -13972,7 +14140,7 @@ export namespace Prisma {
     **/
     findMany<T extends PeriodFindManyArgs>(
       args?: SelectSubset<T, PeriodFindManyArgs>
-    ): CheckSelect<T, Promise<Array<Period>>, Promise<Array<PeriodGetPayload<T>>>>
+    ): CheckSelect<T, PrismaPromise<Array<Period>>, PrismaPromise<Array<PeriodGetPayload<T>>>>
 
     /**
      * Create a Period.
@@ -14039,10 +14207,12 @@ export namespace Prisma {
     **/
     deleteMany<T extends PeriodDeleteManyArgs>(
       args?: SelectSubset<T, PeriodDeleteManyArgs>
-    ): Promise<BatchPayload>
+    ): PrismaPromise<BatchPayload>
 
     /**
      * Update zero or more Periods.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {PeriodUpdateManyArgs} args - Arguments to update one or more rows.
      * @example
      * // Update many Periods
@@ -14058,7 +14228,7 @@ export namespace Prisma {
     **/
     updateMany<T extends PeriodUpdateManyArgs>(
       args: SelectSubset<T, PeriodUpdateManyArgs>
-    ): Promise<BatchPayload>
+    ): PrismaPromise<BatchPayload>
 
     /**
      * Create or update one Period.
@@ -14083,6 +14253,8 @@ export namespace Prisma {
 
     /**
      * Count the number of Periods.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {PeriodCountArgs} args - Arguments to filter Periods to count.
      * @example
      * // Count the number of Periods
@@ -14094,8 +14266,8 @@ export namespace Prisma {
     **/
     count<T extends PeriodCountArgs>(
       args?: Subset<T, PeriodCountArgs>,
-    ): Promise<
-      T extends Record<'select', any>
+    ): PrismaPromise<
+      T extends _Record<'select', any>
         ? T['select'] extends true
           ? number
           : GetScalarType<T['select'], PeriodCountAggregateOutputType>
@@ -14104,6 +14276,8 @@ export namespace Prisma {
 
     /**
      * Allows you to perform aggregations operations on a Period.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {PeriodAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
      * @example
      * // Ordered by age ascending
@@ -14124,7 +14298,7 @@ export namespace Prisma {
      *   take: 10,
      * })
     **/
-    aggregate<T extends PeriodAggregateArgs>(args: Subset<T, PeriodAggregateArgs>): Promise<GetPeriodAggregateType<T>>
+    aggregate<T extends PeriodAggregateArgs>(args: Subset<T, PeriodAggregateArgs>): PrismaPromise<GetPeriodAggregateType<T>>
 
 
   }
@@ -14135,7 +14309,8 @@ export namespace Prisma {
    * Because we want to prevent naming conflicts as mentioned in 
    * https://github.com/prisma/prisma-client-js/issues/707
    */
-  export class Prisma__PeriodClient<T> implements Promise<T> {
+  export class Prisma__PeriodClient<T> implements PrismaPromise<T> {
+    [prisma]: true;
     private readonly _dmmf;
     private readonly _fetcher;
     private readonly _queryType;
@@ -14160,13 +14335,13 @@ export namespace Prisma {
      * @param onrejected The callback to execute when the Promise is rejected.
      * @returns A Promise for the completion of which ever callback is executed.
      */
-    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | Promise<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | Promise<TResult2>) | undefined | null): Promise<TResult1 | TResult2>;
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): Promise<TResult1 | TResult2>;
     /**
      * Attaches a callback for only the rejection of the Promise.
      * @param onrejected The callback to execute when the Promise is rejected.
      * @returns A Promise for the completion of the callback.
      */
-    catch<TResult = never>(onrejected?: ((reason: any) => TResult | Promise<TResult>) | undefined | null): Promise<T | TResult>;
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): Promise<T | TResult>;
     /**
      * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
      * resolved value cannot be modified from the callback.
@@ -14222,7 +14397,7 @@ export namespace Prisma {
     **/
     where?: PeriodWhereInput
     /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
      * Determine the order of Periods to fetch.
     **/
@@ -14246,7 +14421,7 @@ export namespace Prisma {
     **/
     skip?: number
     /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
      * 
      * Filter by unique combinations of Periods.
     **/
@@ -14271,7 +14446,7 @@ export namespace Prisma {
     **/
     where?: PeriodWhereInput
     /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
      * Determine the order of Periods to fetch.
     **/
@@ -14313,7 +14488,7 @@ export namespace Prisma {
     /**
      * The data needed to create a Period.
     **/
-    data: XOR<PeriodUncheckedCreateInput, PeriodCreateInput>
+    data: XOR<PeriodCreateInput, PeriodUncheckedCreateInput>
   }
 
 
@@ -14332,7 +14507,7 @@ export namespace Prisma {
     /**
      * The data needed to update a Period.
     **/
-    data: XOR<PeriodUncheckedUpdateInput, PeriodUpdateInput>
+    data: XOR<PeriodUpdateInput, PeriodUncheckedUpdateInput>
     /**
      * Choose, which Period to update.
     **/
@@ -14344,7 +14519,7 @@ export namespace Prisma {
    * Period updateMany
    */
   export type PeriodUpdateManyArgs = {
-    data: XOR<PeriodUncheckedUpdateManyInput, PeriodUpdateManyMutationInput>
+    data: XOR<PeriodUpdateManyMutationInput, PeriodUncheckedUpdateManyInput>
     where?: PeriodWhereInput
   }
 
@@ -14368,11 +14543,11 @@ export namespace Prisma {
     /**
      * In case the Period found by the `where` argument doesn't exist, create a new Period with this data.
     **/
-    create: XOR<PeriodUncheckedCreateInput, PeriodCreateInput>
+    create: XOR<PeriodCreateInput, PeriodUncheckedCreateInput>
     /**
      * In case the Period was found with the provided `where` argument, update it with this data.
     **/
-    update: XOR<PeriodUncheckedUpdateInput, PeriodUpdateInput>
+    update: XOR<PeriodUpdateInput, PeriodUncheckedUpdateInput>
   }
 
 
@@ -14415,688 +14590,6 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well.
     **/
     include?: PeriodInclude | null
-  }
-
-
-
-  /**
-   * Model Push
-   */
-
-
-  export type AggregatePush = {
-    count: PushCountAggregateOutputType | null
-    avg: PushAvgAggregateOutputType | null
-    sum: PushSumAggregateOutputType | null
-    min: PushMinAggregateOutputType | null
-    max: PushMaxAggregateOutputType | null
-  }
-
-  export type PushAvgAggregateOutputType = {
-    userId: number
-  }
-
-  export type PushSumAggregateOutputType = {
-    userId: number
-  }
-
-  export type PushMinAggregateOutputType = {
-    userId: number
-    expoPushToken: string | null
-    registeredAt: Date | null
-    activeAt: Date | null
-  }
-
-  export type PushMaxAggregateOutputType = {
-    userId: number
-    expoPushToken: string | null
-    registeredAt: Date | null
-    activeAt: Date | null
-  }
-
-  export type PushCountAggregateOutputType = {
-    userId: number
-    expoPushToken: number | null
-    registeredAt: number | null
-    activeAt: number | null
-    _all: number
-  }
-
-
-  export type PushAvgAggregateInputType = {
-    userId?: true
-  }
-
-  export type PushSumAggregateInputType = {
-    userId?: true
-  }
-
-  export type PushMinAggregateInputType = {
-    userId?: true
-    expoPushToken?: true
-    registeredAt?: true
-    activeAt?: true
-  }
-
-  export type PushMaxAggregateInputType = {
-    userId?: true
-    expoPushToken?: true
-    registeredAt?: true
-    activeAt?: true
-  }
-
-  export type PushCountAggregateInputType = {
-    userId?: true
-    expoPushToken?: true
-    registeredAt?: true
-    activeAt?: true
-    _all?: true
-  }
-
-  export type PushAggregateArgs = {
-    /**
-     * Filter which Push to aggregate.
-    **/
-    where?: PushWhereInput
-    /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs
-     * 
-     * Determine the order of Pushes to fetch.
-    **/
-    orderBy?: Enumerable<PushOrderByInput>
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the start position
-    **/
-    cursor?: PushWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` Pushes from the position of the cursor.
-    **/
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` Pushes.
-    **/
-    skip?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Count returned Pushes
-    **/
-    count?: true | PushCountAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to average
-    **/
-    avg?: PushAvgAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to sum
-    **/
-    sum?: PushSumAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to find the minimum value
-    **/
-    min?: PushMinAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to find the maximum value
-    **/
-    max?: PushMaxAggregateInputType
-  }
-
-  export type GetPushAggregateType<T extends PushAggregateArgs> = {
-    [P in keyof T & keyof AggregatePush]: P extends 'count'
-      ? T[P] extends true
-        ? number
-        : GetScalarType<T[P], AggregatePush[P]>
-      : GetScalarType<T[P], AggregatePush[P]>
-  }
-
-
-
-  export type PushSelect = {
-    userId?: boolean
-    expoPushToken?: boolean
-    registeredAt?: boolean
-    activeAt?: boolean
-    user?: boolean | UserArgs
-  }
-
-  export type PushInclude = {
-    user?: boolean | UserArgs
-  }
-
-  export type PushGetPayload<
-    S extends boolean | null | undefined | PushArgs,
-    U = keyof S
-      > = S extends true
-        ? Push
-    : S extends undefined
-    ? never
-    : S extends PushArgs | PushFindManyArgs
-    ?'include' extends U
-    ? Push  & {
-    [P in TrueKeys<S['include']>]: 
-          P extends 'user'
-        ? UserGetPayload<S['include'][P]> : never
-  } 
-    : 'select' extends U
-    ? {
-    [P in TrueKeys<S['select']>]: P extends keyof Push ?Push [P]
-  : 
-          P extends 'user'
-        ? UserGetPayload<S['select'][P]> : never
-  } 
-    : Push
-  : Push
-
-
-  type PushCountArgs = Merge<
-    Omit<PushFindManyArgs, 'select' | 'include'> & {
-      select?: PushCountAggregateInputType | true
-    }
-  >
-
-  export interface PushDelegate<GlobalRejectSettings> {
-    /**
-     * Find zero or one Push that matches the filter.
-     * @param {PushFindUniqueArgs} args - Arguments to find a Push
-     * @example
-     * // Get one Push
-     * const push = await prisma.push.findUnique({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-    **/
-    findUnique<T extends PushFindUniqueArgs,  LocalRejectSettings = T["rejectOnNotFound"] extends RejectOnNotFound ? T['rejectOnNotFound'] : undefined>(
-      args: SelectSubset<T, PushFindUniqueArgs>
-    ): HasReject<GlobalRejectSettings, LocalRejectSettings, 'findUnique', 'Push'> extends True ? CheckSelect<T, Prisma__PushClient<Push>, Prisma__PushClient<PushGetPayload<T>>> : CheckSelect<T, Prisma__PushClient<Push | null >, Prisma__PushClient<PushGetPayload<T> | null >>
-
-    /**
-     * Find the first Push that matches the filter.
-     * @param {PushFindFirstArgs} args - Arguments to find a Push
-     * @example
-     * // Get one Push
-     * const push = await prisma.push.findFirst({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-    **/
-    findFirst<T extends PushFindFirstArgs,  LocalRejectSettings = T["rejectOnNotFound"] extends RejectOnNotFound ? T['rejectOnNotFound'] : undefined>(
-      args?: SelectSubset<T, PushFindFirstArgs>
-    ): HasReject<GlobalRejectSettings, LocalRejectSettings, 'findFirst', 'Push'> extends True ? CheckSelect<T, Prisma__PushClient<Push>, Prisma__PushClient<PushGetPayload<T>>> : CheckSelect<T, Prisma__PushClient<Push | null >, Prisma__PushClient<PushGetPayload<T> | null >>
-
-    /**
-     * Find zero or more Pushes that matches the filter.
-     * @param {PushFindManyArgs=} args - Arguments to filter and select certain fields only.
-     * @example
-     * // Get all Pushes
-     * const pushes = await prisma.push.findMany()
-     * 
-     * // Get first 10 Pushes
-     * const pushes = await prisma.push.findMany({ take: 10 })
-     * 
-     * // Only select the `userId`
-     * const pushWithUserIdOnly = await prisma.push.findMany({ select: { userId: true } })
-     * 
-    **/
-    findMany<T extends PushFindManyArgs>(
-      args?: SelectSubset<T, PushFindManyArgs>
-    ): CheckSelect<T, Promise<Array<Push>>, Promise<Array<PushGetPayload<T>>>>
-
-    /**
-     * Create a Push.
-     * @param {PushCreateArgs} args - Arguments to create a Push.
-     * @example
-     * // Create one Push
-     * const Push = await prisma.push.create({
-     *   data: {
-     *     // ... data to create a Push
-     *   }
-     * })
-     * 
-    **/
-    create<T extends PushCreateArgs>(
-      args: SelectSubset<T, PushCreateArgs>
-    ): CheckSelect<T, Prisma__PushClient<Push>, Prisma__PushClient<PushGetPayload<T>>>
-
-    /**
-     * Delete a Push.
-     * @param {PushDeleteArgs} args - Arguments to delete one Push.
-     * @example
-     * // Delete one Push
-     * const Push = await prisma.push.delete({
-     *   where: {
-     *     // ... filter to delete one Push
-     *   }
-     * })
-     * 
-    **/
-    delete<T extends PushDeleteArgs>(
-      args: SelectSubset<T, PushDeleteArgs>
-    ): CheckSelect<T, Prisma__PushClient<Push>, Prisma__PushClient<PushGetPayload<T>>>
-
-    /**
-     * Update one Push.
-     * @param {PushUpdateArgs} args - Arguments to update one Push.
-     * @example
-     * // Update one Push
-     * const push = await prisma.push.update({
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: {
-     *     // ... provide data here
-     *   }
-     * })
-     * 
-    **/
-    update<T extends PushUpdateArgs>(
-      args: SelectSubset<T, PushUpdateArgs>
-    ): CheckSelect<T, Prisma__PushClient<Push>, Prisma__PushClient<PushGetPayload<T>>>
-
-    /**
-     * Delete zero or more Pushes.
-     * @param {PushDeleteManyArgs} args - Arguments to filter Pushes to delete.
-     * @example
-     * // Delete a few Pushes
-     * const { count } = await prisma.push.deleteMany({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     * 
-    **/
-    deleteMany<T extends PushDeleteManyArgs>(
-      args?: SelectSubset<T, PushDeleteManyArgs>
-    ): Promise<BatchPayload>
-
-    /**
-     * Update zero or more Pushes.
-     * @param {PushUpdateManyArgs} args - Arguments to update one or more rows.
-     * @example
-     * // Update many Pushes
-     * const push = await prisma.push.updateMany({
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: {
-     *     // ... provide data here
-     *   }
-     * })
-     * 
-    **/
-    updateMany<T extends PushUpdateManyArgs>(
-      args: SelectSubset<T, PushUpdateManyArgs>
-    ): Promise<BatchPayload>
-
-    /**
-     * Create or update one Push.
-     * @param {PushUpsertArgs} args - Arguments to update or create a Push.
-     * @example
-     * // Update or create a Push
-     * const push = await prisma.push.upsert({
-     *   create: {
-     *     // ... data to create a Push
-     *   },
-     *   update: {
-     *     // ... in case it already exists, update
-     *   },
-     *   where: {
-     *     // ... the filter for the Push we want to update
-     *   }
-     * })
-    **/
-    upsert<T extends PushUpsertArgs>(
-      args: SelectSubset<T, PushUpsertArgs>
-    ): CheckSelect<T, Prisma__PushClient<Push>, Prisma__PushClient<PushGetPayload<T>>>
-
-    /**
-     * Count the number of Pushes.
-     * @param {PushCountArgs} args - Arguments to filter Pushes to count.
-     * @example
-     * // Count the number of Pushes
-     * const count = await prisma.push.count({
-     *   where: {
-     *     // ... the filter for the Pushes we want to count
-     *   }
-     * })
-    **/
-    count<T extends PushCountArgs>(
-      args?: Subset<T, PushCountArgs>,
-    ): Promise<
-      T extends Record<'select', any>
-        ? T['select'] extends true
-          ? number
-          : GetScalarType<T['select'], PushCountAggregateOutputType>
-        : number
-    >
-
-    /**
-     * Allows you to perform aggregations operations on a Push.
-     * @param {PushAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
-     * @example
-     * // Ordered by age ascending
-     * // Where email contains prisma.io
-     * // Limited to the 10 users
-     * const aggregations = await prisma.user.aggregate({
-     *   avg: {
-     *     age: true,
-     *   },
-     *   where: {
-     *     email: {
-     *       contains: "prisma.io",
-     *     },
-     *   },
-     *   orderBy: {
-     *     age: "asc",
-     *   },
-     *   take: 10,
-     * })
-    **/
-    aggregate<T extends PushAggregateArgs>(args: Subset<T, PushAggregateArgs>): Promise<GetPushAggregateType<T>>
-
-
-  }
-
-  /**
-   * The delegate class that acts as a "Promise-like" for Push.
-   * Why is this prefixed with `Prisma__`?
-   * Because we want to prevent naming conflicts as mentioned in 
-   * https://github.com/prisma/prisma-client-js/issues/707
-   */
-  export class Prisma__PushClient<T> implements Promise<T> {
-    private readonly _dmmf;
-    private readonly _fetcher;
-    private readonly _queryType;
-    private readonly _rootField;
-    private readonly _clientMethod;
-    private readonly _args;
-    private readonly _dataPath;
-    private readonly _errorFormat;
-    private readonly _measurePerformance?;
-    private _isList;
-    private _callsite;
-    private _requestPromise?;
-    constructor(_dmmf: runtime.DMMFClass, _fetcher: PrismaClientFetcher, _queryType: 'query' | 'mutation', _rootField: string, _clientMethod: string, _args: any, _dataPath: string[], _errorFormat: ErrorFormat, _measurePerformance?: boolean | undefined, _isList?: boolean);
-    readonly [Symbol.toStringTag]: 'PrismaClientPromise';
-
-    user<T extends UserArgs = {}>(args?: Subset<T, UserArgs>): CheckSelect<T, Prisma__UserClient<User | null >, Prisma__UserClient<UserGetPayload<T> | null >>;
-
-    private get _document();
-    /**
-     * Attaches callbacks for the resolution and/or rejection of the Promise.
-     * @param onfulfilled The callback to execute when the Promise is resolved.
-     * @param onrejected The callback to execute when the Promise is rejected.
-     * @returns A Promise for the completion of which ever callback is executed.
-     */
-    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | Promise<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | Promise<TResult2>) | undefined | null): Promise<TResult1 | TResult2>;
-    /**
-     * Attaches a callback for only the rejection of the Promise.
-     * @param onrejected The callback to execute when the Promise is rejected.
-     * @returns A Promise for the completion of the callback.
-     */
-    catch<TResult = never>(onrejected?: ((reason: any) => TResult | Promise<TResult>) | undefined | null): Promise<T | TResult>;
-    /**
-     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
-     * resolved value cannot be modified from the callback.
-     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
-     * @returns A Promise for the completion of the callback.
-     */
-    finally(onfinally?: (() => void) | undefined | null): Promise<T>;
-  }
-
-  // Custom InputTypes
-
-  /**
-   * Push findUnique
-   */
-  export type PushFindUniqueArgs = {
-    /**
-     * Select specific fields to fetch from the Push
-    **/
-    select?: PushSelect | null
-    /**
-     * Choose, which related nodes to fetch as well.
-    **/
-    include?: PushInclude | null
-    /**
-     * Throw an Error if a Push can't be found
-    **/
-    rejectOnNotFound?: RejectOnNotFound
-    /**
-     * Filter, which Push to fetch.
-    **/
-    where: PushWhereUniqueInput
-  }
-
-
-  /**
-   * Push findFirst
-   */
-  export type PushFindFirstArgs = {
-    /**
-     * Select specific fields to fetch from the Push
-    **/
-    select?: PushSelect | null
-    /**
-     * Choose, which related nodes to fetch as well.
-    **/
-    include?: PushInclude | null
-    /**
-     * Throw an Error if a Push can't be found
-    **/
-    rejectOnNotFound?: RejectOnNotFound
-    /**
-     * Filter, which Push to fetch.
-    **/
-    where?: PushWhereInput
-    /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs
-     * 
-     * Determine the order of Pushes to fetch.
-    **/
-    orderBy?: Enumerable<PushOrderByInput>
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the position for searching for Pushes.
-    **/
-    cursor?: PushWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` Pushes from the position of the cursor.
-    **/
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` Pushes.
-    **/
-    skip?: number
-    /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs
-     * 
-     * Filter by unique combinations of Pushes.
-    **/
-    distinct?: Enumerable<PushScalarFieldEnum>
-  }
-
-
-  /**
-   * Push findMany
-   */
-  export type PushFindManyArgs = {
-    /**
-     * Select specific fields to fetch from the Push
-    **/
-    select?: PushSelect | null
-    /**
-     * Choose, which related nodes to fetch as well.
-    **/
-    include?: PushInclude | null
-    /**
-     * Filter, which Pushes to fetch.
-    **/
-    where?: PushWhereInput
-    /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs
-     * 
-     * Determine the order of Pushes to fetch.
-    **/
-    orderBy?: Enumerable<PushOrderByInput>
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the position for listing Pushes.
-    **/
-    cursor?: PushWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` Pushes from the position of the cursor.
-    **/
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` Pushes.
-    **/
-    skip?: number
-    distinct?: Enumerable<PushScalarFieldEnum>
-  }
-
-
-  /**
-   * Push create
-   */
-  export type PushCreateArgs = {
-    /**
-     * Select specific fields to fetch from the Push
-    **/
-    select?: PushSelect | null
-    /**
-     * Choose, which related nodes to fetch as well.
-    **/
-    include?: PushInclude | null
-    /**
-     * The data needed to create a Push.
-    **/
-    data: XOR<PushUncheckedCreateInput, PushCreateInput>
-  }
-
-
-  /**
-   * Push update
-   */
-  export type PushUpdateArgs = {
-    /**
-     * Select specific fields to fetch from the Push
-    **/
-    select?: PushSelect | null
-    /**
-     * Choose, which related nodes to fetch as well.
-    **/
-    include?: PushInclude | null
-    /**
-     * The data needed to update a Push.
-    **/
-    data: XOR<PushUncheckedUpdateInput, PushUpdateInput>
-    /**
-     * Choose, which Push to update.
-    **/
-    where: PushWhereUniqueInput
-  }
-
-
-  /**
-   * Push updateMany
-   */
-  export type PushUpdateManyArgs = {
-    data: XOR<PushUncheckedUpdateManyInput, PushUpdateManyMutationInput>
-    where?: PushWhereInput
-  }
-
-
-  /**
-   * Push upsert
-   */
-  export type PushUpsertArgs = {
-    /**
-     * Select specific fields to fetch from the Push
-    **/
-    select?: PushSelect | null
-    /**
-     * Choose, which related nodes to fetch as well.
-    **/
-    include?: PushInclude | null
-    /**
-     * The filter to search for the Push to update in case it exists.
-    **/
-    where: PushWhereUniqueInput
-    /**
-     * In case the Push found by the `where` argument doesn't exist, create a new Push with this data.
-    **/
-    create: XOR<PushUncheckedCreateInput, PushCreateInput>
-    /**
-     * In case the Push was found with the provided `where` argument, update it with this data.
-    **/
-    update: XOR<PushUncheckedUpdateInput, PushUpdateInput>
-  }
-
-
-  /**
-   * Push delete
-   */
-  export type PushDeleteArgs = {
-    /**
-     * Select specific fields to fetch from the Push
-    **/
-    select?: PushSelect | null
-    /**
-     * Choose, which related nodes to fetch as well.
-    **/
-    include?: PushInclude | null
-    /**
-     * Filter which Push to delete.
-    **/
-    where: PushWhereUniqueInput
-  }
-
-
-  /**
-   * Push deleteMany
-   */
-  export type PushDeleteManyArgs = {
-    where?: PushWhereInput
-  }
-
-
-  /**
-   * Push without action
-   */
-  export type PushArgs = {
-    /**
-     * Select specific fields to fetch from the Push
-    **/
-    select?: PushSelect | null
-    /**
-     * Choose, which related nodes to fetch as well.
-    **/
-    include?: PushInclude | null
   }
 
 
@@ -15199,7 +14692,7 @@ export namespace Prisma {
     **/
     where?: UserWhereInput
     /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
      * Determine the order of Users to fetch.
     **/
@@ -15285,7 +14778,6 @@ export namespace Prisma {
     communitySubcomments?: boolean | CommunitySubcommentFindManyArgs
     liveChats?: boolean | LiveChatFindManyArgs
     noticeNotificationsSubscriptions?: boolean | NoticeNotificationsSubscriptionFindManyArgs
-    pushes?: boolean | PushFindManyArgs
     reportComments?: boolean | ReportCommentFindManyArgs
     reportPosts?: boolean | ReportPostFindManyArgs
     reportSubcomments?: boolean | ReportSubcommentFindManyArgs
@@ -15306,7 +14798,6 @@ export namespace Prisma {
     communitySubcomments?: boolean | CommunitySubcommentFindManyArgs
     liveChats?: boolean | LiveChatFindManyArgs
     noticeNotificationsSubscriptions?: boolean | NoticeNotificationsSubscriptionFindManyArgs
-    pushes?: boolean | PushFindManyArgs
     reportComments?: boolean | ReportCommentFindManyArgs
     reportPosts?: boolean | ReportPostFindManyArgs
     reportSubcomments?: boolean | ReportSubcommentFindManyArgs
@@ -15350,8 +14841,6 @@ export namespace Prisma {
         ? Array < LiveChatGetPayload<S['include'][P]>>  :
         P extends 'noticeNotificationsSubscriptions'
         ? Array < NoticeNotificationsSubscriptionGetPayload<S['include'][P]>>  :
-        P extends 'pushes'
-        ? Array < PushGetPayload<S['include'][P]>>  :
         P extends 'reportComments'
         ? Array < ReportCommentGetPayload<S['include'][P]>>  :
         P extends 'reportPosts'
@@ -15391,8 +14880,6 @@ export namespace Prisma {
         ? Array < LiveChatGetPayload<S['select'][P]>>  :
         P extends 'noticeNotificationsSubscriptions'
         ? Array < NoticeNotificationsSubscriptionGetPayload<S['select'][P]>>  :
-        P extends 'pushes'
-        ? Array < PushGetPayload<S['select'][P]>>  :
         P extends 'reportComments'
         ? Array < ReportCommentGetPayload<S['select'][P]>>  :
         P extends 'reportPosts'
@@ -15430,6 +14917,8 @@ export namespace Prisma {
 
     /**
      * Find the first User that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {UserFindFirstArgs} args - Arguments to find a User
      * @example
      * // Get one User
@@ -15445,6 +14934,8 @@ export namespace Prisma {
 
     /**
      * Find zero or more Users that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {UserFindManyArgs=} args - Arguments to filter and select certain fields only.
      * @example
      * // Get all Users
@@ -15459,7 +14950,7 @@ export namespace Prisma {
     **/
     findMany<T extends UserFindManyArgs>(
       args?: SelectSubset<T, UserFindManyArgs>
-    ): CheckSelect<T, Promise<Array<User>>, Promise<Array<UserGetPayload<T>>>>
+    ): CheckSelect<T, PrismaPromise<Array<User>>, PrismaPromise<Array<UserGetPayload<T>>>>
 
     /**
      * Create a User.
@@ -15526,10 +15017,12 @@ export namespace Prisma {
     **/
     deleteMany<T extends UserDeleteManyArgs>(
       args?: SelectSubset<T, UserDeleteManyArgs>
-    ): Promise<BatchPayload>
+    ): PrismaPromise<BatchPayload>
 
     /**
      * Update zero or more Users.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {UserUpdateManyArgs} args - Arguments to update one or more rows.
      * @example
      * // Update many Users
@@ -15545,7 +15038,7 @@ export namespace Prisma {
     **/
     updateMany<T extends UserUpdateManyArgs>(
       args: SelectSubset<T, UserUpdateManyArgs>
-    ): Promise<BatchPayload>
+    ): PrismaPromise<BatchPayload>
 
     /**
      * Create or update one User.
@@ -15570,6 +15063,8 @@ export namespace Prisma {
 
     /**
      * Count the number of Users.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {UserCountArgs} args - Arguments to filter Users to count.
      * @example
      * // Count the number of Users
@@ -15581,8 +15076,8 @@ export namespace Prisma {
     **/
     count<T extends UserCountArgs>(
       args?: Subset<T, UserCountArgs>,
-    ): Promise<
-      T extends Record<'select', any>
+    ): PrismaPromise<
+      T extends _Record<'select', any>
         ? T['select'] extends true
           ? number
           : GetScalarType<T['select'], UserCountAggregateOutputType>
@@ -15591,6 +15086,8 @@ export namespace Prisma {
 
     /**
      * Allows you to perform aggregations operations on a User.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {UserAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
      * @example
      * // Ordered by age ascending
@@ -15611,7 +15108,7 @@ export namespace Prisma {
      *   take: 10,
      * })
     **/
-    aggregate<T extends UserAggregateArgs>(args: Subset<T, UserAggregateArgs>): Promise<GetUserAggregateType<T>>
+    aggregate<T extends UserAggregateArgs>(args: Subset<T, UserAggregateArgs>): PrismaPromise<GetUserAggregateType<T>>
 
 
   }
@@ -15622,7 +15119,8 @@ export namespace Prisma {
    * Because we want to prevent naming conflicts as mentioned in 
    * https://github.com/prisma/prisma-client-js/issues/707
    */
-  export class Prisma__UserClient<T> implements Promise<T> {
+  export class Prisma__UserClient<T> implements PrismaPromise<T> {
+    [prisma]: true;
     private readonly _dmmf;
     private readonly _fetcher;
     private readonly _queryType;
@@ -15642,37 +15140,35 @@ export namespace Prisma {
 
     changePassword<T extends ChangePasswordArgs = {}>(args?: Subset<T, ChangePasswordArgs>): CheckSelect<T, Prisma__ChangePasswordClient<ChangePassword | null >, Prisma__ChangePasswordClient<ChangePasswordGetPayload<T> | null >>;
 
-    communityBoards<T extends CommunityBoardFindManyArgs = {}>(args?: Subset<T, CommunityBoardFindManyArgs>): CheckSelect<T, Promise<Array<CommunityBoard>>, Promise<Array<CommunityBoardGetPayload<T>>>>;
+    communityBoards<T extends CommunityBoardFindManyArgs = {}>(args?: Subset<T, CommunityBoardFindManyArgs>): CheckSelect<T, PrismaPromise<Array<CommunityBoard>>, PrismaPromise<Array<CommunityBoardGetPayload<T>>>>;
 
-    communityBoardCandidates<T extends CommunityBoardCandidateFindManyArgs = {}>(args?: Subset<T, CommunityBoardCandidateFindManyArgs>): CheckSelect<T, Promise<Array<CommunityBoardCandidate>>, Promise<Array<CommunityBoardCandidateGetPayload<T>>>>;
+    communityBoardCandidates<T extends CommunityBoardCandidateFindManyArgs = {}>(args?: Subset<T, CommunityBoardCandidateFindManyArgs>): CheckSelect<T, PrismaPromise<Array<CommunityBoardCandidate>>, PrismaPromise<Array<CommunityBoardCandidateGetPayload<T>>>>;
 
-    communityBoardCandidateVotes<T extends CommunityBoardCandidateVoteFindManyArgs = {}>(args?: Subset<T, CommunityBoardCandidateVoteFindManyArgs>): CheckSelect<T, Promise<Array<CommunityBoardCandidateVote>>, Promise<Array<CommunityBoardCandidateVoteGetPayload<T>>>>;
+    communityBoardCandidateVotes<T extends CommunityBoardCandidateVoteFindManyArgs = {}>(args?: Subset<T, CommunityBoardCandidateVoteFindManyArgs>): CheckSelect<T, PrismaPromise<Array<CommunityBoardCandidateVote>>, PrismaPromise<Array<CommunityBoardCandidateVoteGetPayload<T>>>>;
 
-    communityBoardPins<T extends CommunityBoardPinFindManyArgs = {}>(args?: Subset<T, CommunityBoardPinFindManyArgs>): CheckSelect<T, Promise<Array<CommunityBoardPin>>, Promise<Array<CommunityBoardPinGetPayload<T>>>>;
+    communityBoardPins<T extends CommunityBoardPinFindManyArgs = {}>(args?: Subset<T, CommunityBoardPinFindManyArgs>): CheckSelect<T, PrismaPromise<Array<CommunityBoardPin>>, PrismaPromise<Array<CommunityBoardPinGetPayload<T>>>>;
 
-    communityComments<T extends CommunityCommentFindManyArgs = {}>(args?: Subset<T, CommunityCommentFindManyArgs>): CheckSelect<T, Promise<Array<CommunityComment>>, Promise<Array<CommunityCommentGetPayload<T>>>>;
+    communityComments<T extends CommunityCommentFindManyArgs = {}>(args?: Subset<T, CommunityCommentFindManyArgs>): CheckSelect<T, PrismaPromise<Array<CommunityComment>>, PrismaPromise<Array<CommunityCommentGetPayload<T>>>>;
 
-    communityPosts<T extends CommunityPostFindManyArgs = {}>(args?: Subset<T, CommunityPostFindManyArgs>): CheckSelect<T, Promise<Array<CommunityPost>>, Promise<Array<CommunityPostGetPayload<T>>>>;
+    communityPosts<T extends CommunityPostFindManyArgs = {}>(args?: Subset<T, CommunityPostFindManyArgs>): CheckSelect<T, PrismaPromise<Array<CommunityPost>>, PrismaPromise<Array<CommunityPostGetPayload<T>>>>;
 
-    communityPostBookmarks<T extends CommunityPostBookmarkFindManyArgs = {}>(args?: Subset<T, CommunityPostBookmarkFindManyArgs>): CheckSelect<T, Promise<Array<CommunityPostBookmark>>, Promise<Array<CommunityPostBookmarkGetPayload<T>>>>;
+    communityPostBookmarks<T extends CommunityPostBookmarkFindManyArgs = {}>(args?: Subset<T, CommunityPostBookmarkFindManyArgs>): CheckSelect<T, PrismaPromise<Array<CommunityPostBookmark>>, PrismaPromise<Array<CommunityPostBookmarkGetPayload<T>>>>;
 
-    communityPostLikes<T extends CommunityPostLikeFindManyArgs = {}>(args?: Subset<T, CommunityPostLikeFindManyArgs>): CheckSelect<T, Promise<Array<CommunityPostLike>>, Promise<Array<CommunityPostLikeGetPayload<T>>>>;
+    communityPostLikes<T extends CommunityPostLikeFindManyArgs = {}>(args?: Subset<T, CommunityPostLikeFindManyArgs>): CheckSelect<T, PrismaPromise<Array<CommunityPostLike>>, PrismaPromise<Array<CommunityPostLikeGetPayload<T>>>>;
 
-    communitySubcomments<T extends CommunitySubcommentFindManyArgs = {}>(args?: Subset<T, CommunitySubcommentFindManyArgs>): CheckSelect<T, Promise<Array<CommunitySubcomment>>, Promise<Array<CommunitySubcommentGetPayload<T>>>>;
+    communitySubcomments<T extends CommunitySubcommentFindManyArgs = {}>(args?: Subset<T, CommunitySubcommentFindManyArgs>): CheckSelect<T, PrismaPromise<Array<CommunitySubcomment>>, PrismaPromise<Array<CommunitySubcommentGetPayload<T>>>>;
 
-    liveChats<T extends LiveChatFindManyArgs = {}>(args?: Subset<T, LiveChatFindManyArgs>): CheckSelect<T, Promise<Array<LiveChat>>, Promise<Array<LiveChatGetPayload<T>>>>;
+    liveChats<T extends LiveChatFindManyArgs = {}>(args?: Subset<T, LiveChatFindManyArgs>): CheckSelect<T, PrismaPromise<Array<LiveChat>>, PrismaPromise<Array<LiveChatGetPayload<T>>>>;
 
-    noticeNotificationsSubscriptions<T extends NoticeNotificationsSubscriptionFindManyArgs = {}>(args?: Subset<T, NoticeNotificationsSubscriptionFindManyArgs>): CheckSelect<T, Promise<Array<NoticeNotificationsSubscription>>, Promise<Array<NoticeNotificationsSubscriptionGetPayload<T>>>>;
+    noticeNotificationsSubscriptions<T extends NoticeNotificationsSubscriptionFindManyArgs = {}>(args?: Subset<T, NoticeNotificationsSubscriptionFindManyArgs>): CheckSelect<T, PrismaPromise<Array<NoticeNotificationsSubscription>>, PrismaPromise<Array<NoticeNotificationsSubscriptionGetPayload<T>>>>;
 
-    pushes<T extends PushFindManyArgs = {}>(args?: Subset<T, PushFindManyArgs>): CheckSelect<T, Promise<Array<Push>>, Promise<Array<PushGetPayload<T>>>>;
+    reportComments<T extends ReportCommentFindManyArgs = {}>(args?: Subset<T, ReportCommentFindManyArgs>): CheckSelect<T, PrismaPromise<Array<ReportComment>>, PrismaPromise<Array<ReportCommentGetPayload<T>>>>;
 
-    reportComments<T extends ReportCommentFindManyArgs = {}>(args?: Subset<T, ReportCommentFindManyArgs>): CheckSelect<T, Promise<Array<ReportComment>>, Promise<Array<ReportCommentGetPayload<T>>>>;
+    reportPosts<T extends ReportPostFindManyArgs = {}>(args?: Subset<T, ReportPostFindManyArgs>): CheckSelect<T, PrismaPromise<Array<ReportPost>>, PrismaPromise<Array<ReportPostGetPayload<T>>>>;
 
-    reportPosts<T extends ReportPostFindManyArgs = {}>(args?: Subset<T, ReportPostFindManyArgs>): CheckSelect<T, Promise<Array<ReportPost>>, Promise<Array<ReportPostGetPayload<T>>>>;
+    reportSubcomments<T extends ReportSubcommentFindManyArgs = {}>(args?: Subset<T, ReportSubcommentFindManyArgs>): CheckSelect<T, PrismaPromise<Array<ReportSubcomment>>, PrismaPromise<Array<ReportSubcommentGetPayload<T>>>>;
 
-    reportSubcomments<T extends ReportSubcommentFindManyArgs = {}>(args?: Subset<T, ReportSubcommentFindManyArgs>): CheckSelect<T, Promise<Array<ReportSubcomment>>, Promise<Array<ReportSubcommentGetPayload<T>>>>;
-
-    telegrams<T extends TelegramFindManyArgs = {}>(args?: Subset<T, TelegramFindManyArgs>): CheckSelect<T, Promise<Array<Telegram>>, Promise<Array<TelegramGetPayload<T>>>>;
+    telegrams<T extends TelegramFindManyArgs = {}>(args?: Subset<T, TelegramFindManyArgs>): CheckSelect<T, PrismaPromise<Array<Telegram>>, PrismaPromise<Array<TelegramGetPayload<T>>>>;
 
     private get _document();
     /**
@@ -15681,13 +15177,13 @@ export namespace Prisma {
      * @param onrejected The callback to execute when the Promise is rejected.
      * @returns A Promise for the completion of which ever callback is executed.
      */
-    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | Promise<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | Promise<TResult2>) | undefined | null): Promise<TResult1 | TResult2>;
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): Promise<TResult1 | TResult2>;
     /**
      * Attaches a callback for only the rejection of the Promise.
      * @param onrejected The callback to execute when the Promise is rejected.
      * @returns A Promise for the completion of the callback.
      */
-    catch<TResult = never>(onrejected?: ((reason: any) => TResult | Promise<TResult>) | undefined | null): Promise<T | TResult>;
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): Promise<T | TResult>;
     /**
      * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
      * resolved value cannot be modified from the callback.
@@ -15743,7 +15239,7 @@ export namespace Prisma {
     **/
     where?: UserWhereInput
     /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
      * Determine the order of Users to fetch.
     **/
@@ -15767,7 +15263,7 @@ export namespace Prisma {
     **/
     skip?: number
     /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
      * 
      * Filter by unique combinations of Users.
     **/
@@ -15792,7 +15288,7 @@ export namespace Prisma {
     **/
     where?: UserWhereInput
     /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
      * Determine the order of Users to fetch.
     **/
@@ -15834,7 +15330,7 @@ export namespace Prisma {
     /**
      * The data needed to create a User.
     **/
-    data: XOR<UserUncheckedCreateInput, UserCreateInput>
+    data: XOR<UserCreateInput, UserUncheckedCreateInput>
   }
 
 
@@ -15853,7 +15349,7 @@ export namespace Prisma {
     /**
      * The data needed to update a User.
     **/
-    data: XOR<UserUncheckedUpdateInput, UserUpdateInput>
+    data: XOR<UserUpdateInput, UserUncheckedUpdateInput>
     /**
      * Choose, which User to update.
     **/
@@ -15865,7 +15361,7 @@ export namespace Prisma {
    * User updateMany
    */
   export type UserUpdateManyArgs = {
-    data: XOR<UserUncheckedUpdateManyInput, UserUpdateManyMutationInput>
+    data: XOR<UserUpdateManyMutationInput, UserUncheckedUpdateManyInput>
     where?: UserWhereInput
   }
 
@@ -15889,11 +15385,11 @@ export namespace Prisma {
     /**
      * In case the User found by the `where` argument doesn't exist, create a new User with this data.
     **/
-    create: XOR<UserUncheckedCreateInput, UserCreateInput>
+    create: XOR<UserCreateInput, UserUncheckedCreateInput>
     /**
      * In case the User was found with the provided `where` argument, update it with this data.
     **/
-    update: XOR<UserUncheckedUpdateInput, UserUpdateInput>
+    update: XOR<UserUpdateInput, UserUncheckedUpdateInput>
   }
 
 
@@ -16040,7 +15536,7 @@ export namespace Prisma {
     **/
     where?: ReportCommentWhereInput
     /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
      * Determine the order of ReportComments to fetch.
     **/
@@ -16174,6 +15670,8 @@ export namespace Prisma {
 
     /**
      * Find the first ReportComment that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {ReportCommentFindFirstArgs} args - Arguments to find a ReportComment
      * @example
      * // Get one ReportComment
@@ -16189,6 +15687,8 @@ export namespace Prisma {
 
     /**
      * Find zero or more ReportComments that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {ReportCommentFindManyArgs=} args - Arguments to filter and select certain fields only.
      * @example
      * // Get all ReportComments
@@ -16203,7 +15703,7 @@ export namespace Prisma {
     **/
     findMany<T extends ReportCommentFindManyArgs>(
       args?: SelectSubset<T, ReportCommentFindManyArgs>
-    ): CheckSelect<T, Promise<Array<ReportComment>>, Promise<Array<ReportCommentGetPayload<T>>>>
+    ): CheckSelect<T, PrismaPromise<Array<ReportComment>>, PrismaPromise<Array<ReportCommentGetPayload<T>>>>
 
     /**
      * Create a ReportComment.
@@ -16270,10 +15770,12 @@ export namespace Prisma {
     **/
     deleteMany<T extends ReportCommentDeleteManyArgs>(
       args?: SelectSubset<T, ReportCommentDeleteManyArgs>
-    ): Promise<BatchPayload>
+    ): PrismaPromise<BatchPayload>
 
     /**
      * Update zero or more ReportComments.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {ReportCommentUpdateManyArgs} args - Arguments to update one or more rows.
      * @example
      * // Update many ReportComments
@@ -16289,7 +15791,7 @@ export namespace Prisma {
     **/
     updateMany<T extends ReportCommentUpdateManyArgs>(
       args: SelectSubset<T, ReportCommentUpdateManyArgs>
-    ): Promise<BatchPayload>
+    ): PrismaPromise<BatchPayload>
 
     /**
      * Create or update one ReportComment.
@@ -16314,6 +15816,8 @@ export namespace Prisma {
 
     /**
      * Count the number of ReportComments.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {ReportCommentCountArgs} args - Arguments to filter ReportComments to count.
      * @example
      * // Count the number of ReportComments
@@ -16325,8 +15829,8 @@ export namespace Prisma {
     **/
     count<T extends ReportCommentCountArgs>(
       args?: Subset<T, ReportCommentCountArgs>,
-    ): Promise<
-      T extends Record<'select', any>
+    ): PrismaPromise<
+      T extends _Record<'select', any>
         ? T['select'] extends true
           ? number
           : GetScalarType<T['select'], ReportCommentCountAggregateOutputType>
@@ -16335,6 +15839,8 @@ export namespace Prisma {
 
     /**
      * Allows you to perform aggregations operations on a ReportComment.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {ReportCommentAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
      * @example
      * // Ordered by age ascending
@@ -16355,7 +15861,7 @@ export namespace Prisma {
      *   take: 10,
      * })
     **/
-    aggregate<T extends ReportCommentAggregateArgs>(args: Subset<T, ReportCommentAggregateArgs>): Promise<GetReportCommentAggregateType<T>>
+    aggregate<T extends ReportCommentAggregateArgs>(args: Subset<T, ReportCommentAggregateArgs>): PrismaPromise<GetReportCommentAggregateType<T>>
 
 
   }
@@ -16366,7 +15872,8 @@ export namespace Prisma {
    * Because we want to prevent naming conflicts as mentioned in 
    * https://github.com/prisma/prisma-client-js/issues/707
    */
-  export class Prisma__ReportCommentClient<T> implements Promise<T> {
+  export class Prisma__ReportCommentClient<T> implements PrismaPromise<T> {
+    [prisma]: true;
     private readonly _dmmf;
     private readonly _fetcher;
     private readonly _queryType;
@@ -16393,13 +15900,13 @@ export namespace Prisma {
      * @param onrejected The callback to execute when the Promise is rejected.
      * @returns A Promise for the completion of which ever callback is executed.
      */
-    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | Promise<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | Promise<TResult2>) | undefined | null): Promise<TResult1 | TResult2>;
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): Promise<TResult1 | TResult2>;
     /**
      * Attaches a callback for only the rejection of the Promise.
      * @param onrejected The callback to execute when the Promise is rejected.
      * @returns A Promise for the completion of the callback.
      */
-    catch<TResult = never>(onrejected?: ((reason: any) => TResult | Promise<TResult>) | undefined | null): Promise<T | TResult>;
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): Promise<T | TResult>;
     /**
      * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
      * resolved value cannot be modified from the callback.
@@ -16455,7 +15962,7 @@ export namespace Prisma {
     **/
     where?: ReportCommentWhereInput
     /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
      * Determine the order of ReportComments to fetch.
     **/
@@ -16479,7 +15986,7 @@ export namespace Prisma {
     **/
     skip?: number
     /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
      * 
      * Filter by unique combinations of ReportComments.
     **/
@@ -16504,7 +16011,7 @@ export namespace Prisma {
     **/
     where?: ReportCommentWhereInput
     /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
      * Determine the order of ReportComments to fetch.
     **/
@@ -16546,7 +16053,7 @@ export namespace Prisma {
     /**
      * The data needed to create a ReportComment.
     **/
-    data: XOR<ReportCommentUncheckedCreateInput, ReportCommentCreateInput>
+    data: XOR<ReportCommentCreateInput, ReportCommentUncheckedCreateInput>
   }
 
 
@@ -16565,7 +16072,7 @@ export namespace Prisma {
     /**
      * The data needed to update a ReportComment.
     **/
-    data: XOR<ReportCommentUncheckedUpdateInput, ReportCommentUpdateInput>
+    data: XOR<ReportCommentUpdateInput, ReportCommentUncheckedUpdateInput>
     /**
      * Choose, which ReportComment to update.
     **/
@@ -16577,7 +16084,7 @@ export namespace Prisma {
    * ReportComment updateMany
    */
   export type ReportCommentUpdateManyArgs = {
-    data: XOR<ReportCommentUncheckedUpdateManyInput, ReportCommentUpdateManyMutationInput>
+    data: XOR<ReportCommentUpdateManyMutationInput, ReportCommentUncheckedUpdateManyInput>
     where?: ReportCommentWhereInput
   }
 
@@ -16601,11 +16108,11 @@ export namespace Prisma {
     /**
      * In case the ReportComment found by the `where` argument doesn't exist, create a new ReportComment with this data.
     **/
-    create: XOR<ReportCommentUncheckedCreateInput, ReportCommentCreateInput>
+    create: XOR<ReportCommentCreateInput, ReportCommentUncheckedCreateInput>
     /**
      * In case the ReportComment was found with the provided `where` argument, update it with this data.
     **/
-    update: XOR<ReportCommentUncheckedUpdateInput, ReportCommentUpdateInput>
+    update: XOR<ReportCommentUpdateInput, ReportCommentUncheckedUpdateInput>
   }
 
 
@@ -16752,7 +16259,7 @@ export namespace Prisma {
     **/
     where?: ReportPostWhereInput
     /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
      * Determine the order of ReportPosts to fetch.
     **/
@@ -16886,6 +16393,8 @@ export namespace Prisma {
 
     /**
      * Find the first ReportPost that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {ReportPostFindFirstArgs} args - Arguments to find a ReportPost
      * @example
      * // Get one ReportPost
@@ -16901,6 +16410,8 @@ export namespace Prisma {
 
     /**
      * Find zero or more ReportPosts that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {ReportPostFindManyArgs=} args - Arguments to filter and select certain fields only.
      * @example
      * // Get all ReportPosts
@@ -16915,7 +16426,7 @@ export namespace Prisma {
     **/
     findMany<T extends ReportPostFindManyArgs>(
       args?: SelectSubset<T, ReportPostFindManyArgs>
-    ): CheckSelect<T, Promise<Array<ReportPost>>, Promise<Array<ReportPostGetPayload<T>>>>
+    ): CheckSelect<T, PrismaPromise<Array<ReportPost>>, PrismaPromise<Array<ReportPostGetPayload<T>>>>
 
     /**
      * Create a ReportPost.
@@ -16982,10 +16493,12 @@ export namespace Prisma {
     **/
     deleteMany<T extends ReportPostDeleteManyArgs>(
       args?: SelectSubset<T, ReportPostDeleteManyArgs>
-    ): Promise<BatchPayload>
+    ): PrismaPromise<BatchPayload>
 
     /**
      * Update zero or more ReportPosts.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {ReportPostUpdateManyArgs} args - Arguments to update one or more rows.
      * @example
      * // Update many ReportPosts
@@ -17001,7 +16514,7 @@ export namespace Prisma {
     **/
     updateMany<T extends ReportPostUpdateManyArgs>(
       args: SelectSubset<T, ReportPostUpdateManyArgs>
-    ): Promise<BatchPayload>
+    ): PrismaPromise<BatchPayload>
 
     /**
      * Create or update one ReportPost.
@@ -17026,6 +16539,8 @@ export namespace Prisma {
 
     /**
      * Count the number of ReportPosts.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {ReportPostCountArgs} args - Arguments to filter ReportPosts to count.
      * @example
      * // Count the number of ReportPosts
@@ -17037,8 +16552,8 @@ export namespace Prisma {
     **/
     count<T extends ReportPostCountArgs>(
       args?: Subset<T, ReportPostCountArgs>,
-    ): Promise<
-      T extends Record<'select', any>
+    ): PrismaPromise<
+      T extends _Record<'select', any>
         ? T['select'] extends true
           ? number
           : GetScalarType<T['select'], ReportPostCountAggregateOutputType>
@@ -17047,6 +16562,8 @@ export namespace Prisma {
 
     /**
      * Allows you to perform aggregations operations on a ReportPost.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {ReportPostAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
      * @example
      * // Ordered by age ascending
@@ -17067,7 +16584,7 @@ export namespace Prisma {
      *   take: 10,
      * })
     **/
-    aggregate<T extends ReportPostAggregateArgs>(args: Subset<T, ReportPostAggregateArgs>): Promise<GetReportPostAggregateType<T>>
+    aggregate<T extends ReportPostAggregateArgs>(args: Subset<T, ReportPostAggregateArgs>): PrismaPromise<GetReportPostAggregateType<T>>
 
 
   }
@@ -17078,7 +16595,8 @@ export namespace Prisma {
    * Because we want to prevent naming conflicts as mentioned in 
    * https://github.com/prisma/prisma-client-js/issues/707
    */
-  export class Prisma__ReportPostClient<T> implements Promise<T> {
+  export class Prisma__ReportPostClient<T> implements PrismaPromise<T> {
+    [prisma]: true;
     private readonly _dmmf;
     private readonly _fetcher;
     private readonly _queryType;
@@ -17105,13 +16623,13 @@ export namespace Prisma {
      * @param onrejected The callback to execute when the Promise is rejected.
      * @returns A Promise for the completion of which ever callback is executed.
      */
-    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | Promise<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | Promise<TResult2>) | undefined | null): Promise<TResult1 | TResult2>;
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): Promise<TResult1 | TResult2>;
     /**
      * Attaches a callback for only the rejection of the Promise.
      * @param onrejected The callback to execute when the Promise is rejected.
      * @returns A Promise for the completion of the callback.
      */
-    catch<TResult = never>(onrejected?: ((reason: any) => TResult | Promise<TResult>) | undefined | null): Promise<T | TResult>;
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): Promise<T | TResult>;
     /**
      * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
      * resolved value cannot be modified from the callback.
@@ -17167,7 +16685,7 @@ export namespace Prisma {
     **/
     where?: ReportPostWhereInput
     /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
      * Determine the order of ReportPosts to fetch.
     **/
@@ -17191,7 +16709,7 @@ export namespace Prisma {
     **/
     skip?: number
     /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
      * 
      * Filter by unique combinations of ReportPosts.
     **/
@@ -17216,7 +16734,7 @@ export namespace Prisma {
     **/
     where?: ReportPostWhereInput
     /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
      * Determine the order of ReportPosts to fetch.
     **/
@@ -17258,7 +16776,7 @@ export namespace Prisma {
     /**
      * The data needed to create a ReportPost.
     **/
-    data: XOR<ReportPostUncheckedCreateInput, ReportPostCreateInput>
+    data: XOR<ReportPostCreateInput, ReportPostUncheckedCreateInput>
   }
 
 
@@ -17277,7 +16795,7 @@ export namespace Prisma {
     /**
      * The data needed to update a ReportPost.
     **/
-    data: XOR<ReportPostUncheckedUpdateInput, ReportPostUpdateInput>
+    data: XOR<ReportPostUpdateInput, ReportPostUncheckedUpdateInput>
     /**
      * Choose, which ReportPost to update.
     **/
@@ -17289,7 +16807,7 @@ export namespace Prisma {
    * ReportPost updateMany
    */
   export type ReportPostUpdateManyArgs = {
-    data: XOR<ReportPostUncheckedUpdateManyInput, ReportPostUpdateManyMutationInput>
+    data: XOR<ReportPostUpdateManyMutationInput, ReportPostUncheckedUpdateManyInput>
     where?: ReportPostWhereInput
   }
 
@@ -17313,11 +16831,11 @@ export namespace Prisma {
     /**
      * In case the ReportPost found by the `where` argument doesn't exist, create a new ReportPost with this data.
     **/
-    create: XOR<ReportPostUncheckedCreateInput, ReportPostCreateInput>
+    create: XOR<ReportPostCreateInput, ReportPostUncheckedCreateInput>
     /**
      * In case the ReportPost was found with the provided `where` argument, update it with this data.
     **/
-    update: XOR<ReportPostUncheckedUpdateInput, ReportPostUpdateInput>
+    update: XOR<ReportPostUpdateInput, ReportPostUncheckedUpdateInput>
   }
 
 
@@ -17464,7 +16982,7 @@ export namespace Prisma {
     **/
     where?: ReportSubcommentWhereInput
     /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
      * Determine the order of ReportSubcomments to fetch.
     **/
@@ -17598,6 +17116,8 @@ export namespace Prisma {
 
     /**
      * Find the first ReportSubcomment that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {ReportSubcommentFindFirstArgs} args - Arguments to find a ReportSubcomment
      * @example
      * // Get one ReportSubcomment
@@ -17613,6 +17133,8 @@ export namespace Prisma {
 
     /**
      * Find zero or more ReportSubcomments that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {ReportSubcommentFindManyArgs=} args - Arguments to filter and select certain fields only.
      * @example
      * // Get all ReportSubcomments
@@ -17627,7 +17149,7 @@ export namespace Prisma {
     **/
     findMany<T extends ReportSubcommentFindManyArgs>(
       args?: SelectSubset<T, ReportSubcommentFindManyArgs>
-    ): CheckSelect<T, Promise<Array<ReportSubcomment>>, Promise<Array<ReportSubcommentGetPayload<T>>>>
+    ): CheckSelect<T, PrismaPromise<Array<ReportSubcomment>>, PrismaPromise<Array<ReportSubcommentGetPayload<T>>>>
 
     /**
      * Create a ReportSubcomment.
@@ -17694,10 +17216,12 @@ export namespace Prisma {
     **/
     deleteMany<T extends ReportSubcommentDeleteManyArgs>(
       args?: SelectSubset<T, ReportSubcommentDeleteManyArgs>
-    ): Promise<BatchPayload>
+    ): PrismaPromise<BatchPayload>
 
     /**
      * Update zero or more ReportSubcomments.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {ReportSubcommentUpdateManyArgs} args - Arguments to update one or more rows.
      * @example
      * // Update many ReportSubcomments
@@ -17713,7 +17237,7 @@ export namespace Prisma {
     **/
     updateMany<T extends ReportSubcommentUpdateManyArgs>(
       args: SelectSubset<T, ReportSubcommentUpdateManyArgs>
-    ): Promise<BatchPayload>
+    ): PrismaPromise<BatchPayload>
 
     /**
      * Create or update one ReportSubcomment.
@@ -17738,6 +17262,8 @@ export namespace Prisma {
 
     /**
      * Count the number of ReportSubcomments.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {ReportSubcommentCountArgs} args - Arguments to filter ReportSubcomments to count.
      * @example
      * // Count the number of ReportSubcomments
@@ -17749,8 +17275,8 @@ export namespace Prisma {
     **/
     count<T extends ReportSubcommentCountArgs>(
       args?: Subset<T, ReportSubcommentCountArgs>,
-    ): Promise<
-      T extends Record<'select', any>
+    ): PrismaPromise<
+      T extends _Record<'select', any>
         ? T['select'] extends true
           ? number
           : GetScalarType<T['select'], ReportSubcommentCountAggregateOutputType>
@@ -17759,6 +17285,8 @@ export namespace Prisma {
 
     /**
      * Allows you to perform aggregations operations on a ReportSubcomment.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {ReportSubcommentAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
      * @example
      * // Ordered by age ascending
@@ -17779,7 +17307,7 @@ export namespace Prisma {
      *   take: 10,
      * })
     **/
-    aggregate<T extends ReportSubcommentAggregateArgs>(args: Subset<T, ReportSubcommentAggregateArgs>): Promise<GetReportSubcommentAggregateType<T>>
+    aggregate<T extends ReportSubcommentAggregateArgs>(args: Subset<T, ReportSubcommentAggregateArgs>): PrismaPromise<GetReportSubcommentAggregateType<T>>
 
 
   }
@@ -17790,7 +17318,8 @@ export namespace Prisma {
    * Because we want to prevent naming conflicts as mentioned in 
    * https://github.com/prisma/prisma-client-js/issues/707
    */
-  export class Prisma__ReportSubcommentClient<T> implements Promise<T> {
+  export class Prisma__ReportSubcommentClient<T> implements PrismaPromise<T> {
+    [prisma]: true;
     private readonly _dmmf;
     private readonly _fetcher;
     private readonly _queryType;
@@ -17817,13 +17346,13 @@ export namespace Prisma {
      * @param onrejected The callback to execute when the Promise is rejected.
      * @returns A Promise for the completion of which ever callback is executed.
      */
-    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | Promise<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | Promise<TResult2>) | undefined | null): Promise<TResult1 | TResult2>;
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): Promise<TResult1 | TResult2>;
     /**
      * Attaches a callback for only the rejection of the Promise.
      * @param onrejected The callback to execute when the Promise is rejected.
      * @returns A Promise for the completion of the callback.
      */
-    catch<TResult = never>(onrejected?: ((reason: any) => TResult | Promise<TResult>) | undefined | null): Promise<T | TResult>;
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): Promise<T | TResult>;
     /**
      * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
      * resolved value cannot be modified from the callback.
@@ -17879,7 +17408,7 @@ export namespace Prisma {
     **/
     where?: ReportSubcommentWhereInput
     /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
      * Determine the order of ReportSubcomments to fetch.
     **/
@@ -17903,7 +17432,7 @@ export namespace Prisma {
     **/
     skip?: number
     /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
      * 
      * Filter by unique combinations of ReportSubcomments.
     **/
@@ -17928,7 +17457,7 @@ export namespace Prisma {
     **/
     where?: ReportSubcommentWhereInput
     /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
      * Determine the order of ReportSubcomments to fetch.
     **/
@@ -17970,7 +17499,7 @@ export namespace Prisma {
     /**
      * The data needed to create a ReportSubcomment.
     **/
-    data: XOR<ReportSubcommentUncheckedCreateInput, ReportSubcommentCreateInput>
+    data: XOR<ReportSubcommentCreateInput, ReportSubcommentUncheckedCreateInput>
   }
 
 
@@ -17989,7 +17518,7 @@ export namespace Prisma {
     /**
      * The data needed to update a ReportSubcomment.
     **/
-    data: XOR<ReportSubcommentUncheckedUpdateInput, ReportSubcommentUpdateInput>
+    data: XOR<ReportSubcommentUpdateInput, ReportSubcommentUncheckedUpdateInput>
     /**
      * Choose, which ReportSubcomment to update.
     **/
@@ -18001,7 +17530,7 @@ export namespace Prisma {
    * ReportSubcomment updateMany
    */
   export type ReportSubcommentUpdateManyArgs = {
-    data: XOR<ReportSubcommentUncheckedUpdateManyInput, ReportSubcommentUpdateManyMutationInput>
+    data: XOR<ReportSubcommentUpdateManyMutationInput, ReportSubcommentUncheckedUpdateManyInput>
     where?: ReportSubcommentWhereInput
   }
 
@@ -18025,11 +17554,11 @@ export namespace Prisma {
     /**
      * In case the ReportSubcomment found by the `where` argument doesn't exist, create a new ReportSubcomment with this data.
     **/
-    create: XOR<ReportSubcommentUncheckedCreateInput, ReportSubcommentCreateInput>
+    create: XOR<ReportSubcommentCreateInput, ReportSubcommentUncheckedCreateInput>
     /**
      * In case the ReportSubcomment was found with the provided `where` argument, update it with this data.
     **/
-    update: XOR<ReportSubcommentUncheckedUpdateInput, ReportSubcommentUpdateInput>
+    update: XOR<ReportSubcommentUpdateInput, ReportSubcommentUncheckedUpdateInput>
   }
 
 
@@ -18148,7 +17677,7 @@ export namespace Prisma {
     **/
     where?: TelegramWhereInput
     /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
      * Determine the order of Telegrams to fetch.
     **/
@@ -18272,6 +17801,8 @@ export namespace Prisma {
 
     /**
      * Find the first Telegram that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {TelegramFindFirstArgs} args - Arguments to find a Telegram
      * @example
      * // Get one Telegram
@@ -18287,6 +17818,8 @@ export namespace Prisma {
 
     /**
      * Find zero or more Telegrams that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {TelegramFindManyArgs=} args - Arguments to filter and select certain fields only.
      * @example
      * // Get all Telegrams
@@ -18301,7 +17834,7 @@ export namespace Prisma {
     **/
     findMany<T extends TelegramFindManyArgs>(
       args?: SelectSubset<T, TelegramFindManyArgs>
-    ): CheckSelect<T, Promise<Array<Telegram>>, Promise<Array<TelegramGetPayload<T>>>>
+    ): CheckSelect<T, PrismaPromise<Array<Telegram>>, PrismaPromise<Array<TelegramGetPayload<T>>>>
 
     /**
      * Create a Telegram.
@@ -18368,10 +17901,12 @@ export namespace Prisma {
     **/
     deleteMany<T extends TelegramDeleteManyArgs>(
       args?: SelectSubset<T, TelegramDeleteManyArgs>
-    ): Promise<BatchPayload>
+    ): PrismaPromise<BatchPayload>
 
     /**
      * Update zero or more Telegrams.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {TelegramUpdateManyArgs} args - Arguments to update one or more rows.
      * @example
      * // Update many Telegrams
@@ -18387,7 +17922,7 @@ export namespace Prisma {
     **/
     updateMany<T extends TelegramUpdateManyArgs>(
       args: SelectSubset<T, TelegramUpdateManyArgs>
-    ): Promise<BatchPayload>
+    ): PrismaPromise<BatchPayload>
 
     /**
      * Create or update one Telegram.
@@ -18412,6 +17947,8 @@ export namespace Prisma {
 
     /**
      * Count the number of Telegrams.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {TelegramCountArgs} args - Arguments to filter Telegrams to count.
      * @example
      * // Count the number of Telegrams
@@ -18423,8 +17960,8 @@ export namespace Prisma {
     **/
     count<T extends TelegramCountArgs>(
       args?: Subset<T, TelegramCountArgs>,
-    ): Promise<
-      T extends Record<'select', any>
+    ): PrismaPromise<
+      T extends _Record<'select', any>
         ? T['select'] extends true
           ? number
           : GetScalarType<T['select'], TelegramCountAggregateOutputType>
@@ -18433,6 +17970,8 @@ export namespace Prisma {
 
     /**
      * Allows you to perform aggregations operations on a Telegram.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
      * @param {TelegramAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
      * @example
      * // Ordered by age ascending
@@ -18453,7 +17992,7 @@ export namespace Prisma {
      *   take: 10,
      * })
     **/
-    aggregate<T extends TelegramAggregateArgs>(args: Subset<T, TelegramAggregateArgs>): Promise<GetTelegramAggregateType<T>>
+    aggregate<T extends TelegramAggregateArgs>(args: Subset<T, TelegramAggregateArgs>): PrismaPromise<GetTelegramAggregateType<T>>
 
 
   }
@@ -18464,7 +18003,8 @@ export namespace Prisma {
    * Because we want to prevent naming conflicts as mentioned in 
    * https://github.com/prisma/prisma-client-js/issues/707
    */
-  export class Prisma__TelegramClient<T> implements Promise<T> {
+  export class Prisma__TelegramClient<T> implements PrismaPromise<T> {
+    [prisma]: true;
     private readonly _dmmf;
     private readonly _fetcher;
     private readonly _queryType;
@@ -18489,13 +18029,13 @@ export namespace Prisma {
      * @param onrejected The callback to execute when the Promise is rejected.
      * @returns A Promise for the completion of which ever callback is executed.
      */
-    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | Promise<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | Promise<TResult2>) | undefined | null): Promise<TResult1 | TResult2>;
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): Promise<TResult1 | TResult2>;
     /**
      * Attaches a callback for only the rejection of the Promise.
      * @param onrejected The callback to execute when the Promise is rejected.
      * @returns A Promise for the completion of the callback.
      */
-    catch<TResult = never>(onrejected?: ((reason: any) => TResult | Promise<TResult>) | undefined | null): Promise<T | TResult>;
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): Promise<T | TResult>;
     /**
      * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
      * resolved value cannot be modified from the callback.
@@ -18551,7 +18091,7 @@ export namespace Prisma {
     **/
     where?: TelegramWhereInput
     /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
      * Determine the order of Telegrams to fetch.
     **/
@@ -18575,7 +18115,7 @@ export namespace Prisma {
     **/
     skip?: number
     /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
      * 
      * Filter by unique combinations of Telegrams.
     **/
@@ -18600,7 +18140,7 @@ export namespace Prisma {
     **/
     where?: TelegramWhereInput
     /**
-     * @link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
      * Determine the order of Telegrams to fetch.
     **/
@@ -18642,7 +18182,7 @@ export namespace Prisma {
     /**
      * The data needed to create a Telegram.
     **/
-    data: XOR<TelegramUncheckedCreateInput, TelegramCreateInput>
+    data: XOR<TelegramCreateInput, TelegramUncheckedCreateInput>
   }
 
 
@@ -18661,7 +18201,7 @@ export namespace Prisma {
     /**
      * The data needed to update a Telegram.
     **/
-    data: XOR<TelegramUncheckedUpdateInput, TelegramUpdateInput>
+    data: XOR<TelegramUpdateInput, TelegramUncheckedUpdateInput>
     /**
      * Choose, which Telegram to update.
     **/
@@ -18673,7 +18213,7 @@ export namespace Prisma {
    * Telegram updateMany
    */
   export type TelegramUpdateManyArgs = {
-    data: XOR<TelegramUncheckedUpdateManyInput, TelegramUpdateManyMutationInput>
+    data: XOR<TelegramUpdateManyMutationInput, TelegramUncheckedUpdateManyInput>
     where?: TelegramWhereInput
   }
 
@@ -18697,11 +18237,11 @@ export namespace Prisma {
     /**
      * In case the Telegram found by the `where` argument doesn't exist, create a new Telegram with this data.
     **/
-    create: XOR<TelegramUncheckedCreateInput, TelegramCreateInput>
+    create: XOR<TelegramCreateInput, TelegramUncheckedCreateInput>
     /**
      * In case the Telegram was found with the provided `where` argument, update it with this data.
     **/
-    update: XOR<TelegramUncheckedUpdateInput, TelegramUpdateInput>
+    update: XOR<TelegramUpdateInput, TelegramUncheckedUpdateInput>
   }
 
 
@@ -18968,16 +18508,6 @@ export namespace Prisma {
   export type PeriodScalarFieldEnum = (typeof PeriodScalarFieldEnum)[keyof typeof PeriodScalarFieldEnum]
 
 
-  export const PushScalarFieldEnum: {
-    userId: 'userId',
-    expoPushToken: 'expoPushToken',
-    registeredAt: 'registeredAt',
-    activeAt: 'activeAt'
-  };
-
-  export type PushScalarFieldEnum = (typeof PushScalarFieldEnum)[keyof typeof PushScalarFieldEnum]
-
-
   export const UserScalarFieldEnum: {
     id: 'id',
     portalId: 'portalId',
@@ -19053,7 +18583,7 @@ export namespace Prisma {
     OR?: Enumerable<AdminWhereInput>
     NOT?: Enumerable<AdminWhereInput>
     userId?: IntFilter | number
-    user?: XOR<UserWhereInput, UserRelationFilter>
+    user?: XOR<UserRelationFilter, UserWhereInput>
   }
 
   export type AdminOrderByInput = {
@@ -19090,7 +18620,7 @@ export namespace Prisma {
     userId?: IntFilter | number
     token?: StringFilter | string
     requestedAt?: DateTimeFilter | Date | string
-    user?: XOR<UserWhereInput, UserRelationFilter>
+    user?: XOR<UserRelationFilter, UserWhereInput>
   }
 
   export type ChangePasswordOrderByInput = {
@@ -19116,7 +18646,7 @@ export namespace Prisma {
     createdBy?: IntFilter | number
     createdAt?: DateTimeFilter | Date | string
     activeAt?: DateTimeNullableFilter | Date | string | null
-    user?: XOR<UserWhereInput, UserRelationFilter>
+    user?: XOR<UserRelationFilter, UserWhereInput>
     communityBoardPins?: CommunityBoardPinListRelationFilter
     communityPosts?: CommunityPostListRelationFilter
   }
@@ -19146,7 +18676,7 @@ export namespace Prisma {
     description?: StringNullableFilter | string | null
     createdBy?: IntFilter | number
     createdAt?: DateTimeFilter | Date | string
-    user?: XOR<UserWhereInput, UserRelationFilter>
+    user?: XOR<UserRelationFilter, UserWhereInput>
     communityBoardCandidateVotes?: CommunityBoardCandidateVoteListRelationFilter
   }
 
@@ -19169,8 +18699,8 @@ export namespace Prisma {
     NOT?: Enumerable<CommunityBoardCandidateVoteWhereInput>
     boardCandidateId?: IntFilter | number
     userId?: IntFilter | number
-    communityBoardCandidate?: XOR<CommunityBoardCandidateWhereInput, CommunityBoardCandidateRelationFilter>
-    user?: XOR<UserWhereInput, UserRelationFilter>
+    communityBoardCandidate?: XOR<CommunityBoardCandidateRelationFilter, CommunityBoardCandidateWhereInput>
+    user?: XOR<UserRelationFilter, UserWhereInput>
   }
 
   export type CommunityBoardCandidateVoteOrderByInput = {
@@ -19190,8 +18720,8 @@ export namespace Prisma {
     NOT?: Enumerable<CommunityBoardPinWhereInput>
     userId?: IntFilter | number
     boardId?: IntFilter | number
-    communityBoard?: XOR<CommunityBoardWhereInput, CommunityBoardRelationFilter>
-    user?: XOR<UserWhereInput, UserRelationFilter>
+    communityBoard?: XOR<CommunityBoardRelationFilter, CommunityBoardWhereInput>
+    user?: XOR<UserRelationFilter, UserWhereInput>
   }
 
   export type CommunityBoardPinOrderByInput = {
@@ -19216,8 +18746,8 @@ export namespace Prisma {
     body?: StringFilter | string
     commentedAt?: DateTimeFilter | Date | string
     isDeleted?: BoolFilter | boolean
-    communityPost?: XOR<CommunityPostWhereInput, CommunityPostRelationFilter>
-    user?: XOR<UserWhereInput, UserRelationFilter>
+    communityPost?: XOR<CommunityPostRelationFilter, CommunityPostWhereInput>
+    user?: XOR<UserRelationFilter, UserWhereInput>
     communitySubcomments?: CommunitySubcommentListRelationFilter
     reportComments?: ReportCommentListRelationFilter
   }
@@ -19254,8 +18784,8 @@ export namespace Prisma {
     postedAt?: DateTimeFilter | Date | string
     editedAt?: DateTimeNullableFilter | Date | string | null
     isDeleted?: BoolFilter | boolean
-    communityBoard?: XOR<CommunityBoardWhereInput, CommunityBoardRelationFilter>
-    user?: XOR<UserWhereInput, UserRelationFilter>
+    communityBoard?: XOR<CommunityBoardRelationFilter, CommunityBoardWhereInput>
+    user?: XOR<UserRelationFilter, UserWhereInput>
     communityComments?: CommunityCommentListRelationFilter
     communityPostBookmarks?: CommunityPostBookmarkListRelationFilter
     communityPostLikes?: CommunityPostLikeListRelationFilter
@@ -19290,8 +18820,8 @@ export namespace Prisma {
     NOT?: Enumerable<CommunityPostBookmarkWhereInput>
     userId?: IntFilter | number
     postId?: IntFilter | number
-    communityPost?: XOR<CommunityPostWhereInput, CommunityPostRelationFilter>
-    user?: XOR<UserWhereInput, UserRelationFilter>
+    communityPost?: XOR<CommunityPostRelationFilter, CommunityPostWhereInput>
+    user?: XOR<UserRelationFilter, UserWhereInput>
   }
 
   export type CommunityPostBookmarkOrderByInput = {
@@ -19311,8 +18841,8 @@ export namespace Prisma {
     NOT?: Enumerable<CommunityPostLikeWhereInput>
     userId?: IntFilter | number
     postId?: IntFilter | number
-    communityPost?: XOR<CommunityPostWhereInput, CommunityPostRelationFilter>
-    user?: XOR<UserWhereInput, UserRelationFilter>
+    communityPost?: XOR<CommunityPostRelationFilter, CommunityPostWhereInput>
+    user?: XOR<UserRelationFilter, UserWhereInput>
   }
 
   export type CommunityPostLikeOrderByInput = {
@@ -19338,9 +18868,9 @@ export namespace Prisma {
     body?: StringFilter | string
     subcommentedAt?: DateTimeFilter | Date | string
     isDeleted?: BoolFilter | boolean
-    communityComment?: XOR<CommunityCommentWhereInput, CommunityCommentRelationFilter>
-    communityPost?: XOR<CommunityPostWhereInput, CommunityPostRelationFilter>
-    user?: XOR<UserWhereInput, UserRelationFilter>
+    communityComment?: XOR<CommunityCommentRelationFilter, CommunityCommentWhereInput>
+    communityPost?: XOR<CommunityPostRelationFilter, CommunityPostWhereInput>
+    user?: XOR<UserRelationFilter, UserWhereInput>
     reportSubcomments?: ReportSubcommentListRelationFilter
   }
 
@@ -19388,8 +18918,8 @@ export namespace Prisma {
     NOT?: Enumerable<CoverageMajorLectureWhereInput>
     lectureId?: StringFilter | string
     majorCode?: StringFilter | string
-    lecture?: XOR<LectureWhereInput, LectureRelationFilter>
-    coverageMajor?: XOR<CoverageMajorWhereInput, CoverageMajorRelationFilter>
+    lecture?: XOR<LectureRelationFilter, LectureWhereInput>
+    coverageMajor?: XOR<CoverageMajorRelationFilter, CoverageMajorWhereInput>
   }
 
   export type CoverageMajorLectureOrderByInput = {
@@ -19461,7 +18991,7 @@ export namespace Prisma {
     createdAt?: DateTimeFilter | Date | string
     userId?: IntFilter | number
     randomNickname?: StringFilter | string
-    user?: XOR<UserWhereInput, UserRelationFilter>
+    user?: XOR<UserRelationFilter, UserWhereInput>
   }
 
   export type LiveChatOrderByInput = {
@@ -19485,7 +19015,7 @@ export namespace Prisma {
     userId?: IntFilter | number
     noticeKey?: StringFilter | string
     subscribedAt?: DateTimeFilter | Date | string
-    user?: XOR<UserWhereInput, UserRelationFilter>
+    user?: XOR<UserRelationFilter, UserWhereInput>
   }
 
   export type NoticeNotificationsSubscriptionOrderByInput = {
@@ -19540,7 +19070,7 @@ export namespace Prisma {
     startM?: IntFilter | number
     endH?: IntFilter | number
     endM?: IntFilter | number
-    lecture?: XOR<LectureWhereInput, LectureRelationFilter>
+    lecture?: XOR<LectureRelationFilter, LectureWhereInput>
   }
 
   export type PeriodOrderByInput = {
@@ -19557,29 +19087,6 @@ export namespace Prisma {
     lectureId_day_startH_startM_endH_endM?: PeriodLectureIdDayStartHStartMEndHEndMCompoundUniqueInput
   }
 
-  export type PushWhereInput = {
-    AND?: Enumerable<PushWhereInput>
-    OR?: Enumerable<PushWhereInput>
-    NOT?: Enumerable<PushWhereInput>
-    userId?: IntFilter | number
-    expoPushToken?: StringFilter | string
-    registeredAt?: DateTimeFilter | Date | string
-    activeAt?: DateTimeNullableFilter | Date | string | null
-    user?: XOR<UserWhereInput, UserRelationFilter>
-  }
-
-  export type PushOrderByInput = {
-    userId?: SortOrder
-    expoPushToken?: SortOrder
-    registeredAt?: SortOrder
-    activeAt?: SortOrder
-    user?: UserOrderByInput
-  }
-
-  export type PushWhereUniqueInput = {
-    expoPushToken?: string
-  }
-
   export type UserWhereInput = {
     AND?: Enumerable<UserWhereInput>
     OR?: Enumerable<UserWhereInput>
@@ -19591,8 +19098,8 @@ export namespace Prisma {
     randomNickname?: StringFilter | string
     joinedAt?: DateTimeFilter | Date | string
     refreshToken?: StringNullableFilter | string | null
-    admin?: XOR<AdminWhereInput, AdminRelationFilter> | null
-    changePassword?: XOR<ChangePasswordWhereInput, ChangePasswordRelationFilter> | null
+    admin?: XOR<AdminRelationFilter, AdminWhereInput> | null
+    changePassword?: XOR<ChangePasswordRelationFilter, ChangePasswordWhereInput> | null
     communityBoards?: CommunityBoardListRelationFilter
     communityBoardCandidates?: CommunityBoardCandidateListRelationFilter
     communityBoardCandidateVotes?: CommunityBoardCandidateVoteListRelationFilter
@@ -19604,7 +19111,6 @@ export namespace Prisma {
     communitySubcomments?: CommunitySubcommentListRelationFilter
     liveChats?: LiveChatListRelationFilter
     noticeNotificationsSubscriptions?: NoticeNotificationsSubscriptionListRelationFilter
-    pushes?: PushListRelationFilter
     reportComments?: ReportCommentListRelationFilter
     reportPosts?: ReportPostListRelationFilter
     reportSubcomments?: ReportSubcommentListRelationFilter
@@ -19639,8 +19145,8 @@ export namespace Prisma {
     title?: StringFilter | string
     body?: StringNullableFilter | string | null
     reportedAt?: DateTimeFilter | Date | string
-    communityComment?: XOR<CommunityCommentWhereInput, CommunityCommentRelationFilter>
-    user?: XOR<UserWhereInput, UserRelationFilter>
+    communityComment?: XOR<CommunityCommentRelationFilter, CommunityCommentWhereInput>
+    user?: XOR<UserRelationFilter, UserWhereInput>
   }
 
   export type ReportCommentOrderByInput = {
@@ -19668,8 +19174,8 @@ export namespace Prisma {
     title?: StringFilter | string
     body?: StringNullableFilter | string | null
     reportedAt?: DateTimeFilter | Date | string
-    communityPost?: XOR<CommunityPostWhereInput, CommunityPostRelationFilter>
-    user?: XOR<UserWhereInput, UserRelationFilter>
+    communityPost?: XOR<CommunityPostRelationFilter, CommunityPostWhereInput>
+    user?: XOR<UserRelationFilter, UserWhereInput>
   }
 
   export type ReportPostOrderByInput = {
@@ -19697,8 +19203,8 @@ export namespace Prisma {
     title?: StringFilter | string
     body?: StringNullableFilter | string | null
     reportedAt?: DateTimeFilter | Date | string
-    communitySubcomment?: XOR<CommunitySubcommentWhereInput, CommunitySubcommentRelationFilter>
-    user?: XOR<UserWhereInput, UserRelationFilter>
+    communitySubcomment?: XOR<CommunitySubcommentRelationFilter, CommunitySubcommentWhereInput>
+    user?: XOR<UserRelationFilter, UserWhereInput>
   }
 
   export type ReportSubcommentOrderByInput = {
@@ -19722,7 +19228,7 @@ export namespace Prisma {
     NOT?: Enumerable<TelegramWhereInput>
     userId?: IntFilter | number
     chatId?: IntFilter | number
-    user?: XOR<UserWhereInput, UserRelationFilter>
+    user?: XOR<UserRelationFilter, UserWhereInput>
   }
 
   export type TelegramOrderByInput = {
@@ -20688,47 +20194,6 @@ export namespace Prisma {
     endM?: IntFieldUpdateOperationsInput | number
   }
 
-  export type PushCreateInput = {
-    expoPushToken?: string
-    registeredAt: Date | string
-    activeAt?: Date | string | null
-    user: UserCreateNestedOneWithoutPushesInput
-  }
-
-  export type PushUncheckedCreateInput = {
-    userId: number
-    expoPushToken?: string
-    registeredAt: Date | string
-    activeAt?: Date | string | null
-  }
-
-  export type PushUpdateInput = {
-    expoPushToken?: StringFieldUpdateOperationsInput | string
-    registeredAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    activeAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    user?: UserUpdateOneRequiredWithoutPushesInput
-  }
-
-  export type PushUncheckedUpdateInput = {
-    userId?: IntFieldUpdateOperationsInput | number
-    expoPushToken?: StringFieldUpdateOperationsInput | string
-    registeredAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    activeAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  }
-
-  export type PushUpdateManyMutationInput = {
-    expoPushToken?: StringFieldUpdateOperationsInput | string
-    registeredAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    activeAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  }
-
-  export type PushUncheckedUpdateManyInput = {
-    userId?: IntFieldUpdateOperationsInput | number
-    expoPushToken?: StringFieldUpdateOperationsInput | string
-    registeredAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    activeAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  }
-
   export type UserCreateInput = {
     portalId: string
     password: string
@@ -20749,7 +20214,6 @@ export namespace Prisma {
     communitySubcomments?: CommunitySubcommentCreateNestedManyWithoutUserInput
     liveChats?: LiveChatCreateNestedManyWithoutUserInput
     noticeNotificationsSubscriptions?: NoticeNotificationsSubscriptionCreateNestedManyWithoutUserInput
-    pushes?: PushCreateNestedManyWithoutUserInput
     reportComments?: ReportCommentCreateNestedManyWithoutUserInput
     reportPosts?: ReportPostCreateNestedManyWithoutUserInput
     reportSubcomments?: ReportSubcommentCreateNestedManyWithoutUserInput
@@ -20777,7 +20241,6 @@ export namespace Prisma {
     communitySubcomments?: CommunitySubcommentUncheckedCreateNestedManyWithoutUserInput
     liveChats?: LiveChatUncheckedCreateNestedManyWithoutUserInput
     noticeNotificationsSubscriptions?: NoticeNotificationsSubscriptionUncheckedCreateNestedManyWithoutUserInput
-    pushes?: PushUncheckedCreateNestedManyWithoutUserInput
     reportComments?: ReportCommentUncheckedCreateNestedManyWithoutUserInput
     reportPosts?: ReportPostUncheckedCreateNestedManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUncheckedCreateNestedManyWithoutUserInput
@@ -20804,7 +20267,6 @@ export namespace Prisma {
     communitySubcomments?: CommunitySubcommentUpdateManyWithoutUserInput
     liveChats?: LiveChatUpdateManyWithoutUserInput
     noticeNotificationsSubscriptions?: NoticeNotificationsSubscriptionUpdateManyWithoutUserInput
-    pushes?: PushUpdateManyWithoutUserInput
     reportComments?: ReportCommentUpdateManyWithoutUserInput
     reportPosts?: ReportPostUpdateManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUpdateManyWithoutUserInput
@@ -20832,7 +20294,6 @@ export namespace Prisma {
     communitySubcomments?: CommunitySubcommentUncheckedUpdateManyWithoutUserInput
     liveChats?: LiveChatUncheckedUpdateManyWithoutUserInput
     noticeNotificationsSubscriptions?: NoticeNotificationsSubscriptionUncheckedUpdateManyWithoutUserInput
-    pushes?: PushUncheckedUpdateManyWithoutUserInput
     reportComments?: ReportCommentUncheckedUpdateManyWithoutUserInput
     reportPosts?: ReportPostUncheckedUpdateManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUncheckedUpdateManyWithoutUserInput
@@ -21301,12 +20762,6 @@ export namespace Prisma {
     none?: NoticeNotificationsSubscriptionWhereInput
   }
 
-  export type PushListRelationFilter = {
-    every?: PushWhereInput
-    some?: PushWhereInput
-    none?: PushWhereInput
-  }
-
   export type TelegramListRelationFilter = {
     every?: TelegramWhereInput
     some?: TelegramWhereInput
@@ -21324,17 +20779,17 @@ export namespace Prisma {
   }
 
   export type UserCreateNestedOneWithoutAdminInput = {
-    create?: XOR<UserUncheckedCreateWithoutAdminInput, UserCreateWithoutAdminInput>
-    connectOrCreate?: UserCreateOrConnectWithoutadminInput
+    create?: XOR<UserCreateWithoutAdminInput, UserUncheckedCreateWithoutAdminInput>
+    connectOrCreate?: UserCreateOrConnectWithoutAdminInput
     connect?: UserWhereUniqueInput
   }
 
   export type UserUpdateOneRequiredWithoutAdminInput = {
-    create?: XOR<UserUncheckedCreateWithoutAdminInput, UserCreateWithoutAdminInput>
-    connectOrCreate?: UserCreateOrConnectWithoutadminInput
+    create?: XOR<UserCreateWithoutAdminInput, UserUncheckedCreateWithoutAdminInput>
+    connectOrCreate?: UserCreateOrConnectWithoutAdminInput
     upsert?: UserUpsertWithoutAdminInput
     connect?: UserWhereUniqueInput
-    update?: XOR<UserUncheckedUpdateWithoutAdminInput, UserUpdateWithoutAdminInput>
+    update?: XOR<UserUpdateWithoutAdminInput, UserUncheckedUpdateWithoutAdminInput>
   }
 
   export type IntFieldUpdateOperationsInput = {
@@ -21354,46 +20809,46 @@ export namespace Prisma {
   }
 
   export type UserCreateNestedOneWithoutChangePasswordInput = {
-    create?: XOR<UserUncheckedCreateWithoutChangePasswordInput, UserCreateWithoutChangePasswordInput>
-    connectOrCreate?: UserCreateOrConnectWithoutchangePasswordInput
+    create?: XOR<UserCreateWithoutChangePasswordInput, UserUncheckedCreateWithoutChangePasswordInput>
+    connectOrCreate?: UserCreateOrConnectWithoutChangePasswordInput
     connect?: UserWhereUniqueInput
   }
 
   export type UserUpdateOneRequiredWithoutChangePasswordInput = {
-    create?: XOR<UserUncheckedCreateWithoutChangePasswordInput, UserCreateWithoutChangePasswordInput>
-    connectOrCreate?: UserCreateOrConnectWithoutchangePasswordInput
+    create?: XOR<UserCreateWithoutChangePasswordInput, UserUncheckedCreateWithoutChangePasswordInput>
+    connectOrCreate?: UserCreateOrConnectWithoutChangePasswordInput
     upsert?: UserUpsertWithoutChangePasswordInput
     connect?: UserWhereUniqueInput
-    update?: XOR<UserUncheckedUpdateWithoutChangePasswordInput, UserUpdateWithoutChangePasswordInput>
+    update?: XOR<UserUpdateWithoutChangePasswordInput, UserUncheckedUpdateWithoutChangePasswordInput>
   }
 
   export type UserCreateNestedOneWithoutCommunityBoardsInput = {
-    create?: XOR<UserUncheckedCreateWithoutCommunityBoardsInput, UserCreateWithoutCommunityBoardsInput>
-    connectOrCreate?: UserCreateOrConnectWithoutcommunityBoardsInput
+    create?: XOR<UserCreateWithoutCommunityBoardsInput, UserUncheckedCreateWithoutCommunityBoardsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutCommunityBoardsInput
     connect?: UserWhereUniqueInput
   }
 
   export type CommunityBoardPinCreateNestedManyWithoutCommunityBoardInput = {
-    create?: XOR<Enumerable<CommunityBoardPinUncheckedCreateWithoutCommunityBoardInput>, Enumerable<CommunityBoardPinCreateWithoutCommunityBoardInput>>
-    connectOrCreate?: Enumerable<CommunityBoardPinCreateOrConnectWithoutcommunityBoardInput>
+    create?: XOR<Enumerable<CommunityBoardPinCreateWithoutCommunityBoardInput>, Enumerable<CommunityBoardPinUncheckedCreateWithoutCommunityBoardInput>>
+    connectOrCreate?: Enumerable<CommunityBoardPinCreateOrConnectWithoutCommunityBoardInput>
     connect?: Enumerable<CommunityBoardPinWhereUniqueInput>
   }
 
   export type CommunityPostCreateNestedManyWithoutCommunityBoardInput = {
-    create?: XOR<Enumerable<CommunityPostUncheckedCreateWithoutCommunityBoardInput>, Enumerable<CommunityPostCreateWithoutCommunityBoardInput>>
-    connectOrCreate?: Enumerable<CommunityPostCreateOrConnectWithoutcommunityBoardInput>
+    create?: XOR<Enumerable<CommunityPostCreateWithoutCommunityBoardInput>, Enumerable<CommunityPostUncheckedCreateWithoutCommunityBoardInput>>
+    connectOrCreate?: Enumerable<CommunityPostCreateOrConnectWithoutCommunityBoardInput>
     connect?: Enumerable<CommunityPostWhereUniqueInput>
   }
 
   export type CommunityBoardPinUncheckedCreateNestedManyWithoutCommunityBoardInput = {
-    create?: XOR<Enumerable<CommunityBoardPinUncheckedCreateWithoutCommunityBoardInput>, Enumerable<CommunityBoardPinCreateWithoutCommunityBoardInput>>
-    connectOrCreate?: Enumerable<CommunityBoardPinCreateOrConnectWithoutcommunityBoardInput>
+    create?: XOR<Enumerable<CommunityBoardPinCreateWithoutCommunityBoardInput>, Enumerable<CommunityBoardPinUncheckedCreateWithoutCommunityBoardInput>>
+    connectOrCreate?: Enumerable<CommunityBoardPinCreateOrConnectWithoutCommunityBoardInput>
     connect?: Enumerable<CommunityBoardPinWhereUniqueInput>
   }
 
   export type CommunityPostUncheckedCreateNestedManyWithoutCommunityBoardInput = {
-    create?: XOR<Enumerable<CommunityPostUncheckedCreateWithoutCommunityBoardInput>, Enumerable<CommunityPostCreateWithoutCommunityBoardInput>>
-    connectOrCreate?: Enumerable<CommunityPostCreateOrConnectWithoutcommunityBoardInput>
+    create?: XOR<Enumerable<CommunityPostCreateWithoutCommunityBoardInput>, Enumerable<CommunityPostUncheckedCreateWithoutCommunityBoardInput>>
+    connectOrCreate?: Enumerable<CommunityPostCreateOrConnectWithoutCommunityBoardInput>
     connect?: Enumerable<CommunityPostWhereUniqueInput>
   }
 
@@ -21410,16 +20865,16 @@ export namespace Prisma {
   }
 
   export type UserUpdateOneRequiredWithoutCommunityBoardsInput = {
-    create?: XOR<UserUncheckedCreateWithoutCommunityBoardsInput, UserCreateWithoutCommunityBoardsInput>
-    connectOrCreate?: UserCreateOrConnectWithoutcommunityBoardsInput
+    create?: XOR<UserCreateWithoutCommunityBoardsInput, UserUncheckedCreateWithoutCommunityBoardsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutCommunityBoardsInput
     upsert?: UserUpsertWithoutCommunityBoardsInput
     connect?: UserWhereUniqueInput
-    update?: XOR<UserUncheckedUpdateWithoutCommunityBoardsInput, UserUpdateWithoutCommunityBoardsInput>
+    update?: XOR<UserUpdateWithoutCommunityBoardsInput, UserUncheckedUpdateWithoutCommunityBoardsInput>
   }
 
   export type CommunityBoardPinUpdateManyWithoutCommunityBoardInput = {
-    create?: XOR<Enumerable<CommunityBoardPinUncheckedCreateWithoutCommunityBoardInput>, Enumerable<CommunityBoardPinCreateWithoutCommunityBoardInput>>
-    connectOrCreate?: Enumerable<CommunityBoardPinCreateOrConnectWithoutcommunityBoardInput>
+    create?: XOR<Enumerable<CommunityBoardPinCreateWithoutCommunityBoardInput>, Enumerable<CommunityBoardPinUncheckedCreateWithoutCommunityBoardInput>>
+    connectOrCreate?: Enumerable<CommunityBoardPinCreateOrConnectWithoutCommunityBoardInput>
     upsert?: Enumerable<CommunityBoardPinUpsertWithWhereUniqueWithoutCommunityBoardInput>
     connect?: Enumerable<CommunityBoardPinWhereUniqueInput>
     set?: Enumerable<CommunityBoardPinWhereUniqueInput>
@@ -21431,8 +20886,8 @@ export namespace Prisma {
   }
 
   export type CommunityPostUpdateManyWithoutCommunityBoardInput = {
-    create?: XOR<Enumerable<CommunityPostUncheckedCreateWithoutCommunityBoardInput>, Enumerable<CommunityPostCreateWithoutCommunityBoardInput>>
-    connectOrCreate?: Enumerable<CommunityPostCreateOrConnectWithoutcommunityBoardInput>
+    create?: XOR<Enumerable<CommunityPostCreateWithoutCommunityBoardInput>, Enumerable<CommunityPostUncheckedCreateWithoutCommunityBoardInput>>
+    connectOrCreate?: Enumerable<CommunityPostCreateOrConnectWithoutCommunityBoardInput>
     upsert?: Enumerable<CommunityPostUpsertWithWhereUniqueWithoutCommunityBoardInput>
     connect?: Enumerable<CommunityPostWhereUniqueInput>
     set?: Enumerable<CommunityPostWhereUniqueInput>
@@ -21444,8 +20899,8 @@ export namespace Prisma {
   }
 
   export type CommunityBoardPinUncheckedUpdateManyWithoutCommunityBoardInput = {
-    create?: XOR<Enumerable<CommunityBoardPinUncheckedCreateWithoutCommunityBoardInput>, Enumerable<CommunityBoardPinCreateWithoutCommunityBoardInput>>
-    connectOrCreate?: Enumerable<CommunityBoardPinCreateOrConnectWithoutcommunityBoardInput>
+    create?: XOR<Enumerable<CommunityBoardPinCreateWithoutCommunityBoardInput>, Enumerable<CommunityBoardPinUncheckedCreateWithoutCommunityBoardInput>>
+    connectOrCreate?: Enumerable<CommunityBoardPinCreateOrConnectWithoutCommunityBoardInput>
     upsert?: Enumerable<CommunityBoardPinUpsertWithWhereUniqueWithoutCommunityBoardInput>
     connect?: Enumerable<CommunityBoardPinWhereUniqueInput>
     set?: Enumerable<CommunityBoardPinWhereUniqueInput>
@@ -21457,8 +20912,8 @@ export namespace Prisma {
   }
 
   export type CommunityPostUncheckedUpdateManyWithoutCommunityBoardInput = {
-    create?: XOR<Enumerable<CommunityPostUncheckedCreateWithoutCommunityBoardInput>, Enumerable<CommunityPostCreateWithoutCommunityBoardInput>>
-    connectOrCreate?: Enumerable<CommunityPostCreateOrConnectWithoutcommunityBoardInput>
+    create?: XOR<Enumerable<CommunityPostCreateWithoutCommunityBoardInput>, Enumerable<CommunityPostUncheckedCreateWithoutCommunityBoardInput>>
+    connectOrCreate?: Enumerable<CommunityPostCreateOrConnectWithoutCommunityBoardInput>
     upsert?: Enumerable<CommunityPostUpsertWithWhereUniqueWithoutCommunityBoardInput>
     connect?: Enumerable<CommunityPostWhereUniqueInput>
     set?: Enumerable<CommunityPostWhereUniqueInput>
@@ -21470,34 +20925,34 @@ export namespace Prisma {
   }
 
   export type UserCreateNestedOneWithoutCommunityBoardCandidatesInput = {
-    create?: XOR<UserUncheckedCreateWithoutCommunityBoardCandidatesInput, UserCreateWithoutCommunityBoardCandidatesInput>
-    connectOrCreate?: UserCreateOrConnectWithoutcommunityBoardCandidatesInput
+    create?: XOR<UserCreateWithoutCommunityBoardCandidatesInput, UserUncheckedCreateWithoutCommunityBoardCandidatesInput>
+    connectOrCreate?: UserCreateOrConnectWithoutCommunityBoardCandidatesInput
     connect?: UserWhereUniqueInput
   }
 
   export type CommunityBoardCandidateVoteCreateNestedManyWithoutCommunityBoardCandidateInput = {
-    create?: XOR<Enumerable<CommunityBoardCandidateVoteUncheckedCreateWithoutCommunityBoardCandidateInput>, Enumerable<CommunityBoardCandidateVoteCreateWithoutCommunityBoardCandidateInput>>
-    connectOrCreate?: Enumerable<CommunityBoardCandidateVoteCreateOrConnectWithoutcommunityBoardCandidateInput>
+    create?: XOR<Enumerable<CommunityBoardCandidateVoteCreateWithoutCommunityBoardCandidateInput>, Enumerable<CommunityBoardCandidateVoteUncheckedCreateWithoutCommunityBoardCandidateInput>>
+    connectOrCreate?: Enumerable<CommunityBoardCandidateVoteCreateOrConnectWithoutCommunityBoardCandidateInput>
     connect?: Enumerable<CommunityBoardCandidateVoteWhereUniqueInput>
   }
 
   export type CommunityBoardCandidateVoteUncheckedCreateNestedManyWithoutCommunityBoardCandidateInput = {
-    create?: XOR<Enumerable<CommunityBoardCandidateVoteUncheckedCreateWithoutCommunityBoardCandidateInput>, Enumerable<CommunityBoardCandidateVoteCreateWithoutCommunityBoardCandidateInput>>
-    connectOrCreate?: Enumerable<CommunityBoardCandidateVoteCreateOrConnectWithoutcommunityBoardCandidateInput>
+    create?: XOR<Enumerable<CommunityBoardCandidateVoteCreateWithoutCommunityBoardCandidateInput>, Enumerable<CommunityBoardCandidateVoteUncheckedCreateWithoutCommunityBoardCandidateInput>>
+    connectOrCreate?: Enumerable<CommunityBoardCandidateVoteCreateOrConnectWithoutCommunityBoardCandidateInput>
     connect?: Enumerable<CommunityBoardCandidateVoteWhereUniqueInput>
   }
 
   export type UserUpdateOneRequiredWithoutCommunityBoardCandidatesInput = {
-    create?: XOR<UserUncheckedCreateWithoutCommunityBoardCandidatesInput, UserCreateWithoutCommunityBoardCandidatesInput>
-    connectOrCreate?: UserCreateOrConnectWithoutcommunityBoardCandidatesInput
+    create?: XOR<UserCreateWithoutCommunityBoardCandidatesInput, UserUncheckedCreateWithoutCommunityBoardCandidatesInput>
+    connectOrCreate?: UserCreateOrConnectWithoutCommunityBoardCandidatesInput
     upsert?: UserUpsertWithoutCommunityBoardCandidatesInput
     connect?: UserWhereUniqueInput
-    update?: XOR<UserUncheckedUpdateWithoutCommunityBoardCandidatesInput, UserUpdateWithoutCommunityBoardCandidatesInput>
+    update?: XOR<UserUpdateWithoutCommunityBoardCandidatesInput, UserUncheckedUpdateWithoutCommunityBoardCandidatesInput>
   }
 
   export type CommunityBoardCandidateVoteUpdateManyWithoutCommunityBoardCandidateInput = {
-    create?: XOR<Enumerable<CommunityBoardCandidateVoteUncheckedCreateWithoutCommunityBoardCandidateInput>, Enumerable<CommunityBoardCandidateVoteCreateWithoutCommunityBoardCandidateInput>>
-    connectOrCreate?: Enumerable<CommunityBoardCandidateVoteCreateOrConnectWithoutcommunityBoardCandidateInput>
+    create?: XOR<Enumerable<CommunityBoardCandidateVoteCreateWithoutCommunityBoardCandidateInput>, Enumerable<CommunityBoardCandidateVoteUncheckedCreateWithoutCommunityBoardCandidateInput>>
+    connectOrCreate?: Enumerable<CommunityBoardCandidateVoteCreateOrConnectWithoutCommunityBoardCandidateInput>
     upsert?: Enumerable<CommunityBoardCandidateVoteUpsertWithWhereUniqueWithoutCommunityBoardCandidateInput>
     connect?: Enumerable<CommunityBoardCandidateVoteWhereUniqueInput>
     set?: Enumerable<CommunityBoardCandidateVoteWhereUniqueInput>
@@ -21509,8 +20964,8 @@ export namespace Prisma {
   }
 
   export type CommunityBoardCandidateVoteUncheckedUpdateManyWithoutCommunityBoardCandidateInput = {
-    create?: XOR<Enumerable<CommunityBoardCandidateVoteUncheckedCreateWithoutCommunityBoardCandidateInput>, Enumerable<CommunityBoardCandidateVoteCreateWithoutCommunityBoardCandidateInput>>
-    connectOrCreate?: Enumerable<CommunityBoardCandidateVoteCreateOrConnectWithoutcommunityBoardCandidateInput>
+    create?: XOR<Enumerable<CommunityBoardCandidateVoteCreateWithoutCommunityBoardCandidateInput>, Enumerable<CommunityBoardCandidateVoteUncheckedCreateWithoutCommunityBoardCandidateInput>>
+    connectOrCreate?: Enumerable<CommunityBoardCandidateVoteCreateOrConnectWithoutCommunityBoardCandidateInput>
     upsert?: Enumerable<CommunityBoardCandidateVoteUpsertWithWhereUniqueWithoutCommunityBoardCandidateInput>
     connect?: Enumerable<CommunityBoardCandidateVoteWhereUniqueInput>
     set?: Enumerable<CommunityBoardCandidateVoteWhereUniqueInput>
@@ -21522,116 +20977,116 @@ export namespace Prisma {
   }
 
   export type CommunityBoardCandidateCreateNestedOneWithoutCommunityBoardCandidateVotesInput = {
-    create?: XOR<CommunityBoardCandidateUncheckedCreateWithoutCommunityBoardCandidateVotesInput, CommunityBoardCandidateCreateWithoutCommunityBoardCandidateVotesInput>
-    connectOrCreate?: CommunityBoardCandidateCreateOrConnectWithoutcommunityBoardCandidateVotesInput
+    create?: XOR<CommunityBoardCandidateCreateWithoutCommunityBoardCandidateVotesInput, CommunityBoardCandidateUncheckedCreateWithoutCommunityBoardCandidateVotesInput>
+    connectOrCreate?: CommunityBoardCandidateCreateOrConnectWithoutCommunityBoardCandidateVotesInput
     connect?: CommunityBoardCandidateWhereUniqueInput
   }
 
   export type UserCreateNestedOneWithoutCommunityBoardCandidateVotesInput = {
-    create?: XOR<UserUncheckedCreateWithoutCommunityBoardCandidateVotesInput, UserCreateWithoutCommunityBoardCandidateVotesInput>
-    connectOrCreate?: UserCreateOrConnectWithoutcommunityBoardCandidateVotesInput
+    create?: XOR<UserCreateWithoutCommunityBoardCandidateVotesInput, UserUncheckedCreateWithoutCommunityBoardCandidateVotesInput>
+    connectOrCreate?: UserCreateOrConnectWithoutCommunityBoardCandidateVotesInput
     connect?: UserWhereUniqueInput
   }
 
   export type CommunityBoardCandidateUpdateOneRequiredWithoutCommunityBoardCandidateVotesInput = {
-    create?: XOR<CommunityBoardCandidateUncheckedCreateWithoutCommunityBoardCandidateVotesInput, CommunityBoardCandidateCreateWithoutCommunityBoardCandidateVotesInput>
-    connectOrCreate?: CommunityBoardCandidateCreateOrConnectWithoutcommunityBoardCandidateVotesInput
+    create?: XOR<CommunityBoardCandidateCreateWithoutCommunityBoardCandidateVotesInput, CommunityBoardCandidateUncheckedCreateWithoutCommunityBoardCandidateVotesInput>
+    connectOrCreate?: CommunityBoardCandidateCreateOrConnectWithoutCommunityBoardCandidateVotesInput
     upsert?: CommunityBoardCandidateUpsertWithoutCommunityBoardCandidateVotesInput
     connect?: CommunityBoardCandidateWhereUniqueInput
-    update?: XOR<CommunityBoardCandidateUncheckedUpdateWithoutCommunityBoardCandidateVotesInput, CommunityBoardCandidateUpdateWithoutCommunityBoardCandidateVotesInput>
+    update?: XOR<CommunityBoardCandidateUpdateWithoutCommunityBoardCandidateVotesInput, CommunityBoardCandidateUncheckedUpdateWithoutCommunityBoardCandidateVotesInput>
   }
 
   export type UserUpdateOneRequiredWithoutCommunityBoardCandidateVotesInput = {
-    create?: XOR<UserUncheckedCreateWithoutCommunityBoardCandidateVotesInput, UserCreateWithoutCommunityBoardCandidateVotesInput>
-    connectOrCreate?: UserCreateOrConnectWithoutcommunityBoardCandidateVotesInput
+    create?: XOR<UserCreateWithoutCommunityBoardCandidateVotesInput, UserUncheckedCreateWithoutCommunityBoardCandidateVotesInput>
+    connectOrCreate?: UserCreateOrConnectWithoutCommunityBoardCandidateVotesInput
     upsert?: UserUpsertWithoutCommunityBoardCandidateVotesInput
     connect?: UserWhereUniqueInput
-    update?: XOR<UserUncheckedUpdateWithoutCommunityBoardCandidateVotesInput, UserUpdateWithoutCommunityBoardCandidateVotesInput>
+    update?: XOR<UserUpdateWithoutCommunityBoardCandidateVotesInput, UserUncheckedUpdateWithoutCommunityBoardCandidateVotesInput>
   }
 
   export type CommunityBoardCreateNestedOneWithoutCommunityBoardPinsInput = {
-    create?: XOR<CommunityBoardUncheckedCreateWithoutCommunityBoardPinsInput, CommunityBoardCreateWithoutCommunityBoardPinsInput>
-    connectOrCreate?: CommunityBoardCreateOrConnectWithoutcommunityBoardPinsInput
+    create?: XOR<CommunityBoardCreateWithoutCommunityBoardPinsInput, CommunityBoardUncheckedCreateWithoutCommunityBoardPinsInput>
+    connectOrCreate?: CommunityBoardCreateOrConnectWithoutCommunityBoardPinsInput
     connect?: CommunityBoardWhereUniqueInput
   }
 
   export type UserCreateNestedOneWithoutCommunityBoardPinsInput = {
-    create?: XOR<UserUncheckedCreateWithoutCommunityBoardPinsInput, UserCreateWithoutCommunityBoardPinsInput>
-    connectOrCreate?: UserCreateOrConnectWithoutcommunityBoardPinsInput
+    create?: XOR<UserCreateWithoutCommunityBoardPinsInput, UserUncheckedCreateWithoutCommunityBoardPinsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutCommunityBoardPinsInput
     connect?: UserWhereUniqueInput
   }
 
   export type CommunityBoardUpdateOneRequiredWithoutCommunityBoardPinsInput = {
-    create?: XOR<CommunityBoardUncheckedCreateWithoutCommunityBoardPinsInput, CommunityBoardCreateWithoutCommunityBoardPinsInput>
-    connectOrCreate?: CommunityBoardCreateOrConnectWithoutcommunityBoardPinsInput
+    create?: XOR<CommunityBoardCreateWithoutCommunityBoardPinsInput, CommunityBoardUncheckedCreateWithoutCommunityBoardPinsInput>
+    connectOrCreate?: CommunityBoardCreateOrConnectWithoutCommunityBoardPinsInput
     upsert?: CommunityBoardUpsertWithoutCommunityBoardPinsInput
     connect?: CommunityBoardWhereUniqueInput
-    update?: XOR<CommunityBoardUncheckedUpdateWithoutCommunityBoardPinsInput, CommunityBoardUpdateWithoutCommunityBoardPinsInput>
+    update?: XOR<CommunityBoardUpdateWithoutCommunityBoardPinsInput, CommunityBoardUncheckedUpdateWithoutCommunityBoardPinsInput>
   }
 
   export type UserUpdateOneRequiredWithoutCommunityBoardPinsInput = {
-    create?: XOR<UserUncheckedCreateWithoutCommunityBoardPinsInput, UserCreateWithoutCommunityBoardPinsInput>
-    connectOrCreate?: UserCreateOrConnectWithoutcommunityBoardPinsInput
+    create?: XOR<UserCreateWithoutCommunityBoardPinsInput, UserUncheckedCreateWithoutCommunityBoardPinsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutCommunityBoardPinsInput
     upsert?: UserUpsertWithoutCommunityBoardPinsInput
     connect?: UserWhereUniqueInput
-    update?: XOR<UserUncheckedUpdateWithoutCommunityBoardPinsInput, UserUpdateWithoutCommunityBoardPinsInput>
+    update?: XOR<UserUpdateWithoutCommunityBoardPinsInput, UserUncheckedUpdateWithoutCommunityBoardPinsInput>
   }
 
   export type CommunityPostCreateNestedOneWithoutCommunityCommentsInput = {
-    create?: XOR<CommunityPostUncheckedCreateWithoutCommunityCommentsInput, CommunityPostCreateWithoutCommunityCommentsInput>
-    connectOrCreate?: CommunityPostCreateOrConnectWithoutcommunityCommentsInput
+    create?: XOR<CommunityPostCreateWithoutCommunityCommentsInput, CommunityPostUncheckedCreateWithoutCommunityCommentsInput>
+    connectOrCreate?: CommunityPostCreateOrConnectWithoutCommunityCommentsInput
     connect?: CommunityPostWhereUniqueInput
   }
 
   export type UserCreateNestedOneWithoutCommunityCommentsInput = {
-    create?: XOR<UserUncheckedCreateWithoutCommunityCommentsInput, UserCreateWithoutCommunityCommentsInput>
-    connectOrCreate?: UserCreateOrConnectWithoutcommunityCommentsInput
+    create?: XOR<UserCreateWithoutCommunityCommentsInput, UserUncheckedCreateWithoutCommunityCommentsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutCommunityCommentsInput
     connect?: UserWhereUniqueInput
   }
 
   export type CommunitySubcommentCreateNestedManyWithoutCommunityCommentInput = {
-    create?: XOR<Enumerable<CommunitySubcommentUncheckedCreateWithoutCommunityCommentInput>, Enumerable<CommunitySubcommentCreateWithoutCommunityCommentInput>>
-    connectOrCreate?: Enumerable<CommunitySubcommentCreateOrConnectWithoutcommunityCommentInput>
+    create?: XOR<Enumerable<CommunitySubcommentCreateWithoutCommunityCommentInput>, Enumerable<CommunitySubcommentUncheckedCreateWithoutCommunityCommentInput>>
+    connectOrCreate?: Enumerable<CommunitySubcommentCreateOrConnectWithoutCommunityCommentInput>
     connect?: Enumerable<CommunitySubcommentWhereUniqueInput>
   }
 
   export type ReportCommentCreateNestedManyWithoutCommunityCommentInput = {
-    create?: XOR<Enumerable<ReportCommentUncheckedCreateWithoutCommunityCommentInput>, Enumerable<ReportCommentCreateWithoutCommunityCommentInput>>
-    connectOrCreate?: Enumerable<ReportCommentCreateOrConnectWithoutcommunityCommentInput>
+    create?: XOR<Enumerable<ReportCommentCreateWithoutCommunityCommentInput>, Enumerable<ReportCommentUncheckedCreateWithoutCommunityCommentInput>>
+    connectOrCreate?: Enumerable<ReportCommentCreateOrConnectWithoutCommunityCommentInput>
     connect?: Enumerable<ReportCommentWhereUniqueInput>
   }
 
   export type CommunitySubcommentUncheckedCreateNestedManyWithoutCommunityCommentInput = {
-    create?: XOR<Enumerable<CommunitySubcommentUncheckedCreateWithoutCommunityCommentInput>, Enumerable<CommunitySubcommentCreateWithoutCommunityCommentInput>>
-    connectOrCreate?: Enumerable<CommunitySubcommentCreateOrConnectWithoutcommunityCommentInput>
+    create?: XOR<Enumerable<CommunitySubcommentCreateWithoutCommunityCommentInput>, Enumerable<CommunitySubcommentUncheckedCreateWithoutCommunityCommentInput>>
+    connectOrCreate?: Enumerable<CommunitySubcommentCreateOrConnectWithoutCommunityCommentInput>
     connect?: Enumerable<CommunitySubcommentWhereUniqueInput>
   }
 
   export type ReportCommentUncheckedCreateNestedManyWithoutCommunityCommentInput = {
-    create?: XOR<Enumerable<ReportCommentUncheckedCreateWithoutCommunityCommentInput>, Enumerable<ReportCommentCreateWithoutCommunityCommentInput>>
-    connectOrCreate?: Enumerable<ReportCommentCreateOrConnectWithoutcommunityCommentInput>
+    create?: XOR<Enumerable<ReportCommentCreateWithoutCommunityCommentInput>, Enumerable<ReportCommentUncheckedCreateWithoutCommunityCommentInput>>
+    connectOrCreate?: Enumerable<ReportCommentCreateOrConnectWithoutCommunityCommentInput>
     connect?: Enumerable<ReportCommentWhereUniqueInput>
   }
 
   export type CommunityPostUpdateOneRequiredWithoutCommunityCommentsInput = {
-    create?: XOR<CommunityPostUncheckedCreateWithoutCommunityCommentsInput, CommunityPostCreateWithoutCommunityCommentsInput>
-    connectOrCreate?: CommunityPostCreateOrConnectWithoutcommunityCommentsInput
+    create?: XOR<CommunityPostCreateWithoutCommunityCommentsInput, CommunityPostUncheckedCreateWithoutCommunityCommentsInput>
+    connectOrCreate?: CommunityPostCreateOrConnectWithoutCommunityCommentsInput
     upsert?: CommunityPostUpsertWithoutCommunityCommentsInput
     connect?: CommunityPostWhereUniqueInput
-    update?: XOR<CommunityPostUncheckedUpdateWithoutCommunityCommentsInput, CommunityPostUpdateWithoutCommunityCommentsInput>
+    update?: XOR<CommunityPostUpdateWithoutCommunityCommentsInput, CommunityPostUncheckedUpdateWithoutCommunityCommentsInput>
   }
 
   export type UserUpdateOneRequiredWithoutCommunityCommentsInput = {
-    create?: XOR<UserUncheckedCreateWithoutCommunityCommentsInput, UserCreateWithoutCommunityCommentsInput>
-    connectOrCreate?: UserCreateOrConnectWithoutcommunityCommentsInput
+    create?: XOR<UserCreateWithoutCommunityCommentsInput, UserUncheckedCreateWithoutCommunityCommentsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutCommunityCommentsInput
     upsert?: UserUpsertWithoutCommunityCommentsInput
     connect?: UserWhereUniqueInput
-    update?: XOR<UserUncheckedUpdateWithoutCommunityCommentsInput, UserUpdateWithoutCommunityCommentsInput>
+    update?: XOR<UserUpdateWithoutCommunityCommentsInput, UserUncheckedUpdateWithoutCommunityCommentsInput>
   }
 
   export type CommunitySubcommentUpdateManyWithoutCommunityCommentInput = {
-    create?: XOR<Enumerable<CommunitySubcommentUncheckedCreateWithoutCommunityCommentInput>, Enumerable<CommunitySubcommentCreateWithoutCommunityCommentInput>>
-    connectOrCreate?: Enumerable<CommunitySubcommentCreateOrConnectWithoutcommunityCommentInput>
+    create?: XOR<Enumerable<CommunitySubcommentCreateWithoutCommunityCommentInput>, Enumerable<CommunitySubcommentUncheckedCreateWithoutCommunityCommentInput>>
+    connectOrCreate?: Enumerable<CommunitySubcommentCreateOrConnectWithoutCommunityCommentInput>
     upsert?: Enumerable<CommunitySubcommentUpsertWithWhereUniqueWithoutCommunityCommentInput>
     connect?: Enumerable<CommunitySubcommentWhereUniqueInput>
     set?: Enumerable<CommunitySubcommentWhereUniqueInput>
@@ -21643,8 +21098,8 @@ export namespace Prisma {
   }
 
   export type ReportCommentUpdateManyWithoutCommunityCommentInput = {
-    create?: XOR<Enumerable<ReportCommentUncheckedCreateWithoutCommunityCommentInput>, Enumerable<ReportCommentCreateWithoutCommunityCommentInput>>
-    connectOrCreate?: Enumerable<ReportCommentCreateOrConnectWithoutcommunityCommentInput>
+    create?: XOR<Enumerable<ReportCommentCreateWithoutCommunityCommentInput>, Enumerable<ReportCommentUncheckedCreateWithoutCommunityCommentInput>>
+    connectOrCreate?: Enumerable<ReportCommentCreateOrConnectWithoutCommunityCommentInput>
     upsert?: Enumerable<ReportCommentUpsertWithWhereUniqueWithoutCommunityCommentInput>
     connect?: Enumerable<ReportCommentWhereUniqueInput>
     set?: Enumerable<ReportCommentWhereUniqueInput>
@@ -21656,8 +21111,8 @@ export namespace Prisma {
   }
 
   export type CommunitySubcommentUncheckedUpdateManyWithoutCommunityCommentInput = {
-    create?: XOR<Enumerable<CommunitySubcommentUncheckedCreateWithoutCommunityCommentInput>, Enumerable<CommunitySubcommentCreateWithoutCommunityCommentInput>>
-    connectOrCreate?: Enumerable<CommunitySubcommentCreateOrConnectWithoutcommunityCommentInput>
+    create?: XOR<Enumerable<CommunitySubcommentCreateWithoutCommunityCommentInput>, Enumerable<CommunitySubcommentUncheckedCreateWithoutCommunityCommentInput>>
+    connectOrCreate?: Enumerable<CommunitySubcommentCreateOrConnectWithoutCommunityCommentInput>
     upsert?: Enumerable<CommunitySubcommentUpsertWithWhereUniqueWithoutCommunityCommentInput>
     connect?: Enumerable<CommunitySubcommentWhereUniqueInput>
     set?: Enumerable<CommunitySubcommentWhereUniqueInput>
@@ -21669,8 +21124,8 @@ export namespace Prisma {
   }
 
   export type ReportCommentUncheckedUpdateManyWithoutCommunityCommentInput = {
-    create?: XOR<Enumerable<ReportCommentUncheckedCreateWithoutCommunityCommentInput>, Enumerable<ReportCommentCreateWithoutCommunityCommentInput>>
-    connectOrCreate?: Enumerable<ReportCommentCreateOrConnectWithoutcommunityCommentInput>
+    create?: XOR<Enumerable<ReportCommentCreateWithoutCommunityCommentInput>, Enumerable<ReportCommentUncheckedCreateWithoutCommunityCommentInput>>
+    connectOrCreate?: Enumerable<ReportCommentCreateOrConnectWithoutCommunityCommentInput>
     upsert?: Enumerable<ReportCommentUpsertWithWhereUniqueWithoutCommunityCommentInput>
     connect?: Enumerable<ReportCommentWhereUniqueInput>
     set?: Enumerable<ReportCommentWhereUniqueInput>
@@ -21682,96 +21137,96 @@ export namespace Prisma {
   }
 
   export type CommunityBoardCreateNestedOneWithoutCommunityPostsInput = {
-    create?: XOR<CommunityBoardUncheckedCreateWithoutCommunityPostsInput, CommunityBoardCreateWithoutCommunityPostsInput>
-    connectOrCreate?: CommunityBoardCreateOrConnectWithoutcommunityPostsInput
+    create?: XOR<CommunityBoardCreateWithoutCommunityPostsInput, CommunityBoardUncheckedCreateWithoutCommunityPostsInput>
+    connectOrCreate?: CommunityBoardCreateOrConnectWithoutCommunityPostsInput
     connect?: CommunityBoardWhereUniqueInput
   }
 
   export type UserCreateNestedOneWithoutCommunityPostsInput = {
-    create?: XOR<UserUncheckedCreateWithoutCommunityPostsInput, UserCreateWithoutCommunityPostsInput>
-    connectOrCreate?: UserCreateOrConnectWithoutcommunityPostsInput
+    create?: XOR<UserCreateWithoutCommunityPostsInput, UserUncheckedCreateWithoutCommunityPostsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutCommunityPostsInput
     connect?: UserWhereUniqueInput
   }
 
   export type CommunityCommentCreateNestedManyWithoutCommunityPostInput = {
-    create?: XOR<Enumerable<CommunityCommentUncheckedCreateWithoutCommunityPostInput>, Enumerable<CommunityCommentCreateWithoutCommunityPostInput>>
-    connectOrCreate?: Enumerable<CommunityCommentCreateOrConnectWithoutcommunityPostInput>
+    create?: XOR<Enumerable<CommunityCommentCreateWithoutCommunityPostInput>, Enumerable<CommunityCommentUncheckedCreateWithoutCommunityPostInput>>
+    connectOrCreate?: Enumerable<CommunityCommentCreateOrConnectWithoutCommunityPostInput>
     connect?: Enumerable<CommunityCommentWhereUniqueInput>
   }
 
   export type CommunityPostBookmarkCreateNestedManyWithoutCommunityPostInput = {
-    create?: XOR<Enumerable<CommunityPostBookmarkUncheckedCreateWithoutCommunityPostInput>, Enumerable<CommunityPostBookmarkCreateWithoutCommunityPostInput>>
-    connectOrCreate?: Enumerable<CommunityPostBookmarkCreateOrConnectWithoutcommunityPostInput>
+    create?: XOR<Enumerable<CommunityPostBookmarkCreateWithoutCommunityPostInput>, Enumerable<CommunityPostBookmarkUncheckedCreateWithoutCommunityPostInput>>
+    connectOrCreate?: Enumerable<CommunityPostBookmarkCreateOrConnectWithoutCommunityPostInput>
     connect?: Enumerable<CommunityPostBookmarkWhereUniqueInput>
   }
 
   export type CommunityPostLikeCreateNestedManyWithoutCommunityPostInput = {
-    create?: XOR<Enumerable<CommunityPostLikeUncheckedCreateWithoutCommunityPostInput>, Enumerable<CommunityPostLikeCreateWithoutCommunityPostInput>>
-    connectOrCreate?: Enumerable<CommunityPostLikeCreateOrConnectWithoutcommunityPostInput>
+    create?: XOR<Enumerable<CommunityPostLikeCreateWithoutCommunityPostInput>, Enumerable<CommunityPostLikeUncheckedCreateWithoutCommunityPostInput>>
+    connectOrCreate?: Enumerable<CommunityPostLikeCreateOrConnectWithoutCommunityPostInput>
     connect?: Enumerable<CommunityPostLikeWhereUniqueInput>
   }
 
   export type CommunitySubcommentCreateNestedManyWithoutCommunityPostInput = {
-    create?: XOR<Enumerable<CommunitySubcommentUncheckedCreateWithoutCommunityPostInput>, Enumerable<CommunitySubcommentCreateWithoutCommunityPostInput>>
-    connectOrCreate?: Enumerable<CommunitySubcommentCreateOrConnectWithoutcommunityPostInput>
+    create?: XOR<Enumerable<CommunitySubcommentCreateWithoutCommunityPostInput>, Enumerable<CommunitySubcommentUncheckedCreateWithoutCommunityPostInput>>
+    connectOrCreate?: Enumerable<CommunitySubcommentCreateOrConnectWithoutCommunityPostInput>
     connect?: Enumerable<CommunitySubcommentWhereUniqueInput>
   }
 
   export type ReportPostCreateNestedManyWithoutCommunityPostInput = {
-    create?: XOR<Enumerable<ReportPostUncheckedCreateWithoutCommunityPostInput>, Enumerable<ReportPostCreateWithoutCommunityPostInput>>
-    connectOrCreate?: Enumerable<ReportPostCreateOrConnectWithoutcommunityPostInput>
+    create?: XOR<Enumerable<ReportPostCreateWithoutCommunityPostInput>, Enumerable<ReportPostUncheckedCreateWithoutCommunityPostInput>>
+    connectOrCreate?: Enumerable<ReportPostCreateOrConnectWithoutCommunityPostInput>
     connect?: Enumerable<ReportPostWhereUniqueInput>
   }
 
   export type CommunityCommentUncheckedCreateNestedManyWithoutCommunityPostInput = {
-    create?: XOR<Enumerable<CommunityCommentUncheckedCreateWithoutCommunityPostInput>, Enumerable<CommunityCommentCreateWithoutCommunityPostInput>>
-    connectOrCreate?: Enumerable<CommunityCommentCreateOrConnectWithoutcommunityPostInput>
+    create?: XOR<Enumerable<CommunityCommentCreateWithoutCommunityPostInput>, Enumerable<CommunityCommentUncheckedCreateWithoutCommunityPostInput>>
+    connectOrCreate?: Enumerable<CommunityCommentCreateOrConnectWithoutCommunityPostInput>
     connect?: Enumerable<CommunityCommentWhereUniqueInput>
   }
 
   export type CommunityPostBookmarkUncheckedCreateNestedManyWithoutCommunityPostInput = {
-    create?: XOR<Enumerable<CommunityPostBookmarkUncheckedCreateWithoutCommunityPostInput>, Enumerable<CommunityPostBookmarkCreateWithoutCommunityPostInput>>
-    connectOrCreate?: Enumerable<CommunityPostBookmarkCreateOrConnectWithoutcommunityPostInput>
+    create?: XOR<Enumerable<CommunityPostBookmarkCreateWithoutCommunityPostInput>, Enumerable<CommunityPostBookmarkUncheckedCreateWithoutCommunityPostInput>>
+    connectOrCreate?: Enumerable<CommunityPostBookmarkCreateOrConnectWithoutCommunityPostInput>
     connect?: Enumerable<CommunityPostBookmarkWhereUniqueInput>
   }
 
   export type CommunityPostLikeUncheckedCreateNestedManyWithoutCommunityPostInput = {
-    create?: XOR<Enumerable<CommunityPostLikeUncheckedCreateWithoutCommunityPostInput>, Enumerable<CommunityPostLikeCreateWithoutCommunityPostInput>>
-    connectOrCreate?: Enumerable<CommunityPostLikeCreateOrConnectWithoutcommunityPostInput>
+    create?: XOR<Enumerable<CommunityPostLikeCreateWithoutCommunityPostInput>, Enumerable<CommunityPostLikeUncheckedCreateWithoutCommunityPostInput>>
+    connectOrCreate?: Enumerable<CommunityPostLikeCreateOrConnectWithoutCommunityPostInput>
     connect?: Enumerable<CommunityPostLikeWhereUniqueInput>
   }
 
   export type CommunitySubcommentUncheckedCreateNestedManyWithoutCommunityPostInput = {
-    create?: XOR<Enumerable<CommunitySubcommentUncheckedCreateWithoutCommunityPostInput>, Enumerable<CommunitySubcommentCreateWithoutCommunityPostInput>>
-    connectOrCreate?: Enumerable<CommunitySubcommentCreateOrConnectWithoutcommunityPostInput>
+    create?: XOR<Enumerable<CommunitySubcommentCreateWithoutCommunityPostInput>, Enumerable<CommunitySubcommentUncheckedCreateWithoutCommunityPostInput>>
+    connectOrCreate?: Enumerable<CommunitySubcommentCreateOrConnectWithoutCommunityPostInput>
     connect?: Enumerable<CommunitySubcommentWhereUniqueInput>
   }
 
   export type ReportPostUncheckedCreateNestedManyWithoutCommunityPostInput = {
-    create?: XOR<Enumerable<ReportPostUncheckedCreateWithoutCommunityPostInput>, Enumerable<ReportPostCreateWithoutCommunityPostInput>>
-    connectOrCreate?: Enumerable<ReportPostCreateOrConnectWithoutcommunityPostInput>
+    create?: XOR<Enumerable<ReportPostCreateWithoutCommunityPostInput>, Enumerable<ReportPostUncheckedCreateWithoutCommunityPostInput>>
+    connectOrCreate?: Enumerable<ReportPostCreateOrConnectWithoutCommunityPostInput>
     connect?: Enumerable<ReportPostWhereUniqueInput>
   }
 
   export type CommunityBoardUpdateOneRequiredWithoutCommunityPostsInput = {
-    create?: XOR<CommunityBoardUncheckedCreateWithoutCommunityPostsInput, CommunityBoardCreateWithoutCommunityPostsInput>
-    connectOrCreate?: CommunityBoardCreateOrConnectWithoutcommunityPostsInput
+    create?: XOR<CommunityBoardCreateWithoutCommunityPostsInput, CommunityBoardUncheckedCreateWithoutCommunityPostsInput>
+    connectOrCreate?: CommunityBoardCreateOrConnectWithoutCommunityPostsInput
     upsert?: CommunityBoardUpsertWithoutCommunityPostsInput
     connect?: CommunityBoardWhereUniqueInput
-    update?: XOR<CommunityBoardUncheckedUpdateWithoutCommunityPostsInput, CommunityBoardUpdateWithoutCommunityPostsInput>
+    update?: XOR<CommunityBoardUpdateWithoutCommunityPostsInput, CommunityBoardUncheckedUpdateWithoutCommunityPostsInput>
   }
 
   export type UserUpdateOneRequiredWithoutCommunityPostsInput = {
-    create?: XOR<UserUncheckedCreateWithoutCommunityPostsInput, UserCreateWithoutCommunityPostsInput>
-    connectOrCreate?: UserCreateOrConnectWithoutcommunityPostsInput
+    create?: XOR<UserCreateWithoutCommunityPostsInput, UserUncheckedCreateWithoutCommunityPostsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutCommunityPostsInput
     upsert?: UserUpsertWithoutCommunityPostsInput
     connect?: UserWhereUniqueInput
-    update?: XOR<UserUncheckedUpdateWithoutCommunityPostsInput, UserUpdateWithoutCommunityPostsInput>
+    update?: XOR<UserUpdateWithoutCommunityPostsInput, UserUncheckedUpdateWithoutCommunityPostsInput>
   }
 
   export type CommunityCommentUpdateManyWithoutCommunityPostInput = {
-    create?: XOR<Enumerable<CommunityCommentUncheckedCreateWithoutCommunityPostInput>, Enumerable<CommunityCommentCreateWithoutCommunityPostInput>>
-    connectOrCreate?: Enumerable<CommunityCommentCreateOrConnectWithoutcommunityPostInput>
+    create?: XOR<Enumerable<CommunityCommentCreateWithoutCommunityPostInput>, Enumerable<CommunityCommentUncheckedCreateWithoutCommunityPostInput>>
+    connectOrCreate?: Enumerable<CommunityCommentCreateOrConnectWithoutCommunityPostInput>
     upsert?: Enumerable<CommunityCommentUpsertWithWhereUniqueWithoutCommunityPostInput>
     connect?: Enumerable<CommunityCommentWhereUniqueInput>
     set?: Enumerable<CommunityCommentWhereUniqueInput>
@@ -21783,8 +21238,8 @@ export namespace Prisma {
   }
 
   export type CommunityPostBookmarkUpdateManyWithoutCommunityPostInput = {
-    create?: XOR<Enumerable<CommunityPostBookmarkUncheckedCreateWithoutCommunityPostInput>, Enumerable<CommunityPostBookmarkCreateWithoutCommunityPostInput>>
-    connectOrCreate?: Enumerable<CommunityPostBookmarkCreateOrConnectWithoutcommunityPostInput>
+    create?: XOR<Enumerable<CommunityPostBookmarkCreateWithoutCommunityPostInput>, Enumerable<CommunityPostBookmarkUncheckedCreateWithoutCommunityPostInput>>
+    connectOrCreate?: Enumerable<CommunityPostBookmarkCreateOrConnectWithoutCommunityPostInput>
     upsert?: Enumerable<CommunityPostBookmarkUpsertWithWhereUniqueWithoutCommunityPostInput>
     connect?: Enumerable<CommunityPostBookmarkWhereUniqueInput>
     set?: Enumerable<CommunityPostBookmarkWhereUniqueInput>
@@ -21796,8 +21251,8 @@ export namespace Prisma {
   }
 
   export type CommunityPostLikeUpdateManyWithoutCommunityPostInput = {
-    create?: XOR<Enumerable<CommunityPostLikeUncheckedCreateWithoutCommunityPostInput>, Enumerable<CommunityPostLikeCreateWithoutCommunityPostInput>>
-    connectOrCreate?: Enumerable<CommunityPostLikeCreateOrConnectWithoutcommunityPostInput>
+    create?: XOR<Enumerable<CommunityPostLikeCreateWithoutCommunityPostInput>, Enumerable<CommunityPostLikeUncheckedCreateWithoutCommunityPostInput>>
+    connectOrCreate?: Enumerable<CommunityPostLikeCreateOrConnectWithoutCommunityPostInput>
     upsert?: Enumerable<CommunityPostLikeUpsertWithWhereUniqueWithoutCommunityPostInput>
     connect?: Enumerable<CommunityPostLikeWhereUniqueInput>
     set?: Enumerable<CommunityPostLikeWhereUniqueInput>
@@ -21809,8 +21264,8 @@ export namespace Prisma {
   }
 
   export type CommunitySubcommentUpdateManyWithoutCommunityPostInput = {
-    create?: XOR<Enumerable<CommunitySubcommentUncheckedCreateWithoutCommunityPostInput>, Enumerable<CommunitySubcommentCreateWithoutCommunityPostInput>>
-    connectOrCreate?: Enumerable<CommunitySubcommentCreateOrConnectWithoutcommunityPostInput>
+    create?: XOR<Enumerable<CommunitySubcommentCreateWithoutCommunityPostInput>, Enumerable<CommunitySubcommentUncheckedCreateWithoutCommunityPostInput>>
+    connectOrCreate?: Enumerable<CommunitySubcommentCreateOrConnectWithoutCommunityPostInput>
     upsert?: Enumerable<CommunitySubcommentUpsertWithWhereUniqueWithoutCommunityPostInput>
     connect?: Enumerable<CommunitySubcommentWhereUniqueInput>
     set?: Enumerable<CommunitySubcommentWhereUniqueInput>
@@ -21822,8 +21277,8 @@ export namespace Prisma {
   }
 
   export type ReportPostUpdateManyWithoutCommunityPostInput = {
-    create?: XOR<Enumerable<ReportPostUncheckedCreateWithoutCommunityPostInput>, Enumerable<ReportPostCreateWithoutCommunityPostInput>>
-    connectOrCreate?: Enumerable<ReportPostCreateOrConnectWithoutcommunityPostInput>
+    create?: XOR<Enumerable<ReportPostCreateWithoutCommunityPostInput>, Enumerable<ReportPostUncheckedCreateWithoutCommunityPostInput>>
+    connectOrCreate?: Enumerable<ReportPostCreateOrConnectWithoutCommunityPostInput>
     upsert?: Enumerable<ReportPostUpsertWithWhereUniqueWithoutCommunityPostInput>
     connect?: Enumerable<ReportPostWhereUniqueInput>
     set?: Enumerable<ReportPostWhereUniqueInput>
@@ -21835,8 +21290,8 @@ export namespace Prisma {
   }
 
   export type CommunityCommentUncheckedUpdateManyWithoutCommunityPostInput = {
-    create?: XOR<Enumerable<CommunityCommentUncheckedCreateWithoutCommunityPostInput>, Enumerable<CommunityCommentCreateWithoutCommunityPostInput>>
-    connectOrCreate?: Enumerable<CommunityCommentCreateOrConnectWithoutcommunityPostInput>
+    create?: XOR<Enumerable<CommunityCommentCreateWithoutCommunityPostInput>, Enumerable<CommunityCommentUncheckedCreateWithoutCommunityPostInput>>
+    connectOrCreate?: Enumerable<CommunityCommentCreateOrConnectWithoutCommunityPostInput>
     upsert?: Enumerable<CommunityCommentUpsertWithWhereUniqueWithoutCommunityPostInput>
     connect?: Enumerable<CommunityCommentWhereUniqueInput>
     set?: Enumerable<CommunityCommentWhereUniqueInput>
@@ -21848,8 +21303,8 @@ export namespace Prisma {
   }
 
   export type CommunityPostBookmarkUncheckedUpdateManyWithoutCommunityPostInput = {
-    create?: XOR<Enumerable<CommunityPostBookmarkUncheckedCreateWithoutCommunityPostInput>, Enumerable<CommunityPostBookmarkCreateWithoutCommunityPostInput>>
-    connectOrCreate?: Enumerable<CommunityPostBookmarkCreateOrConnectWithoutcommunityPostInput>
+    create?: XOR<Enumerable<CommunityPostBookmarkCreateWithoutCommunityPostInput>, Enumerable<CommunityPostBookmarkUncheckedCreateWithoutCommunityPostInput>>
+    connectOrCreate?: Enumerable<CommunityPostBookmarkCreateOrConnectWithoutCommunityPostInput>
     upsert?: Enumerable<CommunityPostBookmarkUpsertWithWhereUniqueWithoutCommunityPostInput>
     connect?: Enumerable<CommunityPostBookmarkWhereUniqueInput>
     set?: Enumerable<CommunityPostBookmarkWhereUniqueInput>
@@ -21861,8 +21316,8 @@ export namespace Prisma {
   }
 
   export type CommunityPostLikeUncheckedUpdateManyWithoutCommunityPostInput = {
-    create?: XOR<Enumerable<CommunityPostLikeUncheckedCreateWithoutCommunityPostInput>, Enumerable<CommunityPostLikeCreateWithoutCommunityPostInput>>
-    connectOrCreate?: Enumerable<CommunityPostLikeCreateOrConnectWithoutcommunityPostInput>
+    create?: XOR<Enumerable<CommunityPostLikeCreateWithoutCommunityPostInput>, Enumerable<CommunityPostLikeUncheckedCreateWithoutCommunityPostInput>>
+    connectOrCreate?: Enumerable<CommunityPostLikeCreateOrConnectWithoutCommunityPostInput>
     upsert?: Enumerable<CommunityPostLikeUpsertWithWhereUniqueWithoutCommunityPostInput>
     connect?: Enumerable<CommunityPostLikeWhereUniqueInput>
     set?: Enumerable<CommunityPostLikeWhereUniqueInput>
@@ -21874,8 +21329,8 @@ export namespace Prisma {
   }
 
   export type CommunitySubcommentUncheckedUpdateManyWithoutCommunityPostInput = {
-    create?: XOR<Enumerable<CommunitySubcommentUncheckedCreateWithoutCommunityPostInput>, Enumerable<CommunitySubcommentCreateWithoutCommunityPostInput>>
-    connectOrCreate?: Enumerable<CommunitySubcommentCreateOrConnectWithoutcommunityPostInput>
+    create?: XOR<Enumerable<CommunitySubcommentCreateWithoutCommunityPostInput>, Enumerable<CommunitySubcommentUncheckedCreateWithoutCommunityPostInput>>
+    connectOrCreate?: Enumerable<CommunitySubcommentCreateOrConnectWithoutCommunityPostInput>
     upsert?: Enumerable<CommunitySubcommentUpsertWithWhereUniqueWithoutCommunityPostInput>
     connect?: Enumerable<CommunitySubcommentWhereUniqueInput>
     set?: Enumerable<CommunitySubcommentWhereUniqueInput>
@@ -21887,8 +21342,8 @@ export namespace Prisma {
   }
 
   export type ReportPostUncheckedUpdateManyWithoutCommunityPostInput = {
-    create?: XOR<Enumerable<ReportPostUncheckedCreateWithoutCommunityPostInput>, Enumerable<ReportPostCreateWithoutCommunityPostInput>>
-    connectOrCreate?: Enumerable<ReportPostCreateOrConnectWithoutcommunityPostInput>
+    create?: XOR<Enumerable<ReportPostCreateWithoutCommunityPostInput>, Enumerable<ReportPostUncheckedCreateWithoutCommunityPostInput>>
+    connectOrCreate?: Enumerable<ReportPostCreateOrConnectWithoutCommunityPostInput>
     upsert?: Enumerable<ReportPostUpsertWithWhereUniqueWithoutCommunityPostInput>
     connect?: Enumerable<ReportPostWhereUniqueInput>
     set?: Enumerable<ReportPostWhereUniqueInput>
@@ -21900,118 +21355,118 @@ export namespace Prisma {
   }
 
   export type CommunityPostCreateNestedOneWithoutCommunityPostBookmarksInput = {
-    create?: XOR<CommunityPostUncheckedCreateWithoutCommunityPostBookmarksInput, CommunityPostCreateWithoutCommunityPostBookmarksInput>
-    connectOrCreate?: CommunityPostCreateOrConnectWithoutcommunityPostBookmarksInput
+    create?: XOR<CommunityPostCreateWithoutCommunityPostBookmarksInput, CommunityPostUncheckedCreateWithoutCommunityPostBookmarksInput>
+    connectOrCreate?: CommunityPostCreateOrConnectWithoutCommunityPostBookmarksInput
     connect?: CommunityPostWhereUniqueInput
   }
 
   export type UserCreateNestedOneWithoutCommunityPostBookmarksInput = {
-    create?: XOR<UserUncheckedCreateWithoutCommunityPostBookmarksInput, UserCreateWithoutCommunityPostBookmarksInput>
-    connectOrCreate?: UserCreateOrConnectWithoutcommunityPostBookmarksInput
+    create?: XOR<UserCreateWithoutCommunityPostBookmarksInput, UserUncheckedCreateWithoutCommunityPostBookmarksInput>
+    connectOrCreate?: UserCreateOrConnectWithoutCommunityPostBookmarksInput
     connect?: UserWhereUniqueInput
   }
 
   export type CommunityPostUpdateOneRequiredWithoutCommunityPostBookmarksInput = {
-    create?: XOR<CommunityPostUncheckedCreateWithoutCommunityPostBookmarksInput, CommunityPostCreateWithoutCommunityPostBookmarksInput>
-    connectOrCreate?: CommunityPostCreateOrConnectWithoutcommunityPostBookmarksInput
+    create?: XOR<CommunityPostCreateWithoutCommunityPostBookmarksInput, CommunityPostUncheckedCreateWithoutCommunityPostBookmarksInput>
+    connectOrCreate?: CommunityPostCreateOrConnectWithoutCommunityPostBookmarksInput
     upsert?: CommunityPostUpsertWithoutCommunityPostBookmarksInput
     connect?: CommunityPostWhereUniqueInput
-    update?: XOR<CommunityPostUncheckedUpdateWithoutCommunityPostBookmarksInput, CommunityPostUpdateWithoutCommunityPostBookmarksInput>
+    update?: XOR<CommunityPostUpdateWithoutCommunityPostBookmarksInput, CommunityPostUncheckedUpdateWithoutCommunityPostBookmarksInput>
   }
 
   export type UserUpdateOneRequiredWithoutCommunityPostBookmarksInput = {
-    create?: XOR<UserUncheckedCreateWithoutCommunityPostBookmarksInput, UserCreateWithoutCommunityPostBookmarksInput>
-    connectOrCreate?: UserCreateOrConnectWithoutcommunityPostBookmarksInput
+    create?: XOR<UserCreateWithoutCommunityPostBookmarksInput, UserUncheckedCreateWithoutCommunityPostBookmarksInput>
+    connectOrCreate?: UserCreateOrConnectWithoutCommunityPostBookmarksInput
     upsert?: UserUpsertWithoutCommunityPostBookmarksInput
     connect?: UserWhereUniqueInput
-    update?: XOR<UserUncheckedUpdateWithoutCommunityPostBookmarksInput, UserUpdateWithoutCommunityPostBookmarksInput>
+    update?: XOR<UserUpdateWithoutCommunityPostBookmarksInput, UserUncheckedUpdateWithoutCommunityPostBookmarksInput>
   }
 
   export type CommunityPostCreateNestedOneWithoutCommunityPostLikesInput = {
-    create?: XOR<CommunityPostUncheckedCreateWithoutCommunityPostLikesInput, CommunityPostCreateWithoutCommunityPostLikesInput>
-    connectOrCreate?: CommunityPostCreateOrConnectWithoutcommunityPostLikesInput
+    create?: XOR<CommunityPostCreateWithoutCommunityPostLikesInput, CommunityPostUncheckedCreateWithoutCommunityPostLikesInput>
+    connectOrCreate?: CommunityPostCreateOrConnectWithoutCommunityPostLikesInput
     connect?: CommunityPostWhereUniqueInput
   }
 
   export type UserCreateNestedOneWithoutCommunityPostLikesInput = {
-    create?: XOR<UserUncheckedCreateWithoutCommunityPostLikesInput, UserCreateWithoutCommunityPostLikesInput>
-    connectOrCreate?: UserCreateOrConnectWithoutcommunityPostLikesInput
+    create?: XOR<UserCreateWithoutCommunityPostLikesInput, UserUncheckedCreateWithoutCommunityPostLikesInput>
+    connectOrCreate?: UserCreateOrConnectWithoutCommunityPostLikesInput
     connect?: UserWhereUniqueInput
   }
 
   export type CommunityPostUpdateOneRequiredWithoutCommunityPostLikesInput = {
-    create?: XOR<CommunityPostUncheckedCreateWithoutCommunityPostLikesInput, CommunityPostCreateWithoutCommunityPostLikesInput>
-    connectOrCreate?: CommunityPostCreateOrConnectWithoutcommunityPostLikesInput
+    create?: XOR<CommunityPostCreateWithoutCommunityPostLikesInput, CommunityPostUncheckedCreateWithoutCommunityPostLikesInput>
+    connectOrCreate?: CommunityPostCreateOrConnectWithoutCommunityPostLikesInput
     upsert?: CommunityPostUpsertWithoutCommunityPostLikesInput
     connect?: CommunityPostWhereUniqueInput
-    update?: XOR<CommunityPostUncheckedUpdateWithoutCommunityPostLikesInput, CommunityPostUpdateWithoutCommunityPostLikesInput>
+    update?: XOR<CommunityPostUpdateWithoutCommunityPostLikesInput, CommunityPostUncheckedUpdateWithoutCommunityPostLikesInput>
   }
 
   export type UserUpdateOneRequiredWithoutCommunityPostLikesInput = {
-    create?: XOR<UserUncheckedCreateWithoutCommunityPostLikesInput, UserCreateWithoutCommunityPostLikesInput>
-    connectOrCreate?: UserCreateOrConnectWithoutcommunityPostLikesInput
+    create?: XOR<UserCreateWithoutCommunityPostLikesInput, UserUncheckedCreateWithoutCommunityPostLikesInput>
+    connectOrCreate?: UserCreateOrConnectWithoutCommunityPostLikesInput
     upsert?: UserUpsertWithoutCommunityPostLikesInput
     connect?: UserWhereUniqueInput
-    update?: XOR<UserUncheckedUpdateWithoutCommunityPostLikesInput, UserUpdateWithoutCommunityPostLikesInput>
+    update?: XOR<UserUpdateWithoutCommunityPostLikesInput, UserUncheckedUpdateWithoutCommunityPostLikesInput>
   }
 
   export type CommunityCommentCreateNestedOneWithoutCommunitySubcommentsInput = {
-    create?: XOR<CommunityCommentUncheckedCreateWithoutCommunitySubcommentsInput, CommunityCommentCreateWithoutCommunitySubcommentsInput>
-    connectOrCreate?: CommunityCommentCreateOrConnectWithoutcommunitySubcommentsInput
+    create?: XOR<CommunityCommentCreateWithoutCommunitySubcommentsInput, CommunityCommentUncheckedCreateWithoutCommunitySubcommentsInput>
+    connectOrCreate?: CommunityCommentCreateOrConnectWithoutCommunitySubcommentsInput
     connect?: CommunityCommentWhereUniqueInput
   }
 
   export type CommunityPostCreateNestedOneWithoutCommunitySubcommentsInput = {
-    create?: XOR<CommunityPostUncheckedCreateWithoutCommunitySubcommentsInput, CommunityPostCreateWithoutCommunitySubcommentsInput>
-    connectOrCreate?: CommunityPostCreateOrConnectWithoutcommunitySubcommentsInput
+    create?: XOR<CommunityPostCreateWithoutCommunitySubcommentsInput, CommunityPostUncheckedCreateWithoutCommunitySubcommentsInput>
+    connectOrCreate?: CommunityPostCreateOrConnectWithoutCommunitySubcommentsInput
     connect?: CommunityPostWhereUniqueInput
   }
 
   export type UserCreateNestedOneWithoutCommunitySubcommentsInput = {
-    create?: XOR<UserUncheckedCreateWithoutCommunitySubcommentsInput, UserCreateWithoutCommunitySubcommentsInput>
-    connectOrCreate?: UserCreateOrConnectWithoutcommunitySubcommentsInput
+    create?: XOR<UserCreateWithoutCommunitySubcommentsInput, UserUncheckedCreateWithoutCommunitySubcommentsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutCommunitySubcommentsInput
     connect?: UserWhereUniqueInput
   }
 
   export type ReportSubcommentCreateNestedManyWithoutCommunitySubcommentInput = {
-    create?: XOR<Enumerable<ReportSubcommentUncheckedCreateWithoutCommunitySubcommentInput>, Enumerable<ReportSubcommentCreateWithoutCommunitySubcommentInput>>
-    connectOrCreate?: Enumerable<ReportSubcommentCreateOrConnectWithoutcommunitySubcommentInput>
+    create?: XOR<Enumerable<ReportSubcommentCreateWithoutCommunitySubcommentInput>, Enumerable<ReportSubcommentUncheckedCreateWithoutCommunitySubcommentInput>>
+    connectOrCreate?: Enumerable<ReportSubcommentCreateOrConnectWithoutCommunitySubcommentInput>
     connect?: Enumerable<ReportSubcommentWhereUniqueInput>
   }
 
   export type ReportSubcommentUncheckedCreateNestedManyWithoutCommunitySubcommentInput = {
-    create?: XOR<Enumerable<ReportSubcommentUncheckedCreateWithoutCommunitySubcommentInput>, Enumerable<ReportSubcommentCreateWithoutCommunitySubcommentInput>>
-    connectOrCreate?: Enumerable<ReportSubcommentCreateOrConnectWithoutcommunitySubcommentInput>
+    create?: XOR<Enumerable<ReportSubcommentCreateWithoutCommunitySubcommentInput>, Enumerable<ReportSubcommentUncheckedCreateWithoutCommunitySubcommentInput>>
+    connectOrCreate?: Enumerable<ReportSubcommentCreateOrConnectWithoutCommunitySubcommentInput>
     connect?: Enumerable<ReportSubcommentWhereUniqueInput>
   }
 
   export type CommunityCommentUpdateOneRequiredWithoutCommunitySubcommentsInput = {
-    create?: XOR<CommunityCommentUncheckedCreateWithoutCommunitySubcommentsInput, CommunityCommentCreateWithoutCommunitySubcommentsInput>
-    connectOrCreate?: CommunityCommentCreateOrConnectWithoutcommunitySubcommentsInput
+    create?: XOR<CommunityCommentCreateWithoutCommunitySubcommentsInput, CommunityCommentUncheckedCreateWithoutCommunitySubcommentsInput>
+    connectOrCreate?: CommunityCommentCreateOrConnectWithoutCommunitySubcommentsInput
     upsert?: CommunityCommentUpsertWithoutCommunitySubcommentsInput
     connect?: CommunityCommentWhereUniqueInput
-    update?: XOR<CommunityCommentUncheckedUpdateWithoutCommunitySubcommentsInput, CommunityCommentUpdateWithoutCommunitySubcommentsInput>
+    update?: XOR<CommunityCommentUpdateWithoutCommunitySubcommentsInput, CommunityCommentUncheckedUpdateWithoutCommunitySubcommentsInput>
   }
 
   export type CommunityPostUpdateOneRequiredWithoutCommunitySubcommentsInput = {
-    create?: XOR<CommunityPostUncheckedCreateWithoutCommunitySubcommentsInput, CommunityPostCreateWithoutCommunitySubcommentsInput>
-    connectOrCreate?: CommunityPostCreateOrConnectWithoutcommunitySubcommentsInput
+    create?: XOR<CommunityPostCreateWithoutCommunitySubcommentsInput, CommunityPostUncheckedCreateWithoutCommunitySubcommentsInput>
+    connectOrCreate?: CommunityPostCreateOrConnectWithoutCommunitySubcommentsInput
     upsert?: CommunityPostUpsertWithoutCommunitySubcommentsInput
     connect?: CommunityPostWhereUniqueInput
-    update?: XOR<CommunityPostUncheckedUpdateWithoutCommunitySubcommentsInput, CommunityPostUpdateWithoutCommunitySubcommentsInput>
+    update?: XOR<CommunityPostUpdateWithoutCommunitySubcommentsInput, CommunityPostUncheckedUpdateWithoutCommunitySubcommentsInput>
   }
 
   export type UserUpdateOneRequiredWithoutCommunitySubcommentsInput = {
-    create?: XOR<UserUncheckedCreateWithoutCommunitySubcommentsInput, UserCreateWithoutCommunitySubcommentsInput>
-    connectOrCreate?: UserCreateOrConnectWithoutcommunitySubcommentsInput
+    create?: XOR<UserCreateWithoutCommunitySubcommentsInput, UserUncheckedCreateWithoutCommunitySubcommentsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutCommunitySubcommentsInput
     upsert?: UserUpsertWithoutCommunitySubcommentsInput
     connect?: UserWhereUniqueInput
-    update?: XOR<UserUncheckedUpdateWithoutCommunitySubcommentsInput, UserUpdateWithoutCommunitySubcommentsInput>
+    update?: XOR<UserUpdateWithoutCommunitySubcommentsInput, UserUncheckedUpdateWithoutCommunitySubcommentsInput>
   }
 
   export type ReportSubcommentUpdateManyWithoutCommunitySubcommentInput = {
-    create?: XOR<Enumerable<ReportSubcommentUncheckedCreateWithoutCommunitySubcommentInput>, Enumerable<ReportSubcommentCreateWithoutCommunitySubcommentInput>>
-    connectOrCreate?: Enumerable<ReportSubcommentCreateOrConnectWithoutcommunitySubcommentInput>
+    create?: XOR<Enumerable<ReportSubcommentCreateWithoutCommunitySubcommentInput>, Enumerable<ReportSubcommentUncheckedCreateWithoutCommunitySubcommentInput>>
+    connectOrCreate?: Enumerable<ReportSubcommentCreateOrConnectWithoutCommunitySubcommentInput>
     upsert?: Enumerable<ReportSubcommentUpsertWithWhereUniqueWithoutCommunitySubcommentInput>
     connect?: Enumerable<ReportSubcommentWhereUniqueInput>
     set?: Enumerable<ReportSubcommentWhereUniqueInput>
@@ -22023,8 +21478,8 @@ export namespace Prisma {
   }
 
   export type ReportSubcommentUncheckedUpdateManyWithoutCommunitySubcommentInput = {
-    create?: XOR<Enumerable<ReportSubcommentUncheckedCreateWithoutCommunitySubcommentInput>, Enumerable<ReportSubcommentCreateWithoutCommunitySubcommentInput>>
-    connectOrCreate?: Enumerable<ReportSubcommentCreateOrConnectWithoutcommunitySubcommentInput>
+    create?: XOR<Enumerable<ReportSubcommentCreateWithoutCommunitySubcommentInput>, Enumerable<ReportSubcommentUncheckedCreateWithoutCommunitySubcommentInput>>
+    connectOrCreate?: Enumerable<ReportSubcommentCreateOrConnectWithoutCommunitySubcommentInput>
     upsert?: Enumerable<ReportSubcommentUpsertWithWhereUniqueWithoutCommunitySubcommentInput>
     connect?: Enumerable<ReportSubcommentWhereUniqueInput>
     set?: Enumerable<ReportSubcommentWhereUniqueInput>
@@ -22036,20 +21491,20 @@ export namespace Prisma {
   }
 
   export type CoverageMajorLectureCreateNestedManyWithoutCoverageMajorInput = {
-    create?: XOR<Enumerable<CoverageMajorLectureUncheckedCreateWithoutCoverageMajorInput>, Enumerable<CoverageMajorLectureCreateWithoutCoverageMajorInput>>
-    connectOrCreate?: Enumerable<CoverageMajorLectureCreateOrConnectWithoutcoverageMajorInput>
+    create?: XOR<Enumerable<CoverageMajorLectureCreateWithoutCoverageMajorInput>, Enumerable<CoverageMajorLectureUncheckedCreateWithoutCoverageMajorInput>>
+    connectOrCreate?: Enumerable<CoverageMajorLectureCreateOrConnectWithoutCoverageMajorInput>
     connect?: Enumerable<CoverageMajorLectureWhereUniqueInput>
   }
 
   export type CoverageMajorLectureUncheckedCreateNestedManyWithoutCoverageMajorInput = {
-    create?: XOR<Enumerable<CoverageMajorLectureUncheckedCreateWithoutCoverageMajorInput>, Enumerable<CoverageMajorLectureCreateWithoutCoverageMajorInput>>
-    connectOrCreate?: Enumerable<CoverageMajorLectureCreateOrConnectWithoutcoverageMajorInput>
+    create?: XOR<Enumerable<CoverageMajorLectureCreateWithoutCoverageMajorInput>, Enumerable<CoverageMajorLectureUncheckedCreateWithoutCoverageMajorInput>>
+    connectOrCreate?: Enumerable<CoverageMajorLectureCreateOrConnectWithoutCoverageMajorInput>
     connect?: Enumerable<CoverageMajorLectureWhereUniqueInput>
   }
 
   export type CoverageMajorLectureUpdateManyWithoutCoverageMajorInput = {
-    create?: XOR<Enumerable<CoverageMajorLectureUncheckedCreateWithoutCoverageMajorInput>, Enumerable<CoverageMajorLectureCreateWithoutCoverageMajorInput>>
-    connectOrCreate?: Enumerable<CoverageMajorLectureCreateOrConnectWithoutcoverageMajorInput>
+    create?: XOR<Enumerable<CoverageMajorLectureCreateWithoutCoverageMajorInput>, Enumerable<CoverageMajorLectureUncheckedCreateWithoutCoverageMajorInput>>
+    connectOrCreate?: Enumerable<CoverageMajorLectureCreateOrConnectWithoutCoverageMajorInput>
     upsert?: Enumerable<CoverageMajorLectureUpsertWithWhereUniqueWithoutCoverageMajorInput>
     connect?: Enumerable<CoverageMajorLectureWhereUniqueInput>
     set?: Enumerable<CoverageMajorLectureWhereUniqueInput>
@@ -22061,8 +21516,8 @@ export namespace Prisma {
   }
 
   export type CoverageMajorLectureUncheckedUpdateManyWithoutCoverageMajorInput = {
-    create?: XOR<Enumerable<CoverageMajorLectureUncheckedCreateWithoutCoverageMajorInput>, Enumerable<CoverageMajorLectureCreateWithoutCoverageMajorInput>>
-    connectOrCreate?: Enumerable<CoverageMajorLectureCreateOrConnectWithoutcoverageMajorInput>
+    create?: XOR<Enumerable<CoverageMajorLectureCreateWithoutCoverageMajorInput>, Enumerable<CoverageMajorLectureUncheckedCreateWithoutCoverageMajorInput>>
+    connectOrCreate?: Enumerable<CoverageMajorLectureCreateOrConnectWithoutCoverageMajorInput>
     upsert?: Enumerable<CoverageMajorLectureUpsertWithWhereUniqueWithoutCoverageMajorInput>
     connect?: Enumerable<CoverageMajorLectureWhereUniqueInput>
     set?: Enumerable<CoverageMajorLectureWhereUniqueInput>
@@ -22074,54 +21529,54 @@ export namespace Prisma {
   }
 
   export type LectureCreateNestedOneWithoutCoverageMajorLecturesInput = {
-    create?: XOR<LectureUncheckedCreateWithoutCoverageMajorLecturesInput, LectureCreateWithoutCoverageMajorLecturesInput>
-    connectOrCreate?: LectureCreateOrConnectWithoutcoverageMajorLecturesInput
+    create?: XOR<LectureCreateWithoutCoverageMajorLecturesInput, LectureUncheckedCreateWithoutCoverageMajorLecturesInput>
+    connectOrCreate?: LectureCreateOrConnectWithoutCoverageMajorLecturesInput
     connect?: LectureWhereUniqueInput
   }
 
   export type CoverageMajorCreateNestedOneWithoutCoverageMajorLecturesInput = {
-    create?: XOR<CoverageMajorUncheckedCreateWithoutCoverageMajorLecturesInput, CoverageMajorCreateWithoutCoverageMajorLecturesInput>
-    connectOrCreate?: CoverageMajorCreateOrConnectWithoutcoverageMajorLecturesInput
+    create?: XOR<CoverageMajorCreateWithoutCoverageMajorLecturesInput, CoverageMajorUncheckedCreateWithoutCoverageMajorLecturesInput>
+    connectOrCreate?: CoverageMajorCreateOrConnectWithoutCoverageMajorLecturesInput
     connect?: CoverageMajorWhereUniqueInput
   }
 
   export type LectureUpdateOneRequiredWithoutCoverageMajorLecturesInput = {
-    create?: XOR<LectureUncheckedCreateWithoutCoverageMajorLecturesInput, LectureCreateWithoutCoverageMajorLecturesInput>
-    connectOrCreate?: LectureCreateOrConnectWithoutcoverageMajorLecturesInput
+    create?: XOR<LectureCreateWithoutCoverageMajorLecturesInput, LectureUncheckedCreateWithoutCoverageMajorLecturesInput>
+    connectOrCreate?: LectureCreateOrConnectWithoutCoverageMajorLecturesInput
     upsert?: LectureUpsertWithoutCoverageMajorLecturesInput
     connect?: LectureWhereUniqueInput
-    update?: XOR<LectureUncheckedUpdateWithoutCoverageMajorLecturesInput, LectureUpdateWithoutCoverageMajorLecturesInput>
+    update?: XOR<LectureUpdateWithoutCoverageMajorLecturesInput, LectureUncheckedUpdateWithoutCoverageMajorLecturesInput>
   }
 
   export type CoverageMajorUpdateOneRequiredWithoutCoverageMajorLecturesInput = {
-    create?: XOR<CoverageMajorUncheckedCreateWithoutCoverageMajorLecturesInput, CoverageMajorCreateWithoutCoverageMajorLecturesInput>
-    connectOrCreate?: CoverageMajorCreateOrConnectWithoutcoverageMajorLecturesInput
+    create?: XOR<CoverageMajorCreateWithoutCoverageMajorLecturesInput, CoverageMajorUncheckedCreateWithoutCoverageMajorLecturesInput>
+    connectOrCreate?: CoverageMajorCreateOrConnectWithoutCoverageMajorLecturesInput
     upsert?: CoverageMajorUpsertWithoutCoverageMajorLecturesInput
     connect?: CoverageMajorWhereUniqueInput
-    update?: XOR<CoverageMajorUncheckedUpdateWithoutCoverageMajorLecturesInput, CoverageMajorUpdateWithoutCoverageMajorLecturesInput>
+    update?: XOR<CoverageMajorUpdateWithoutCoverageMajorLecturesInput, CoverageMajorUncheckedUpdateWithoutCoverageMajorLecturesInput>
   }
 
   export type CoverageMajorLectureCreateNestedManyWithoutLectureInput = {
-    create?: XOR<Enumerable<CoverageMajorLectureUncheckedCreateWithoutLectureInput>, Enumerable<CoverageMajorLectureCreateWithoutLectureInput>>
-    connectOrCreate?: Enumerable<CoverageMajorLectureCreateOrConnectWithoutlectureInput>
+    create?: XOR<Enumerable<CoverageMajorLectureCreateWithoutLectureInput>, Enumerable<CoverageMajorLectureUncheckedCreateWithoutLectureInput>>
+    connectOrCreate?: Enumerable<CoverageMajorLectureCreateOrConnectWithoutLectureInput>
     connect?: Enumerable<CoverageMajorLectureWhereUniqueInput>
   }
 
   export type PeriodCreateNestedManyWithoutLectureInput = {
-    create?: XOR<Enumerable<PeriodUncheckedCreateWithoutLectureInput>, Enumerable<PeriodCreateWithoutLectureInput>>
-    connectOrCreate?: Enumerable<PeriodCreateOrConnectWithoutlectureInput>
+    create?: XOR<Enumerable<PeriodCreateWithoutLectureInput>, Enumerable<PeriodUncheckedCreateWithoutLectureInput>>
+    connectOrCreate?: Enumerable<PeriodCreateOrConnectWithoutLectureInput>
     connect?: Enumerable<PeriodWhereUniqueInput>
   }
 
   export type CoverageMajorLectureUncheckedCreateNestedManyWithoutLectureInput = {
-    create?: XOR<Enumerable<CoverageMajorLectureUncheckedCreateWithoutLectureInput>, Enumerable<CoverageMajorLectureCreateWithoutLectureInput>>
-    connectOrCreate?: Enumerable<CoverageMajorLectureCreateOrConnectWithoutlectureInput>
+    create?: XOR<Enumerable<CoverageMajorLectureCreateWithoutLectureInput>, Enumerable<CoverageMajorLectureUncheckedCreateWithoutLectureInput>>
+    connectOrCreate?: Enumerable<CoverageMajorLectureCreateOrConnectWithoutLectureInput>
     connect?: Enumerable<CoverageMajorLectureWhereUniqueInput>
   }
 
   export type PeriodUncheckedCreateNestedManyWithoutLectureInput = {
-    create?: XOR<Enumerable<PeriodUncheckedCreateWithoutLectureInput>, Enumerable<PeriodCreateWithoutLectureInput>>
-    connectOrCreate?: Enumerable<PeriodCreateOrConnectWithoutlectureInput>
+    create?: XOR<Enumerable<PeriodCreateWithoutLectureInput>, Enumerable<PeriodUncheckedCreateWithoutLectureInput>>
+    connectOrCreate?: Enumerable<PeriodCreateOrConnectWithoutLectureInput>
     connect?: Enumerable<PeriodWhereUniqueInput>
   }
 
@@ -22134,8 +21589,8 @@ export namespace Prisma {
   }
 
   export type CoverageMajorLectureUpdateManyWithoutLectureInput = {
-    create?: XOR<Enumerable<CoverageMajorLectureUncheckedCreateWithoutLectureInput>, Enumerable<CoverageMajorLectureCreateWithoutLectureInput>>
-    connectOrCreate?: Enumerable<CoverageMajorLectureCreateOrConnectWithoutlectureInput>
+    create?: XOR<Enumerable<CoverageMajorLectureCreateWithoutLectureInput>, Enumerable<CoverageMajorLectureUncheckedCreateWithoutLectureInput>>
+    connectOrCreate?: Enumerable<CoverageMajorLectureCreateOrConnectWithoutLectureInput>
     upsert?: Enumerable<CoverageMajorLectureUpsertWithWhereUniqueWithoutLectureInput>
     connect?: Enumerable<CoverageMajorLectureWhereUniqueInput>
     set?: Enumerable<CoverageMajorLectureWhereUniqueInput>
@@ -22147,8 +21602,8 @@ export namespace Prisma {
   }
 
   export type PeriodUpdateManyWithoutLectureInput = {
-    create?: XOR<Enumerable<PeriodUncheckedCreateWithoutLectureInput>, Enumerable<PeriodCreateWithoutLectureInput>>
-    connectOrCreate?: Enumerable<PeriodCreateOrConnectWithoutlectureInput>
+    create?: XOR<Enumerable<PeriodCreateWithoutLectureInput>, Enumerable<PeriodUncheckedCreateWithoutLectureInput>>
+    connectOrCreate?: Enumerable<PeriodCreateOrConnectWithoutLectureInput>
     upsert?: Enumerable<PeriodUpsertWithWhereUniqueWithoutLectureInput>
     connect?: Enumerable<PeriodWhereUniqueInput>
     set?: Enumerable<PeriodWhereUniqueInput>
@@ -22160,8 +21615,8 @@ export namespace Prisma {
   }
 
   export type CoverageMajorLectureUncheckedUpdateManyWithoutLectureInput = {
-    create?: XOR<Enumerable<CoverageMajorLectureUncheckedCreateWithoutLectureInput>, Enumerable<CoverageMajorLectureCreateWithoutLectureInput>>
-    connectOrCreate?: Enumerable<CoverageMajorLectureCreateOrConnectWithoutlectureInput>
+    create?: XOR<Enumerable<CoverageMajorLectureCreateWithoutLectureInput>, Enumerable<CoverageMajorLectureUncheckedCreateWithoutLectureInput>>
+    connectOrCreate?: Enumerable<CoverageMajorLectureCreateOrConnectWithoutLectureInput>
     upsert?: Enumerable<CoverageMajorLectureUpsertWithWhereUniqueWithoutLectureInput>
     connect?: Enumerable<CoverageMajorLectureWhereUniqueInput>
     set?: Enumerable<CoverageMajorLectureWhereUniqueInput>
@@ -22173,8 +21628,8 @@ export namespace Prisma {
   }
 
   export type PeriodUncheckedUpdateManyWithoutLectureInput = {
-    create?: XOR<Enumerable<PeriodUncheckedCreateWithoutLectureInput>, Enumerable<PeriodCreateWithoutLectureInput>>
-    connectOrCreate?: Enumerable<PeriodCreateOrConnectWithoutlectureInput>
+    create?: XOR<Enumerable<PeriodCreateWithoutLectureInput>, Enumerable<PeriodUncheckedCreateWithoutLectureInput>>
+    connectOrCreate?: Enumerable<PeriodCreateOrConnectWithoutLectureInput>
     upsert?: Enumerable<PeriodUpsertWithWhereUniqueWithoutLectureInput>
     connect?: Enumerable<PeriodWhereUniqueInput>
     set?: Enumerable<PeriodWhereUniqueInput>
@@ -22186,299 +21641,273 @@ export namespace Prisma {
   }
 
   export type UserCreateNestedOneWithoutLiveChatsInput = {
-    create?: XOR<UserUncheckedCreateWithoutLiveChatsInput, UserCreateWithoutLiveChatsInput>
-    connectOrCreate?: UserCreateOrConnectWithoutliveChatsInput
+    create?: XOR<UserCreateWithoutLiveChatsInput, UserUncheckedCreateWithoutLiveChatsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutLiveChatsInput
     connect?: UserWhereUniqueInput
   }
 
   export type UserUpdateOneRequiredWithoutLiveChatsInput = {
-    create?: XOR<UserUncheckedCreateWithoutLiveChatsInput, UserCreateWithoutLiveChatsInput>
-    connectOrCreate?: UserCreateOrConnectWithoutliveChatsInput
+    create?: XOR<UserCreateWithoutLiveChatsInput, UserUncheckedCreateWithoutLiveChatsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutLiveChatsInput
     upsert?: UserUpsertWithoutLiveChatsInput
     connect?: UserWhereUniqueInput
-    update?: XOR<UserUncheckedUpdateWithoutLiveChatsInput, UserUpdateWithoutLiveChatsInput>
+    update?: XOR<UserUpdateWithoutLiveChatsInput, UserUncheckedUpdateWithoutLiveChatsInput>
   }
 
   export type UserCreateNestedOneWithoutNoticeNotificationsSubscriptionsInput = {
-    create?: XOR<UserUncheckedCreateWithoutNoticeNotificationsSubscriptionsInput, UserCreateWithoutNoticeNotificationsSubscriptionsInput>
-    connectOrCreate?: UserCreateOrConnectWithoutnoticeNotificationsSubscriptionsInput
+    create?: XOR<UserCreateWithoutNoticeNotificationsSubscriptionsInput, UserUncheckedCreateWithoutNoticeNotificationsSubscriptionsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutNoticeNotificationsSubscriptionsInput
     connect?: UserWhereUniqueInput
   }
 
   export type UserUpdateOneRequiredWithoutNoticeNotificationsSubscriptionsInput = {
-    create?: XOR<UserUncheckedCreateWithoutNoticeNotificationsSubscriptionsInput, UserCreateWithoutNoticeNotificationsSubscriptionsInput>
-    connectOrCreate?: UserCreateOrConnectWithoutnoticeNotificationsSubscriptionsInput
+    create?: XOR<UserCreateWithoutNoticeNotificationsSubscriptionsInput, UserUncheckedCreateWithoutNoticeNotificationsSubscriptionsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutNoticeNotificationsSubscriptionsInput
     upsert?: UserUpsertWithoutNoticeNotificationsSubscriptionsInput
     connect?: UserWhereUniqueInput
-    update?: XOR<UserUncheckedUpdateWithoutNoticeNotificationsSubscriptionsInput, UserUpdateWithoutNoticeNotificationsSubscriptionsInput>
+    update?: XOR<UserUpdateWithoutNoticeNotificationsSubscriptionsInput, UserUncheckedUpdateWithoutNoticeNotificationsSubscriptionsInput>
   }
 
   export type LectureCreateNestedOneWithoutPeriodsInput = {
-    create?: XOR<LectureUncheckedCreateWithoutPeriodsInput, LectureCreateWithoutPeriodsInput>
-    connectOrCreate?: LectureCreateOrConnectWithoutperiodsInput
+    create?: XOR<LectureCreateWithoutPeriodsInput, LectureUncheckedCreateWithoutPeriodsInput>
+    connectOrCreate?: LectureCreateOrConnectWithoutPeriodsInput
     connect?: LectureWhereUniqueInput
   }
 
   export type LectureUpdateOneRequiredWithoutPeriodsInput = {
-    create?: XOR<LectureUncheckedCreateWithoutPeriodsInput, LectureCreateWithoutPeriodsInput>
-    connectOrCreate?: LectureCreateOrConnectWithoutperiodsInput
+    create?: XOR<LectureCreateWithoutPeriodsInput, LectureUncheckedCreateWithoutPeriodsInput>
+    connectOrCreate?: LectureCreateOrConnectWithoutPeriodsInput
     upsert?: LectureUpsertWithoutPeriodsInput
     connect?: LectureWhereUniqueInput
-    update?: XOR<LectureUncheckedUpdateWithoutPeriodsInput, LectureUpdateWithoutPeriodsInput>
-  }
-
-  export type UserCreateNestedOneWithoutPushesInput = {
-    create?: XOR<UserUncheckedCreateWithoutPushesInput, UserCreateWithoutPushesInput>
-    connectOrCreate?: UserCreateOrConnectWithoutpushesInput
-    connect?: UserWhereUniqueInput
-  }
-
-  export type UserUpdateOneRequiredWithoutPushesInput = {
-    create?: XOR<UserUncheckedCreateWithoutPushesInput, UserCreateWithoutPushesInput>
-    connectOrCreate?: UserCreateOrConnectWithoutpushesInput
-    upsert?: UserUpsertWithoutPushesInput
-    connect?: UserWhereUniqueInput
-    update?: XOR<UserUncheckedUpdateWithoutPushesInput, UserUpdateWithoutPushesInput>
+    update?: XOR<LectureUpdateWithoutPeriodsInput, LectureUncheckedUpdateWithoutPeriodsInput>
   }
 
   export type AdminCreateNestedOneWithoutUserInput = {
-    create?: XOR<AdminUncheckedCreateWithoutUserInput, AdminCreateWithoutUserInput>
-    connectOrCreate?: AdminCreateOrConnectWithoutuserInput
+    create?: XOR<AdminCreateWithoutUserInput, AdminUncheckedCreateWithoutUserInput>
+    connectOrCreate?: AdminCreateOrConnectWithoutUserInput
     connect?: AdminWhereUniqueInput
   }
 
   export type ChangePasswordCreateNestedOneWithoutUserInput = {
-    create?: XOR<ChangePasswordUncheckedCreateWithoutUserInput, ChangePasswordCreateWithoutUserInput>
-    connectOrCreate?: ChangePasswordCreateOrConnectWithoutuserInput
+    create?: XOR<ChangePasswordCreateWithoutUserInput, ChangePasswordUncheckedCreateWithoutUserInput>
+    connectOrCreate?: ChangePasswordCreateOrConnectWithoutUserInput
     connect?: ChangePasswordWhereUniqueInput
   }
 
   export type CommunityBoardCreateNestedManyWithoutUserInput = {
-    create?: XOR<Enumerable<CommunityBoardUncheckedCreateWithoutUserInput>, Enumerable<CommunityBoardCreateWithoutUserInput>>
-    connectOrCreate?: Enumerable<CommunityBoardCreateOrConnectWithoutuserInput>
+    create?: XOR<Enumerable<CommunityBoardCreateWithoutUserInput>, Enumerable<CommunityBoardUncheckedCreateWithoutUserInput>>
+    connectOrCreate?: Enumerable<CommunityBoardCreateOrConnectWithoutUserInput>
     connect?: Enumerable<CommunityBoardWhereUniqueInput>
   }
 
   export type CommunityBoardCandidateCreateNestedManyWithoutUserInput = {
-    create?: XOR<Enumerable<CommunityBoardCandidateUncheckedCreateWithoutUserInput>, Enumerable<CommunityBoardCandidateCreateWithoutUserInput>>
-    connectOrCreate?: Enumerable<CommunityBoardCandidateCreateOrConnectWithoutuserInput>
+    create?: XOR<Enumerable<CommunityBoardCandidateCreateWithoutUserInput>, Enumerable<CommunityBoardCandidateUncheckedCreateWithoutUserInput>>
+    connectOrCreate?: Enumerable<CommunityBoardCandidateCreateOrConnectWithoutUserInput>
     connect?: Enumerable<CommunityBoardCandidateWhereUniqueInput>
   }
 
   export type CommunityBoardCandidateVoteCreateNestedManyWithoutUserInput = {
-    create?: XOR<Enumerable<CommunityBoardCandidateVoteUncheckedCreateWithoutUserInput>, Enumerable<CommunityBoardCandidateVoteCreateWithoutUserInput>>
-    connectOrCreate?: Enumerable<CommunityBoardCandidateVoteCreateOrConnectWithoutuserInput>
+    create?: XOR<Enumerable<CommunityBoardCandidateVoteCreateWithoutUserInput>, Enumerable<CommunityBoardCandidateVoteUncheckedCreateWithoutUserInput>>
+    connectOrCreate?: Enumerable<CommunityBoardCandidateVoteCreateOrConnectWithoutUserInput>
     connect?: Enumerable<CommunityBoardCandidateVoteWhereUniqueInput>
   }
 
   export type CommunityBoardPinCreateNestedManyWithoutUserInput = {
-    create?: XOR<Enumerable<CommunityBoardPinUncheckedCreateWithoutUserInput>, Enumerable<CommunityBoardPinCreateWithoutUserInput>>
-    connectOrCreate?: Enumerable<CommunityBoardPinCreateOrConnectWithoutuserInput>
+    create?: XOR<Enumerable<CommunityBoardPinCreateWithoutUserInput>, Enumerable<CommunityBoardPinUncheckedCreateWithoutUserInput>>
+    connectOrCreate?: Enumerable<CommunityBoardPinCreateOrConnectWithoutUserInput>
     connect?: Enumerable<CommunityBoardPinWhereUniqueInput>
   }
 
   export type CommunityCommentCreateNestedManyWithoutUserInput = {
-    create?: XOR<Enumerable<CommunityCommentUncheckedCreateWithoutUserInput>, Enumerable<CommunityCommentCreateWithoutUserInput>>
-    connectOrCreate?: Enumerable<CommunityCommentCreateOrConnectWithoutuserInput>
+    create?: XOR<Enumerable<CommunityCommentCreateWithoutUserInput>, Enumerable<CommunityCommentUncheckedCreateWithoutUserInput>>
+    connectOrCreate?: Enumerable<CommunityCommentCreateOrConnectWithoutUserInput>
     connect?: Enumerable<CommunityCommentWhereUniqueInput>
   }
 
   export type CommunityPostCreateNestedManyWithoutUserInput = {
-    create?: XOR<Enumerable<CommunityPostUncheckedCreateWithoutUserInput>, Enumerable<CommunityPostCreateWithoutUserInput>>
-    connectOrCreate?: Enumerable<CommunityPostCreateOrConnectWithoutuserInput>
+    create?: XOR<Enumerable<CommunityPostCreateWithoutUserInput>, Enumerable<CommunityPostUncheckedCreateWithoutUserInput>>
+    connectOrCreate?: Enumerable<CommunityPostCreateOrConnectWithoutUserInput>
     connect?: Enumerable<CommunityPostWhereUniqueInput>
   }
 
   export type CommunityPostBookmarkCreateNestedManyWithoutUserInput = {
-    create?: XOR<Enumerable<CommunityPostBookmarkUncheckedCreateWithoutUserInput>, Enumerable<CommunityPostBookmarkCreateWithoutUserInput>>
-    connectOrCreate?: Enumerable<CommunityPostBookmarkCreateOrConnectWithoutuserInput>
+    create?: XOR<Enumerable<CommunityPostBookmarkCreateWithoutUserInput>, Enumerable<CommunityPostBookmarkUncheckedCreateWithoutUserInput>>
+    connectOrCreate?: Enumerable<CommunityPostBookmarkCreateOrConnectWithoutUserInput>
     connect?: Enumerable<CommunityPostBookmarkWhereUniqueInput>
   }
 
   export type CommunityPostLikeCreateNestedManyWithoutUserInput = {
-    create?: XOR<Enumerable<CommunityPostLikeUncheckedCreateWithoutUserInput>, Enumerable<CommunityPostLikeCreateWithoutUserInput>>
-    connectOrCreate?: Enumerable<CommunityPostLikeCreateOrConnectWithoutuserInput>
+    create?: XOR<Enumerable<CommunityPostLikeCreateWithoutUserInput>, Enumerable<CommunityPostLikeUncheckedCreateWithoutUserInput>>
+    connectOrCreate?: Enumerable<CommunityPostLikeCreateOrConnectWithoutUserInput>
     connect?: Enumerable<CommunityPostLikeWhereUniqueInput>
   }
 
   export type CommunitySubcommentCreateNestedManyWithoutUserInput = {
-    create?: XOR<Enumerable<CommunitySubcommentUncheckedCreateWithoutUserInput>, Enumerable<CommunitySubcommentCreateWithoutUserInput>>
-    connectOrCreate?: Enumerable<CommunitySubcommentCreateOrConnectWithoutuserInput>
+    create?: XOR<Enumerable<CommunitySubcommentCreateWithoutUserInput>, Enumerable<CommunitySubcommentUncheckedCreateWithoutUserInput>>
+    connectOrCreate?: Enumerable<CommunitySubcommentCreateOrConnectWithoutUserInput>
     connect?: Enumerable<CommunitySubcommentWhereUniqueInput>
   }
 
   export type LiveChatCreateNestedManyWithoutUserInput = {
-    create?: XOR<Enumerable<LiveChatUncheckedCreateWithoutUserInput>, Enumerable<LiveChatCreateWithoutUserInput>>
-    connectOrCreate?: Enumerable<LiveChatCreateOrConnectWithoutuserInput>
+    create?: XOR<Enumerable<LiveChatCreateWithoutUserInput>, Enumerable<LiveChatUncheckedCreateWithoutUserInput>>
+    connectOrCreate?: Enumerable<LiveChatCreateOrConnectWithoutUserInput>
     connect?: Enumerable<LiveChatWhereUniqueInput>
   }
 
   export type NoticeNotificationsSubscriptionCreateNestedManyWithoutUserInput = {
-    create?: XOR<Enumerable<NoticeNotificationsSubscriptionUncheckedCreateWithoutUserInput>, Enumerable<NoticeNotificationsSubscriptionCreateWithoutUserInput>>
-    connectOrCreate?: Enumerable<NoticeNotificationsSubscriptionCreateOrConnectWithoutuserInput>
+    create?: XOR<Enumerable<NoticeNotificationsSubscriptionCreateWithoutUserInput>, Enumerable<NoticeNotificationsSubscriptionUncheckedCreateWithoutUserInput>>
+    connectOrCreate?: Enumerable<NoticeNotificationsSubscriptionCreateOrConnectWithoutUserInput>
     connect?: Enumerable<NoticeNotificationsSubscriptionWhereUniqueInput>
   }
 
-  export type PushCreateNestedManyWithoutUserInput = {
-    create?: XOR<Enumerable<PushUncheckedCreateWithoutUserInput>, Enumerable<PushCreateWithoutUserInput>>
-    connectOrCreate?: Enumerable<PushCreateOrConnectWithoutuserInput>
-    connect?: Enumerable<PushWhereUniqueInput>
-  }
-
   export type ReportCommentCreateNestedManyWithoutUserInput = {
-    create?: XOR<Enumerable<ReportCommentUncheckedCreateWithoutUserInput>, Enumerable<ReportCommentCreateWithoutUserInput>>
-    connectOrCreate?: Enumerable<ReportCommentCreateOrConnectWithoutuserInput>
+    create?: XOR<Enumerable<ReportCommentCreateWithoutUserInput>, Enumerable<ReportCommentUncheckedCreateWithoutUserInput>>
+    connectOrCreate?: Enumerable<ReportCommentCreateOrConnectWithoutUserInput>
     connect?: Enumerable<ReportCommentWhereUniqueInput>
   }
 
   export type ReportPostCreateNestedManyWithoutUserInput = {
-    create?: XOR<Enumerable<ReportPostUncheckedCreateWithoutUserInput>, Enumerable<ReportPostCreateWithoutUserInput>>
-    connectOrCreate?: Enumerable<ReportPostCreateOrConnectWithoutuserInput>
+    create?: XOR<Enumerable<ReportPostCreateWithoutUserInput>, Enumerable<ReportPostUncheckedCreateWithoutUserInput>>
+    connectOrCreate?: Enumerable<ReportPostCreateOrConnectWithoutUserInput>
     connect?: Enumerable<ReportPostWhereUniqueInput>
   }
 
   export type ReportSubcommentCreateNestedManyWithoutUserInput = {
-    create?: XOR<Enumerable<ReportSubcommentUncheckedCreateWithoutUserInput>, Enumerable<ReportSubcommentCreateWithoutUserInput>>
-    connectOrCreate?: Enumerable<ReportSubcommentCreateOrConnectWithoutuserInput>
+    create?: XOR<Enumerable<ReportSubcommentCreateWithoutUserInput>, Enumerable<ReportSubcommentUncheckedCreateWithoutUserInput>>
+    connectOrCreate?: Enumerable<ReportSubcommentCreateOrConnectWithoutUserInput>
     connect?: Enumerable<ReportSubcommentWhereUniqueInput>
   }
 
   export type TelegramCreateNestedManyWithoutUserInput = {
-    create?: XOR<Enumerable<TelegramUncheckedCreateWithoutUserInput>, Enumerable<TelegramCreateWithoutUserInput>>
-    connectOrCreate?: Enumerable<TelegramCreateOrConnectWithoutuserInput>
+    create?: XOR<Enumerable<TelegramCreateWithoutUserInput>, Enumerable<TelegramUncheckedCreateWithoutUserInput>>
+    connectOrCreate?: Enumerable<TelegramCreateOrConnectWithoutUserInput>
     connect?: Enumerable<TelegramWhereUniqueInput>
   }
 
   export type AdminUncheckedCreateNestedOneWithoutUserInput = {
-    create?: XOR<AdminUncheckedCreateWithoutUserInput, AdminCreateWithoutUserInput>
-    connectOrCreate?: AdminCreateOrConnectWithoutuserInput
+    create?: XOR<AdminCreateWithoutUserInput, AdminUncheckedCreateWithoutUserInput>
+    connectOrCreate?: AdminCreateOrConnectWithoutUserInput
     connect?: AdminWhereUniqueInput
   }
 
   export type ChangePasswordUncheckedCreateNestedOneWithoutUserInput = {
-    create?: XOR<ChangePasswordUncheckedCreateWithoutUserInput, ChangePasswordCreateWithoutUserInput>
-    connectOrCreate?: ChangePasswordCreateOrConnectWithoutuserInput
+    create?: XOR<ChangePasswordCreateWithoutUserInput, ChangePasswordUncheckedCreateWithoutUserInput>
+    connectOrCreate?: ChangePasswordCreateOrConnectWithoutUserInput
     connect?: ChangePasswordWhereUniqueInput
   }
 
   export type CommunityBoardUncheckedCreateNestedManyWithoutUserInput = {
-    create?: XOR<Enumerable<CommunityBoardUncheckedCreateWithoutUserInput>, Enumerable<CommunityBoardCreateWithoutUserInput>>
-    connectOrCreate?: Enumerable<CommunityBoardCreateOrConnectWithoutuserInput>
+    create?: XOR<Enumerable<CommunityBoardCreateWithoutUserInput>, Enumerable<CommunityBoardUncheckedCreateWithoutUserInput>>
+    connectOrCreate?: Enumerable<CommunityBoardCreateOrConnectWithoutUserInput>
     connect?: Enumerable<CommunityBoardWhereUniqueInput>
   }
 
   export type CommunityBoardCandidateUncheckedCreateNestedManyWithoutUserInput = {
-    create?: XOR<Enumerable<CommunityBoardCandidateUncheckedCreateWithoutUserInput>, Enumerable<CommunityBoardCandidateCreateWithoutUserInput>>
-    connectOrCreate?: Enumerable<CommunityBoardCandidateCreateOrConnectWithoutuserInput>
+    create?: XOR<Enumerable<CommunityBoardCandidateCreateWithoutUserInput>, Enumerable<CommunityBoardCandidateUncheckedCreateWithoutUserInput>>
+    connectOrCreate?: Enumerable<CommunityBoardCandidateCreateOrConnectWithoutUserInput>
     connect?: Enumerable<CommunityBoardCandidateWhereUniqueInput>
   }
 
   export type CommunityBoardCandidateVoteUncheckedCreateNestedManyWithoutUserInput = {
-    create?: XOR<Enumerable<CommunityBoardCandidateVoteUncheckedCreateWithoutUserInput>, Enumerable<CommunityBoardCandidateVoteCreateWithoutUserInput>>
-    connectOrCreate?: Enumerable<CommunityBoardCandidateVoteCreateOrConnectWithoutuserInput>
+    create?: XOR<Enumerable<CommunityBoardCandidateVoteCreateWithoutUserInput>, Enumerable<CommunityBoardCandidateVoteUncheckedCreateWithoutUserInput>>
+    connectOrCreate?: Enumerable<CommunityBoardCandidateVoteCreateOrConnectWithoutUserInput>
     connect?: Enumerable<CommunityBoardCandidateVoteWhereUniqueInput>
   }
 
   export type CommunityBoardPinUncheckedCreateNestedManyWithoutUserInput = {
-    create?: XOR<Enumerable<CommunityBoardPinUncheckedCreateWithoutUserInput>, Enumerable<CommunityBoardPinCreateWithoutUserInput>>
-    connectOrCreate?: Enumerable<CommunityBoardPinCreateOrConnectWithoutuserInput>
+    create?: XOR<Enumerable<CommunityBoardPinCreateWithoutUserInput>, Enumerable<CommunityBoardPinUncheckedCreateWithoutUserInput>>
+    connectOrCreate?: Enumerable<CommunityBoardPinCreateOrConnectWithoutUserInput>
     connect?: Enumerable<CommunityBoardPinWhereUniqueInput>
   }
 
   export type CommunityCommentUncheckedCreateNestedManyWithoutUserInput = {
-    create?: XOR<Enumerable<CommunityCommentUncheckedCreateWithoutUserInput>, Enumerable<CommunityCommentCreateWithoutUserInput>>
-    connectOrCreate?: Enumerable<CommunityCommentCreateOrConnectWithoutuserInput>
+    create?: XOR<Enumerable<CommunityCommentCreateWithoutUserInput>, Enumerable<CommunityCommentUncheckedCreateWithoutUserInput>>
+    connectOrCreate?: Enumerable<CommunityCommentCreateOrConnectWithoutUserInput>
     connect?: Enumerable<CommunityCommentWhereUniqueInput>
   }
 
   export type CommunityPostUncheckedCreateNestedManyWithoutUserInput = {
-    create?: XOR<Enumerable<CommunityPostUncheckedCreateWithoutUserInput>, Enumerable<CommunityPostCreateWithoutUserInput>>
-    connectOrCreate?: Enumerable<CommunityPostCreateOrConnectWithoutuserInput>
+    create?: XOR<Enumerable<CommunityPostCreateWithoutUserInput>, Enumerable<CommunityPostUncheckedCreateWithoutUserInput>>
+    connectOrCreate?: Enumerable<CommunityPostCreateOrConnectWithoutUserInput>
     connect?: Enumerable<CommunityPostWhereUniqueInput>
   }
 
   export type CommunityPostBookmarkUncheckedCreateNestedManyWithoutUserInput = {
-    create?: XOR<Enumerable<CommunityPostBookmarkUncheckedCreateWithoutUserInput>, Enumerable<CommunityPostBookmarkCreateWithoutUserInput>>
-    connectOrCreate?: Enumerable<CommunityPostBookmarkCreateOrConnectWithoutuserInput>
+    create?: XOR<Enumerable<CommunityPostBookmarkCreateWithoutUserInput>, Enumerable<CommunityPostBookmarkUncheckedCreateWithoutUserInput>>
+    connectOrCreate?: Enumerable<CommunityPostBookmarkCreateOrConnectWithoutUserInput>
     connect?: Enumerable<CommunityPostBookmarkWhereUniqueInput>
   }
 
   export type CommunityPostLikeUncheckedCreateNestedManyWithoutUserInput = {
-    create?: XOR<Enumerable<CommunityPostLikeUncheckedCreateWithoutUserInput>, Enumerable<CommunityPostLikeCreateWithoutUserInput>>
-    connectOrCreate?: Enumerable<CommunityPostLikeCreateOrConnectWithoutuserInput>
+    create?: XOR<Enumerable<CommunityPostLikeCreateWithoutUserInput>, Enumerable<CommunityPostLikeUncheckedCreateWithoutUserInput>>
+    connectOrCreate?: Enumerable<CommunityPostLikeCreateOrConnectWithoutUserInput>
     connect?: Enumerable<CommunityPostLikeWhereUniqueInput>
   }
 
   export type CommunitySubcommentUncheckedCreateNestedManyWithoutUserInput = {
-    create?: XOR<Enumerable<CommunitySubcommentUncheckedCreateWithoutUserInput>, Enumerable<CommunitySubcommentCreateWithoutUserInput>>
-    connectOrCreate?: Enumerable<CommunitySubcommentCreateOrConnectWithoutuserInput>
+    create?: XOR<Enumerable<CommunitySubcommentCreateWithoutUserInput>, Enumerable<CommunitySubcommentUncheckedCreateWithoutUserInput>>
+    connectOrCreate?: Enumerable<CommunitySubcommentCreateOrConnectWithoutUserInput>
     connect?: Enumerable<CommunitySubcommentWhereUniqueInput>
   }
 
   export type LiveChatUncheckedCreateNestedManyWithoutUserInput = {
-    create?: XOR<Enumerable<LiveChatUncheckedCreateWithoutUserInput>, Enumerable<LiveChatCreateWithoutUserInput>>
-    connectOrCreate?: Enumerable<LiveChatCreateOrConnectWithoutuserInput>
+    create?: XOR<Enumerable<LiveChatCreateWithoutUserInput>, Enumerable<LiveChatUncheckedCreateWithoutUserInput>>
+    connectOrCreate?: Enumerable<LiveChatCreateOrConnectWithoutUserInput>
     connect?: Enumerable<LiveChatWhereUniqueInput>
   }
 
   export type NoticeNotificationsSubscriptionUncheckedCreateNestedManyWithoutUserInput = {
-    create?: XOR<Enumerable<NoticeNotificationsSubscriptionUncheckedCreateWithoutUserInput>, Enumerable<NoticeNotificationsSubscriptionCreateWithoutUserInput>>
-    connectOrCreate?: Enumerable<NoticeNotificationsSubscriptionCreateOrConnectWithoutuserInput>
+    create?: XOR<Enumerable<NoticeNotificationsSubscriptionCreateWithoutUserInput>, Enumerable<NoticeNotificationsSubscriptionUncheckedCreateWithoutUserInput>>
+    connectOrCreate?: Enumerable<NoticeNotificationsSubscriptionCreateOrConnectWithoutUserInput>
     connect?: Enumerable<NoticeNotificationsSubscriptionWhereUniqueInput>
   }
 
-  export type PushUncheckedCreateNestedManyWithoutUserInput = {
-    create?: XOR<Enumerable<PushUncheckedCreateWithoutUserInput>, Enumerable<PushCreateWithoutUserInput>>
-    connectOrCreate?: Enumerable<PushCreateOrConnectWithoutuserInput>
-    connect?: Enumerable<PushWhereUniqueInput>
-  }
-
   export type ReportCommentUncheckedCreateNestedManyWithoutUserInput = {
-    create?: XOR<Enumerable<ReportCommentUncheckedCreateWithoutUserInput>, Enumerable<ReportCommentCreateWithoutUserInput>>
-    connectOrCreate?: Enumerable<ReportCommentCreateOrConnectWithoutuserInput>
+    create?: XOR<Enumerable<ReportCommentCreateWithoutUserInput>, Enumerable<ReportCommentUncheckedCreateWithoutUserInput>>
+    connectOrCreate?: Enumerable<ReportCommentCreateOrConnectWithoutUserInput>
     connect?: Enumerable<ReportCommentWhereUniqueInput>
   }
 
   export type ReportPostUncheckedCreateNestedManyWithoutUserInput = {
-    create?: XOR<Enumerable<ReportPostUncheckedCreateWithoutUserInput>, Enumerable<ReportPostCreateWithoutUserInput>>
-    connectOrCreate?: Enumerable<ReportPostCreateOrConnectWithoutuserInput>
+    create?: XOR<Enumerable<ReportPostCreateWithoutUserInput>, Enumerable<ReportPostUncheckedCreateWithoutUserInput>>
+    connectOrCreate?: Enumerable<ReportPostCreateOrConnectWithoutUserInput>
     connect?: Enumerable<ReportPostWhereUniqueInput>
   }
 
   export type ReportSubcommentUncheckedCreateNestedManyWithoutUserInput = {
-    create?: XOR<Enumerable<ReportSubcommentUncheckedCreateWithoutUserInput>, Enumerable<ReportSubcommentCreateWithoutUserInput>>
-    connectOrCreate?: Enumerable<ReportSubcommentCreateOrConnectWithoutuserInput>
+    create?: XOR<Enumerable<ReportSubcommentCreateWithoutUserInput>, Enumerable<ReportSubcommentUncheckedCreateWithoutUserInput>>
+    connectOrCreate?: Enumerable<ReportSubcommentCreateOrConnectWithoutUserInput>
     connect?: Enumerable<ReportSubcommentWhereUniqueInput>
   }
 
   export type TelegramUncheckedCreateNestedManyWithoutUserInput = {
-    create?: XOR<Enumerable<TelegramUncheckedCreateWithoutUserInput>, Enumerable<TelegramCreateWithoutUserInput>>
-    connectOrCreate?: Enumerable<TelegramCreateOrConnectWithoutuserInput>
+    create?: XOR<Enumerable<TelegramCreateWithoutUserInput>, Enumerable<TelegramUncheckedCreateWithoutUserInput>>
+    connectOrCreate?: Enumerable<TelegramCreateOrConnectWithoutUserInput>
     connect?: Enumerable<TelegramWhereUniqueInput>
   }
 
   export type AdminUpdateOneWithoutUserInput = {
-    create?: XOR<AdminUncheckedCreateWithoutUserInput, AdminCreateWithoutUserInput>
-    connectOrCreate?: AdminCreateOrConnectWithoutuserInput
+    create?: XOR<AdminCreateWithoutUserInput, AdminUncheckedCreateWithoutUserInput>
+    connectOrCreate?: AdminCreateOrConnectWithoutUserInput
     connect?: AdminWhereUniqueInput
     disconnect?: boolean
     delete?: boolean
-    update?: XOR<AdminUncheckedUpdateWithoutUserInput, AdminUpdateWithoutUserInput>
+    update?: XOR<AdminUpdateWithoutUserInput, AdminUncheckedUpdateWithoutUserInput>
   }
 
   export type ChangePasswordUpdateOneWithoutUserInput = {
-    create?: XOR<ChangePasswordUncheckedCreateWithoutUserInput, ChangePasswordCreateWithoutUserInput>
-    connectOrCreate?: ChangePasswordCreateOrConnectWithoutuserInput
+    create?: XOR<ChangePasswordCreateWithoutUserInput, ChangePasswordUncheckedCreateWithoutUserInput>
+    connectOrCreate?: ChangePasswordCreateOrConnectWithoutUserInput
     upsert?: ChangePasswordUpsertWithoutUserInput
     connect?: ChangePasswordWhereUniqueInput
     disconnect?: boolean
     delete?: boolean
-    update?: XOR<ChangePasswordUncheckedUpdateWithoutUserInput, ChangePasswordUpdateWithoutUserInput>
+    update?: XOR<ChangePasswordUpdateWithoutUserInput, ChangePasswordUncheckedUpdateWithoutUserInput>
   }
 
   export type CommunityBoardUpdateManyWithoutUserInput = {
-    create?: XOR<Enumerable<CommunityBoardUncheckedCreateWithoutUserInput>, Enumerable<CommunityBoardCreateWithoutUserInput>>
-    connectOrCreate?: Enumerable<CommunityBoardCreateOrConnectWithoutuserInput>
+    create?: XOR<Enumerable<CommunityBoardCreateWithoutUserInput>, Enumerable<CommunityBoardUncheckedCreateWithoutUserInput>>
+    connectOrCreate?: Enumerable<CommunityBoardCreateOrConnectWithoutUserInput>
     upsert?: Enumerable<CommunityBoardUpsertWithWhereUniqueWithoutUserInput>
     connect?: Enumerable<CommunityBoardWhereUniqueInput>
     set?: Enumerable<CommunityBoardWhereUniqueInput>
@@ -22490,8 +21919,8 @@ export namespace Prisma {
   }
 
   export type CommunityBoardCandidateUpdateManyWithoutUserInput = {
-    create?: XOR<Enumerable<CommunityBoardCandidateUncheckedCreateWithoutUserInput>, Enumerable<CommunityBoardCandidateCreateWithoutUserInput>>
-    connectOrCreate?: Enumerable<CommunityBoardCandidateCreateOrConnectWithoutuserInput>
+    create?: XOR<Enumerable<CommunityBoardCandidateCreateWithoutUserInput>, Enumerable<CommunityBoardCandidateUncheckedCreateWithoutUserInput>>
+    connectOrCreate?: Enumerable<CommunityBoardCandidateCreateOrConnectWithoutUserInput>
     upsert?: Enumerable<CommunityBoardCandidateUpsertWithWhereUniqueWithoutUserInput>
     connect?: Enumerable<CommunityBoardCandidateWhereUniqueInput>
     set?: Enumerable<CommunityBoardCandidateWhereUniqueInput>
@@ -22503,8 +21932,8 @@ export namespace Prisma {
   }
 
   export type CommunityBoardCandidateVoteUpdateManyWithoutUserInput = {
-    create?: XOR<Enumerable<CommunityBoardCandidateVoteUncheckedCreateWithoutUserInput>, Enumerable<CommunityBoardCandidateVoteCreateWithoutUserInput>>
-    connectOrCreate?: Enumerable<CommunityBoardCandidateVoteCreateOrConnectWithoutuserInput>
+    create?: XOR<Enumerable<CommunityBoardCandidateVoteCreateWithoutUserInput>, Enumerable<CommunityBoardCandidateVoteUncheckedCreateWithoutUserInput>>
+    connectOrCreate?: Enumerable<CommunityBoardCandidateVoteCreateOrConnectWithoutUserInput>
     upsert?: Enumerable<CommunityBoardCandidateVoteUpsertWithWhereUniqueWithoutUserInput>
     connect?: Enumerable<CommunityBoardCandidateVoteWhereUniqueInput>
     set?: Enumerable<CommunityBoardCandidateVoteWhereUniqueInput>
@@ -22516,8 +21945,8 @@ export namespace Prisma {
   }
 
   export type CommunityBoardPinUpdateManyWithoutUserInput = {
-    create?: XOR<Enumerable<CommunityBoardPinUncheckedCreateWithoutUserInput>, Enumerable<CommunityBoardPinCreateWithoutUserInput>>
-    connectOrCreate?: Enumerable<CommunityBoardPinCreateOrConnectWithoutuserInput>
+    create?: XOR<Enumerable<CommunityBoardPinCreateWithoutUserInput>, Enumerable<CommunityBoardPinUncheckedCreateWithoutUserInput>>
+    connectOrCreate?: Enumerable<CommunityBoardPinCreateOrConnectWithoutUserInput>
     upsert?: Enumerable<CommunityBoardPinUpsertWithWhereUniqueWithoutUserInput>
     connect?: Enumerable<CommunityBoardPinWhereUniqueInput>
     set?: Enumerable<CommunityBoardPinWhereUniqueInput>
@@ -22529,8 +21958,8 @@ export namespace Prisma {
   }
 
   export type CommunityCommentUpdateManyWithoutUserInput = {
-    create?: XOR<Enumerable<CommunityCommentUncheckedCreateWithoutUserInput>, Enumerable<CommunityCommentCreateWithoutUserInput>>
-    connectOrCreate?: Enumerable<CommunityCommentCreateOrConnectWithoutuserInput>
+    create?: XOR<Enumerable<CommunityCommentCreateWithoutUserInput>, Enumerable<CommunityCommentUncheckedCreateWithoutUserInput>>
+    connectOrCreate?: Enumerable<CommunityCommentCreateOrConnectWithoutUserInput>
     upsert?: Enumerable<CommunityCommentUpsertWithWhereUniqueWithoutUserInput>
     connect?: Enumerable<CommunityCommentWhereUniqueInput>
     set?: Enumerable<CommunityCommentWhereUniqueInput>
@@ -22542,8 +21971,8 @@ export namespace Prisma {
   }
 
   export type CommunityPostUpdateManyWithoutUserInput = {
-    create?: XOR<Enumerable<CommunityPostUncheckedCreateWithoutUserInput>, Enumerable<CommunityPostCreateWithoutUserInput>>
-    connectOrCreate?: Enumerable<CommunityPostCreateOrConnectWithoutuserInput>
+    create?: XOR<Enumerable<CommunityPostCreateWithoutUserInput>, Enumerable<CommunityPostUncheckedCreateWithoutUserInput>>
+    connectOrCreate?: Enumerable<CommunityPostCreateOrConnectWithoutUserInput>
     upsert?: Enumerable<CommunityPostUpsertWithWhereUniqueWithoutUserInput>
     connect?: Enumerable<CommunityPostWhereUniqueInput>
     set?: Enumerable<CommunityPostWhereUniqueInput>
@@ -22555,8 +21984,8 @@ export namespace Prisma {
   }
 
   export type CommunityPostBookmarkUpdateManyWithoutUserInput = {
-    create?: XOR<Enumerable<CommunityPostBookmarkUncheckedCreateWithoutUserInput>, Enumerable<CommunityPostBookmarkCreateWithoutUserInput>>
-    connectOrCreate?: Enumerable<CommunityPostBookmarkCreateOrConnectWithoutuserInput>
+    create?: XOR<Enumerable<CommunityPostBookmarkCreateWithoutUserInput>, Enumerable<CommunityPostBookmarkUncheckedCreateWithoutUserInput>>
+    connectOrCreate?: Enumerable<CommunityPostBookmarkCreateOrConnectWithoutUserInput>
     upsert?: Enumerable<CommunityPostBookmarkUpsertWithWhereUniqueWithoutUserInput>
     connect?: Enumerable<CommunityPostBookmarkWhereUniqueInput>
     set?: Enumerable<CommunityPostBookmarkWhereUniqueInput>
@@ -22568,8 +21997,8 @@ export namespace Prisma {
   }
 
   export type CommunityPostLikeUpdateManyWithoutUserInput = {
-    create?: XOR<Enumerable<CommunityPostLikeUncheckedCreateWithoutUserInput>, Enumerable<CommunityPostLikeCreateWithoutUserInput>>
-    connectOrCreate?: Enumerable<CommunityPostLikeCreateOrConnectWithoutuserInput>
+    create?: XOR<Enumerable<CommunityPostLikeCreateWithoutUserInput>, Enumerable<CommunityPostLikeUncheckedCreateWithoutUserInput>>
+    connectOrCreate?: Enumerable<CommunityPostLikeCreateOrConnectWithoutUserInput>
     upsert?: Enumerable<CommunityPostLikeUpsertWithWhereUniqueWithoutUserInput>
     connect?: Enumerable<CommunityPostLikeWhereUniqueInput>
     set?: Enumerable<CommunityPostLikeWhereUniqueInput>
@@ -22581,8 +22010,8 @@ export namespace Prisma {
   }
 
   export type CommunitySubcommentUpdateManyWithoutUserInput = {
-    create?: XOR<Enumerable<CommunitySubcommentUncheckedCreateWithoutUserInput>, Enumerable<CommunitySubcommentCreateWithoutUserInput>>
-    connectOrCreate?: Enumerable<CommunitySubcommentCreateOrConnectWithoutuserInput>
+    create?: XOR<Enumerable<CommunitySubcommentCreateWithoutUserInput>, Enumerable<CommunitySubcommentUncheckedCreateWithoutUserInput>>
+    connectOrCreate?: Enumerable<CommunitySubcommentCreateOrConnectWithoutUserInput>
     upsert?: Enumerable<CommunitySubcommentUpsertWithWhereUniqueWithoutUserInput>
     connect?: Enumerable<CommunitySubcommentWhereUniqueInput>
     set?: Enumerable<CommunitySubcommentWhereUniqueInput>
@@ -22594,8 +22023,8 @@ export namespace Prisma {
   }
 
   export type LiveChatUpdateManyWithoutUserInput = {
-    create?: XOR<Enumerable<LiveChatUncheckedCreateWithoutUserInput>, Enumerable<LiveChatCreateWithoutUserInput>>
-    connectOrCreate?: Enumerable<LiveChatCreateOrConnectWithoutuserInput>
+    create?: XOR<Enumerable<LiveChatCreateWithoutUserInput>, Enumerable<LiveChatUncheckedCreateWithoutUserInput>>
+    connectOrCreate?: Enumerable<LiveChatCreateOrConnectWithoutUserInput>
     upsert?: Enumerable<LiveChatUpsertWithWhereUniqueWithoutUserInput>
     connect?: Enumerable<LiveChatWhereUniqueInput>
     set?: Enumerable<LiveChatWhereUniqueInput>
@@ -22607,8 +22036,8 @@ export namespace Prisma {
   }
 
   export type NoticeNotificationsSubscriptionUpdateManyWithoutUserInput = {
-    create?: XOR<Enumerable<NoticeNotificationsSubscriptionUncheckedCreateWithoutUserInput>, Enumerable<NoticeNotificationsSubscriptionCreateWithoutUserInput>>
-    connectOrCreate?: Enumerable<NoticeNotificationsSubscriptionCreateOrConnectWithoutuserInput>
+    create?: XOR<Enumerable<NoticeNotificationsSubscriptionCreateWithoutUserInput>, Enumerable<NoticeNotificationsSubscriptionUncheckedCreateWithoutUserInput>>
+    connectOrCreate?: Enumerable<NoticeNotificationsSubscriptionCreateOrConnectWithoutUserInput>
     upsert?: Enumerable<NoticeNotificationsSubscriptionUpsertWithWhereUniqueWithoutUserInput>
     connect?: Enumerable<NoticeNotificationsSubscriptionWhereUniqueInput>
     set?: Enumerable<NoticeNotificationsSubscriptionWhereUniqueInput>
@@ -22619,22 +22048,9 @@ export namespace Prisma {
     deleteMany?: Enumerable<NoticeNotificationsSubscriptionScalarWhereInput>
   }
 
-  export type PushUpdateManyWithoutUserInput = {
-    create?: XOR<Enumerable<PushUncheckedCreateWithoutUserInput>, Enumerable<PushCreateWithoutUserInput>>
-    connectOrCreate?: Enumerable<PushCreateOrConnectWithoutuserInput>
-    upsert?: Enumerable<PushUpsertWithWhereUniqueWithoutUserInput>
-    connect?: Enumerable<PushWhereUniqueInput>
-    set?: Enumerable<PushWhereUniqueInput>
-    disconnect?: Enumerable<PushWhereUniqueInput>
-    delete?: Enumerable<PushWhereUniqueInput>
-    update?: Enumerable<PushUpdateWithWhereUniqueWithoutUserInput>
-    updateMany?: Enumerable<PushUpdateManyWithWhereWithoutUserInput>
-    deleteMany?: Enumerable<PushScalarWhereInput>
-  }
-
   export type ReportCommentUpdateManyWithoutUserInput = {
-    create?: XOR<Enumerable<ReportCommentUncheckedCreateWithoutUserInput>, Enumerable<ReportCommentCreateWithoutUserInput>>
-    connectOrCreate?: Enumerable<ReportCommentCreateOrConnectWithoutuserInput>
+    create?: XOR<Enumerable<ReportCommentCreateWithoutUserInput>, Enumerable<ReportCommentUncheckedCreateWithoutUserInput>>
+    connectOrCreate?: Enumerable<ReportCommentCreateOrConnectWithoutUserInput>
     upsert?: Enumerable<ReportCommentUpsertWithWhereUniqueWithoutUserInput>
     connect?: Enumerable<ReportCommentWhereUniqueInput>
     set?: Enumerable<ReportCommentWhereUniqueInput>
@@ -22646,8 +22062,8 @@ export namespace Prisma {
   }
 
   export type ReportPostUpdateManyWithoutUserInput = {
-    create?: XOR<Enumerable<ReportPostUncheckedCreateWithoutUserInput>, Enumerable<ReportPostCreateWithoutUserInput>>
-    connectOrCreate?: Enumerable<ReportPostCreateOrConnectWithoutuserInput>
+    create?: XOR<Enumerable<ReportPostCreateWithoutUserInput>, Enumerable<ReportPostUncheckedCreateWithoutUserInput>>
+    connectOrCreate?: Enumerable<ReportPostCreateOrConnectWithoutUserInput>
     upsert?: Enumerable<ReportPostUpsertWithWhereUniqueWithoutUserInput>
     connect?: Enumerable<ReportPostWhereUniqueInput>
     set?: Enumerable<ReportPostWhereUniqueInput>
@@ -22659,8 +22075,8 @@ export namespace Prisma {
   }
 
   export type ReportSubcommentUpdateManyWithoutUserInput = {
-    create?: XOR<Enumerable<ReportSubcommentUncheckedCreateWithoutUserInput>, Enumerable<ReportSubcommentCreateWithoutUserInput>>
-    connectOrCreate?: Enumerable<ReportSubcommentCreateOrConnectWithoutuserInput>
+    create?: XOR<Enumerable<ReportSubcommentCreateWithoutUserInput>, Enumerable<ReportSubcommentUncheckedCreateWithoutUserInput>>
+    connectOrCreate?: Enumerable<ReportSubcommentCreateOrConnectWithoutUserInput>
     upsert?: Enumerable<ReportSubcommentUpsertWithWhereUniqueWithoutUserInput>
     connect?: Enumerable<ReportSubcommentWhereUniqueInput>
     set?: Enumerable<ReportSubcommentWhereUniqueInput>
@@ -22672,8 +22088,8 @@ export namespace Prisma {
   }
 
   export type TelegramUpdateManyWithoutUserInput = {
-    create?: XOR<Enumerable<TelegramUncheckedCreateWithoutUserInput>, Enumerable<TelegramCreateWithoutUserInput>>
-    connectOrCreate?: Enumerable<TelegramCreateOrConnectWithoutuserInput>
+    create?: XOR<Enumerable<TelegramCreateWithoutUserInput>, Enumerable<TelegramUncheckedCreateWithoutUserInput>>
+    connectOrCreate?: Enumerable<TelegramCreateOrConnectWithoutUserInput>
     upsert?: Enumerable<TelegramUpsertWithWhereUniqueWithoutUserInput>
     connect?: Enumerable<TelegramWhereUniqueInput>
     set?: Enumerable<TelegramWhereUniqueInput>
@@ -22685,27 +22101,27 @@ export namespace Prisma {
   }
 
   export type AdminUncheckedUpdateOneWithoutUserInput = {
-    create?: XOR<AdminUncheckedCreateWithoutUserInput, AdminCreateWithoutUserInput>
-    connectOrCreate?: AdminCreateOrConnectWithoutuserInput
+    create?: XOR<AdminCreateWithoutUserInput, AdminUncheckedCreateWithoutUserInput>
+    connectOrCreate?: AdminCreateOrConnectWithoutUserInput
     connect?: AdminWhereUniqueInput
     disconnect?: boolean
     delete?: boolean
-    update?: XOR<AdminUncheckedUpdateWithoutUserInput, AdminUpdateWithoutUserInput>
+    update?: XOR<AdminUpdateWithoutUserInput, AdminUncheckedUpdateWithoutUserInput>
   }
 
   export type ChangePasswordUncheckedUpdateOneWithoutUserInput = {
-    create?: XOR<ChangePasswordUncheckedCreateWithoutUserInput, ChangePasswordCreateWithoutUserInput>
-    connectOrCreate?: ChangePasswordCreateOrConnectWithoutuserInput
+    create?: XOR<ChangePasswordCreateWithoutUserInput, ChangePasswordUncheckedCreateWithoutUserInput>
+    connectOrCreate?: ChangePasswordCreateOrConnectWithoutUserInput
     upsert?: ChangePasswordUpsertWithoutUserInput
     connect?: ChangePasswordWhereUniqueInput
     disconnect?: boolean
     delete?: boolean
-    update?: XOR<ChangePasswordUncheckedUpdateWithoutUserInput, ChangePasswordUpdateWithoutUserInput>
+    update?: XOR<ChangePasswordUpdateWithoutUserInput, ChangePasswordUncheckedUpdateWithoutUserInput>
   }
 
   export type CommunityBoardUncheckedUpdateManyWithoutUserInput = {
-    create?: XOR<Enumerable<CommunityBoardUncheckedCreateWithoutUserInput>, Enumerable<CommunityBoardCreateWithoutUserInput>>
-    connectOrCreate?: Enumerable<CommunityBoardCreateOrConnectWithoutuserInput>
+    create?: XOR<Enumerable<CommunityBoardCreateWithoutUserInput>, Enumerable<CommunityBoardUncheckedCreateWithoutUserInput>>
+    connectOrCreate?: Enumerable<CommunityBoardCreateOrConnectWithoutUserInput>
     upsert?: Enumerable<CommunityBoardUpsertWithWhereUniqueWithoutUserInput>
     connect?: Enumerable<CommunityBoardWhereUniqueInput>
     set?: Enumerable<CommunityBoardWhereUniqueInput>
@@ -22717,8 +22133,8 @@ export namespace Prisma {
   }
 
   export type CommunityBoardCandidateUncheckedUpdateManyWithoutUserInput = {
-    create?: XOR<Enumerable<CommunityBoardCandidateUncheckedCreateWithoutUserInput>, Enumerable<CommunityBoardCandidateCreateWithoutUserInput>>
-    connectOrCreate?: Enumerable<CommunityBoardCandidateCreateOrConnectWithoutuserInput>
+    create?: XOR<Enumerable<CommunityBoardCandidateCreateWithoutUserInput>, Enumerable<CommunityBoardCandidateUncheckedCreateWithoutUserInput>>
+    connectOrCreate?: Enumerable<CommunityBoardCandidateCreateOrConnectWithoutUserInput>
     upsert?: Enumerable<CommunityBoardCandidateUpsertWithWhereUniqueWithoutUserInput>
     connect?: Enumerable<CommunityBoardCandidateWhereUniqueInput>
     set?: Enumerable<CommunityBoardCandidateWhereUniqueInput>
@@ -22730,8 +22146,8 @@ export namespace Prisma {
   }
 
   export type CommunityBoardCandidateVoteUncheckedUpdateManyWithoutUserInput = {
-    create?: XOR<Enumerable<CommunityBoardCandidateVoteUncheckedCreateWithoutUserInput>, Enumerable<CommunityBoardCandidateVoteCreateWithoutUserInput>>
-    connectOrCreate?: Enumerable<CommunityBoardCandidateVoteCreateOrConnectWithoutuserInput>
+    create?: XOR<Enumerable<CommunityBoardCandidateVoteCreateWithoutUserInput>, Enumerable<CommunityBoardCandidateVoteUncheckedCreateWithoutUserInput>>
+    connectOrCreate?: Enumerable<CommunityBoardCandidateVoteCreateOrConnectWithoutUserInput>
     upsert?: Enumerable<CommunityBoardCandidateVoteUpsertWithWhereUniqueWithoutUserInput>
     connect?: Enumerable<CommunityBoardCandidateVoteWhereUniqueInput>
     set?: Enumerable<CommunityBoardCandidateVoteWhereUniqueInput>
@@ -22743,8 +22159,8 @@ export namespace Prisma {
   }
 
   export type CommunityBoardPinUncheckedUpdateManyWithoutUserInput = {
-    create?: XOR<Enumerable<CommunityBoardPinUncheckedCreateWithoutUserInput>, Enumerable<CommunityBoardPinCreateWithoutUserInput>>
-    connectOrCreate?: Enumerable<CommunityBoardPinCreateOrConnectWithoutuserInput>
+    create?: XOR<Enumerable<CommunityBoardPinCreateWithoutUserInput>, Enumerable<CommunityBoardPinUncheckedCreateWithoutUserInput>>
+    connectOrCreate?: Enumerable<CommunityBoardPinCreateOrConnectWithoutUserInput>
     upsert?: Enumerable<CommunityBoardPinUpsertWithWhereUniqueWithoutUserInput>
     connect?: Enumerable<CommunityBoardPinWhereUniqueInput>
     set?: Enumerable<CommunityBoardPinWhereUniqueInput>
@@ -22756,8 +22172,8 @@ export namespace Prisma {
   }
 
   export type CommunityCommentUncheckedUpdateManyWithoutUserInput = {
-    create?: XOR<Enumerable<CommunityCommentUncheckedCreateWithoutUserInput>, Enumerable<CommunityCommentCreateWithoutUserInput>>
-    connectOrCreate?: Enumerable<CommunityCommentCreateOrConnectWithoutuserInput>
+    create?: XOR<Enumerable<CommunityCommentCreateWithoutUserInput>, Enumerable<CommunityCommentUncheckedCreateWithoutUserInput>>
+    connectOrCreate?: Enumerable<CommunityCommentCreateOrConnectWithoutUserInput>
     upsert?: Enumerable<CommunityCommentUpsertWithWhereUniqueWithoutUserInput>
     connect?: Enumerable<CommunityCommentWhereUniqueInput>
     set?: Enumerable<CommunityCommentWhereUniqueInput>
@@ -22769,8 +22185,8 @@ export namespace Prisma {
   }
 
   export type CommunityPostUncheckedUpdateManyWithoutUserInput = {
-    create?: XOR<Enumerable<CommunityPostUncheckedCreateWithoutUserInput>, Enumerable<CommunityPostCreateWithoutUserInput>>
-    connectOrCreate?: Enumerable<CommunityPostCreateOrConnectWithoutuserInput>
+    create?: XOR<Enumerable<CommunityPostCreateWithoutUserInput>, Enumerable<CommunityPostUncheckedCreateWithoutUserInput>>
+    connectOrCreate?: Enumerable<CommunityPostCreateOrConnectWithoutUserInput>
     upsert?: Enumerable<CommunityPostUpsertWithWhereUniqueWithoutUserInput>
     connect?: Enumerable<CommunityPostWhereUniqueInput>
     set?: Enumerable<CommunityPostWhereUniqueInput>
@@ -22782,8 +22198,8 @@ export namespace Prisma {
   }
 
   export type CommunityPostBookmarkUncheckedUpdateManyWithoutUserInput = {
-    create?: XOR<Enumerable<CommunityPostBookmarkUncheckedCreateWithoutUserInput>, Enumerable<CommunityPostBookmarkCreateWithoutUserInput>>
-    connectOrCreate?: Enumerable<CommunityPostBookmarkCreateOrConnectWithoutuserInput>
+    create?: XOR<Enumerable<CommunityPostBookmarkCreateWithoutUserInput>, Enumerable<CommunityPostBookmarkUncheckedCreateWithoutUserInput>>
+    connectOrCreate?: Enumerable<CommunityPostBookmarkCreateOrConnectWithoutUserInput>
     upsert?: Enumerable<CommunityPostBookmarkUpsertWithWhereUniqueWithoutUserInput>
     connect?: Enumerable<CommunityPostBookmarkWhereUniqueInput>
     set?: Enumerable<CommunityPostBookmarkWhereUniqueInput>
@@ -22795,8 +22211,8 @@ export namespace Prisma {
   }
 
   export type CommunityPostLikeUncheckedUpdateManyWithoutUserInput = {
-    create?: XOR<Enumerable<CommunityPostLikeUncheckedCreateWithoutUserInput>, Enumerable<CommunityPostLikeCreateWithoutUserInput>>
-    connectOrCreate?: Enumerable<CommunityPostLikeCreateOrConnectWithoutuserInput>
+    create?: XOR<Enumerable<CommunityPostLikeCreateWithoutUserInput>, Enumerable<CommunityPostLikeUncheckedCreateWithoutUserInput>>
+    connectOrCreate?: Enumerable<CommunityPostLikeCreateOrConnectWithoutUserInput>
     upsert?: Enumerable<CommunityPostLikeUpsertWithWhereUniqueWithoutUserInput>
     connect?: Enumerable<CommunityPostLikeWhereUniqueInput>
     set?: Enumerable<CommunityPostLikeWhereUniqueInput>
@@ -22808,8 +22224,8 @@ export namespace Prisma {
   }
 
   export type CommunitySubcommentUncheckedUpdateManyWithoutUserInput = {
-    create?: XOR<Enumerable<CommunitySubcommentUncheckedCreateWithoutUserInput>, Enumerable<CommunitySubcommentCreateWithoutUserInput>>
-    connectOrCreate?: Enumerable<CommunitySubcommentCreateOrConnectWithoutuserInput>
+    create?: XOR<Enumerable<CommunitySubcommentCreateWithoutUserInput>, Enumerable<CommunitySubcommentUncheckedCreateWithoutUserInput>>
+    connectOrCreate?: Enumerable<CommunitySubcommentCreateOrConnectWithoutUserInput>
     upsert?: Enumerable<CommunitySubcommentUpsertWithWhereUniqueWithoutUserInput>
     connect?: Enumerable<CommunitySubcommentWhereUniqueInput>
     set?: Enumerable<CommunitySubcommentWhereUniqueInput>
@@ -22821,8 +22237,8 @@ export namespace Prisma {
   }
 
   export type LiveChatUncheckedUpdateManyWithoutUserInput = {
-    create?: XOR<Enumerable<LiveChatUncheckedCreateWithoutUserInput>, Enumerable<LiveChatCreateWithoutUserInput>>
-    connectOrCreate?: Enumerable<LiveChatCreateOrConnectWithoutuserInput>
+    create?: XOR<Enumerable<LiveChatCreateWithoutUserInput>, Enumerable<LiveChatUncheckedCreateWithoutUserInput>>
+    connectOrCreate?: Enumerable<LiveChatCreateOrConnectWithoutUserInput>
     upsert?: Enumerable<LiveChatUpsertWithWhereUniqueWithoutUserInput>
     connect?: Enumerable<LiveChatWhereUniqueInput>
     set?: Enumerable<LiveChatWhereUniqueInput>
@@ -22834,8 +22250,8 @@ export namespace Prisma {
   }
 
   export type NoticeNotificationsSubscriptionUncheckedUpdateManyWithoutUserInput = {
-    create?: XOR<Enumerable<NoticeNotificationsSubscriptionUncheckedCreateWithoutUserInput>, Enumerable<NoticeNotificationsSubscriptionCreateWithoutUserInput>>
-    connectOrCreate?: Enumerable<NoticeNotificationsSubscriptionCreateOrConnectWithoutuserInput>
+    create?: XOR<Enumerable<NoticeNotificationsSubscriptionCreateWithoutUserInput>, Enumerable<NoticeNotificationsSubscriptionUncheckedCreateWithoutUserInput>>
+    connectOrCreate?: Enumerable<NoticeNotificationsSubscriptionCreateOrConnectWithoutUserInput>
     upsert?: Enumerable<NoticeNotificationsSubscriptionUpsertWithWhereUniqueWithoutUserInput>
     connect?: Enumerable<NoticeNotificationsSubscriptionWhereUniqueInput>
     set?: Enumerable<NoticeNotificationsSubscriptionWhereUniqueInput>
@@ -22846,22 +22262,9 @@ export namespace Prisma {
     deleteMany?: Enumerable<NoticeNotificationsSubscriptionScalarWhereInput>
   }
 
-  export type PushUncheckedUpdateManyWithoutUserInput = {
-    create?: XOR<Enumerable<PushUncheckedCreateWithoutUserInput>, Enumerable<PushCreateWithoutUserInput>>
-    connectOrCreate?: Enumerable<PushCreateOrConnectWithoutuserInput>
-    upsert?: Enumerable<PushUpsertWithWhereUniqueWithoutUserInput>
-    connect?: Enumerable<PushWhereUniqueInput>
-    set?: Enumerable<PushWhereUniqueInput>
-    disconnect?: Enumerable<PushWhereUniqueInput>
-    delete?: Enumerable<PushWhereUniqueInput>
-    update?: Enumerable<PushUpdateWithWhereUniqueWithoutUserInput>
-    updateMany?: Enumerable<PushUpdateManyWithWhereWithoutUserInput>
-    deleteMany?: Enumerable<PushScalarWhereInput>
-  }
-
   export type ReportCommentUncheckedUpdateManyWithoutUserInput = {
-    create?: XOR<Enumerable<ReportCommentUncheckedCreateWithoutUserInput>, Enumerable<ReportCommentCreateWithoutUserInput>>
-    connectOrCreate?: Enumerable<ReportCommentCreateOrConnectWithoutuserInput>
+    create?: XOR<Enumerable<ReportCommentCreateWithoutUserInput>, Enumerable<ReportCommentUncheckedCreateWithoutUserInput>>
+    connectOrCreate?: Enumerable<ReportCommentCreateOrConnectWithoutUserInput>
     upsert?: Enumerable<ReportCommentUpsertWithWhereUniqueWithoutUserInput>
     connect?: Enumerable<ReportCommentWhereUniqueInput>
     set?: Enumerable<ReportCommentWhereUniqueInput>
@@ -22873,8 +22276,8 @@ export namespace Prisma {
   }
 
   export type ReportPostUncheckedUpdateManyWithoutUserInput = {
-    create?: XOR<Enumerable<ReportPostUncheckedCreateWithoutUserInput>, Enumerable<ReportPostCreateWithoutUserInput>>
-    connectOrCreate?: Enumerable<ReportPostCreateOrConnectWithoutuserInput>
+    create?: XOR<Enumerable<ReportPostCreateWithoutUserInput>, Enumerable<ReportPostUncheckedCreateWithoutUserInput>>
+    connectOrCreate?: Enumerable<ReportPostCreateOrConnectWithoutUserInput>
     upsert?: Enumerable<ReportPostUpsertWithWhereUniqueWithoutUserInput>
     connect?: Enumerable<ReportPostWhereUniqueInput>
     set?: Enumerable<ReportPostWhereUniqueInput>
@@ -22886,8 +22289,8 @@ export namespace Prisma {
   }
 
   export type ReportSubcommentUncheckedUpdateManyWithoutUserInput = {
-    create?: XOR<Enumerable<ReportSubcommentUncheckedCreateWithoutUserInput>, Enumerable<ReportSubcommentCreateWithoutUserInput>>
-    connectOrCreate?: Enumerable<ReportSubcommentCreateOrConnectWithoutuserInput>
+    create?: XOR<Enumerable<ReportSubcommentCreateWithoutUserInput>, Enumerable<ReportSubcommentUncheckedCreateWithoutUserInput>>
+    connectOrCreate?: Enumerable<ReportSubcommentCreateOrConnectWithoutUserInput>
     upsert?: Enumerable<ReportSubcommentUpsertWithWhereUniqueWithoutUserInput>
     connect?: Enumerable<ReportSubcommentWhereUniqueInput>
     set?: Enumerable<ReportSubcommentWhereUniqueInput>
@@ -22899,8 +22302,8 @@ export namespace Prisma {
   }
 
   export type TelegramUncheckedUpdateManyWithoutUserInput = {
-    create?: XOR<Enumerable<TelegramUncheckedCreateWithoutUserInput>, Enumerable<TelegramCreateWithoutUserInput>>
-    connectOrCreate?: Enumerable<TelegramCreateOrConnectWithoutuserInput>
+    create?: XOR<Enumerable<TelegramCreateWithoutUserInput>, Enumerable<TelegramUncheckedCreateWithoutUserInput>>
+    connectOrCreate?: Enumerable<TelegramCreateOrConnectWithoutUserInput>
     upsert?: Enumerable<TelegramUpsertWithWhereUniqueWithoutUserInput>
     connect?: Enumerable<TelegramWhereUniqueInput>
     set?: Enumerable<TelegramWhereUniqueInput>
@@ -22912,101 +22315,101 @@ export namespace Prisma {
   }
 
   export type CommunityCommentCreateNestedOneWithoutReportCommentsInput = {
-    create?: XOR<CommunityCommentUncheckedCreateWithoutReportCommentsInput, CommunityCommentCreateWithoutReportCommentsInput>
-    connectOrCreate?: CommunityCommentCreateOrConnectWithoutreportCommentsInput
+    create?: XOR<CommunityCommentCreateWithoutReportCommentsInput, CommunityCommentUncheckedCreateWithoutReportCommentsInput>
+    connectOrCreate?: CommunityCommentCreateOrConnectWithoutReportCommentsInput
     connect?: CommunityCommentWhereUniqueInput
   }
 
   export type UserCreateNestedOneWithoutReportCommentsInput = {
-    create?: XOR<UserUncheckedCreateWithoutReportCommentsInput, UserCreateWithoutReportCommentsInput>
-    connectOrCreate?: UserCreateOrConnectWithoutreportCommentsInput
+    create?: XOR<UserCreateWithoutReportCommentsInput, UserUncheckedCreateWithoutReportCommentsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutReportCommentsInput
     connect?: UserWhereUniqueInput
   }
 
   export type CommunityCommentUpdateOneRequiredWithoutReportCommentsInput = {
-    create?: XOR<CommunityCommentUncheckedCreateWithoutReportCommentsInput, CommunityCommentCreateWithoutReportCommentsInput>
-    connectOrCreate?: CommunityCommentCreateOrConnectWithoutreportCommentsInput
+    create?: XOR<CommunityCommentCreateWithoutReportCommentsInput, CommunityCommentUncheckedCreateWithoutReportCommentsInput>
+    connectOrCreate?: CommunityCommentCreateOrConnectWithoutReportCommentsInput
     upsert?: CommunityCommentUpsertWithoutReportCommentsInput
     connect?: CommunityCommentWhereUniqueInput
-    update?: XOR<CommunityCommentUncheckedUpdateWithoutReportCommentsInput, CommunityCommentUpdateWithoutReportCommentsInput>
+    update?: XOR<CommunityCommentUpdateWithoutReportCommentsInput, CommunityCommentUncheckedUpdateWithoutReportCommentsInput>
   }
 
   export type UserUpdateOneRequiredWithoutReportCommentsInput = {
-    create?: XOR<UserUncheckedCreateWithoutReportCommentsInput, UserCreateWithoutReportCommentsInput>
-    connectOrCreate?: UserCreateOrConnectWithoutreportCommentsInput
+    create?: XOR<UserCreateWithoutReportCommentsInput, UserUncheckedCreateWithoutReportCommentsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutReportCommentsInput
     upsert?: UserUpsertWithoutReportCommentsInput
     connect?: UserWhereUniqueInput
-    update?: XOR<UserUncheckedUpdateWithoutReportCommentsInput, UserUpdateWithoutReportCommentsInput>
+    update?: XOR<UserUpdateWithoutReportCommentsInput, UserUncheckedUpdateWithoutReportCommentsInput>
   }
 
   export type CommunityPostCreateNestedOneWithoutReportPostsInput = {
-    create?: XOR<CommunityPostUncheckedCreateWithoutReportPostsInput, CommunityPostCreateWithoutReportPostsInput>
-    connectOrCreate?: CommunityPostCreateOrConnectWithoutreportPostsInput
+    create?: XOR<CommunityPostCreateWithoutReportPostsInput, CommunityPostUncheckedCreateWithoutReportPostsInput>
+    connectOrCreate?: CommunityPostCreateOrConnectWithoutReportPostsInput
     connect?: CommunityPostWhereUniqueInput
   }
 
   export type UserCreateNestedOneWithoutReportPostsInput = {
-    create?: XOR<UserUncheckedCreateWithoutReportPostsInput, UserCreateWithoutReportPostsInput>
-    connectOrCreate?: UserCreateOrConnectWithoutreportPostsInput
+    create?: XOR<UserCreateWithoutReportPostsInput, UserUncheckedCreateWithoutReportPostsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutReportPostsInput
     connect?: UserWhereUniqueInput
   }
 
   export type CommunityPostUpdateOneRequiredWithoutReportPostsInput = {
-    create?: XOR<CommunityPostUncheckedCreateWithoutReportPostsInput, CommunityPostCreateWithoutReportPostsInput>
-    connectOrCreate?: CommunityPostCreateOrConnectWithoutreportPostsInput
+    create?: XOR<CommunityPostCreateWithoutReportPostsInput, CommunityPostUncheckedCreateWithoutReportPostsInput>
+    connectOrCreate?: CommunityPostCreateOrConnectWithoutReportPostsInput
     upsert?: CommunityPostUpsertWithoutReportPostsInput
     connect?: CommunityPostWhereUniqueInput
-    update?: XOR<CommunityPostUncheckedUpdateWithoutReportPostsInput, CommunityPostUpdateWithoutReportPostsInput>
+    update?: XOR<CommunityPostUpdateWithoutReportPostsInput, CommunityPostUncheckedUpdateWithoutReportPostsInput>
   }
 
   export type UserUpdateOneRequiredWithoutReportPostsInput = {
-    create?: XOR<UserUncheckedCreateWithoutReportPostsInput, UserCreateWithoutReportPostsInput>
-    connectOrCreate?: UserCreateOrConnectWithoutreportPostsInput
+    create?: XOR<UserCreateWithoutReportPostsInput, UserUncheckedCreateWithoutReportPostsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutReportPostsInput
     upsert?: UserUpsertWithoutReportPostsInput
     connect?: UserWhereUniqueInput
-    update?: XOR<UserUncheckedUpdateWithoutReportPostsInput, UserUpdateWithoutReportPostsInput>
+    update?: XOR<UserUpdateWithoutReportPostsInput, UserUncheckedUpdateWithoutReportPostsInput>
   }
 
   export type CommunitySubcommentCreateNestedOneWithoutReportSubcommentsInput = {
-    create?: XOR<CommunitySubcommentUncheckedCreateWithoutReportSubcommentsInput, CommunitySubcommentCreateWithoutReportSubcommentsInput>
-    connectOrCreate?: CommunitySubcommentCreateOrConnectWithoutreportSubcommentsInput
+    create?: XOR<CommunitySubcommentCreateWithoutReportSubcommentsInput, CommunitySubcommentUncheckedCreateWithoutReportSubcommentsInput>
+    connectOrCreate?: CommunitySubcommentCreateOrConnectWithoutReportSubcommentsInput
     connect?: CommunitySubcommentWhereUniqueInput
   }
 
   export type UserCreateNestedOneWithoutReportSubcommentsInput = {
-    create?: XOR<UserUncheckedCreateWithoutReportSubcommentsInput, UserCreateWithoutReportSubcommentsInput>
-    connectOrCreate?: UserCreateOrConnectWithoutreportSubcommentsInput
+    create?: XOR<UserCreateWithoutReportSubcommentsInput, UserUncheckedCreateWithoutReportSubcommentsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutReportSubcommentsInput
     connect?: UserWhereUniqueInput
   }
 
   export type CommunitySubcommentUpdateOneRequiredWithoutReportSubcommentsInput = {
-    create?: XOR<CommunitySubcommentUncheckedCreateWithoutReportSubcommentsInput, CommunitySubcommentCreateWithoutReportSubcommentsInput>
-    connectOrCreate?: CommunitySubcommentCreateOrConnectWithoutreportSubcommentsInput
+    create?: XOR<CommunitySubcommentCreateWithoutReportSubcommentsInput, CommunitySubcommentUncheckedCreateWithoutReportSubcommentsInput>
+    connectOrCreate?: CommunitySubcommentCreateOrConnectWithoutReportSubcommentsInput
     upsert?: CommunitySubcommentUpsertWithoutReportSubcommentsInput
     connect?: CommunitySubcommentWhereUniqueInput
-    update?: XOR<CommunitySubcommentUncheckedUpdateWithoutReportSubcommentsInput, CommunitySubcommentUpdateWithoutReportSubcommentsInput>
+    update?: XOR<CommunitySubcommentUpdateWithoutReportSubcommentsInput, CommunitySubcommentUncheckedUpdateWithoutReportSubcommentsInput>
   }
 
   export type UserUpdateOneRequiredWithoutReportSubcommentsInput = {
-    create?: XOR<UserUncheckedCreateWithoutReportSubcommentsInput, UserCreateWithoutReportSubcommentsInput>
-    connectOrCreate?: UserCreateOrConnectWithoutreportSubcommentsInput
+    create?: XOR<UserCreateWithoutReportSubcommentsInput, UserUncheckedCreateWithoutReportSubcommentsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutReportSubcommentsInput
     upsert?: UserUpsertWithoutReportSubcommentsInput
     connect?: UserWhereUniqueInput
-    update?: XOR<UserUncheckedUpdateWithoutReportSubcommentsInput, UserUpdateWithoutReportSubcommentsInput>
+    update?: XOR<UserUpdateWithoutReportSubcommentsInput, UserUncheckedUpdateWithoutReportSubcommentsInput>
   }
 
   export type UserCreateNestedOneWithoutTelegramsInput = {
-    create?: XOR<UserUncheckedCreateWithoutTelegramsInput, UserCreateWithoutTelegramsInput>
-    connectOrCreate?: UserCreateOrConnectWithouttelegramsInput
+    create?: XOR<UserCreateWithoutTelegramsInput, UserUncheckedCreateWithoutTelegramsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutTelegramsInput
     connect?: UserWhereUniqueInput
   }
 
   export type UserUpdateOneRequiredWithoutTelegramsInput = {
-    create?: XOR<UserUncheckedCreateWithoutTelegramsInput, UserCreateWithoutTelegramsInput>
-    connectOrCreate?: UserCreateOrConnectWithouttelegramsInput
+    create?: XOR<UserCreateWithoutTelegramsInput, UserUncheckedCreateWithoutTelegramsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutTelegramsInput
     upsert?: UserUpsertWithoutTelegramsInput
     connect?: UserWhereUniqueInput
-    update?: XOR<UserUncheckedUpdateWithoutTelegramsInput, UserUpdateWithoutTelegramsInput>
+    update?: XOR<UserUpdateWithoutTelegramsInput, UserUncheckedUpdateWithoutTelegramsInput>
   }
 
   export type NestedIntFilter = {
@@ -23105,7 +22508,6 @@ export namespace Prisma {
     communitySubcomments?: CommunitySubcommentCreateNestedManyWithoutUserInput
     liveChats?: LiveChatCreateNestedManyWithoutUserInput
     noticeNotificationsSubscriptions?: NoticeNotificationsSubscriptionCreateNestedManyWithoutUserInput
-    pushes?: PushCreateNestedManyWithoutUserInput
     reportComments?: ReportCommentCreateNestedManyWithoutUserInput
     reportPosts?: ReportPostCreateNestedManyWithoutUserInput
     reportSubcomments?: ReportSubcommentCreateNestedManyWithoutUserInput
@@ -23132,21 +22534,20 @@ export namespace Prisma {
     communitySubcomments?: CommunitySubcommentUncheckedCreateNestedManyWithoutUserInput
     liveChats?: LiveChatUncheckedCreateNestedManyWithoutUserInput
     noticeNotificationsSubscriptions?: NoticeNotificationsSubscriptionUncheckedCreateNestedManyWithoutUserInput
-    pushes?: PushUncheckedCreateNestedManyWithoutUserInput
     reportComments?: ReportCommentUncheckedCreateNestedManyWithoutUserInput
     reportPosts?: ReportPostUncheckedCreateNestedManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUncheckedCreateNestedManyWithoutUserInput
     telegrams?: TelegramUncheckedCreateNestedManyWithoutUserInput
   }
 
-  export type UserCreateOrConnectWithoutadminInput = {
+  export type UserCreateOrConnectWithoutAdminInput = {
     where: UserWhereUniqueInput
-    create: XOR<UserUncheckedCreateWithoutAdminInput, UserCreateWithoutAdminInput>
+    create: XOR<UserCreateWithoutAdminInput, UserUncheckedCreateWithoutAdminInput>
   }
 
   export type UserUpsertWithoutAdminInput = {
-    update: XOR<UserUncheckedUpdateWithoutAdminInput, UserUpdateWithoutAdminInput>
-    create: XOR<UserUncheckedCreateWithoutAdminInput, UserCreateWithoutAdminInput>
+    update: XOR<UserUpdateWithoutAdminInput, UserUncheckedUpdateWithoutAdminInput>
+    create: XOR<UserCreateWithoutAdminInput, UserUncheckedCreateWithoutAdminInput>
   }
 
   export type UserUpdateWithoutAdminInput = {
@@ -23168,7 +22569,6 @@ export namespace Prisma {
     communitySubcomments?: CommunitySubcommentUpdateManyWithoutUserInput
     liveChats?: LiveChatUpdateManyWithoutUserInput
     noticeNotificationsSubscriptions?: NoticeNotificationsSubscriptionUpdateManyWithoutUserInput
-    pushes?: PushUpdateManyWithoutUserInput
     reportComments?: ReportCommentUpdateManyWithoutUserInput
     reportPosts?: ReportPostUpdateManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUpdateManyWithoutUserInput
@@ -23195,7 +22595,6 @@ export namespace Prisma {
     communitySubcomments?: CommunitySubcommentUncheckedUpdateManyWithoutUserInput
     liveChats?: LiveChatUncheckedUpdateManyWithoutUserInput
     noticeNotificationsSubscriptions?: NoticeNotificationsSubscriptionUncheckedUpdateManyWithoutUserInput
-    pushes?: PushUncheckedUpdateManyWithoutUserInput
     reportComments?: ReportCommentUncheckedUpdateManyWithoutUserInput
     reportPosts?: ReportPostUncheckedUpdateManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUncheckedUpdateManyWithoutUserInput
@@ -23221,7 +22620,6 @@ export namespace Prisma {
     communitySubcomments?: CommunitySubcommentCreateNestedManyWithoutUserInput
     liveChats?: LiveChatCreateNestedManyWithoutUserInput
     noticeNotificationsSubscriptions?: NoticeNotificationsSubscriptionCreateNestedManyWithoutUserInput
-    pushes?: PushCreateNestedManyWithoutUserInput
     reportComments?: ReportCommentCreateNestedManyWithoutUserInput
     reportPosts?: ReportPostCreateNestedManyWithoutUserInput
     reportSubcomments?: ReportSubcommentCreateNestedManyWithoutUserInput
@@ -23248,21 +22646,20 @@ export namespace Prisma {
     communitySubcomments?: CommunitySubcommentUncheckedCreateNestedManyWithoutUserInput
     liveChats?: LiveChatUncheckedCreateNestedManyWithoutUserInput
     noticeNotificationsSubscriptions?: NoticeNotificationsSubscriptionUncheckedCreateNestedManyWithoutUserInput
-    pushes?: PushUncheckedCreateNestedManyWithoutUserInput
     reportComments?: ReportCommentUncheckedCreateNestedManyWithoutUserInput
     reportPosts?: ReportPostUncheckedCreateNestedManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUncheckedCreateNestedManyWithoutUserInput
     telegrams?: TelegramUncheckedCreateNestedManyWithoutUserInput
   }
 
-  export type UserCreateOrConnectWithoutchangePasswordInput = {
+  export type UserCreateOrConnectWithoutChangePasswordInput = {
     where: UserWhereUniqueInput
-    create: XOR<UserUncheckedCreateWithoutChangePasswordInput, UserCreateWithoutChangePasswordInput>
+    create: XOR<UserCreateWithoutChangePasswordInput, UserUncheckedCreateWithoutChangePasswordInput>
   }
 
   export type UserUpsertWithoutChangePasswordInput = {
-    update: XOR<UserUncheckedUpdateWithoutChangePasswordInput, UserUpdateWithoutChangePasswordInput>
-    create: XOR<UserUncheckedCreateWithoutChangePasswordInput, UserCreateWithoutChangePasswordInput>
+    update: XOR<UserUpdateWithoutChangePasswordInput, UserUncheckedUpdateWithoutChangePasswordInput>
+    create: XOR<UserCreateWithoutChangePasswordInput, UserUncheckedCreateWithoutChangePasswordInput>
   }
 
   export type UserUpdateWithoutChangePasswordInput = {
@@ -23284,7 +22681,6 @@ export namespace Prisma {
     communitySubcomments?: CommunitySubcommentUpdateManyWithoutUserInput
     liveChats?: LiveChatUpdateManyWithoutUserInput
     noticeNotificationsSubscriptions?: NoticeNotificationsSubscriptionUpdateManyWithoutUserInput
-    pushes?: PushUpdateManyWithoutUserInput
     reportComments?: ReportCommentUpdateManyWithoutUserInput
     reportPosts?: ReportPostUpdateManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUpdateManyWithoutUserInput
@@ -23311,7 +22707,6 @@ export namespace Prisma {
     communitySubcomments?: CommunitySubcommentUncheckedUpdateManyWithoutUserInput
     liveChats?: LiveChatUncheckedUpdateManyWithoutUserInput
     noticeNotificationsSubscriptions?: NoticeNotificationsSubscriptionUncheckedUpdateManyWithoutUserInput
-    pushes?: PushUncheckedUpdateManyWithoutUserInput
     reportComments?: ReportCommentUncheckedUpdateManyWithoutUserInput
     reportPosts?: ReportPostUncheckedUpdateManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUncheckedUpdateManyWithoutUserInput
@@ -23337,7 +22732,6 @@ export namespace Prisma {
     communitySubcomments?: CommunitySubcommentCreateNestedManyWithoutUserInput
     liveChats?: LiveChatCreateNestedManyWithoutUserInput
     noticeNotificationsSubscriptions?: NoticeNotificationsSubscriptionCreateNestedManyWithoutUserInput
-    pushes?: PushCreateNestedManyWithoutUserInput
     reportComments?: ReportCommentCreateNestedManyWithoutUserInput
     reportPosts?: ReportPostCreateNestedManyWithoutUserInput
     reportSubcomments?: ReportSubcommentCreateNestedManyWithoutUserInput
@@ -23364,16 +22758,15 @@ export namespace Prisma {
     communitySubcomments?: CommunitySubcommentUncheckedCreateNestedManyWithoutUserInput
     liveChats?: LiveChatUncheckedCreateNestedManyWithoutUserInput
     noticeNotificationsSubscriptions?: NoticeNotificationsSubscriptionUncheckedCreateNestedManyWithoutUserInput
-    pushes?: PushUncheckedCreateNestedManyWithoutUserInput
     reportComments?: ReportCommentUncheckedCreateNestedManyWithoutUserInput
     reportPosts?: ReportPostUncheckedCreateNestedManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUncheckedCreateNestedManyWithoutUserInput
     telegrams?: TelegramUncheckedCreateNestedManyWithoutUserInput
   }
 
-  export type UserCreateOrConnectWithoutcommunityBoardsInput = {
+  export type UserCreateOrConnectWithoutCommunityBoardsInput = {
     where: UserWhereUniqueInput
-    create: XOR<UserUncheckedCreateWithoutCommunityBoardsInput, UserCreateWithoutCommunityBoardsInput>
+    create: XOR<UserCreateWithoutCommunityBoardsInput, UserUncheckedCreateWithoutCommunityBoardsInput>
   }
 
   export type CommunityBoardPinCreateWithoutCommunityBoardInput = {
@@ -23384,9 +22777,9 @@ export namespace Prisma {
     userId: number
   }
 
-  export type CommunityBoardPinCreateOrConnectWithoutcommunityBoardInput = {
+  export type CommunityBoardPinCreateOrConnectWithoutCommunityBoardInput = {
     where: CommunityBoardPinWhereUniqueInput
-    create: XOR<CommunityBoardPinUncheckedCreateWithoutCommunityBoardInput, CommunityBoardPinCreateWithoutCommunityBoardInput>
+    create: XOR<CommunityBoardPinCreateWithoutCommunityBoardInput, CommunityBoardPinUncheckedCreateWithoutCommunityBoardInput>
   }
 
   export type CommunityPostCreateWithoutCommunityBoardInput = {
@@ -23426,14 +22819,14 @@ export namespace Prisma {
     reportPosts?: ReportPostUncheckedCreateNestedManyWithoutCommunityPostInput
   }
 
-  export type CommunityPostCreateOrConnectWithoutcommunityBoardInput = {
+  export type CommunityPostCreateOrConnectWithoutCommunityBoardInput = {
     where: CommunityPostWhereUniqueInput
-    create: XOR<CommunityPostUncheckedCreateWithoutCommunityBoardInput, CommunityPostCreateWithoutCommunityBoardInput>
+    create: XOR<CommunityPostCreateWithoutCommunityBoardInput, CommunityPostUncheckedCreateWithoutCommunityBoardInput>
   }
 
   export type UserUpsertWithoutCommunityBoardsInput = {
-    update: XOR<UserUncheckedUpdateWithoutCommunityBoardsInput, UserUpdateWithoutCommunityBoardsInput>
-    create: XOR<UserUncheckedCreateWithoutCommunityBoardsInput, UserCreateWithoutCommunityBoardsInput>
+    update: XOR<UserUpdateWithoutCommunityBoardsInput, UserUncheckedUpdateWithoutCommunityBoardsInput>
+    create: XOR<UserCreateWithoutCommunityBoardsInput, UserUncheckedCreateWithoutCommunityBoardsInput>
   }
 
   export type UserUpdateWithoutCommunityBoardsInput = {
@@ -23455,7 +22848,6 @@ export namespace Prisma {
     communitySubcomments?: CommunitySubcommentUpdateManyWithoutUserInput
     liveChats?: LiveChatUpdateManyWithoutUserInput
     noticeNotificationsSubscriptions?: NoticeNotificationsSubscriptionUpdateManyWithoutUserInput
-    pushes?: PushUpdateManyWithoutUserInput
     reportComments?: ReportCommentUpdateManyWithoutUserInput
     reportPosts?: ReportPostUpdateManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUpdateManyWithoutUserInput
@@ -23482,7 +22874,6 @@ export namespace Prisma {
     communitySubcomments?: CommunitySubcommentUncheckedUpdateManyWithoutUserInput
     liveChats?: LiveChatUncheckedUpdateManyWithoutUserInput
     noticeNotificationsSubscriptions?: NoticeNotificationsSubscriptionUncheckedUpdateManyWithoutUserInput
-    pushes?: PushUncheckedUpdateManyWithoutUserInput
     reportComments?: ReportCommentUncheckedUpdateManyWithoutUserInput
     reportPosts?: ReportPostUncheckedUpdateManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUncheckedUpdateManyWithoutUserInput
@@ -23491,18 +22882,18 @@ export namespace Prisma {
 
   export type CommunityBoardPinUpsertWithWhereUniqueWithoutCommunityBoardInput = {
     where: CommunityBoardPinWhereUniqueInput
-    update: XOR<CommunityBoardPinUncheckedUpdateWithoutCommunityBoardInput, CommunityBoardPinUpdateWithoutCommunityBoardInput>
-    create: XOR<CommunityBoardPinUncheckedCreateWithoutCommunityBoardInput, CommunityBoardPinCreateWithoutCommunityBoardInput>
+    update: XOR<CommunityBoardPinUpdateWithoutCommunityBoardInput, CommunityBoardPinUncheckedUpdateWithoutCommunityBoardInput>
+    create: XOR<CommunityBoardPinCreateWithoutCommunityBoardInput, CommunityBoardPinUncheckedCreateWithoutCommunityBoardInput>
   }
 
   export type CommunityBoardPinUpdateWithWhereUniqueWithoutCommunityBoardInput = {
     where: CommunityBoardPinWhereUniqueInput
-    data: XOR<CommunityBoardPinUncheckedUpdateWithoutCommunityBoardInput, CommunityBoardPinUpdateWithoutCommunityBoardInput>
+    data: XOR<CommunityBoardPinUpdateWithoutCommunityBoardInput, CommunityBoardPinUncheckedUpdateWithoutCommunityBoardInput>
   }
 
   export type CommunityBoardPinUpdateManyWithWhereWithoutCommunityBoardInput = {
     where: CommunityBoardPinScalarWhereInput
-    data: XOR<CommunityBoardPinUncheckedUpdateManyWithoutCommunityBoardPinsInput, CommunityBoardPinUpdateManyMutationInput>
+    data: XOR<CommunityBoardPinUpdateManyMutationInput, CommunityBoardPinUncheckedUpdateManyWithoutCommunityBoardPinsInput>
   }
 
   export type CommunityBoardPinScalarWhereInput = {
@@ -23515,18 +22906,18 @@ export namespace Prisma {
 
   export type CommunityPostUpsertWithWhereUniqueWithoutCommunityBoardInput = {
     where: CommunityPostWhereUniqueInput
-    update: XOR<CommunityPostUncheckedUpdateWithoutCommunityBoardInput, CommunityPostUpdateWithoutCommunityBoardInput>
-    create: XOR<CommunityPostUncheckedCreateWithoutCommunityBoardInput, CommunityPostCreateWithoutCommunityBoardInput>
+    update: XOR<CommunityPostUpdateWithoutCommunityBoardInput, CommunityPostUncheckedUpdateWithoutCommunityBoardInput>
+    create: XOR<CommunityPostCreateWithoutCommunityBoardInput, CommunityPostUncheckedCreateWithoutCommunityBoardInput>
   }
 
   export type CommunityPostUpdateWithWhereUniqueWithoutCommunityBoardInput = {
     where: CommunityPostWhereUniqueInput
-    data: XOR<CommunityPostUncheckedUpdateWithoutCommunityBoardInput, CommunityPostUpdateWithoutCommunityBoardInput>
+    data: XOR<CommunityPostUpdateWithoutCommunityBoardInput, CommunityPostUncheckedUpdateWithoutCommunityBoardInput>
   }
 
   export type CommunityPostUpdateManyWithWhereWithoutCommunityBoardInput = {
     where: CommunityPostScalarWhereInput
-    data: XOR<CommunityPostUncheckedUpdateManyWithoutCommunityPostsInput, CommunityPostUpdateManyMutationInput>
+    data: XOR<CommunityPostUpdateManyMutationInput, CommunityPostUncheckedUpdateManyWithoutCommunityPostsInput>
   }
 
   export type CommunityPostScalarWhereInput = {
@@ -23566,7 +22957,6 @@ export namespace Prisma {
     communitySubcomments?: CommunitySubcommentCreateNestedManyWithoutUserInput
     liveChats?: LiveChatCreateNestedManyWithoutUserInput
     noticeNotificationsSubscriptions?: NoticeNotificationsSubscriptionCreateNestedManyWithoutUserInput
-    pushes?: PushCreateNestedManyWithoutUserInput
     reportComments?: ReportCommentCreateNestedManyWithoutUserInput
     reportPosts?: ReportPostCreateNestedManyWithoutUserInput
     reportSubcomments?: ReportSubcommentCreateNestedManyWithoutUserInput
@@ -23593,16 +22983,15 @@ export namespace Prisma {
     communitySubcomments?: CommunitySubcommentUncheckedCreateNestedManyWithoutUserInput
     liveChats?: LiveChatUncheckedCreateNestedManyWithoutUserInput
     noticeNotificationsSubscriptions?: NoticeNotificationsSubscriptionUncheckedCreateNestedManyWithoutUserInput
-    pushes?: PushUncheckedCreateNestedManyWithoutUserInput
     reportComments?: ReportCommentUncheckedCreateNestedManyWithoutUserInput
     reportPosts?: ReportPostUncheckedCreateNestedManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUncheckedCreateNestedManyWithoutUserInput
     telegrams?: TelegramUncheckedCreateNestedManyWithoutUserInput
   }
 
-  export type UserCreateOrConnectWithoutcommunityBoardCandidatesInput = {
+  export type UserCreateOrConnectWithoutCommunityBoardCandidatesInput = {
     where: UserWhereUniqueInput
-    create: XOR<UserUncheckedCreateWithoutCommunityBoardCandidatesInput, UserCreateWithoutCommunityBoardCandidatesInput>
+    create: XOR<UserCreateWithoutCommunityBoardCandidatesInput, UserUncheckedCreateWithoutCommunityBoardCandidatesInput>
   }
 
   export type CommunityBoardCandidateVoteCreateWithoutCommunityBoardCandidateInput = {
@@ -23613,14 +23002,14 @@ export namespace Prisma {
     userId: number
   }
 
-  export type CommunityBoardCandidateVoteCreateOrConnectWithoutcommunityBoardCandidateInput = {
+  export type CommunityBoardCandidateVoteCreateOrConnectWithoutCommunityBoardCandidateInput = {
     where: CommunityBoardCandidateVoteWhereUniqueInput
-    create: XOR<CommunityBoardCandidateVoteUncheckedCreateWithoutCommunityBoardCandidateInput, CommunityBoardCandidateVoteCreateWithoutCommunityBoardCandidateInput>
+    create: XOR<CommunityBoardCandidateVoteCreateWithoutCommunityBoardCandidateInput, CommunityBoardCandidateVoteUncheckedCreateWithoutCommunityBoardCandidateInput>
   }
 
   export type UserUpsertWithoutCommunityBoardCandidatesInput = {
-    update: XOR<UserUncheckedUpdateWithoutCommunityBoardCandidatesInput, UserUpdateWithoutCommunityBoardCandidatesInput>
-    create: XOR<UserUncheckedCreateWithoutCommunityBoardCandidatesInput, UserCreateWithoutCommunityBoardCandidatesInput>
+    update: XOR<UserUpdateWithoutCommunityBoardCandidatesInput, UserUncheckedUpdateWithoutCommunityBoardCandidatesInput>
+    create: XOR<UserCreateWithoutCommunityBoardCandidatesInput, UserUncheckedCreateWithoutCommunityBoardCandidatesInput>
   }
 
   export type UserUpdateWithoutCommunityBoardCandidatesInput = {
@@ -23642,7 +23031,6 @@ export namespace Prisma {
     communitySubcomments?: CommunitySubcommentUpdateManyWithoutUserInput
     liveChats?: LiveChatUpdateManyWithoutUserInput
     noticeNotificationsSubscriptions?: NoticeNotificationsSubscriptionUpdateManyWithoutUserInput
-    pushes?: PushUpdateManyWithoutUserInput
     reportComments?: ReportCommentUpdateManyWithoutUserInput
     reportPosts?: ReportPostUpdateManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUpdateManyWithoutUserInput
@@ -23669,7 +23057,6 @@ export namespace Prisma {
     communitySubcomments?: CommunitySubcommentUncheckedUpdateManyWithoutUserInput
     liveChats?: LiveChatUncheckedUpdateManyWithoutUserInput
     noticeNotificationsSubscriptions?: NoticeNotificationsSubscriptionUncheckedUpdateManyWithoutUserInput
-    pushes?: PushUncheckedUpdateManyWithoutUserInput
     reportComments?: ReportCommentUncheckedUpdateManyWithoutUserInput
     reportPosts?: ReportPostUncheckedUpdateManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUncheckedUpdateManyWithoutUserInput
@@ -23678,18 +23065,18 @@ export namespace Prisma {
 
   export type CommunityBoardCandidateVoteUpsertWithWhereUniqueWithoutCommunityBoardCandidateInput = {
     where: CommunityBoardCandidateVoteWhereUniqueInput
-    update: XOR<CommunityBoardCandidateVoteUncheckedUpdateWithoutCommunityBoardCandidateInput, CommunityBoardCandidateVoteUpdateWithoutCommunityBoardCandidateInput>
-    create: XOR<CommunityBoardCandidateVoteUncheckedCreateWithoutCommunityBoardCandidateInput, CommunityBoardCandidateVoteCreateWithoutCommunityBoardCandidateInput>
+    update: XOR<CommunityBoardCandidateVoteUpdateWithoutCommunityBoardCandidateInput, CommunityBoardCandidateVoteUncheckedUpdateWithoutCommunityBoardCandidateInput>
+    create: XOR<CommunityBoardCandidateVoteCreateWithoutCommunityBoardCandidateInput, CommunityBoardCandidateVoteUncheckedCreateWithoutCommunityBoardCandidateInput>
   }
 
   export type CommunityBoardCandidateVoteUpdateWithWhereUniqueWithoutCommunityBoardCandidateInput = {
     where: CommunityBoardCandidateVoteWhereUniqueInput
-    data: XOR<CommunityBoardCandidateVoteUncheckedUpdateWithoutCommunityBoardCandidateInput, CommunityBoardCandidateVoteUpdateWithoutCommunityBoardCandidateInput>
+    data: XOR<CommunityBoardCandidateVoteUpdateWithoutCommunityBoardCandidateInput, CommunityBoardCandidateVoteUncheckedUpdateWithoutCommunityBoardCandidateInput>
   }
 
   export type CommunityBoardCandidateVoteUpdateManyWithWhereWithoutCommunityBoardCandidateInput = {
     where: CommunityBoardCandidateVoteScalarWhereInput
-    data: XOR<CommunityBoardCandidateVoteUncheckedUpdateManyWithoutCommunityBoardCandidateVotesInput, CommunityBoardCandidateVoteUpdateManyMutationInput>
+    data: XOR<CommunityBoardCandidateVoteUpdateManyMutationInput, CommunityBoardCandidateVoteUncheckedUpdateManyWithoutCommunityBoardCandidateVotesInput>
   }
 
   export type CommunityBoardCandidateVoteScalarWhereInput = {
@@ -23715,9 +23102,9 @@ export namespace Prisma {
     createdAt: Date | string
   }
 
-  export type CommunityBoardCandidateCreateOrConnectWithoutcommunityBoardCandidateVotesInput = {
+  export type CommunityBoardCandidateCreateOrConnectWithoutCommunityBoardCandidateVotesInput = {
     where: CommunityBoardCandidateWhereUniqueInput
-    create: XOR<CommunityBoardCandidateUncheckedCreateWithoutCommunityBoardCandidateVotesInput, CommunityBoardCandidateCreateWithoutCommunityBoardCandidateVotesInput>
+    create: XOR<CommunityBoardCandidateCreateWithoutCommunityBoardCandidateVotesInput, CommunityBoardCandidateUncheckedCreateWithoutCommunityBoardCandidateVotesInput>
   }
 
   export type UserCreateWithoutCommunityBoardCandidateVotesInput = {
@@ -23739,7 +23126,6 @@ export namespace Prisma {
     communitySubcomments?: CommunitySubcommentCreateNestedManyWithoutUserInput
     liveChats?: LiveChatCreateNestedManyWithoutUserInput
     noticeNotificationsSubscriptions?: NoticeNotificationsSubscriptionCreateNestedManyWithoutUserInput
-    pushes?: PushCreateNestedManyWithoutUserInput
     reportComments?: ReportCommentCreateNestedManyWithoutUserInput
     reportPosts?: ReportPostCreateNestedManyWithoutUserInput
     reportSubcomments?: ReportSubcommentCreateNestedManyWithoutUserInput
@@ -23766,21 +23152,20 @@ export namespace Prisma {
     communitySubcomments?: CommunitySubcommentUncheckedCreateNestedManyWithoutUserInput
     liveChats?: LiveChatUncheckedCreateNestedManyWithoutUserInput
     noticeNotificationsSubscriptions?: NoticeNotificationsSubscriptionUncheckedCreateNestedManyWithoutUserInput
-    pushes?: PushUncheckedCreateNestedManyWithoutUserInput
     reportComments?: ReportCommentUncheckedCreateNestedManyWithoutUserInput
     reportPosts?: ReportPostUncheckedCreateNestedManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUncheckedCreateNestedManyWithoutUserInput
     telegrams?: TelegramUncheckedCreateNestedManyWithoutUserInput
   }
 
-  export type UserCreateOrConnectWithoutcommunityBoardCandidateVotesInput = {
+  export type UserCreateOrConnectWithoutCommunityBoardCandidateVotesInput = {
     where: UserWhereUniqueInput
-    create: XOR<UserUncheckedCreateWithoutCommunityBoardCandidateVotesInput, UserCreateWithoutCommunityBoardCandidateVotesInput>
+    create: XOR<UserCreateWithoutCommunityBoardCandidateVotesInput, UserUncheckedCreateWithoutCommunityBoardCandidateVotesInput>
   }
 
   export type CommunityBoardCandidateUpsertWithoutCommunityBoardCandidateVotesInput = {
-    update: XOR<CommunityBoardCandidateUncheckedUpdateWithoutCommunityBoardCandidateVotesInput, CommunityBoardCandidateUpdateWithoutCommunityBoardCandidateVotesInput>
-    create: XOR<CommunityBoardCandidateUncheckedCreateWithoutCommunityBoardCandidateVotesInput, CommunityBoardCandidateCreateWithoutCommunityBoardCandidateVotesInput>
+    update: XOR<CommunityBoardCandidateUpdateWithoutCommunityBoardCandidateVotesInput, CommunityBoardCandidateUncheckedUpdateWithoutCommunityBoardCandidateVotesInput>
+    create: XOR<CommunityBoardCandidateCreateWithoutCommunityBoardCandidateVotesInput, CommunityBoardCandidateUncheckedCreateWithoutCommunityBoardCandidateVotesInput>
   }
 
   export type CommunityBoardCandidateUpdateWithoutCommunityBoardCandidateVotesInput = {
@@ -23799,8 +23184,8 @@ export namespace Prisma {
   }
 
   export type UserUpsertWithoutCommunityBoardCandidateVotesInput = {
-    update: XOR<UserUncheckedUpdateWithoutCommunityBoardCandidateVotesInput, UserUpdateWithoutCommunityBoardCandidateVotesInput>
-    create: XOR<UserUncheckedCreateWithoutCommunityBoardCandidateVotesInput, UserCreateWithoutCommunityBoardCandidateVotesInput>
+    update: XOR<UserUpdateWithoutCommunityBoardCandidateVotesInput, UserUncheckedUpdateWithoutCommunityBoardCandidateVotesInput>
+    create: XOR<UserCreateWithoutCommunityBoardCandidateVotesInput, UserUncheckedCreateWithoutCommunityBoardCandidateVotesInput>
   }
 
   export type UserUpdateWithoutCommunityBoardCandidateVotesInput = {
@@ -23822,7 +23207,6 @@ export namespace Prisma {
     communitySubcomments?: CommunitySubcommentUpdateManyWithoutUserInput
     liveChats?: LiveChatUpdateManyWithoutUserInput
     noticeNotificationsSubscriptions?: NoticeNotificationsSubscriptionUpdateManyWithoutUserInput
-    pushes?: PushUpdateManyWithoutUserInput
     reportComments?: ReportCommentUpdateManyWithoutUserInput
     reportPosts?: ReportPostUpdateManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUpdateManyWithoutUserInput
@@ -23849,7 +23233,6 @@ export namespace Prisma {
     communitySubcomments?: CommunitySubcommentUncheckedUpdateManyWithoutUserInput
     liveChats?: LiveChatUncheckedUpdateManyWithoutUserInput
     noticeNotificationsSubscriptions?: NoticeNotificationsSubscriptionUncheckedUpdateManyWithoutUserInput
-    pushes?: PushUncheckedUpdateManyWithoutUserInput
     reportComments?: ReportCommentUncheckedUpdateManyWithoutUserInput
     reportPosts?: ReportPostUncheckedUpdateManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUncheckedUpdateManyWithoutUserInput
@@ -23879,9 +23262,9 @@ export namespace Prisma {
     communityPosts?: CommunityPostUncheckedCreateNestedManyWithoutCommunityBoardInput
   }
 
-  export type CommunityBoardCreateOrConnectWithoutcommunityBoardPinsInput = {
+  export type CommunityBoardCreateOrConnectWithoutCommunityBoardPinsInput = {
     where: CommunityBoardWhereUniqueInput
-    create: XOR<CommunityBoardUncheckedCreateWithoutCommunityBoardPinsInput, CommunityBoardCreateWithoutCommunityBoardPinsInput>
+    create: XOR<CommunityBoardCreateWithoutCommunityBoardPinsInput, CommunityBoardUncheckedCreateWithoutCommunityBoardPinsInput>
   }
 
   export type UserCreateWithoutCommunityBoardPinsInput = {
@@ -23903,7 +23286,6 @@ export namespace Prisma {
     communitySubcomments?: CommunitySubcommentCreateNestedManyWithoutUserInput
     liveChats?: LiveChatCreateNestedManyWithoutUserInput
     noticeNotificationsSubscriptions?: NoticeNotificationsSubscriptionCreateNestedManyWithoutUserInput
-    pushes?: PushCreateNestedManyWithoutUserInput
     reportComments?: ReportCommentCreateNestedManyWithoutUserInput
     reportPosts?: ReportPostCreateNestedManyWithoutUserInput
     reportSubcomments?: ReportSubcommentCreateNestedManyWithoutUserInput
@@ -23930,21 +23312,20 @@ export namespace Prisma {
     communitySubcomments?: CommunitySubcommentUncheckedCreateNestedManyWithoutUserInput
     liveChats?: LiveChatUncheckedCreateNestedManyWithoutUserInput
     noticeNotificationsSubscriptions?: NoticeNotificationsSubscriptionUncheckedCreateNestedManyWithoutUserInput
-    pushes?: PushUncheckedCreateNestedManyWithoutUserInput
     reportComments?: ReportCommentUncheckedCreateNestedManyWithoutUserInput
     reportPosts?: ReportPostUncheckedCreateNestedManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUncheckedCreateNestedManyWithoutUserInput
     telegrams?: TelegramUncheckedCreateNestedManyWithoutUserInput
   }
 
-  export type UserCreateOrConnectWithoutcommunityBoardPinsInput = {
+  export type UserCreateOrConnectWithoutCommunityBoardPinsInput = {
     where: UserWhereUniqueInput
-    create: XOR<UserUncheckedCreateWithoutCommunityBoardPinsInput, UserCreateWithoutCommunityBoardPinsInput>
+    create: XOR<UserCreateWithoutCommunityBoardPinsInput, UserUncheckedCreateWithoutCommunityBoardPinsInput>
   }
 
   export type CommunityBoardUpsertWithoutCommunityBoardPinsInput = {
-    update: XOR<CommunityBoardUncheckedUpdateWithoutCommunityBoardPinsInput, CommunityBoardUpdateWithoutCommunityBoardPinsInput>
-    create: XOR<CommunityBoardUncheckedCreateWithoutCommunityBoardPinsInput, CommunityBoardCreateWithoutCommunityBoardPinsInput>
+    update: XOR<CommunityBoardUpdateWithoutCommunityBoardPinsInput, CommunityBoardUncheckedUpdateWithoutCommunityBoardPinsInput>
+    create: XOR<CommunityBoardCreateWithoutCommunityBoardPinsInput, CommunityBoardUncheckedCreateWithoutCommunityBoardPinsInput>
   }
 
   export type CommunityBoardUpdateWithoutCommunityBoardPinsInput = {
@@ -23971,8 +23352,8 @@ export namespace Prisma {
   }
 
   export type UserUpsertWithoutCommunityBoardPinsInput = {
-    update: XOR<UserUncheckedUpdateWithoutCommunityBoardPinsInput, UserUpdateWithoutCommunityBoardPinsInput>
-    create: XOR<UserUncheckedCreateWithoutCommunityBoardPinsInput, UserCreateWithoutCommunityBoardPinsInput>
+    update: XOR<UserUpdateWithoutCommunityBoardPinsInput, UserUncheckedUpdateWithoutCommunityBoardPinsInput>
+    create: XOR<UserCreateWithoutCommunityBoardPinsInput, UserUncheckedCreateWithoutCommunityBoardPinsInput>
   }
 
   export type UserUpdateWithoutCommunityBoardPinsInput = {
@@ -23994,7 +23375,6 @@ export namespace Prisma {
     communitySubcomments?: CommunitySubcommentUpdateManyWithoutUserInput
     liveChats?: LiveChatUpdateManyWithoutUserInput
     noticeNotificationsSubscriptions?: NoticeNotificationsSubscriptionUpdateManyWithoutUserInput
-    pushes?: PushUpdateManyWithoutUserInput
     reportComments?: ReportCommentUpdateManyWithoutUserInput
     reportPosts?: ReportPostUpdateManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUpdateManyWithoutUserInput
@@ -24021,7 +23401,6 @@ export namespace Prisma {
     communitySubcomments?: CommunitySubcommentUncheckedUpdateManyWithoutUserInput
     liveChats?: LiveChatUncheckedUpdateManyWithoutUserInput
     noticeNotificationsSubscriptions?: NoticeNotificationsSubscriptionUncheckedUpdateManyWithoutUserInput
-    pushes?: PushUncheckedUpdateManyWithoutUserInput
     reportComments?: ReportCommentUncheckedUpdateManyWithoutUserInput
     reportPosts?: ReportPostUncheckedUpdateManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUncheckedUpdateManyWithoutUserInput
@@ -24065,9 +23444,9 @@ export namespace Prisma {
     reportPosts?: ReportPostUncheckedCreateNestedManyWithoutCommunityPostInput
   }
 
-  export type CommunityPostCreateOrConnectWithoutcommunityCommentsInput = {
+  export type CommunityPostCreateOrConnectWithoutCommunityCommentsInput = {
     where: CommunityPostWhereUniqueInput
-    create: XOR<CommunityPostUncheckedCreateWithoutCommunityCommentsInput, CommunityPostCreateWithoutCommunityCommentsInput>
+    create: XOR<CommunityPostCreateWithoutCommunityCommentsInput, CommunityPostUncheckedCreateWithoutCommunityCommentsInput>
   }
 
   export type UserCreateWithoutCommunityCommentsInput = {
@@ -24089,7 +23468,6 @@ export namespace Prisma {
     communitySubcomments?: CommunitySubcommentCreateNestedManyWithoutUserInput
     liveChats?: LiveChatCreateNestedManyWithoutUserInput
     noticeNotificationsSubscriptions?: NoticeNotificationsSubscriptionCreateNestedManyWithoutUserInput
-    pushes?: PushCreateNestedManyWithoutUserInput
     reportComments?: ReportCommentCreateNestedManyWithoutUserInput
     reportPosts?: ReportPostCreateNestedManyWithoutUserInput
     reportSubcomments?: ReportSubcommentCreateNestedManyWithoutUserInput
@@ -24116,16 +23494,15 @@ export namespace Prisma {
     communitySubcomments?: CommunitySubcommentUncheckedCreateNestedManyWithoutUserInput
     liveChats?: LiveChatUncheckedCreateNestedManyWithoutUserInput
     noticeNotificationsSubscriptions?: NoticeNotificationsSubscriptionUncheckedCreateNestedManyWithoutUserInput
-    pushes?: PushUncheckedCreateNestedManyWithoutUserInput
     reportComments?: ReportCommentUncheckedCreateNestedManyWithoutUserInput
     reportPosts?: ReportPostUncheckedCreateNestedManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUncheckedCreateNestedManyWithoutUserInput
     telegrams?: TelegramUncheckedCreateNestedManyWithoutUserInput
   }
 
-  export type UserCreateOrConnectWithoutcommunityCommentsInput = {
+  export type UserCreateOrConnectWithoutCommunityCommentsInput = {
     where: UserWhereUniqueInput
-    create: XOR<UserUncheckedCreateWithoutCommunityCommentsInput, UserCreateWithoutCommunityCommentsInput>
+    create: XOR<UserCreateWithoutCommunityCommentsInput, UserUncheckedCreateWithoutCommunityCommentsInput>
   }
 
   export type CommunitySubcommentCreateWithoutCommunityCommentInput = {
@@ -24149,9 +23526,9 @@ export namespace Prisma {
     reportSubcomments?: ReportSubcommentUncheckedCreateNestedManyWithoutCommunitySubcommentInput
   }
 
-  export type CommunitySubcommentCreateOrConnectWithoutcommunityCommentInput = {
+  export type CommunitySubcommentCreateOrConnectWithoutCommunityCommentInput = {
     where: CommunitySubcommentWhereUniqueInput
-    create: XOR<CommunitySubcommentUncheckedCreateWithoutCommunityCommentInput, CommunitySubcommentCreateWithoutCommunityCommentInput>
+    create: XOR<CommunitySubcommentCreateWithoutCommunityCommentInput, CommunitySubcommentUncheckedCreateWithoutCommunityCommentInput>
   }
 
   export type ReportCommentCreateWithoutCommunityCommentInput = {
@@ -24169,14 +23546,14 @@ export namespace Prisma {
     reportedAt: Date | string
   }
 
-  export type ReportCommentCreateOrConnectWithoutcommunityCommentInput = {
+  export type ReportCommentCreateOrConnectWithoutCommunityCommentInput = {
     where: ReportCommentWhereUniqueInput
-    create: XOR<ReportCommentUncheckedCreateWithoutCommunityCommentInput, ReportCommentCreateWithoutCommunityCommentInput>
+    create: XOR<ReportCommentCreateWithoutCommunityCommentInput, ReportCommentUncheckedCreateWithoutCommunityCommentInput>
   }
 
   export type CommunityPostUpsertWithoutCommunityCommentsInput = {
-    update: XOR<CommunityPostUncheckedUpdateWithoutCommunityCommentsInput, CommunityPostUpdateWithoutCommunityCommentsInput>
-    create: XOR<CommunityPostUncheckedCreateWithoutCommunityCommentsInput, CommunityPostCreateWithoutCommunityCommentsInput>
+    update: XOR<CommunityPostUpdateWithoutCommunityCommentsInput, CommunityPostUncheckedUpdateWithoutCommunityCommentsInput>
+    create: XOR<CommunityPostCreateWithoutCommunityCommentsInput, CommunityPostUncheckedCreateWithoutCommunityCommentsInput>
   }
 
   export type CommunityPostUpdateWithoutCommunityCommentsInput = {
@@ -24217,8 +23594,8 @@ export namespace Prisma {
   }
 
   export type UserUpsertWithoutCommunityCommentsInput = {
-    update: XOR<UserUncheckedUpdateWithoutCommunityCommentsInput, UserUpdateWithoutCommunityCommentsInput>
-    create: XOR<UserUncheckedCreateWithoutCommunityCommentsInput, UserCreateWithoutCommunityCommentsInput>
+    update: XOR<UserUpdateWithoutCommunityCommentsInput, UserUncheckedUpdateWithoutCommunityCommentsInput>
+    create: XOR<UserCreateWithoutCommunityCommentsInput, UserUncheckedCreateWithoutCommunityCommentsInput>
   }
 
   export type UserUpdateWithoutCommunityCommentsInput = {
@@ -24240,7 +23617,6 @@ export namespace Prisma {
     communitySubcomments?: CommunitySubcommentUpdateManyWithoutUserInput
     liveChats?: LiveChatUpdateManyWithoutUserInput
     noticeNotificationsSubscriptions?: NoticeNotificationsSubscriptionUpdateManyWithoutUserInput
-    pushes?: PushUpdateManyWithoutUserInput
     reportComments?: ReportCommentUpdateManyWithoutUserInput
     reportPosts?: ReportPostUpdateManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUpdateManyWithoutUserInput
@@ -24267,7 +23643,6 @@ export namespace Prisma {
     communitySubcomments?: CommunitySubcommentUncheckedUpdateManyWithoutUserInput
     liveChats?: LiveChatUncheckedUpdateManyWithoutUserInput
     noticeNotificationsSubscriptions?: NoticeNotificationsSubscriptionUncheckedUpdateManyWithoutUserInput
-    pushes?: PushUncheckedUpdateManyWithoutUserInput
     reportComments?: ReportCommentUncheckedUpdateManyWithoutUserInput
     reportPosts?: ReportPostUncheckedUpdateManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUncheckedUpdateManyWithoutUserInput
@@ -24276,18 +23651,18 @@ export namespace Prisma {
 
   export type CommunitySubcommentUpsertWithWhereUniqueWithoutCommunityCommentInput = {
     where: CommunitySubcommentWhereUniqueInput
-    update: XOR<CommunitySubcommentUncheckedUpdateWithoutCommunityCommentInput, CommunitySubcommentUpdateWithoutCommunityCommentInput>
-    create: XOR<CommunitySubcommentUncheckedCreateWithoutCommunityCommentInput, CommunitySubcommentCreateWithoutCommunityCommentInput>
+    update: XOR<CommunitySubcommentUpdateWithoutCommunityCommentInput, CommunitySubcommentUncheckedUpdateWithoutCommunityCommentInput>
+    create: XOR<CommunitySubcommentCreateWithoutCommunityCommentInput, CommunitySubcommentUncheckedCreateWithoutCommunityCommentInput>
   }
 
   export type CommunitySubcommentUpdateWithWhereUniqueWithoutCommunityCommentInput = {
     where: CommunitySubcommentWhereUniqueInput
-    data: XOR<CommunitySubcommentUncheckedUpdateWithoutCommunityCommentInput, CommunitySubcommentUpdateWithoutCommunityCommentInput>
+    data: XOR<CommunitySubcommentUpdateWithoutCommunityCommentInput, CommunitySubcommentUncheckedUpdateWithoutCommunityCommentInput>
   }
 
   export type CommunitySubcommentUpdateManyWithWhereWithoutCommunityCommentInput = {
     where: CommunitySubcommentScalarWhereInput
-    data: XOR<CommunitySubcommentUncheckedUpdateManyWithoutCommunitySubcommentsInput, CommunitySubcommentUpdateManyMutationInput>
+    data: XOR<CommunitySubcommentUpdateManyMutationInput, CommunitySubcommentUncheckedUpdateManyWithoutCommunitySubcommentsInput>
   }
 
   export type CommunitySubcommentScalarWhereInput = {
@@ -24306,18 +23681,18 @@ export namespace Prisma {
 
   export type ReportCommentUpsertWithWhereUniqueWithoutCommunityCommentInput = {
     where: ReportCommentWhereUniqueInput
-    update: XOR<ReportCommentUncheckedUpdateWithoutCommunityCommentInput, ReportCommentUpdateWithoutCommunityCommentInput>
-    create: XOR<ReportCommentUncheckedCreateWithoutCommunityCommentInput, ReportCommentCreateWithoutCommunityCommentInput>
+    update: XOR<ReportCommentUpdateWithoutCommunityCommentInput, ReportCommentUncheckedUpdateWithoutCommunityCommentInput>
+    create: XOR<ReportCommentCreateWithoutCommunityCommentInput, ReportCommentUncheckedCreateWithoutCommunityCommentInput>
   }
 
   export type ReportCommentUpdateWithWhereUniqueWithoutCommunityCommentInput = {
     where: ReportCommentWhereUniqueInput
-    data: XOR<ReportCommentUncheckedUpdateWithoutCommunityCommentInput, ReportCommentUpdateWithoutCommunityCommentInput>
+    data: XOR<ReportCommentUpdateWithoutCommunityCommentInput, ReportCommentUncheckedUpdateWithoutCommunityCommentInput>
   }
 
   export type ReportCommentUpdateManyWithWhereWithoutCommunityCommentInput = {
     where: ReportCommentScalarWhereInput
-    data: XOR<ReportCommentUncheckedUpdateManyWithoutReportCommentsInput, ReportCommentUpdateManyMutationInput>
+    data: XOR<ReportCommentUpdateManyMutationInput, ReportCommentUncheckedUpdateManyWithoutReportCommentsInput>
   }
 
   export type ReportCommentScalarWhereInput = {
@@ -24355,9 +23730,9 @@ export namespace Prisma {
     communityBoardPins?: CommunityBoardPinUncheckedCreateNestedManyWithoutCommunityBoardInput
   }
 
-  export type CommunityBoardCreateOrConnectWithoutcommunityPostsInput = {
+  export type CommunityBoardCreateOrConnectWithoutCommunityPostsInput = {
     where: CommunityBoardWhereUniqueInput
-    create: XOR<CommunityBoardUncheckedCreateWithoutCommunityPostsInput, CommunityBoardCreateWithoutCommunityPostsInput>
+    create: XOR<CommunityBoardCreateWithoutCommunityPostsInput, CommunityBoardUncheckedCreateWithoutCommunityPostsInput>
   }
 
   export type UserCreateWithoutCommunityPostsInput = {
@@ -24379,7 +23754,6 @@ export namespace Prisma {
     communitySubcomments?: CommunitySubcommentCreateNestedManyWithoutUserInput
     liveChats?: LiveChatCreateNestedManyWithoutUserInput
     noticeNotificationsSubscriptions?: NoticeNotificationsSubscriptionCreateNestedManyWithoutUserInput
-    pushes?: PushCreateNestedManyWithoutUserInput
     reportComments?: ReportCommentCreateNestedManyWithoutUserInput
     reportPosts?: ReportPostCreateNestedManyWithoutUserInput
     reportSubcomments?: ReportSubcommentCreateNestedManyWithoutUserInput
@@ -24406,16 +23780,15 @@ export namespace Prisma {
     communitySubcomments?: CommunitySubcommentUncheckedCreateNestedManyWithoutUserInput
     liveChats?: LiveChatUncheckedCreateNestedManyWithoutUserInput
     noticeNotificationsSubscriptions?: NoticeNotificationsSubscriptionUncheckedCreateNestedManyWithoutUserInput
-    pushes?: PushUncheckedCreateNestedManyWithoutUserInput
     reportComments?: ReportCommentUncheckedCreateNestedManyWithoutUserInput
     reportPosts?: ReportPostUncheckedCreateNestedManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUncheckedCreateNestedManyWithoutUserInput
     telegrams?: TelegramUncheckedCreateNestedManyWithoutUserInput
   }
 
-  export type UserCreateOrConnectWithoutcommunityPostsInput = {
+  export type UserCreateOrConnectWithoutCommunityPostsInput = {
     where: UserWhereUniqueInput
-    create: XOR<UserUncheckedCreateWithoutCommunityPostsInput, UserCreateWithoutCommunityPostsInput>
+    create: XOR<UserCreateWithoutCommunityPostsInput, UserUncheckedCreateWithoutCommunityPostsInput>
   }
 
   export type CommunityCommentCreateWithoutCommunityPostInput = {
@@ -24439,9 +23812,9 @@ export namespace Prisma {
     reportComments?: ReportCommentUncheckedCreateNestedManyWithoutCommunityCommentInput
   }
 
-  export type CommunityCommentCreateOrConnectWithoutcommunityPostInput = {
+  export type CommunityCommentCreateOrConnectWithoutCommunityPostInput = {
     where: CommunityCommentWhereUniqueInput
-    create: XOR<CommunityCommentUncheckedCreateWithoutCommunityPostInput, CommunityCommentCreateWithoutCommunityPostInput>
+    create: XOR<CommunityCommentCreateWithoutCommunityPostInput, CommunityCommentUncheckedCreateWithoutCommunityPostInput>
   }
 
   export type CommunityPostBookmarkCreateWithoutCommunityPostInput = {
@@ -24452,9 +23825,9 @@ export namespace Prisma {
     userId: number
   }
 
-  export type CommunityPostBookmarkCreateOrConnectWithoutcommunityPostInput = {
+  export type CommunityPostBookmarkCreateOrConnectWithoutCommunityPostInput = {
     where: CommunityPostBookmarkWhereUniqueInput
-    create: XOR<CommunityPostBookmarkUncheckedCreateWithoutCommunityPostInput, CommunityPostBookmarkCreateWithoutCommunityPostInput>
+    create: XOR<CommunityPostBookmarkCreateWithoutCommunityPostInput, CommunityPostBookmarkUncheckedCreateWithoutCommunityPostInput>
   }
 
   export type CommunityPostLikeCreateWithoutCommunityPostInput = {
@@ -24465,9 +23838,9 @@ export namespace Prisma {
     userId: number
   }
 
-  export type CommunityPostLikeCreateOrConnectWithoutcommunityPostInput = {
+  export type CommunityPostLikeCreateOrConnectWithoutCommunityPostInput = {
     where: CommunityPostLikeWhereUniqueInput
-    create: XOR<CommunityPostLikeUncheckedCreateWithoutCommunityPostInput, CommunityPostLikeCreateWithoutCommunityPostInput>
+    create: XOR<CommunityPostLikeCreateWithoutCommunityPostInput, CommunityPostLikeUncheckedCreateWithoutCommunityPostInput>
   }
 
   export type CommunitySubcommentCreateWithoutCommunityPostInput = {
@@ -24491,9 +23864,9 @@ export namespace Prisma {
     reportSubcomments?: ReportSubcommentUncheckedCreateNestedManyWithoutCommunitySubcommentInput
   }
 
-  export type CommunitySubcommentCreateOrConnectWithoutcommunityPostInput = {
+  export type CommunitySubcommentCreateOrConnectWithoutCommunityPostInput = {
     where: CommunitySubcommentWhereUniqueInput
-    create: XOR<CommunitySubcommentUncheckedCreateWithoutCommunityPostInput, CommunitySubcommentCreateWithoutCommunityPostInput>
+    create: XOR<CommunitySubcommentCreateWithoutCommunityPostInput, CommunitySubcommentUncheckedCreateWithoutCommunityPostInput>
   }
 
   export type ReportPostCreateWithoutCommunityPostInput = {
@@ -24511,14 +23884,14 @@ export namespace Prisma {
     reportedAt: Date | string
   }
 
-  export type ReportPostCreateOrConnectWithoutcommunityPostInput = {
+  export type ReportPostCreateOrConnectWithoutCommunityPostInput = {
     where: ReportPostWhereUniqueInput
-    create: XOR<ReportPostUncheckedCreateWithoutCommunityPostInput, ReportPostCreateWithoutCommunityPostInput>
+    create: XOR<ReportPostCreateWithoutCommunityPostInput, ReportPostUncheckedCreateWithoutCommunityPostInput>
   }
 
   export type CommunityBoardUpsertWithoutCommunityPostsInput = {
-    update: XOR<CommunityBoardUncheckedUpdateWithoutCommunityPostsInput, CommunityBoardUpdateWithoutCommunityPostsInput>
-    create: XOR<CommunityBoardUncheckedCreateWithoutCommunityPostsInput, CommunityBoardCreateWithoutCommunityPostsInput>
+    update: XOR<CommunityBoardUpdateWithoutCommunityPostsInput, CommunityBoardUncheckedUpdateWithoutCommunityPostsInput>
+    create: XOR<CommunityBoardCreateWithoutCommunityPostsInput, CommunityBoardUncheckedCreateWithoutCommunityPostsInput>
   }
 
   export type CommunityBoardUpdateWithoutCommunityPostsInput = {
@@ -24545,8 +23918,8 @@ export namespace Prisma {
   }
 
   export type UserUpsertWithoutCommunityPostsInput = {
-    update: XOR<UserUncheckedUpdateWithoutCommunityPostsInput, UserUpdateWithoutCommunityPostsInput>
-    create: XOR<UserUncheckedCreateWithoutCommunityPostsInput, UserCreateWithoutCommunityPostsInput>
+    update: XOR<UserUpdateWithoutCommunityPostsInput, UserUncheckedUpdateWithoutCommunityPostsInput>
+    create: XOR<UserCreateWithoutCommunityPostsInput, UserUncheckedCreateWithoutCommunityPostsInput>
   }
 
   export type UserUpdateWithoutCommunityPostsInput = {
@@ -24568,7 +23941,6 @@ export namespace Prisma {
     communitySubcomments?: CommunitySubcommentUpdateManyWithoutUserInput
     liveChats?: LiveChatUpdateManyWithoutUserInput
     noticeNotificationsSubscriptions?: NoticeNotificationsSubscriptionUpdateManyWithoutUserInput
-    pushes?: PushUpdateManyWithoutUserInput
     reportComments?: ReportCommentUpdateManyWithoutUserInput
     reportPosts?: ReportPostUpdateManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUpdateManyWithoutUserInput
@@ -24595,7 +23967,6 @@ export namespace Prisma {
     communitySubcomments?: CommunitySubcommentUncheckedUpdateManyWithoutUserInput
     liveChats?: LiveChatUncheckedUpdateManyWithoutUserInput
     noticeNotificationsSubscriptions?: NoticeNotificationsSubscriptionUncheckedUpdateManyWithoutUserInput
-    pushes?: PushUncheckedUpdateManyWithoutUserInput
     reportComments?: ReportCommentUncheckedUpdateManyWithoutUserInput
     reportPosts?: ReportPostUncheckedUpdateManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUncheckedUpdateManyWithoutUserInput
@@ -24604,18 +23975,18 @@ export namespace Prisma {
 
   export type CommunityCommentUpsertWithWhereUniqueWithoutCommunityPostInput = {
     where: CommunityCommentWhereUniqueInput
-    update: XOR<CommunityCommentUncheckedUpdateWithoutCommunityPostInput, CommunityCommentUpdateWithoutCommunityPostInput>
-    create: XOR<CommunityCommentUncheckedCreateWithoutCommunityPostInput, CommunityCommentCreateWithoutCommunityPostInput>
+    update: XOR<CommunityCommentUpdateWithoutCommunityPostInput, CommunityCommentUncheckedUpdateWithoutCommunityPostInput>
+    create: XOR<CommunityCommentCreateWithoutCommunityPostInput, CommunityCommentUncheckedCreateWithoutCommunityPostInput>
   }
 
   export type CommunityCommentUpdateWithWhereUniqueWithoutCommunityPostInput = {
     where: CommunityCommentWhereUniqueInput
-    data: XOR<CommunityCommentUncheckedUpdateWithoutCommunityPostInput, CommunityCommentUpdateWithoutCommunityPostInput>
+    data: XOR<CommunityCommentUpdateWithoutCommunityPostInput, CommunityCommentUncheckedUpdateWithoutCommunityPostInput>
   }
 
   export type CommunityCommentUpdateManyWithWhereWithoutCommunityPostInput = {
     where: CommunityCommentScalarWhereInput
-    data: XOR<CommunityCommentUncheckedUpdateManyWithoutCommunityCommentsInput, CommunityCommentUpdateManyMutationInput>
+    data: XOR<CommunityCommentUpdateManyMutationInput, CommunityCommentUncheckedUpdateManyWithoutCommunityCommentsInput>
   }
 
   export type CommunityCommentScalarWhereInput = {
@@ -24633,18 +24004,18 @@ export namespace Prisma {
 
   export type CommunityPostBookmarkUpsertWithWhereUniqueWithoutCommunityPostInput = {
     where: CommunityPostBookmarkWhereUniqueInput
-    update: XOR<CommunityPostBookmarkUncheckedUpdateWithoutCommunityPostInput, CommunityPostBookmarkUpdateWithoutCommunityPostInput>
-    create: XOR<CommunityPostBookmarkUncheckedCreateWithoutCommunityPostInput, CommunityPostBookmarkCreateWithoutCommunityPostInput>
+    update: XOR<CommunityPostBookmarkUpdateWithoutCommunityPostInput, CommunityPostBookmarkUncheckedUpdateWithoutCommunityPostInput>
+    create: XOR<CommunityPostBookmarkCreateWithoutCommunityPostInput, CommunityPostBookmarkUncheckedCreateWithoutCommunityPostInput>
   }
 
   export type CommunityPostBookmarkUpdateWithWhereUniqueWithoutCommunityPostInput = {
     where: CommunityPostBookmarkWhereUniqueInput
-    data: XOR<CommunityPostBookmarkUncheckedUpdateWithoutCommunityPostInput, CommunityPostBookmarkUpdateWithoutCommunityPostInput>
+    data: XOR<CommunityPostBookmarkUpdateWithoutCommunityPostInput, CommunityPostBookmarkUncheckedUpdateWithoutCommunityPostInput>
   }
 
   export type CommunityPostBookmarkUpdateManyWithWhereWithoutCommunityPostInput = {
     where: CommunityPostBookmarkScalarWhereInput
-    data: XOR<CommunityPostBookmarkUncheckedUpdateManyWithoutCommunityPostBookmarksInput, CommunityPostBookmarkUpdateManyMutationInput>
+    data: XOR<CommunityPostBookmarkUpdateManyMutationInput, CommunityPostBookmarkUncheckedUpdateManyWithoutCommunityPostBookmarksInput>
   }
 
   export type CommunityPostBookmarkScalarWhereInput = {
@@ -24657,18 +24028,18 @@ export namespace Prisma {
 
   export type CommunityPostLikeUpsertWithWhereUniqueWithoutCommunityPostInput = {
     where: CommunityPostLikeWhereUniqueInput
-    update: XOR<CommunityPostLikeUncheckedUpdateWithoutCommunityPostInput, CommunityPostLikeUpdateWithoutCommunityPostInput>
-    create: XOR<CommunityPostLikeUncheckedCreateWithoutCommunityPostInput, CommunityPostLikeCreateWithoutCommunityPostInput>
+    update: XOR<CommunityPostLikeUpdateWithoutCommunityPostInput, CommunityPostLikeUncheckedUpdateWithoutCommunityPostInput>
+    create: XOR<CommunityPostLikeCreateWithoutCommunityPostInput, CommunityPostLikeUncheckedCreateWithoutCommunityPostInput>
   }
 
   export type CommunityPostLikeUpdateWithWhereUniqueWithoutCommunityPostInput = {
     where: CommunityPostLikeWhereUniqueInput
-    data: XOR<CommunityPostLikeUncheckedUpdateWithoutCommunityPostInput, CommunityPostLikeUpdateWithoutCommunityPostInput>
+    data: XOR<CommunityPostLikeUpdateWithoutCommunityPostInput, CommunityPostLikeUncheckedUpdateWithoutCommunityPostInput>
   }
 
   export type CommunityPostLikeUpdateManyWithWhereWithoutCommunityPostInput = {
     where: CommunityPostLikeScalarWhereInput
-    data: XOR<CommunityPostLikeUncheckedUpdateManyWithoutCommunityPostLikesInput, CommunityPostLikeUpdateManyMutationInput>
+    data: XOR<CommunityPostLikeUpdateManyMutationInput, CommunityPostLikeUncheckedUpdateManyWithoutCommunityPostLikesInput>
   }
 
   export type CommunityPostLikeScalarWhereInput = {
@@ -24681,34 +24052,34 @@ export namespace Prisma {
 
   export type CommunitySubcommentUpsertWithWhereUniqueWithoutCommunityPostInput = {
     where: CommunitySubcommentWhereUniqueInput
-    update: XOR<CommunitySubcommentUncheckedUpdateWithoutCommunityPostInput, CommunitySubcommentUpdateWithoutCommunityPostInput>
-    create: XOR<CommunitySubcommentUncheckedCreateWithoutCommunityPostInput, CommunitySubcommentCreateWithoutCommunityPostInput>
+    update: XOR<CommunitySubcommentUpdateWithoutCommunityPostInput, CommunitySubcommentUncheckedUpdateWithoutCommunityPostInput>
+    create: XOR<CommunitySubcommentCreateWithoutCommunityPostInput, CommunitySubcommentUncheckedCreateWithoutCommunityPostInput>
   }
 
   export type CommunitySubcommentUpdateWithWhereUniqueWithoutCommunityPostInput = {
     where: CommunitySubcommentWhereUniqueInput
-    data: XOR<CommunitySubcommentUncheckedUpdateWithoutCommunityPostInput, CommunitySubcommentUpdateWithoutCommunityPostInput>
+    data: XOR<CommunitySubcommentUpdateWithoutCommunityPostInput, CommunitySubcommentUncheckedUpdateWithoutCommunityPostInput>
   }
 
   export type CommunitySubcommentUpdateManyWithWhereWithoutCommunityPostInput = {
     where: CommunitySubcommentScalarWhereInput
-    data: XOR<CommunitySubcommentUncheckedUpdateManyWithoutCommunitySubcommentsInput, CommunitySubcommentUpdateManyMutationInput>
+    data: XOR<CommunitySubcommentUpdateManyMutationInput, CommunitySubcommentUncheckedUpdateManyWithoutCommunitySubcommentsInput>
   }
 
   export type ReportPostUpsertWithWhereUniqueWithoutCommunityPostInput = {
     where: ReportPostWhereUniqueInput
-    update: XOR<ReportPostUncheckedUpdateWithoutCommunityPostInput, ReportPostUpdateWithoutCommunityPostInput>
-    create: XOR<ReportPostUncheckedCreateWithoutCommunityPostInput, ReportPostCreateWithoutCommunityPostInput>
+    update: XOR<ReportPostUpdateWithoutCommunityPostInput, ReportPostUncheckedUpdateWithoutCommunityPostInput>
+    create: XOR<ReportPostCreateWithoutCommunityPostInput, ReportPostUncheckedCreateWithoutCommunityPostInput>
   }
 
   export type ReportPostUpdateWithWhereUniqueWithoutCommunityPostInput = {
     where: ReportPostWhereUniqueInput
-    data: XOR<ReportPostUncheckedUpdateWithoutCommunityPostInput, ReportPostUpdateWithoutCommunityPostInput>
+    data: XOR<ReportPostUpdateWithoutCommunityPostInput, ReportPostUncheckedUpdateWithoutCommunityPostInput>
   }
 
   export type ReportPostUpdateManyWithWhereWithoutCommunityPostInput = {
     where: ReportPostScalarWhereInput
-    data: XOR<ReportPostUncheckedUpdateManyWithoutReportPostsInput, ReportPostUpdateManyMutationInput>
+    data: XOR<ReportPostUpdateManyMutationInput, ReportPostUncheckedUpdateManyWithoutReportPostsInput>
   }
 
   export type ReportPostScalarWhereInput = {
@@ -24760,9 +24131,9 @@ export namespace Prisma {
     reportPosts?: ReportPostUncheckedCreateNestedManyWithoutCommunityPostInput
   }
 
-  export type CommunityPostCreateOrConnectWithoutcommunityPostBookmarksInput = {
+  export type CommunityPostCreateOrConnectWithoutCommunityPostBookmarksInput = {
     where: CommunityPostWhereUniqueInput
-    create: XOR<CommunityPostUncheckedCreateWithoutCommunityPostBookmarksInput, CommunityPostCreateWithoutCommunityPostBookmarksInput>
+    create: XOR<CommunityPostCreateWithoutCommunityPostBookmarksInput, CommunityPostUncheckedCreateWithoutCommunityPostBookmarksInput>
   }
 
   export type UserCreateWithoutCommunityPostBookmarksInput = {
@@ -24784,7 +24155,6 @@ export namespace Prisma {
     communitySubcomments?: CommunitySubcommentCreateNestedManyWithoutUserInput
     liveChats?: LiveChatCreateNestedManyWithoutUserInput
     noticeNotificationsSubscriptions?: NoticeNotificationsSubscriptionCreateNestedManyWithoutUserInput
-    pushes?: PushCreateNestedManyWithoutUserInput
     reportComments?: ReportCommentCreateNestedManyWithoutUserInput
     reportPosts?: ReportPostCreateNestedManyWithoutUserInput
     reportSubcomments?: ReportSubcommentCreateNestedManyWithoutUserInput
@@ -24811,21 +24181,20 @@ export namespace Prisma {
     communitySubcomments?: CommunitySubcommentUncheckedCreateNestedManyWithoutUserInput
     liveChats?: LiveChatUncheckedCreateNestedManyWithoutUserInput
     noticeNotificationsSubscriptions?: NoticeNotificationsSubscriptionUncheckedCreateNestedManyWithoutUserInput
-    pushes?: PushUncheckedCreateNestedManyWithoutUserInput
     reportComments?: ReportCommentUncheckedCreateNestedManyWithoutUserInput
     reportPosts?: ReportPostUncheckedCreateNestedManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUncheckedCreateNestedManyWithoutUserInput
     telegrams?: TelegramUncheckedCreateNestedManyWithoutUserInput
   }
 
-  export type UserCreateOrConnectWithoutcommunityPostBookmarksInput = {
+  export type UserCreateOrConnectWithoutCommunityPostBookmarksInput = {
     where: UserWhereUniqueInput
-    create: XOR<UserUncheckedCreateWithoutCommunityPostBookmarksInput, UserCreateWithoutCommunityPostBookmarksInput>
+    create: XOR<UserCreateWithoutCommunityPostBookmarksInput, UserUncheckedCreateWithoutCommunityPostBookmarksInput>
   }
 
   export type CommunityPostUpsertWithoutCommunityPostBookmarksInput = {
-    update: XOR<CommunityPostUncheckedUpdateWithoutCommunityPostBookmarksInput, CommunityPostUpdateWithoutCommunityPostBookmarksInput>
-    create: XOR<CommunityPostUncheckedCreateWithoutCommunityPostBookmarksInput, CommunityPostCreateWithoutCommunityPostBookmarksInput>
+    update: XOR<CommunityPostUpdateWithoutCommunityPostBookmarksInput, CommunityPostUncheckedUpdateWithoutCommunityPostBookmarksInput>
+    create: XOR<CommunityPostCreateWithoutCommunityPostBookmarksInput, CommunityPostUncheckedCreateWithoutCommunityPostBookmarksInput>
   }
 
   export type CommunityPostUpdateWithoutCommunityPostBookmarksInput = {
@@ -24866,8 +24235,8 @@ export namespace Prisma {
   }
 
   export type UserUpsertWithoutCommunityPostBookmarksInput = {
-    update: XOR<UserUncheckedUpdateWithoutCommunityPostBookmarksInput, UserUpdateWithoutCommunityPostBookmarksInput>
-    create: XOR<UserUncheckedCreateWithoutCommunityPostBookmarksInput, UserCreateWithoutCommunityPostBookmarksInput>
+    update: XOR<UserUpdateWithoutCommunityPostBookmarksInput, UserUncheckedUpdateWithoutCommunityPostBookmarksInput>
+    create: XOR<UserCreateWithoutCommunityPostBookmarksInput, UserUncheckedCreateWithoutCommunityPostBookmarksInput>
   }
 
   export type UserUpdateWithoutCommunityPostBookmarksInput = {
@@ -24889,7 +24258,6 @@ export namespace Prisma {
     communitySubcomments?: CommunitySubcommentUpdateManyWithoutUserInput
     liveChats?: LiveChatUpdateManyWithoutUserInput
     noticeNotificationsSubscriptions?: NoticeNotificationsSubscriptionUpdateManyWithoutUserInput
-    pushes?: PushUpdateManyWithoutUserInput
     reportComments?: ReportCommentUpdateManyWithoutUserInput
     reportPosts?: ReportPostUpdateManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUpdateManyWithoutUserInput
@@ -24916,7 +24284,6 @@ export namespace Prisma {
     communitySubcomments?: CommunitySubcommentUncheckedUpdateManyWithoutUserInput
     liveChats?: LiveChatUncheckedUpdateManyWithoutUserInput
     noticeNotificationsSubscriptions?: NoticeNotificationsSubscriptionUncheckedUpdateManyWithoutUserInput
-    pushes?: PushUncheckedUpdateManyWithoutUserInput
     reportComments?: ReportCommentUncheckedUpdateManyWithoutUserInput
     reportPosts?: ReportPostUncheckedUpdateManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUncheckedUpdateManyWithoutUserInput
@@ -24960,9 +24327,9 @@ export namespace Prisma {
     reportPosts?: ReportPostUncheckedCreateNestedManyWithoutCommunityPostInput
   }
 
-  export type CommunityPostCreateOrConnectWithoutcommunityPostLikesInput = {
+  export type CommunityPostCreateOrConnectWithoutCommunityPostLikesInput = {
     where: CommunityPostWhereUniqueInput
-    create: XOR<CommunityPostUncheckedCreateWithoutCommunityPostLikesInput, CommunityPostCreateWithoutCommunityPostLikesInput>
+    create: XOR<CommunityPostCreateWithoutCommunityPostLikesInput, CommunityPostUncheckedCreateWithoutCommunityPostLikesInput>
   }
 
   export type UserCreateWithoutCommunityPostLikesInput = {
@@ -24984,7 +24351,6 @@ export namespace Prisma {
     communitySubcomments?: CommunitySubcommentCreateNestedManyWithoutUserInput
     liveChats?: LiveChatCreateNestedManyWithoutUserInput
     noticeNotificationsSubscriptions?: NoticeNotificationsSubscriptionCreateNestedManyWithoutUserInput
-    pushes?: PushCreateNestedManyWithoutUserInput
     reportComments?: ReportCommentCreateNestedManyWithoutUserInput
     reportPosts?: ReportPostCreateNestedManyWithoutUserInput
     reportSubcomments?: ReportSubcommentCreateNestedManyWithoutUserInput
@@ -25011,21 +24377,20 @@ export namespace Prisma {
     communitySubcomments?: CommunitySubcommentUncheckedCreateNestedManyWithoutUserInput
     liveChats?: LiveChatUncheckedCreateNestedManyWithoutUserInput
     noticeNotificationsSubscriptions?: NoticeNotificationsSubscriptionUncheckedCreateNestedManyWithoutUserInput
-    pushes?: PushUncheckedCreateNestedManyWithoutUserInput
     reportComments?: ReportCommentUncheckedCreateNestedManyWithoutUserInput
     reportPosts?: ReportPostUncheckedCreateNestedManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUncheckedCreateNestedManyWithoutUserInput
     telegrams?: TelegramUncheckedCreateNestedManyWithoutUserInput
   }
 
-  export type UserCreateOrConnectWithoutcommunityPostLikesInput = {
+  export type UserCreateOrConnectWithoutCommunityPostLikesInput = {
     where: UserWhereUniqueInput
-    create: XOR<UserUncheckedCreateWithoutCommunityPostLikesInput, UserCreateWithoutCommunityPostLikesInput>
+    create: XOR<UserCreateWithoutCommunityPostLikesInput, UserUncheckedCreateWithoutCommunityPostLikesInput>
   }
 
   export type CommunityPostUpsertWithoutCommunityPostLikesInput = {
-    update: XOR<CommunityPostUncheckedUpdateWithoutCommunityPostLikesInput, CommunityPostUpdateWithoutCommunityPostLikesInput>
-    create: XOR<CommunityPostUncheckedCreateWithoutCommunityPostLikesInput, CommunityPostCreateWithoutCommunityPostLikesInput>
+    update: XOR<CommunityPostUpdateWithoutCommunityPostLikesInput, CommunityPostUncheckedUpdateWithoutCommunityPostLikesInput>
+    create: XOR<CommunityPostCreateWithoutCommunityPostLikesInput, CommunityPostUncheckedCreateWithoutCommunityPostLikesInput>
   }
 
   export type CommunityPostUpdateWithoutCommunityPostLikesInput = {
@@ -25066,8 +24431,8 @@ export namespace Prisma {
   }
 
   export type UserUpsertWithoutCommunityPostLikesInput = {
-    update: XOR<UserUncheckedUpdateWithoutCommunityPostLikesInput, UserUpdateWithoutCommunityPostLikesInput>
-    create: XOR<UserUncheckedCreateWithoutCommunityPostLikesInput, UserCreateWithoutCommunityPostLikesInput>
+    update: XOR<UserUpdateWithoutCommunityPostLikesInput, UserUncheckedUpdateWithoutCommunityPostLikesInput>
+    create: XOR<UserCreateWithoutCommunityPostLikesInput, UserUncheckedCreateWithoutCommunityPostLikesInput>
   }
 
   export type UserUpdateWithoutCommunityPostLikesInput = {
@@ -25089,7 +24454,6 @@ export namespace Prisma {
     communitySubcomments?: CommunitySubcommentUpdateManyWithoutUserInput
     liveChats?: LiveChatUpdateManyWithoutUserInput
     noticeNotificationsSubscriptions?: NoticeNotificationsSubscriptionUpdateManyWithoutUserInput
-    pushes?: PushUpdateManyWithoutUserInput
     reportComments?: ReportCommentUpdateManyWithoutUserInput
     reportPosts?: ReportPostUpdateManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUpdateManyWithoutUserInput
@@ -25116,7 +24480,6 @@ export namespace Prisma {
     communitySubcomments?: CommunitySubcommentUncheckedUpdateManyWithoutUserInput
     liveChats?: LiveChatUncheckedUpdateManyWithoutUserInput
     noticeNotificationsSubscriptions?: NoticeNotificationsSubscriptionUncheckedUpdateManyWithoutUserInput
-    pushes?: PushUncheckedUpdateManyWithoutUserInput
     reportComments?: ReportCommentUncheckedUpdateManyWithoutUserInput
     reportPosts?: ReportPostUncheckedUpdateManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUncheckedUpdateManyWithoutUserInput
@@ -25144,9 +24507,9 @@ export namespace Prisma {
     reportComments?: ReportCommentUncheckedCreateNestedManyWithoutCommunityCommentInput
   }
 
-  export type CommunityCommentCreateOrConnectWithoutcommunitySubcommentsInput = {
+  export type CommunityCommentCreateOrConnectWithoutCommunitySubcommentsInput = {
     where: CommunityCommentWhereUniqueInput
-    create: XOR<CommunityCommentUncheckedCreateWithoutCommunitySubcommentsInput, CommunityCommentCreateWithoutCommunitySubcommentsInput>
+    create: XOR<CommunityCommentCreateWithoutCommunitySubcommentsInput, CommunityCommentUncheckedCreateWithoutCommunitySubcommentsInput>
   }
 
   export type CommunityPostCreateWithoutCommunitySubcommentsInput = {
@@ -25186,9 +24549,9 @@ export namespace Prisma {
     reportPosts?: ReportPostUncheckedCreateNestedManyWithoutCommunityPostInput
   }
 
-  export type CommunityPostCreateOrConnectWithoutcommunitySubcommentsInput = {
+  export type CommunityPostCreateOrConnectWithoutCommunitySubcommentsInput = {
     where: CommunityPostWhereUniqueInput
-    create: XOR<CommunityPostUncheckedCreateWithoutCommunitySubcommentsInput, CommunityPostCreateWithoutCommunitySubcommentsInput>
+    create: XOR<CommunityPostCreateWithoutCommunitySubcommentsInput, CommunityPostUncheckedCreateWithoutCommunitySubcommentsInput>
   }
 
   export type UserCreateWithoutCommunitySubcommentsInput = {
@@ -25210,7 +24573,6 @@ export namespace Prisma {
     communityPostLikes?: CommunityPostLikeCreateNestedManyWithoutUserInput
     liveChats?: LiveChatCreateNestedManyWithoutUserInput
     noticeNotificationsSubscriptions?: NoticeNotificationsSubscriptionCreateNestedManyWithoutUserInput
-    pushes?: PushCreateNestedManyWithoutUserInput
     reportComments?: ReportCommentCreateNestedManyWithoutUserInput
     reportPosts?: ReportPostCreateNestedManyWithoutUserInput
     reportSubcomments?: ReportSubcommentCreateNestedManyWithoutUserInput
@@ -25237,16 +24599,15 @@ export namespace Prisma {
     communityPostLikes?: CommunityPostLikeUncheckedCreateNestedManyWithoutUserInput
     liveChats?: LiveChatUncheckedCreateNestedManyWithoutUserInput
     noticeNotificationsSubscriptions?: NoticeNotificationsSubscriptionUncheckedCreateNestedManyWithoutUserInput
-    pushes?: PushUncheckedCreateNestedManyWithoutUserInput
     reportComments?: ReportCommentUncheckedCreateNestedManyWithoutUserInput
     reportPosts?: ReportPostUncheckedCreateNestedManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUncheckedCreateNestedManyWithoutUserInput
     telegrams?: TelegramUncheckedCreateNestedManyWithoutUserInput
   }
 
-  export type UserCreateOrConnectWithoutcommunitySubcommentsInput = {
+  export type UserCreateOrConnectWithoutCommunitySubcommentsInput = {
     where: UserWhereUniqueInput
-    create: XOR<UserUncheckedCreateWithoutCommunitySubcommentsInput, UserCreateWithoutCommunitySubcommentsInput>
+    create: XOR<UserCreateWithoutCommunitySubcommentsInput, UserUncheckedCreateWithoutCommunitySubcommentsInput>
   }
 
   export type ReportSubcommentCreateWithoutCommunitySubcommentInput = {
@@ -25264,14 +24625,14 @@ export namespace Prisma {
     reportedAt: Date | string
   }
 
-  export type ReportSubcommentCreateOrConnectWithoutcommunitySubcommentInput = {
+  export type ReportSubcommentCreateOrConnectWithoutCommunitySubcommentInput = {
     where: ReportSubcommentWhereUniqueInput
-    create: XOR<ReportSubcommentUncheckedCreateWithoutCommunitySubcommentInput, ReportSubcommentCreateWithoutCommunitySubcommentInput>
+    create: XOR<ReportSubcommentCreateWithoutCommunitySubcommentInput, ReportSubcommentUncheckedCreateWithoutCommunitySubcommentInput>
   }
 
   export type CommunityCommentUpsertWithoutCommunitySubcommentsInput = {
-    update: XOR<CommunityCommentUncheckedUpdateWithoutCommunitySubcommentsInput, CommunityCommentUpdateWithoutCommunitySubcommentsInput>
-    create: XOR<CommunityCommentUncheckedCreateWithoutCommunitySubcommentsInput, CommunityCommentCreateWithoutCommunitySubcommentsInput>
+    update: XOR<CommunityCommentUpdateWithoutCommunitySubcommentsInput, CommunityCommentUncheckedUpdateWithoutCommunitySubcommentsInput>
+    create: XOR<CommunityCommentCreateWithoutCommunitySubcommentsInput, CommunityCommentUncheckedCreateWithoutCommunitySubcommentsInput>
   }
 
   export type CommunityCommentUpdateWithoutCommunitySubcommentsInput = {
@@ -25296,8 +24657,8 @@ export namespace Prisma {
   }
 
   export type CommunityPostUpsertWithoutCommunitySubcommentsInput = {
-    update: XOR<CommunityPostUncheckedUpdateWithoutCommunitySubcommentsInput, CommunityPostUpdateWithoutCommunitySubcommentsInput>
-    create: XOR<CommunityPostUncheckedCreateWithoutCommunitySubcommentsInput, CommunityPostCreateWithoutCommunitySubcommentsInput>
+    update: XOR<CommunityPostUpdateWithoutCommunitySubcommentsInput, CommunityPostUncheckedUpdateWithoutCommunitySubcommentsInput>
+    create: XOR<CommunityPostCreateWithoutCommunitySubcommentsInput, CommunityPostUncheckedCreateWithoutCommunitySubcommentsInput>
   }
 
   export type CommunityPostUpdateWithoutCommunitySubcommentsInput = {
@@ -25338,8 +24699,8 @@ export namespace Prisma {
   }
 
   export type UserUpsertWithoutCommunitySubcommentsInput = {
-    update: XOR<UserUncheckedUpdateWithoutCommunitySubcommentsInput, UserUpdateWithoutCommunitySubcommentsInput>
-    create: XOR<UserUncheckedCreateWithoutCommunitySubcommentsInput, UserCreateWithoutCommunitySubcommentsInput>
+    update: XOR<UserUpdateWithoutCommunitySubcommentsInput, UserUncheckedUpdateWithoutCommunitySubcommentsInput>
+    create: XOR<UserCreateWithoutCommunitySubcommentsInput, UserUncheckedCreateWithoutCommunitySubcommentsInput>
   }
 
   export type UserUpdateWithoutCommunitySubcommentsInput = {
@@ -25361,7 +24722,6 @@ export namespace Prisma {
     communityPostLikes?: CommunityPostLikeUpdateManyWithoutUserInput
     liveChats?: LiveChatUpdateManyWithoutUserInput
     noticeNotificationsSubscriptions?: NoticeNotificationsSubscriptionUpdateManyWithoutUserInput
-    pushes?: PushUpdateManyWithoutUserInput
     reportComments?: ReportCommentUpdateManyWithoutUserInput
     reportPosts?: ReportPostUpdateManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUpdateManyWithoutUserInput
@@ -25388,7 +24748,6 @@ export namespace Prisma {
     communityPostLikes?: CommunityPostLikeUncheckedUpdateManyWithoutUserInput
     liveChats?: LiveChatUncheckedUpdateManyWithoutUserInput
     noticeNotificationsSubscriptions?: NoticeNotificationsSubscriptionUncheckedUpdateManyWithoutUserInput
-    pushes?: PushUncheckedUpdateManyWithoutUserInput
     reportComments?: ReportCommentUncheckedUpdateManyWithoutUserInput
     reportPosts?: ReportPostUncheckedUpdateManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUncheckedUpdateManyWithoutUserInput
@@ -25397,18 +24756,18 @@ export namespace Prisma {
 
   export type ReportSubcommentUpsertWithWhereUniqueWithoutCommunitySubcommentInput = {
     where: ReportSubcommentWhereUniqueInput
-    update: XOR<ReportSubcommentUncheckedUpdateWithoutCommunitySubcommentInput, ReportSubcommentUpdateWithoutCommunitySubcommentInput>
-    create: XOR<ReportSubcommentUncheckedCreateWithoutCommunitySubcommentInput, ReportSubcommentCreateWithoutCommunitySubcommentInput>
+    update: XOR<ReportSubcommentUpdateWithoutCommunitySubcommentInput, ReportSubcommentUncheckedUpdateWithoutCommunitySubcommentInput>
+    create: XOR<ReportSubcommentCreateWithoutCommunitySubcommentInput, ReportSubcommentUncheckedCreateWithoutCommunitySubcommentInput>
   }
 
   export type ReportSubcommentUpdateWithWhereUniqueWithoutCommunitySubcommentInput = {
     where: ReportSubcommentWhereUniqueInput
-    data: XOR<ReportSubcommentUncheckedUpdateWithoutCommunitySubcommentInput, ReportSubcommentUpdateWithoutCommunitySubcommentInput>
+    data: XOR<ReportSubcommentUpdateWithoutCommunitySubcommentInput, ReportSubcommentUncheckedUpdateWithoutCommunitySubcommentInput>
   }
 
   export type ReportSubcommentUpdateManyWithWhereWithoutCommunitySubcommentInput = {
     where: ReportSubcommentScalarWhereInput
-    data: XOR<ReportSubcommentUncheckedUpdateManyWithoutReportSubcommentsInput, ReportSubcommentUpdateManyMutationInput>
+    data: XOR<ReportSubcommentUpdateManyMutationInput, ReportSubcommentUncheckedUpdateManyWithoutReportSubcommentsInput>
   }
 
   export type ReportSubcommentScalarWhereInput = {
@@ -25431,25 +24790,25 @@ export namespace Prisma {
     lectureId: string
   }
 
-  export type CoverageMajorLectureCreateOrConnectWithoutcoverageMajorInput = {
+  export type CoverageMajorLectureCreateOrConnectWithoutCoverageMajorInput = {
     where: CoverageMajorLectureWhereUniqueInput
-    create: XOR<CoverageMajorLectureUncheckedCreateWithoutCoverageMajorInput, CoverageMajorLectureCreateWithoutCoverageMajorInput>
+    create: XOR<CoverageMajorLectureCreateWithoutCoverageMajorInput, CoverageMajorLectureUncheckedCreateWithoutCoverageMajorInput>
   }
 
   export type CoverageMajorLectureUpsertWithWhereUniqueWithoutCoverageMajorInput = {
     where: CoverageMajorLectureWhereUniqueInput
-    update: XOR<CoverageMajorLectureUncheckedUpdateWithoutCoverageMajorInput, CoverageMajorLectureUpdateWithoutCoverageMajorInput>
-    create: XOR<CoverageMajorLectureUncheckedCreateWithoutCoverageMajorInput, CoverageMajorLectureCreateWithoutCoverageMajorInput>
+    update: XOR<CoverageMajorLectureUpdateWithoutCoverageMajorInput, CoverageMajorLectureUncheckedUpdateWithoutCoverageMajorInput>
+    create: XOR<CoverageMajorLectureCreateWithoutCoverageMajorInput, CoverageMajorLectureUncheckedCreateWithoutCoverageMajorInput>
   }
 
   export type CoverageMajorLectureUpdateWithWhereUniqueWithoutCoverageMajorInput = {
     where: CoverageMajorLectureWhereUniqueInput
-    data: XOR<CoverageMajorLectureUncheckedUpdateWithoutCoverageMajorInput, CoverageMajorLectureUpdateWithoutCoverageMajorInput>
+    data: XOR<CoverageMajorLectureUpdateWithoutCoverageMajorInput, CoverageMajorLectureUncheckedUpdateWithoutCoverageMajorInput>
   }
 
   export type CoverageMajorLectureUpdateManyWithWhereWithoutCoverageMajorInput = {
     where: CoverageMajorLectureScalarWhereInput
-    data: XOR<CoverageMajorLectureUncheckedUpdateManyWithoutCoverageMajorLecturesInput, CoverageMajorLectureUpdateManyMutationInput>
+    data: XOR<CoverageMajorLectureUpdateManyMutationInput, CoverageMajorLectureUncheckedUpdateManyWithoutCoverageMajorLecturesInput>
   }
 
   export type CoverageMajorLectureScalarWhereInput = {
@@ -25502,9 +24861,9 @@ export namespace Prisma {
     periods?: PeriodUncheckedCreateNestedManyWithoutLectureInput
   }
 
-  export type LectureCreateOrConnectWithoutcoverageMajorLecturesInput = {
+  export type LectureCreateOrConnectWithoutCoverageMajorLecturesInput = {
     where: LectureWhereUniqueInput
-    create: XOR<LectureUncheckedCreateWithoutCoverageMajorLecturesInput, LectureCreateWithoutCoverageMajorLecturesInput>
+    create: XOR<LectureCreateWithoutCoverageMajorLecturesInput, LectureUncheckedCreateWithoutCoverageMajorLecturesInput>
   }
 
   export type CoverageMajorCreateWithoutCoverageMajorLecturesInput = {
@@ -25519,14 +24878,14 @@ export namespace Prisma {
     code: string
   }
 
-  export type CoverageMajorCreateOrConnectWithoutcoverageMajorLecturesInput = {
+  export type CoverageMajorCreateOrConnectWithoutCoverageMajorLecturesInput = {
     where: CoverageMajorWhereUniqueInput
-    create: XOR<CoverageMajorUncheckedCreateWithoutCoverageMajorLecturesInput, CoverageMajorCreateWithoutCoverageMajorLecturesInput>
+    create: XOR<CoverageMajorCreateWithoutCoverageMajorLecturesInput, CoverageMajorUncheckedCreateWithoutCoverageMajorLecturesInput>
   }
 
   export type LectureUpsertWithoutCoverageMajorLecturesInput = {
-    update: XOR<LectureUncheckedUpdateWithoutCoverageMajorLecturesInput, LectureUpdateWithoutCoverageMajorLecturesInput>
-    create: XOR<LectureUncheckedCreateWithoutCoverageMajorLecturesInput, LectureCreateWithoutCoverageMajorLecturesInput>
+    update: XOR<LectureUpdateWithoutCoverageMajorLecturesInput, LectureUncheckedUpdateWithoutCoverageMajorLecturesInput>
+    create: XOR<LectureCreateWithoutCoverageMajorLecturesInput, LectureUncheckedCreateWithoutCoverageMajorLecturesInput>
   }
 
   export type LectureUpdateWithoutCoverageMajorLecturesInput = {
@@ -25572,8 +24931,8 @@ export namespace Prisma {
   }
 
   export type CoverageMajorUpsertWithoutCoverageMajorLecturesInput = {
-    update: XOR<CoverageMajorUncheckedUpdateWithoutCoverageMajorLecturesInput, CoverageMajorUpdateWithoutCoverageMajorLecturesInput>
-    create: XOR<CoverageMajorUncheckedCreateWithoutCoverageMajorLecturesInput, CoverageMajorCreateWithoutCoverageMajorLecturesInput>
+    update: XOR<CoverageMajorUpdateWithoutCoverageMajorLecturesInput, CoverageMajorUncheckedUpdateWithoutCoverageMajorLecturesInput>
+    create: XOR<CoverageMajorCreateWithoutCoverageMajorLecturesInput, CoverageMajorUncheckedCreateWithoutCoverageMajorLecturesInput>
   }
 
   export type CoverageMajorUpdateWithoutCoverageMajorLecturesInput = {
@@ -25596,9 +24955,9 @@ export namespace Prisma {
     majorCode: string
   }
 
-  export type CoverageMajorLectureCreateOrConnectWithoutlectureInput = {
+  export type CoverageMajorLectureCreateOrConnectWithoutLectureInput = {
     where: CoverageMajorLectureWhereUniqueInput
-    create: XOR<CoverageMajorLectureUncheckedCreateWithoutLectureInput, CoverageMajorLectureCreateWithoutLectureInput>
+    create: XOR<CoverageMajorLectureCreateWithoutLectureInput, CoverageMajorLectureUncheckedCreateWithoutLectureInput>
   }
 
   export type PeriodCreateWithoutLectureInput = {
@@ -25617,41 +24976,41 @@ export namespace Prisma {
     endM: number
   }
 
-  export type PeriodCreateOrConnectWithoutlectureInput = {
+  export type PeriodCreateOrConnectWithoutLectureInput = {
     where: PeriodWhereUniqueInput
-    create: XOR<PeriodUncheckedCreateWithoutLectureInput, PeriodCreateWithoutLectureInput>
+    create: XOR<PeriodCreateWithoutLectureInput, PeriodUncheckedCreateWithoutLectureInput>
   }
 
   export type CoverageMajorLectureUpsertWithWhereUniqueWithoutLectureInput = {
     where: CoverageMajorLectureWhereUniqueInput
-    update: XOR<CoverageMajorLectureUncheckedUpdateWithoutLectureInput, CoverageMajorLectureUpdateWithoutLectureInput>
-    create: XOR<CoverageMajorLectureUncheckedCreateWithoutLectureInput, CoverageMajorLectureCreateWithoutLectureInput>
+    update: XOR<CoverageMajorLectureUpdateWithoutLectureInput, CoverageMajorLectureUncheckedUpdateWithoutLectureInput>
+    create: XOR<CoverageMajorLectureCreateWithoutLectureInput, CoverageMajorLectureUncheckedCreateWithoutLectureInput>
   }
 
   export type CoverageMajorLectureUpdateWithWhereUniqueWithoutLectureInput = {
     where: CoverageMajorLectureWhereUniqueInput
-    data: XOR<CoverageMajorLectureUncheckedUpdateWithoutLectureInput, CoverageMajorLectureUpdateWithoutLectureInput>
+    data: XOR<CoverageMajorLectureUpdateWithoutLectureInput, CoverageMajorLectureUncheckedUpdateWithoutLectureInput>
   }
 
   export type CoverageMajorLectureUpdateManyWithWhereWithoutLectureInput = {
     where: CoverageMajorLectureScalarWhereInput
-    data: XOR<CoverageMajorLectureUncheckedUpdateManyWithoutCoverageMajorLecturesInput, CoverageMajorLectureUpdateManyMutationInput>
+    data: XOR<CoverageMajorLectureUpdateManyMutationInput, CoverageMajorLectureUncheckedUpdateManyWithoutCoverageMajorLecturesInput>
   }
 
   export type PeriodUpsertWithWhereUniqueWithoutLectureInput = {
     where: PeriodWhereUniqueInput
-    update: XOR<PeriodUncheckedUpdateWithoutLectureInput, PeriodUpdateWithoutLectureInput>
-    create: XOR<PeriodUncheckedCreateWithoutLectureInput, PeriodCreateWithoutLectureInput>
+    update: XOR<PeriodUpdateWithoutLectureInput, PeriodUncheckedUpdateWithoutLectureInput>
+    create: XOR<PeriodCreateWithoutLectureInput, PeriodUncheckedCreateWithoutLectureInput>
   }
 
   export type PeriodUpdateWithWhereUniqueWithoutLectureInput = {
     where: PeriodWhereUniqueInput
-    data: XOR<PeriodUncheckedUpdateWithoutLectureInput, PeriodUpdateWithoutLectureInput>
+    data: XOR<PeriodUpdateWithoutLectureInput, PeriodUncheckedUpdateWithoutLectureInput>
   }
 
   export type PeriodUpdateManyWithWhereWithoutLectureInput = {
     where: PeriodScalarWhereInput
-    data: XOR<PeriodUncheckedUpdateManyWithoutPeriodsInput, PeriodUpdateManyMutationInput>
+    data: XOR<PeriodUpdateManyMutationInput, PeriodUncheckedUpdateManyWithoutPeriodsInput>
   }
 
   export type PeriodScalarWhereInput = {
@@ -25685,7 +25044,6 @@ export namespace Prisma {
     communityPostLikes?: CommunityPostLikeCreateNestedManyWithoutUserInput
     communitySubcomments?: CommunitySubcommentCreateNestedManyWithoutUserInput
     noticeNotificationsSubscriptions?: NoticeNotificationsSubscriptionCreateNestedManyWithoutUserInput
-    pushes?: PushCreateNestedManyWithoutUserInput
     reportComments?: ReportCommentCreateNestedManyWithoutUserInput
     reportPosts?: ReportPostCreateNestedManyWithoutUserInput
     reportSubcomments?: ReportSubcommentCreateNestedManyWithoutUserInput
@@ -25712,21 +25070,20 @@ export namespace Prisma {
     communityPostLikes?: CommunityPostLikeUncheckedCreateNestedManyWithoutUserInput
     communitySubcomments?: CommunitySubcommentUncheckedCreateNestedManyWithoutUserInput
     noticeNotificationsSubscriptions?: NoticeNotificationsSubscriptionUncheckedCreateNestedManyWithoutUserInput
-    pushes?: PushUncheckedCreateNestedManyWithoutUserInput
     reportComments?: ReportCommentUncheckedCreateNestedManyWithoutUserInput
     reportPosts?: ReportPostUncheckedCreateNestedManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUncheckedCreateNestedManyWithoutUserInput
     telegrams?: TelegramUncheckedCreateNestedManyWithoutUserInput
   }
 
-  export type UserCreateOrConnectWithoutliveChatsInput = {
+  export type UserCreateOrConnectWithoutLiveChatsInput = {
     where: UserWhereUniqueInput
-    create: XOR<UserUncheckedCreateWithoutLiveChatsInput, UserCreateWithoutLiveChatsInput>
+    create: XOR<UserCreateWithoutLiveChatsInput, UserUncheckedCreateWithoutLiveChatsInput>
   }
 
   export type UserUpsertWithoutLiveChatsInput = {
-    update: XOR<UserUncheckedUpdateWithoutLiveChatsInput, UserUpdateWithoutLiveChatsInput>
-    create: XOR<UserUncheckedCreateWithoutLiveChatsInput, UserCreateWithoutLiveChatsInput>
+    update: XOR<UserUpdateWithoutLiveChatsInput, UserUncheckedUpdateWithoutLiveChatsInput>
+    create: XOR<UserCreateWithoutLiveChatsInput, UserUncheckedCreateWithoutLiveChatsInput>
   }
 
   export type UserUpdateWithoutLiveChatsInput = {
@@ -25748,7 +25105,6 @@ export namespace Prisma {
     communityPostLikes?: CommunityPostLikeUpdateManyWithoutUserInput
     communitySubcomments?: CommunitySubcommentUpdateManyWithoutUserInput
     noticeNotificationsSubscriptions?: NoticeNotificationsSubscriptionUpdateManyWithoutUserInput
-    pushes?: PushUpdateManyWithoutUserInput
     reportComments?: ReportCommentUpdateManyWithoutUserInput
     reportPosts?: ReportPostUpdateManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUpdateManyWithoutUserInput
@@ -25775,7 +25131,6 @@ export namespace Prisma {
     communityPostLikes?: CommunityPostLikeUncheckedUpdateManyWithoutUserInput
     communitySubcomments?: CommunitySubcommentUncheckedUpdateManyWithoutUserInput
     noticeNotificationsSubscriptions?: NoticeNotificationsSubscriptionUncheckedUpdateManyWithoutUserInput
-    pushes?: PushUncheckedUpdateManyWithoutUserInput
     reportComments?: ReportCommentUncheckedUpdateManyWithoutUserInput
     reportPosts?: ReportPostUncheckedUpdateManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUncheckedUpdateManyWithoutUserInput
@@ -25801,7 +25156,6 @@ export namespace Prisma {
     communityPostLikes?: CommunityPostLikeCreateNestedManyWithoutUserInput
     communitySubcomments?: CommunitySubcommentCreateNestedManyWithoutUserInput
     liveChats?: LiveChatCreateNestedManyWithoutUserInput
-    pushes?: PushCreateNestedManyWithoutUserInput
     reportComments?: ReportCommentCreateNestedManyWithoutUserInput
     reportPosts?: ReportPostCreateNestedManyWithoutUserInput
     reportSubcomments?: ReportSubcommentCreateNestedManyWithoutUserInput
@@ -25828,21 +25182,20 @@ export namespace Prisma {
     communityPostLikes?: CommunityPostLikeUncheckedCreateNestedManyWithoutUserInput
     communitySubcomments?: CommunitySubcommentUncheckedCreateNestedManyWithoutUserInput
     liveChats?: LiveChatUncheckedCreateNestedManyWithoutUserInput
-    pushes?: PushUncheckedCreateNestedManyWithoutUserInput
     reportComments?: ReportCommentUncheckedCreateNestedManyWithoutUserInput
     reportPosts?: ReportPostUncheckedCreateNestedManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUncheckedCreateNestedManyWithoutUserInput
     telegrams?: TelegramUncheckedCreateNestedManyWithoutUserInput
   }
 
-  export type UserCreateOrConnectWithoutnoticeNotificationsSubscriptionsInput = {
+  export type UserCreateOrConnectWithoutNoticeNotificationsSubscriptionsInput = {
     where: UserWhereUniqueInput
-    create: XOR<UserUncheckedCreateWithoutNoticeNotificationsSubscriptionsInput, UserCreateWithoutNoticeNotificationsSubscriptionsInput>
+    create: XOR<UserCreateWithoutNoticeNotificationsSubscriptionsInput, UserUncheckedCreateWithoutNoticeNotificationsSubscriptionsInput>
   }
 
   export type UserUpsertWithoutNoticeNotificationsSubscriptionsInput = {
-    update: XOR<UserUncheckedUpdateWithoutNoticeNotificationsSubscriptionsInput, UserUpdateWithoutNoticeNotificationsSubscriptionsInput>
-    create: XOR<UserUncheckedCreateWithoutNoticeNotificationsSubscriptionsInput, UserCreateWithoutNoticeNotificationsSubscriptionsInput>
+    update: XOR<UserUpdateWithoutNoticeNotificationsSubscriptionsInput, UserUncheckedUpdateWithoutNoticeNotificationsSubscriptionsInput>
+    create: XOR<UserCreateWithoutNoticeNotificationsSubscriptionsInput, UserUncheckedCreateWithoutNoticeNotificationsSubscriptionsInput>
   }
 
   export type UserUpdateWithoutNoticeNotificationsSubscriptionsInput = {
@@ -25864,7 +25217,6 @@ export namespace Prisma {
     communityPostLikes?: CommunityPostLikeUpdateManyWithoutUserInput
     communitySubcomments?: CommunitySubcommentUpdateManyWithoutUserInput
     liveChats?: LiveChatUpdateManyWithoutUserInput
-    pushes?: PushUpdateManyWithoutUserInput
     reportComments?: ReportCommentUpdateManyWithoutUserInput
     reportPosts?: ReportPostUpdateManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUpdateManyWithoutUserInput
@@ -25891,7 +25243,6 @@ export namespace Prisma {
     communityPostLikes?: CommunityPostLikeUncheckedUpdateManyWithoutUserInput
     communitySubcomments?: CommunitySubcommentUncheckedUpdateManyWithoutUserInput
     liveChats?: LiveChatUncheckedUpdateManyWithoutUserInput
-    pushes?: PushUncheckedUpdateManyWithoutUserInput
     reportComments?: ReportCommentUncheckedUpdateManyWithoutUserInput
     reportPosts?: ReportPostUncheckedUpdateManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUncheckedUpdateManyWithoutUserInput
@@ -25940,14 +25291,14 @@ export namespace Prisma {
     coverageMajorLectures?: CoverageMajorLectureUncheckedCreateNestedManyWithoutLectureInput
   }
 
-  export type LectureCreateOrConnectWithoutperiodsInput = {
+  export type LectureCreateOrConnectWithoutPeriodsInput = {
     where: LectureWhereUniqueInput
-    create: XOR<LectureUncheckedCreateWithoutPeriodsInput, LectureCreateWithoutPeriodsInput>
+    create: XOR<LectureCreateWithoutPeriodsInput, LectureUncheckedCreateWithoutPeriodsInput>
   }
 
   export type LectureUpsertWithoutPeriodsInput = {
-    update: XOR<LectureUncheckedUpdateWithoutPeriodsInput, LectureUpdateWithoutPeriodsInput>
-    create: XOR<LectureUncheckedCreateWithoutPeriodsInput, LectureCreateWithoutPeriodsInput>
+    update: XOR<LectureUpdateWithoutPeriodsInput, LectureUncheckedUpdateWithoutPeriodsInput>
+    create: XOR<LectureCreateWithoutPeriodsInput, LectureUncheckedCreateWithoutPeriodsInput>
   }
 
   export type LectureUpdateWithoutPeriodsInput = {
@@ -25992,122 +25343,6 @@ export namespace Prisma {
     coverageMajorLectures?: CoverageMajorLectureUncheckedUpdateManyWithoutLectureInput
   }
 
-  export type UserCreateWithoutPushesInput = {
-    portalId: string
-    password: string
-    nickname: string
-    randomNickname: string
-    joinedAt: Date | string
-    refreshToken?: string | null
-    admin?: AdminCreateNestedOneWithoutUserInput
-    changePassword?: ChangePasswordCreateNestedOneWithoutUserInput
-    communityBoards?: CommunityBoardCreateNestedManyWithoutUserInput
-    communityBoardCandidates?: CommunityBoardCandidateCreateNestedManyWithoutUserInput
-    communityBoardCandidateVotes?: CommunityBoardCandidateVoteCreateNestedManyWithoutUserInput
-    communityBoardPins?: CommunityBoardPinCreateNestedManyWithoutUserInput
-    communityComments?: CommunityCommentCreateNestedManyWithoutUserInput
-    communityPosts?: CommunityPostCreateNestedManyWithoutUserInput
-    communityPostBookmarks?: CommunityPostBookmarkCreateNestedManyWithoutUserInput
-    communityPostLikes?: CommunityPostLikeCreateNestedManyWithoutUserInput
-    communitySubcomments?: CommunitySubcommentCreateNestedManyWithoutUserInput
-    liveChats?: LiveChatCreateNestedManyWithoutUserInput
-    noticeNotificationsSubscriptions?: NoticeNotificationsSubscriptionCreateNestedManyWithoutUserInput
-    reportComments?: ReportCommentCreateNestedManyWithoutUserInput
-    reportPosts?: ReportPostCreateNestedManyWithoutUserInput
-    reportSubcomments?: ReportSubcommentCreateNestedManyWithoutUserInput
-    telegrams?: TelegramCreateNestedManyWithoutUserInput
-  }
-
-  export type UserUncheckedCreateWithoutPushesInput = {
-    id?: number
-    portalId: string
-    password: string
-    nickname: string
-    randomNickname: string
-    joinedAt: Date | string
-    refreshToken?: string | null
-    admin?: AdminUncheckedCreateNestedOneWithoutUserInput
-    changePassword?: ChangePasswordUncheckedCreateNestedOneWithoutUserInput
-    communityBoards?: CommunityBoardUncheckedCreateNestedManyWithoutUserInput
-    communityBoardCandidates?: CommunityBoardCandidateUncheckedCreateNestedManyWithoutUserInput
-    communityBoardCandidateVotes?: CommunityBoardCandidateVoteUncheckedCreateNestedManyWithoutUserInput
-    communityBoardPins?: CommunityBoardPinUncheckedCreateNestedManyWithoutUserInput
-    communityComments?: CommunityCommentUncheckedCreateNestedManyWithoutUserInput
-    communityPosts?: CommunityPostUncheckedCreateNestedManyWithoutUserInput
-    communityPostBookmarks?: CommunityPostBookmarkUncheckedCreateNestedManyWithoutUserInput
-    communityPostLikes?: CommunityPostLikeUncheckedCreateNestedManyWithoutUserInput
-    communitySubcomments?: CommunitySubcommentUncheckedCreateNestedManyWithoutUserInput
-    liveChats?: LiveChatUncheckedCreateNestedManyWithoutUserInput
-    noticeNotificationsSubscriptions?: NoticeNotificationsSubscriptionUncheckedCreateNestedManyWithoutUserInput
-    reportComments?: ReportCommentUncheckedCreateNestedManyWithoutUserInput
-    reportPosts?: ReportPostUncheckedCreateNestedManyWithoutUserInput
-    reportSubcomments?: ReportSubcommentUncheckedCreateNestedManyWithoutUserInput
-    telegrams?: TelegramUncheckedCreateNestedManyWithoutUserInput
-  }
-
-  export type UserCreateOrConnectWithoutpushesInput = {
-    where: UserWhereUniqueInput
-    create: XOR<UserUncheckedCreateWithoutPushesInput, UserCreateWithoutPushesInput>
-  }
-
-  export type UserUpsertWithoutPushesInput = {
-    update: XOR<UserUncheckedUpdateWithoutPushesInput, UserUpdateWithoutPushesInput>
-    create: XOR<UserUncheckedCreateWithoutPushesInput, UserCreateWithoutPushesInput>
-  }
-
-  export type UserUpdateWithoutPushesInput = {
-    portalId?: StringFieldUpdateOperationsInput | string
-    password?: StringFieldUpdateOperationsInput | string
-    nickname?: StringFieldUpdateOperationsInput | string
-    randomNickname?: StringFieldUpdateOperationsInput | string
-    joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    refreshToken?: NullableStringFieldUpdateOperationsInput | string | null
-    admin?: AdminUpdateOneWithoutUserInput
-    changePassword?: ChangePasswordUpdateOneWithoutUserInput
-    communityBoards?: CommunityBoardUpdateManyWithoutUserInput
-    communityBoardCandidates?: CommunityBoardCandidateUpdateManyWithoutUserInput
-    communityBoardCandidateVotes?: CommunityBoardCandidateVoteUpdateManyWithoutUserInput
-    communityBoardPins?: CommunityBoardPinUpdateManyWithoutUserInput
-    communityComments?: CommunityCommentUpdateManyWithoutUserInput
-    communityPosts?: CommunityPostUpdateManyWithoutUserInput
-    communityPostBookmarks?: CommunityPostBookmarkUpdateManyWithoutUserInput
-    communityPostLikes?: CommunityPostLikeUpdateManyWithoutUserInput
-    communitySubcomments?: CommunitySubcommentUpdateManyWithoutUserInput
-    liveChats?: LiveChatUpdateManyWithoutUserInput
-    noticeNotificationsSubscriptions?: NoticeNotificationsSubscriptionUpdateManyWithoutUserInput
-    reportComments?: ReportCommentUpdateManyWithoutUserInput
-    reportPosts?: ReportPostUpdateManyWithoutUserInput
-    reportSubcomments?: ReportSubcommentUpdateManyWithoutUserInput
-    telegrams?: TelegramUpdateManyWithoutUserInput
-  }
-
-  export type UserUncheckedUpdateWithoutPushesInput = {
-    id?: IntFieldUpdateOperationsInput | number
-    portalId?: StringFieldUpdateOperationsInput | string
-    password?: StringFieldUpdateOperationsInput | string
-    nickname?: StringFieldUpdateOperationsInput | string
-    randomNickname?: StringFieldUpdateOperationsInput | string
-    joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    refreshToken?: NullableStringFieldUpdateOperationsInput | string | null
-    admin?: AdminUncheckedUpdateOneWithoutUserInput
-    changePassword?: ChangePasswordUncheckedUpdateOneWithoutUserInput
-    communityBoards?: CommunityBoardUncheckedUpdateManyWithoutUserInput
-    communityBoardCandidates?: CommunityBoardCandidateUncheckedUpdateManyWithoutUserInput
-    communityBoardCandidateVotes?: CommunityBoardCandidateVoteUncheckedUpdateManyWithoutUserInput
-    communityBoardPins?: CommunityBoardPinUncheckedUpdateManyWithoutUserInput
-    communityComments?: CommunityCommentUncheckedUpdateManyWithoutUserInput
-    communityPosts?: CommunityPostUncheckedUpdateManyWithoutUserInput
-    communityPostBookmarks?: CommunityPostBookmarkUncheckedUpdateManyWithoutUserInput
-    communityPostLikes?: CommunityPostLikeUncheckedUpdateManyWithoutUserInput
-    communitySubcomments?: CommunitySubcommentUncheckedUpdateManyWithoutUserInput
-    liveChats?: LiveChatUncheckedUpdateManyWithoutUserInput
-    noticeNotificationsSubscriptions?: NoticeNotificationsSubscriptionUncheckedUpdateManyWithoutUserInput
-    reportComments?: ReportCommentUncheckedUpdateManyWithoutUserInput
-    reportPosts?: ReportPostUncheckedUpdateManyWithoutUserInput
-    reportSubcomments?: ReportSubcommentUncheckedUpdateManyWithoutUserInput
-    telegrams?: TelegramUncheckedUpdateManyWithoutUserInput
-  }
-
   export type AdminCreateWithoutUserInput = {
 
   }
@@ -26116,9 +25351,9 @@ export namespace Prisma {
 
   }
 
-  export type AdminCreateOrConnectWithoutuserInput = {
+  export type AdminCreateOrConnectWithoutUserInput = {
     where: AdminWhereUniqueInput
-    create: XOR<AdminUncheckedCreateWithoutUserInput, AdminCreateWithoutUserInput>
+    create: XOR<AdminCreateWithoutUserInput, AdminUncheckedCreateWithoutUserInput>
   }
 
   export type ChangePasswordCreateWithoutUserInput = {
@@ -26131,9 +25366,9 @@ export namespace Prisma {
     requestedAt: Date | string
   }
 
-  export type ChangePasswordCreateOrConnectWithoutuserInput = {
+  export type ChangePasswordCreateOrConnectWithoutUserInput = {
     where: ChangePasswordWhereUniqueInput
-    create: XOR<ChangePasswordUncheckedCreateWithoutUserInput, ChangePasswordCreateWithoutUserInput>
+    create: XOR<ChangePasswordCreateWithoutUserInput, ChangePasswordUncheckedCreateWithoutUserInput>
   }
 
   export type CommunityBoardCreateWithoutUserInput = {
@@ -26159,9 +25394,9 @@ export namespace Prisma {
     communityPosts?: CommunityPostUncheckedCreateNestedManyWithoutCommunityBoardInput
   }
 
-  export type CommunityBoardCreateOrConnectWithoutuserInput = {
+  export type CommunityBoardCreateOrConnectWithoutUserInput = {
     where: CommunityBoardWhereUniqueInput
-    create: XOR<CommunityBoardUncheckedCreateWithoutUserInput, CommunityBoardCreateWithoutUserInput>
+    create: XOR<CommunityBoardCreateWithoutUserInput, CommunityBoardUncheckedCreateWithoutUserInput>
   }
 
   export type CommunityBoardCandidateCreateWithoutUserInput = {
@@ -26179,9 +25414,9 @@ export namespace Prisma {
     communityBoardCandidateVotes?: CommunityBoardCandidateVoteUncheckedCreateNestedManyWithoutCommunityBoardCandidateInput
   }
 
-  export type CommunityBoardCandidateCreateOrConnectWithoutuserInput = {
+  export type CommunityBoardCandidateCreateOrConnectWithoutUserInput = {
     where: CommunityBoardCandidateWhereUniqueInput
-    create: XOR<CommunityBoardCandidateUncheckedCreateWithoutUserInput, CommunityBoardCandidateCreateWithoutUserInput>
+    create: XOR<CommunityBoardCandidateCreateWithoutUserInput, CommunityBoardCandidateUncheckedCreateWithoutUserInput>
   }
 
   export type CommunityBoardCandidateVoteCreateWithoutUserInput = {
@@ -26192,9 +25427,9 @@ export namespace Prisma {
     boardCandidateId: number
   }
 
-  export type CommunityBoardCandidateVoteCreateOrConnectWithoutuserInput = {
+  export type CommunityBoardCandidateVoteCreateOrConnectWithoutUserInput = {
     where: CommunityBoardCandidateVoteWhereUniqueInput
-    create: XOR<CommunityBoardCandidateVoteUncheckedCreateWithoutUserInput, CommunityBoardCandidateVoteCreateWithoutUserInput>
+    create: XOR<CommunityBoardCandidateVoteCreateWithoutUserInput, CommunityBoardCandidateVoteUncheckedCreateWithoutUserInput>
   }
 
   export type CommunityBoardPinCreateWithoutUserInput = {
@@ -26205,9 +25440,9 @@ export namespace Prisma {
     boardId: number
   }
 
-  export type CommunityBoardPinCreateOrConnectWithoutuserInput = {
+  export type CommunityBoardPinCreateOrConnectWithoutUserInput = {
     where: CommunityBoardPinWhereUniqueInput
-    create: XOR<CommunityBoardPinUncheckedCreateWithoutUserInput, CommunityBoardPinCreateWithoutUserInput>
+    create: XOR<CommunityBoardPinCreateWithoutUserInput, CommunityBoardPinUncheckedCreateWithoutUserInput>
   }
 
   export type CommunityCommentCreateWithoutUserInput = {
@@ -26231,9 +25466,9 @@ export namespace Prisma {
     reportComments?: ReportCommentUncheckedCreateNestedManyWithoutCommunityCommentInput
   }
 
-  export type CommunityCommentCreateOrConnectWithoutuserInput = {
+  export type CommunityCommentCreateOrConnectWithoutUserInput = {
     where: CommunityCommentWhereUniqueInput
-    create: XOR<CommunityCommentUncheckedCreateWithoutUserInput, CommunityCommentCreateWithoutUserInput>
+    create: XOR<CommunityCommentCreateWithoutUserInput, CommunityCommentUncheckedCreateWithoutUserInput>
   }
 
   export type CommunityPostCreateWithoutUserInput = {
@@ -26273,9 +25508,9 @@ export namespace Prisma {
     reportPosts?: ReportPostUncheckedCreateNestedManyWithoutCommunityPostInput
   }
 
-  export type CommunityPostCreateOrConnectWithoutuserInput = {
+  export type CommunityPostCreateOrConnectWithoutUserInput = {
     where: CommunityPostWhereUniqueInput
-    create: XOR<CommunityPostUncheckedCreateWithoutUserInput, CommunityPostCreateWithoutUserInput>
+    create: XOR<CommunityPostCreateWithoutUserInput, CommunityPostUncheckedCreateWithoutUserInput>
   }
 
   export type CommunityPostBookmarkCreateWithoutUserInput = {
@@ -26286,9 +25521,9 @@ export namespace Prisma {
     postId: number
   }
 
-  export type CommunityPostBookmarkCreateOrConnectWithoutuserInput = {
+  export type CommunityPostBookmarkCreateOrConnectWithoutUserInput = {
     where: CommunityPostBookmarkWhereUniqueInput
-    create: XOR<CommunityPostBookmarkUncheckedCreateWithoutUserInput, CommunityPostBookmarkCreateWithoutUserInput>
+    create: XOR<CommunityPostBookmarkCreateWithoutUserInput, CommunityPostBookmarkUncheckedCreateWithoutUserInput>
   }
 
   export type CommunityPostLikeCreateWithoutUserInput = {
@@ -26299,9 +25534,9 @@ export namespace Prisma {
     postId: number
   }
 
-  export type CommunityPostLikeCreateOrConnectWithoutuserInput = {
+  export type CommunityPostLikeCreateOrConnectWithoutUserInput = {
     where: CommunityPostLikeWhereUniqueInput
-    create: XOR<CommunityPostLikeUncheckedCreateWithoutUserInput, CommunityPostLikeCreateWithoutUserInput>
+    create: XOR<CommunityPostLikeCreateWithoutUserInput, CommunityPostLikeUncheckedCreateWithoutUserInput>
   }
 
   export type CommunitySubcommentCreateWithoutUserInput = {
@@ -26325,9 +25560,9 @@ export namespace Prisma {
     reportSubcomments?: ReportSubcommentUncheckedCreateNestedManyWithoutCommunitySubcommentInput
   }
 
-  export type CommunitySubcommentCreateOrConnectWithoutuserInput = {
+  export type CommunitySubcommentCreateOrConnectWithoutUserInput = {
     where: CommunitySubcommentWhereUniqueInput
-    create: XOR<CommunitySubcommentUncheckedCreateWithoutUserInput, CommunitySubcommentCreateWithoutUserInput>
+    create: XOR<CommunitySubcommentCreateWithoutUserInput, CommunitySubcommentUncheckedCreateWithoutUserInput>
   }
 
   export type LiveChatCreateWithoutUserInput = {
@@ -26344,9 +25579,9 @@ export namespace Prisma {
     randomNickname: string
   }
 
-  export type LiveChatCreateOrConnectWithoutuserInput = {
+  export type LiveChatCreateOrConnectWithoutUserInput = {
     where: LiveChatWhereUniqueInput
-    create: XOR<LiveChatUncheckedCreateWithoutUserInput, LiveChatCreateWithoutUserInput>
+    create: XOR<LiveChatCreateWithoutUserInput, LiveChatUncheckedCreateWithoutUserInput>
   }
 
   export type NoticeNotificationsSubscriptionCreateWithoutUserInput = {
@@ -26360,26 +25595,9 @@ export namespace Prisma {
     subscribedAt: Date | string
   }
 
-  export type NoticeNotificationsSubscriptionCreateOrConnectWithoutuserInput = {
+  export type NoticeNotificationsSubscriptionCreateOrConnectWithoutUserInput = {
     where: NoticeNotificationsSubscriptionWhereUniqueInput
-    create: XOR<NoticeNotificationsSubscriptionUncheckedCreateWithoutUserInput, NoticeNotificationsSubscriptionCreateWithoutUserInput>
-  }
-
-  export type PushCreateWithoutUserInput = {
-    expoPushToken?: string
-    registeredAt: Date | string
-    activeAt?: Date | string | null
-  }
-
-  export type PushUncheckedCreateWithoutUserInput = {
-    expoPushToken?: string
-    registeredAt: Date | string
-    activeAt?: Date | string | null
-  }
-
-  export type PushCreateOrConnectWithoutuserInput = {
-    where: PushWhereUniqueInput
-    create: XOR<PushUncheckedCreateWithoutUserInput, PushCreateWithoutUserInput>
+    create: XOR<NoticeNotificationsSubscriptionCreateWithoutUserInput, NoticeNotificationsSubscriptionUncheckedCreateWithoutUserInput>
   }
 
   export type ReportCommentCreateWithoutUserInput = {
@@ -26397,9 +25615,9 @@ export namespace Prisma {
     reportedAt: Date | string
   }
 
-  export type ReportCommentCreateOrConnectWithoutuserInput = {
+  export type ReportCommentCreateOrConnectWithoutUserInput = {
     where: ReportCommentWhereUniqueInput
-    create: XOR<ReportCommentUncheckedCreateWithoutUserInput, ReportCommentCreateWithoutUserInput>
+    create: XOR<ReportCommentCreateWithoutUserInput, ReportCommentUncheckedCreateWithoutUserInput>
   }
 
   export type ReportPostCreateWithoutUserInput = {
@@ -26417,9 +25635,9 @@ export namespace Prisma {
     reportedAt: Date | string
   }
 
-  export type ReportPostCreateOrConnectWithoutuserInput = {
+  export type ReportPostCreateOrConnectWithoutUserInput = {
     where: ReportPostWhereUniqueInput
-    create: XOR<ReportPostUncheckedCreateWithoutUserInput, ReportPostCreateWithoutUserInput>
+    create: XOR<ReportPostCreateWithoutUserInput, ReportPostUncheckedCreateWithoutUserInput>
   }
 
   export type ReportSubcommentCreateWithoutUserInput = {
@@ -26437,9 +25655,9 @@ export namespace Prisma {
     reportedAt: Date | string
   }
 
-  export type ReportSubcommentCreateOrConnectWithoutuserInput = {
+  export type ReportSubcommentCreateOrConnectWithoutUserInput = {
     where: ReportSubcommentWhereUniqueInput
-    create: XOR<ReportSubcommentUncheckedCreateWithoutUserInput, ReportSubcommentCreateWithoutUserInput>
+    create: XOR<ReportSubcommentCreateWithoutUserInput, ReportSubcommentUncheckedCreateWithoutUserInput>
   }
 
   export type TelegramCreateWithoutUserInput = {
@@ -26450,9 +25668,9 @@ export namespace Prisma {
     chatId: number
   }
 
-  export type TelegramCreateOrConnectWithoutuserInput = {
+  export type TelegramCreateOrConnectWithoutUserInput = {
     where: TelegramWhereUniqueInput
-    create: XOR<TelegramUncheckedCreateWithoutUserInput, TelegramCreateWithoutUserInput>
+    create: XOR<TelegramCreateWithoutUserInput, TelegramUncheckedCreateWithoutUserInput>
   }
 
   export type AdminUpdateWithoutUserInput = {
@@ -26464,8 +25682,8 @@ export namespace Prisma {
   }
 
   export type ChangePasswordUpsertWithoutUserInput = {
-    update: XOR<ChangePasswordUncheckedUpdateWithoutUserInput, ChangePasswordUpdateWithoutUserInput>
-    create: XOR<ChangePasswordUncheckedCreateWithoutUserInput, ChangePasswordCreateWithoutUserInput>
+    update: XOR<ChangePasswordUpdateWithoutUserInput, ChangePasswordUncheckedUpdateWithoutUserInput>
+    create: XOR<ChangePasswordCreateWithoutUserInput, ChangePasswordUncheckedCreateWithoutUserInput>
   }
 
   export type ChangePasswordUpdateWithoutUserInput = {
@@ -26480,18 +25698,18 @@ export namespace Prisma {
 
   export type CommunityBoardUpsertWithWhereUniqueWithoutUserInput = {
     where: CommunityBoardWhereUniqueInput
-    update: XOR<CommunityBoardUncheckedUpdateWithoutUserInput, CommunityBoardUpdateWithoutUserInput>
-    create: XOR<CommunityBoardUncheckedCreateWithoutUserInput, CommunityBoardCreateWithoutUserInput>
+    update: XOR<CommunityBoardUpdateWithoutUserInput, CommunityBoardUncheckedUpdateWithoutUserInput>
+    create: XOR<CommunityBoardCreateWithoutUserInput, CommunityBoardUncheckedCreateWithoutUserInput>
   }
 
   export type CommunityBoardUpdateWithWhereUniqueWithoutUserInput = {
     where: CommunityBoardWhereUniqueInput
-    data: XOR<CommunityBoardUncheckedUpdateWithoutUserInput, CommunityBoardUpdateWithoutUserInput>
+    data: XOR<CommunityBoardUpdateWithoutUserInput, CommunityBoardUncheckedUpdateWithoutUserInput>
   }
 
   export type CommunityBoardUpdateManyWithWhereWithoutUserInput = {
     where: CommunityBoardScalarWhereInput
-    data: XOR<CommunityBoardUncheckedUpdateManyWithoutCommunityBoardsInput, CommunityBoardUpdateManyMutationInput>
+    data: XOR<CommunityBoardUpdateManyMutationInput, CommunityBoardUncheckedUpdateManyWithoutCommunityBoardsInput>
   }
 
   export type CommunityBoardScalarWhereInput = {
@@ -26510,18 +25728,18 @@ export namespace Prisma {
 
   export type CommunityBoardCandidateUpsertWithWhereUniqueWithoutUserInput = {
     where: CommunityBoardCandidateWhereUniqueInput
-    update: XOR<CommunityBoardCandidateUncheckedUpdateWithoutUserInput, CommunityBoardCandidateUpdateWithoutUserInput>
-    create: XOR<CommunityBoardCandidateUncheckedCreateWithoutUserInput, CommunityBoardCandidateCreateWithoutUserInput>
+    update: XOR<CommunityBoardCandidateUpdateWithoutUserInput, CommunityBoardCandidateUncheckedUpdateWithoutUserInput>
+    create: XOR<CommunityBoardCandidateCreateWithoutUserInput, CommunityBoardCandidateUncheckedCreateWithoutUserInput>
   }
 
   export type CommunityBoardCandidateUpdateWithWhereUniqueWithoutUserInput = {
     where: CommunityBoardCandidateWhereUniqueInput
-    data: XOR<CommunityBoardCandidateUncheckedUpdateWithoutUserInput, CommunityBoardCandidateUpdateWithoutUserInput>
+    data: XOR<CommunityBoardCandidateUpdateWithoutUserInput, CommunityBoardCandidateUncheckedUpdateWithoutUserInput>
   }
 
   export type CommunityBoardCandidateUpdateManyWithWhereWithoutUserInput = {
     where: CommunityBoardCandidateScalarWhereInput
-    data: XOR<CommunityBoardCandidateUncheckedUpdateManyWithoutCommunityBoardCandidatesInput, CommunityBoardCandidateUpdateManyMutationInput>
+    data: XOR<CommunityBoardCandidateUpdateManyMutationInput, CommunityBoardCandidateUncheckedUpdateManyWithoutCommunityBoardCandidatesInput>
   }
 
   export type CommunityBoardCandidateScalarWhereInput = {
@@ -26537,130 +25755,130 @@ export namespace Prisma {
 
   export type CommunityBoardCandidateVoteUpsertWithWhereUniqueWithoutUserInput = {
     where: CommunityBoardCandidateVoteWhereUniqueInput
-    update: XOR<CommunityBoardCandidateVoteUncheckedUpdateWithoutUserInput, CommunityBoardCandidateVoteUpdateWithoutUserInput>
-    create: XOR<CommunityBoardCandidateVoteUncheckedCreateWithoutUserInput, CommunityBoardCandidateVoteCreateWithoutUserInput>
+    update: XOR<CommunityBoardCandidateVoteUpdateWithoutUserInput, CommunityBoardCandidateVoteUncheckedUpdateWithoutUserInput>
+    create: XOR<CommunityBoardCandidateVoteCreateWithoutUserInput, CommunityBoardCandidateVoteUncheckedCreateWithoutUserInput>
   }
 
   export type CommunityBoardCandidateVoteUpdateWithWhereUniqueWithoutUserInput = {
     where: CommunityBoardCandidateVoteWhereUniqueInput
-    data: XOR<CommunityBoardCandidateVoteUncheckedUpdateWithoutUserInput, CommunityBoardCandidateVoteUpdateWithoutUserInput>
+    data: XOR<CommunityBoardCandidateVoteUpdateWithoutUserInput, CommunityBoardCandidateVoteUncheckedUpdateWithoutUserInput>
   }
 
   export type CommunityBoardCandidateVoteUpdateManyWithWhereWithoutUserInput = {
     where: CommunityBoardCandidateVoteScalarWhereInput
-    data: XOR<CommunityBoardCandidateVoteUncheckedUpdateManyWithoutCommunityBoardCandidateVotesInput, CommunityBoardCandidateVoteUpdateManyMutationInput>
+    data: XOR<CommunityBoardCandidateVoteUpdateManyMutationInput, CommunityBoardCandidateVoteUncheckedUpdateManyWithoutCommunityBoardCandidateVotesInput>
   }
 
   export type CommunityBoardPinUpsertWithWhereUniqueWithoutUserInput = {
     where: CommunityBoardPinWhereUniqueInput
-    update: XOR<CommunityBoardPinUncheckedUpdateWithoutUserInput, CommunityBoardPinUpdateWithoutUserInput>
-    create: XOR<CommunityBoardPinUncheckedCreateWithoutUserInput, CommunityBoardPinCreateWithoutUserInput>
+    update: XOR<CommunityBoardPinUpdateWithoutUserInput, CommunityBoardPinUncheckedUpdateWithoutUserInput>
+    create: XOR<CommunityBoardPinCreateWithoutUserInput, CommunityBoardPinUncheckedCreateWithoutUserInput>
   }
 
   export type CommunityBoardPinUpdateWithWhereUniqueWithoutUserInput = {
     where: CommunityBoardPinWhereUniqueInput
-    data: XOR<CommunityBoardPinUncheckedUpdateWithoutUserInput, CommunityBoardPinUpdateWithoutUserInput>
+    data: XOR<CommunityBoardPinUpdateWithoutUserInput, CommunityBoardPinUncheckedUpdateWithoutUserInput>
   }
 
   export type CommunityBoardPinUpdateManyWithWhereWithoutUserInput = {
     where: CommunityBoardPinScalarWhereInput
-    data: XOR<CommunityBoardPinUncheckedUpdateManyWithoutCommunityBoardPinsInput, CommunityBoardPinUpdateManyMutationInput>
+    data: XOR<CommunityBoardPinUpdateManyMutationInput, CommunityBoardPinUncheckedUpdateManyWithoutCommunityBoardPinsInput>
   }
 
   export type CommunityCommentUpsertWithWhereUniqueWithoutUserInput = {
     where: CommunityCommentWhereUniqueInput
-    update: XOR<CommunityCommentUncheckedUpdateWithoutUserInput, CommunityCommentUpdateWithoutUserInput>
-    create: XOR<CommunityCommentUncheckedCreateWithoutUserInput, CommunityCommentCreateWithoutUserInput>
+    update: XOR<CommunityCommentUpdateWithoutUserInput, CommunityCommentUncheckedUpdateWithoutUserInput>
+    create: XOR<CommunityCommentCreateWithoutUserInput, CommunityCommentUncheckedCreateWithoutUserInput>
   }
 
   export type CommunityCommentUpdateWithWhereUniqueWithoutUserInput = {
     where: CommunityCommentWhereUniqueInput
-    data: XOR<CommunityCommentUncheckedUpdateWithoutUserInput, CommunityCommentUpdateWithoutUserInput>
+    data: XOR<CommunityCommentUpdateWithoutUserInput, CommunityCommentUncheckedUpdateWithoutUserInput>
   }
 
   export type CommunityCommentUpdateManyWithWhereWithoutUserInput = {
     where: CommunityCommentScalarWhereInput
-    data: XOR<CommunityCommentUncheckedUpdateManyWithoutCommunityCommentsInput, CommunityCommentUpdateManyMutationInput>
+    data: XOR<CommunityCommentUpdateManyMutationInput, CommunityCommentUncheckedUpdateManyWithoutCommunityCommentsInput>
   }
 
   export type CommunityPostUpsertWithWhereUniqueWithoutUserInput = {
     where: CommunityPostWhereUniqueInput
-    update: XOR<CommunityPostUncheckedUpdateWithoutUserInput, CommunityPostUpdateWithoutUserInput>
-    create: XOR<CommunityPostUncheckedCreateWithoutUserInput, CommunityPostCreateWithoutUserInput>
+    update: XOR<CommunityPostUpdateWithoutUserInput, CommunityPostUncheckedUpdateWithoutUserInput>
+    create: XOR<CommunityPostCreateWithoutUserInput, CommunityPostUncheckedCreateWithoutUserInput>
   }
 
   export type CommunityPostUpdateWithWhereUniqueWithoutUserInput = {
     where: CommunityPostWhereUniqueInput
-    data: XOR<CommunityPostUncheckedUpdateWithoutUserInput, CommunityPostUpdateWithoutUserInput>
+    data: XOR<CommunityPostUpdateWithoutUserInput, CommunityPostUncheckedUpdateWithoutUserInput>
   }
 
   export type CommunityPostUpdateManyWithWhereWithoutUserInput = {
     where: CommunityPostScalarWhereInput
-    data: XOR<CommunityPostUncheckedUpdateManyWithoutCommunityPostsInput, CommunityPostUpdateManyMutationInput>
+    data: XOR<CommunityPostUpdateManyMutationInput, CommunityPostUncheckedUpdateManyWithoutCommunityPostsInput>
   }
 
   export type CommunityPostBookmarkUpsertWithWhereUniqueWithoutUserInput = {
     where: CommunityPostBookmarkWhereUniqueInput
-    update: XOR<CommunityPostBookmarkUncheckedUpdateWithoutUserInput, CommunityPostBookmarkUpdateWithoutUserInput>
-    create: XOR<CommunityPostBookmarkUncheckedCreateWithoutUserInput, CommunityPostBookmarkCreateWithoutUserInput>
+    update: XOR<CommunityPostBookmarkUpdateWithoutUserInput, CommunityPostBookmarkUncheckedUpdateWithoutUserInput>
+    create: XOR<CommunityPostBookmarkCreateWithoutUserInput, CommunityPostBookmarkUncheckedCreateWithoutUserInput>
   }
 
   export type CommunityPostBookmarkUpdateWithWhereUniqueWithoutUserInput = {
     where: CommunityPostBookmarkWhereUniqueInput
-    data: XOR<CommunityPostBookmarkUncheckedUpdateWithoutUserInput, CommunityPostBookmarkUpdateWithoutUserInput>
+    data: XOR<CommunityPostBookmarkUpdateWithoutUserInput, CommunityPostBookmarkUncheckedUpdateWithoutUserInput>
   }
 
   export type CommunityPostBookmarkUpdateManyWithWhereWithoutUserInput = {
     where: CommunityPostBookmarkScalarWhereInput
-    data: XOR<CommunityPostBookmarkUncheckedUpdateManyWithoutCommunityPostBookmarksInput, CommunityPostBookmarkUpdateManyMutationInput>
+    data: XOR<CommunityPostBookmarkUpdateManyMutationInput, CommunityPostBookmarkUncheckedUpdateManyWithoutCommunityPostBookmarksInput>
   }
 
   export type CommunityPostLikeUpsertWithWhereUniqueWithoutUserInput = {
     where: CommunityPostLikeWhereUniqueInput
-    update: XOR<CommunityPostLikeUncheckedUpdateWithoutUserInput, CommunityPostLikeUpdateWithoutUserInput>
-    create: XOR<CommunityPostLikeUncheckedCreateWithoutUserInput, CommunityPostLikeCreateWithoutUserInput>
+    update: XOR<CommunityPostLikeUpdateWithoutUserInput, CommunityPostLikeUncheckedUpdateWithoutUserInput>
+    create: XOR<CommunityPostLikeCreateWithoutUserInput, CommunityPostLikeUncheckedCreateWithoutUserInput>
   }
 
   export type CommunityPostLikeUpdateWithWhereUniqueWithoutUserInput = {
     where: CommunityPostLikeWhereUniqueInput
-    data: XOR<CommunityPostLikeUncheckedUpdateWithoutUserInput, CommunityPostLikeUpdateWithoutUserInput>
+    data: XOR<CommunityPostLikeUpdateWithoutUserInput, CommunityPostLikeUncheckedUpdateWithoutUserInput>
   }
 
   export type CommunityPostLikeUpdateManyWithWhereWithoutUserInput = {
     where: CommunityPostLikeScalarWhereInput
-    data: XOR<CommunityPostLikeUncheckedUpdateManyWithoutCommunityPostLikesInput, CommunityPostLikeUpdateManyMutationInput>
+    data: XOR<CommunityPostLikeUpdateManyMutationInput, CommunityPostLikeUncheckedUpdateManyWithoutCommunityPostLikesInput>
   }
 
   export type CommunitySubcommentUpsertWithWhereUniqueWithoutUserInput = {
     where: CommunitySubcommentWhereUniqueInput
-    update: XOR<CommunitySubcommentUncheckedUpdateWithoutUserInput, CommunitySubcommentUpdateWithoutUserInput>
-    create: XOR<CommunitySubcommentUncheckedCreateWithoutUserInput, CommunitySubcommentCreateWithoutUserInput>
+    update: XOR<CommunitySubcommentUpdateWithoutUserInput, CommunitySubcommentUncheckedUpdateWithoutUserInput>
+    create: XOR<CommunitySubcommentCreateWithoutUserInput, CommunitySubcommentUncheckedCreateWithoutUserInput>
   }
 
   export type CommunitySubcommentUpdateWithWhereUniqueWithoutUserInput = {
     where: CommunitySubcommentWhereUniqueInput
-    data: XOR<CommunitySubcommentUncheckedUpdateWithoutUserInput, CommunitySubcommentUpdateWithoutUserInput>
+    data: XOR<CommunitySubcommentUpdateWithoutUserInput, CommunitySubcommentUncheckedUpdateWithoutUserInput>
   }
 
   export type CommunitySubcommentUpdateManyWithWhereWithoutUserInput = {
     where: CommunitySubcommentScalarWhereInput
-    data: XOR<CommunitySubcommentUncheckedUpdateManyWithoutCommunitySubcommentsInput, CommunitySubcommentUpdateManyMutationInput>
+    data: XOR<CommunitySubcommentUpdateManyMutationInput, CommunitySubcommentUncheckedUpdateManyWithoutCommunitySubcommentsInput>
   }
 
   export type LiveChatUpsertWithWhereUniqueWithoutUserInput = {
     where: LiveChatWhereUniqueInput
-    update: XOR<LiveChatUncheckedUpdateWithoutUserInput, LiveChatUpdateWithoutUserInput>
-    create: XOR<LiveChatUncheckedCreateWithoutUserInput, LiveChatCreateWithoutUserInput>
+    update: XOR<LiveChatUpdateWithoutUserInput, LiveChatUncheckedUpdateWithoutUserInput>
+    create: XOR<LiveChatCreateWithoutUserInput, LiveChatUncheckedCreateWithoutUserInput>
   }
 
   export type LiveChatUpdateWithWhereUniqueWithoutUserInput = {
     where: LiveChatWhereUniqueInput
-    data: XOR<LiveChatUncheckedUpdateWithoutUserInput, LiveChatUpdateWithoutUserInput>
+    data: XOR<LiveChatUpdateWithoutUserInput, LiveChatUncheckedUpdateWithoutUserInput>
   }
 
   export type LiveChatUpdateManyWithWhereWithoutUserInput = {
     where: LiveChatScalarWhereInput
-    data: XOR<LiveChatUncheckedUpdateManyWithoutLiveChatsInput, LiveChatUpdateManyMutationInput>
+    data: XOR<LiveChatUpdateManyMutationInput, LiveChatUncheckedUpdateManyWithoutLiveChatsInput>
   }
 
   export type LiveChatScalarWhereInput = {
@@ -26676,18 +25894,18 @@ export namespace Prisma {
 
   export type NoticeNotificationsSubscriptionUpsertWithWhereUniqueWithoutUserInput = {
     where: NoticeNotificationsSubscriptionWhereUniqueInput
-    update: XOR<NoticeNotificationsSubscriptionUncheckedUpdateWithoutUserInput, NoticeNotificationsSubscriptionUpdateWithoutUserInput>
-    create: XOR<NoticeNotificationsSubscriptionUncheckedCreateWithoutUserInput, NoticeNotificationsSubscriptionCreateWithoutUserInput>
+    update: XOR<NoticeNotificationsSubscriptionUpdateWithoutUserInput, NoticeNotificationsSubscriptionUncheckedUpdateWithoutUserInput>
+    create: XOR<NoticeNotificationsSubscriptionCreateWithoutUserInput, NoticeNotificationsSubscriptionUncheckedCreateWithoutUserInput>
   }
 
   export type NoticeNotificationsSubscriptionUpdateWithWhereUniqueWithoutUserInput = {
     where: NoticeNotificationsSubscriptionWhereUniqueInput
-    data: XOR<NoticeNotificationsSubscriptionUncheckedUpdateWithoutUserInput, NoticeNotificationsSubscriptionUpdateWithoutUserInput>
+    data: XOR<NoticeNotificationsSubscriptionUpdateWithoutUserInput, NoticeNotificationsSubscriptionUncheckedUpdateWithoutUserInput>
   }
 
   export type NoticeNotificationsSubscriptionUpdateManyWithWhereWithoutUserInput = {
     where: NoticeNotificationsSubscriptionScalarWhereInput
-    data: XOR<NoticeNotificationsSubscriptionUncheckedUpdateManyWithoutNoticeNotificationsSubscriptionsInput, NoticeNotificationsSubscriptionUpdateManyMutationInput>
+    data: XOR<NoticeNotificationsSubscriptionUpdateManyMutationInput, NoticeNotificationsSubscriptionUncheckedUpdateManyWithoutNoticeNotificationsSubscriptionsInput>
   }
 
   export type NoticeNotificationsSubscriptionScalarWhereInput = {
@@ -26700,94 +25918,68 @@ export namespace Prisma {
     subscribedAt?: DateTimeFilter | Date | string
   }
 
-  export type PushUpsertWithWhereUniqueWithoutUserInput = {
-    where: PushWhereUniqueInput
-    update: XOR<PushUncheckedUpdateWithoutUserInput, PushUpdateWithoutUserInput>
-    create: XOR<PushUncheckedCreateWithoutUserInput, PushCreateWithoutUserInput>
-  }
-
-  export type PushUpdateWithWhereUniqueWithoutUserInput = {
-    where: PushWhereUniqueInput
-    data: XOR<PushUncheckedUpdateWithoutUserInput, PushUpdateWithoutUserInput>
-  }
-
-  export type PushUpdateManyWithWhereWithoutUserInput = {
-    where: PushScalarWhereInput
-    data: XOR<PushUncheckedUpdateManyWithoutPushesInput, PushUpdateManyMutationInput>
-  }
-
-  export type PushScalarWhereInput = {
-    AND?: Enumerable<PushScalarWhereInput>
-    OR?: Enumerable<PushScalarWhereInput>
-    NOT?: Enumerable<PushScalarWhereInput>
-    userId?: IntFilter | number
-    expoPushToken?: StringFilter | string
-    registeredAt?: DateTimeFilter | Date | string
-    activeAt?: DateTimeNullableFilter | Date | string | null
-  }
-
   export type ReportCommentUpsertWithWhereUniqueWithoutUserInput = {
     where: ReportCommentWhereUniqueInput
-    update: XOR<ReportCommentUncheckedUpdateWithoutUserInput, ReportCommentUpdateWithoutUserInput>
-    create: XOR<ReportCommentUncheckedCreateWithoutUserInput, ReportCommentCreateWithoutUserInput>
+    update: XOR<ReportCommentUpdateWithoutUserInput, ReportCommentUncheckedUpdateWithoutUserInput>
+    create: XOR<ReportCommentCreateWithoutUserInput, ReportCommentUncheckedCreateWithoutUserInput>
   }
 
   export type ReportCommentUpdateWithWhereUniqueWithoutUserInput = {
     where: ReportCommentWhereUniqueInput
-    data: XOR<ReportCommentUncheckedUpdateWithoutUserInput, ReportCommentUpdateWithoutUserInput>
+    data: XOR<ReportCommentUpdateWithoutUserInput, ReportCommentUncheckedUpdateWithoutUserInput>
   }
 
   export type ReportCommentUpdateManyWithWhereWithoutUserInput = {
     where: ReportCommentScalarWhereInput
-    data: XOR<ReportCommentUncheckedUpdateManyWithoutReportCommentsInput, ReportCommentUpdateManyMutationInput>
+    data: XOR<ReportCommentUpdateManyMutationInput, ReportCommentUncheckedUpdateManyWithoutReportCommentsInput>
   }
 
   export type ReportPostUpsertWithWhereUniqueWithoutUserInput = {
     where: ReportPostWhereUniqueInput
-    update: XOR<ReportPostUncheckedUpdateWithoutUserInput, ReportPostUpdateWithoutUserInput>
-    create: XOR<ReportPostUncheckedCreateWithoutUserInput, ReportPostCreateWithoutUserInput>
+    update: XOR<ReportPostUpdateWithoutUserInput, ReportPostUncheckedUpdateWithoutUserInput>
+    create: XOR<ReportPostCreateWithoutUserInput, ReportPostUncheckedCreateWithoutUserInput>
   }
 
   export type ReportPostUpdateWithWhereUniqueWithoutUserInput = {
     where: ReportPostWhereUniqueInput
-    data: XOR<ReportPostUncheckedUpdateWithoutUserInput, ReportPostUpdateWithoutUserInput>
+    data: XOR<ReportPostUpdateWithoutUserInput, ReportPostUncheckedUpdateWithoutUserInput>
   }
 
   export type ReportPostUpdateManyWithWhereWithoutUserInput = {
     where: ReportPostScalarWhereInput
-    data: XOR<ReportPostUncheckedUpdateManyWithoutReportPostsInput, ReportPostUpdateManyMutationInput>
+    data: XOR<ReportPostUpdateManyMutationInput, ReportPostUncheckedUpdateManyWithoutReportPostsInput>
   }
 
   export type ReportSubcommentUpsertWithWhereUniqueWithoutUserInput = {
     where: ReportSubcommentWhereUniqueInput
-    update: XOR<ReportSubcommentUncheckedUpdateWithoutUserInput, ReportSubcommentUpdateWithoutUserInput>
-    create: XOR<ReportSubcommentUncheckedCreateWithoutUserInput, ReportSubcommentCreateWithoutUserInput>
+    update: XOR<ReportSubcommentUpdateWithoutUserInput, ReportSubcommentUncheckedUpdateWithoutUserInput>
+    create: XOR<ReportSubcommentCreateWithoutUserInput, ReportSubcommentUncheckedCreateWithoutUserInput>
   }
 
   export type ReportSubcommentUpdateWithWhereUniqueWithoutUserInput = {
     where: ReportSubcommentWhereUniqueInput
-    data: XOR<ReportSubcommentUncheckedUpdateWithoutUserInput, ReportSubcommentUpdateWithoutUserInput>
+    data: XOR<ReportSubcommentUpdateWithoutUserInput, ReportSubcommentUncheckedUpdateWithoutUserInput>
   }
 
   export type ReportSubcommentUpdateManyWithWhereWithoutUserInput = {
     where: ReportSubcommentScalarWhereInput
-    data: XOR<ReportSubcommentUncheckedUpdateManyWithoutReportSubcommentsInput, ReportSubcommentUpdateManyMutationInput>
+    data: XOR<ReportSubcommentUpdateManyMutationInput, ReportSubcommentUncheckedUpdateManyWithoutReportSubcommentsInput>
   }
 
   export type TelegramUpsertWithWhereUniqueWithoutUserInput = {
     where: TelegramWhereUniqueInput
-    update: XOR<TelegramUncheckedUpdateWithoutUserInput, TelegramUpdateWithoutUserInput>
-    create: XOR<TelegramUncheckedCreateWithoutUserInput, TelegramCreateWithoutUserInput>
+    update: XOR<TelegramUpdateWithoutUserInput, TelegramUncheckedUpdateWithoutUserInput>
+    create: XOR<TelegramCreateWithoutUserInput, TelegramUncheckedCreateWithoutUserInput>
   }
 
   export type TelegramUpdateWithWhereUniqueWithoutUserInput = {
     where: TelegramWhereUniqueInput
-    data: XOR<TelegramUncheckedUpdateWithoutUserInput, TelegramUpdateWithoutUserInput>
+    data: XOR<TelegramUpdateWithoutUserInput, TelegramUncheckedUpdateWithoutUserInput>
   }
 
   export type TelegramUpdateManyWithWhereWithoutUserInput = {
     where: TelegramScalarWhereInput
-    data: XOR<TelegramUncheckedUpdateManyWithoutTelegramsInput, TelegramUpdateManyMutationInput>
+    data: XOR<TelegramUpdateManyMutationInput, TelegramUncheckedUpdateManyWithoutTelegramsInput>
   }
 
   export type TelegramScalarWhereInput = {
@@ -26819,9 +26011,9 @@ export namespace Prisma {
     communitySubcomments?: CommunitySubcommentUncheckedCreateNestedManyWithoutCommunityCommentInput
   }
 
-  export type CommunityCommentCreateOrConnectWithoutreportCommentsInput = {
+  export type CommunityCommentCreateOrConnectWithoutReportCommentsInput = {
     where: CommunityCommentWhereUniqueInput
-    create: XOR<CommunityCommentUncheckedCreateWithoutReportCommentsInput, CommunityCommentCreateWithoutReportCommentsInput>
+    create: XOR<CommunityCommentCreateWithoutReportCommentsInput, CommunityCommentUncheckedCreateWithoutReportCommentsInput>
   }
 
   export type UserCreateWithoutReportCommentsInput = {
@@ -26844,7 +26036,6 @@ export namespace Prisma {
     communitySubcomments?: CommunitySubcommentCreateNestedManyWithoutUserInput
     liveChats?: LiveChatCreateNestedManyWithoutUserInput
     noticeNotificationsSubscriptions?: NoticeNotificationsSubscriptionCreateNestedManyWithoutUserInput
-    pushes?: PushCreateNestedManyWithoutUserInput
     reportPosts?: ReportPostCreateNestedManyWithoutUserInput
     reportSubcomments?: ReportSubcommentCreateNestedManyWithoutUserInput
     telegrams?: TelegramCreateNestedManyWithoutUserInput
@@ -26871,20 +26062,19 @@ export namespace Prisma {
     communitySubcomments?: CommunitySubcommentUncheckedCreateNestedManyWithoutUserInput
     liveChats?: LiveChatUncheckedCreateNestedManyWithoutUserInput
     noticeNotificationsSubscriptions?: NoticeNotificationsSubscriptionUncheckedCreateNestedManyWithoutUserInput
-    pushes?: PushUncheckedCreateNestedManyWithoutUserInput
     reportPosts?: ReportPostUncheckedCreateNestedManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUncheckedCreateNestedManyWithoutUserInput
     telegrams?: TelegramUncheckedCreateNestedManyWithoutUserInput
   }
 
-  export type UserCreateOrConnectWithoutreportCommentsInput = {
+  export type UserCreateOrConnectWithoutReportCommentsInput = {
     where: UserWhereUniqueInput
-    create: XOR<UserUncheckedCreateWithoutReportCommentsInput, UserCreateWithoutReportCommentsInput>
+    create: XOR<UserCreateWithoutReportCommentsInput, UserUncheckedCreateWithoutReportCommentsInput>
   }
 
   export type CommunityCommentUpsertWithoutReportCommentsInput = {
-    update: XOR<CommunityCommentUncheckedUpdateWithoutReportCommentsInput, CommunityCommentUpdateWithoutReportCommentsInput>
-    create: XOR<CommunityCommentUncheckedCreateWithoutReportCommentsInput, CommunityCommentCreateWithoutReportCommentsInput>
+    update: XOR<CommunityCommentUpdateWithoutReportCommentsInput, CommunityCommentUncheckedUpdateWithoutReportCommentsInput>
+    create: XOR<CommunityCommentCreateWithoutReportCommentsInput, CommunityCommentUncheckedCreateWithoutReportCommentsInput>
   }
 
   export type CommunityCommentUpdateWithoutReportCommentsInput = {
@@ -26909,8 +26099,8 @@ export namespace Prisma {
   }
 
   export type UserUpsertWithoutReportCommentsInput = {
-    update: XOR<UserUncheckedUpdateWithoutReportCommentsInput, UserUpdateWithoutReportCommentsInput>
-    create: XOR<UserUncheckedCreateWithoutReportCommentsInput, UserCreateWithoutReportCommentsInput>
+    update: XOR<UserUpdateWithoutReportCommentsInput, UserUncheckedUpdateWithoutReportCommentsInput>
+    create: XOR<UserCreateWithoutReportCommentsInput, UserUncheckedCreateWithoutReportCommentsInput>
   }
 
   export type UserUpdateWithoutReportCommentsInput = {
@@ -26933,7 +26123,6 @@ export namespace Prisma {
     communitySubcomments?: CommunitySubcommentUpdateManyWithoutUserInput
     liveChats?: LiveChatUpdateManyWithoutUserInput
     noticeNotificationsSubscriptions?: NoticeNotificationsSubscriptionUpdateManyWithoutUserInput
-    pushes?: PushUpdateManyWithoutUserInput
     reportPosts?: ReportPostUpdateManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUpdateManyWithoutUserInput
     telegrams?: TelegramUpdateManyWithoutUserInput
@@ -26960,7 +26149,6 @@ export namespace Prisma {
     communitySubcomments?: CommunitySubcommentUncheckedUpdateManyWithoutUserInput
     liveChats?: LiveChatUncheckedUpdateManyWithoutUserInput
     noticeNotificationsSubscriptions?: NoticeNotificationsSubscriptionUncheckedUpdateManyWithoutUserInput
-    pushes?: PushUncheckedUpdateManyWithoutUserInput
     reportPosts?: ReportPostUncheckedUpdateManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUncheckedUpdateManyWithoutUserInput
     telegrams?: TelegramUncheckedUpdateManyWithoutUserInput
@@ -27003,9 +26191,9 @@ export namespace Prisma {
     communitySubcomments?: CommunitySubcommentUncheckedCreateNestedManyWithoutCommunityPostInput
   }
 
-  export type CommunityPostCreateOrConnectWithoutreportPostsInput = {
+  export type CommunityPostCreateOrConnectWithoutReportPostsInput = {
     where: CommunityPostWhereUniqueInput
-    create: XOR<CommunityPostUncheckedCreateWithoutReportPostsInput, CommunityPostCreateWithoutReportPostsInput>
+    create: XOR<CommunityPostCreateWithoutReportPostsInput, CommunityPostUncheckedCreateWithoutReportPostsInput>
   }
 
   export type UserCreateWithoutReportPostsInput = {
@@ -27028,7 +26216,6 @@ export namespace Prisma {
     communitySubcomments?: CommunitySubcommentCreateNestedManyWithoutUserInput
     liveChats?: LiveChatCreateNestedManyWithoutUserInput
     noticeNotificationsSubscriptions?: NoticeNotificationsSubscriptionCreateNestedManyWithoutUserInput
-    pushes?: PushCreateNestedManyWithoutUserInput
     reportComments?: ReportCommentCreateNestedManyWithoutUserInput
     reportSubcomments?: ReportSubcommentCreateNestedManyWithoutUserInput
     telegrams?: TelegramCreateNestedManyWithoutUserInput
@@ -27055,20 +26242,19 @@ export namespace Prisma {
     communitySubcomments?: CommunitySubcommentUncheckedCreateNestedManyWithoutUserInput
     liveChats?: LiveChatUncheckedCreateNestedManyWithoutUserInput
     noticeNotificationsSubscriptions?: NoticeNotificationsSubscriptionUncheckedCreateNestedManyWithoutUserInput
-    pushes?: PushUncheckedCreateNestedManyWithoutUserInput
     reportComments?: ReportCommentUncheckedCreateNestedManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUncheckedCreateNestedManyWithoutUserInput
     telegrams?: TelegramUncheckedCreateNestedManyWithoutUserInput
   }
 
-  export type UserCreateOrConnectWithoutreportPostsInput = {
+  export type UserCreateOrConnectWithoutReportPostsInput = {
     where: UserWhereUniqueInput
-    create: XOR<UserUncheckedCreateWithoutReportPostsInput, UserCreateWithoutReportPostsInput>
+    create: XOR<UserCreateWithoutReportPostsInput, UserUncheckedCreateWithoutReportPostsInput>
   }
 
   export type CommunityPostUpsertWithoutReportPostsInput = {
-    update: XOR<CommunityPostUncheckedUpdateWithoutReportPostsInput, CommunityPostUpdateWithoutReportPostsInput>
-    create: XOR<CommunityPostUncheckedCreateWithoutReportPostsInput, CommunityPostCreateWithoutReportPostsInput>
+    update: XOR<CommunityPostUpdateWithoutReportPostsInput, CommunityPostUncheckedUpdateWithoutReportPostsInput>
+    create: XOR<CommunityPostCreateWithoutReportPostsInput, CommunityPostUncheckedCreateWithoutReportPostsInput>
   }
 
   export type CommunityPostUpdateWithoutReportPostsInput = {
@@ -27109,8 +26295,8 @@ export namespace Prisma {
   }
 
   export type UserUpsertWithoutReportPostsInput = {
-    update: XOR<UserUncheckedUpdateWithoutReportPostsInput, UserUpdateWithoutReportPostsInput>
-    create: XOR<UserUncheckedCreateWithoutReportPostsInput, UserCreateWithoutReportPostsInput>
+    update: XOR<UserUpdateWithoutReportPostsInput, UserUncheckedUpdateWithoutReportPostsInput>
+    create: XOR<UserCreateWithoutReportPostsInput, UserUncheckedCreateWithoutReportPostsInput>
   }
 
   export type UserUpdateWithoutReportPostsInput = {
@@ -27133,7 +26319,6 @@ export namespace Prisma {
     communitySubcomments?: CommunitySubcommentUpdateManyWithoutUserInput
     liveChats?: LiveChatUpdateManyWithoutUserInput
     noticeNotificationsSubscriptions?: NoticeNotificationsSubscriptionUpdateManyWithoutUserInput
-    pushes?: PushUpdateManyWithoutUserInput
     reportComments?: ReportCommentUpdateManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUpdateManyWithoutUserInput
     telegrams?: TelegramUpdateManyWithoutUserInput
@@ -27160,7 +26345,6 @@ export namespace Prisma {
     communitySubcomments?: CommunitySubcommentUncheckedUpdateManyWithoutUserInput
     liveChats?: LiveChatUncheckedUpdateManyWithoutUserInput
     noticeNotificationsSubscriptions?: NoticeNotificationsSubscriptionUncheckedUpdateManyWithoutUserInput
-    pushes?: PushUncheckedUpdateManyWithoutUserInput
     reportComments?: ReportCommentUncheckedUpdateManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUncheckedUpdateManyWithoutUserInput
     telegrams?: TelegramUncheckedUpdateManyWithoutUserInput
@@ -27187,9 +26371,9 @@ export namespace Prisma {
     isDeleted?: boolean
   }
 
-  export type CommunitySubcommentCreateOrConnectWithoutreportSubcommentsInput = {
+  export type CommunitySubcommentCreateOrConnectWithoutReportSubcommentsInput = {
     where: CommunitySubcommentWhereUniqueInput
-    create: XOR<CommunitySubcommentUncheckedCreateWithoutReportSubcommentsInput, CommunitySubcommentCreateWithoutReportSubcommentsInput>
+    create: XOR<CommunitySubcommentCreateWithoutReportSubcommentsInput, CommunitySubcommentUncheckedCreateWithoutReportSubcommentsInput>
   }
 
   export type UserCreateWithoutReportSubcommentsInput = {
@@ -27212,7 +26396,6 @@ export namespace Prisma {
     communitySubcomments?: CommunitySubcommentCreateNestedManyWithoutUserInput
     liveChats?: LiveChatCreateNestedManyWithoutUserInput
     noticeNotificationsSubscriptions?: NoticeNotificationsSubscriptionCreateNestedManyWithoutUserInput
-    pushes?: PushCreateNestedManyWithoutUserInput
     reportComments?: ReportCommentCreateNestedManyWithoutUserInput
     reportPosts?: ReportPostCreateNestedManyWithoutUserInput
     telegrams?: TelegramCreateNestedManyWithoutUserInput
@@ -27239,20 +26422,19 @@ export namespace Prisma {
     communitySubcomments?: CommunitySubcommentUncheckedCreateNestedManyWithoutUserInput
     liveChats?: LiveChatUncheckedCreateNestedManyWithoutUserInput
     noticeNotificationsSubscriptions?: NoticeNotificationsSubscriptionUncheckedCreateNestedManyWithoutUserInput
-    pushes?: PushUncheckedCreateNestedManyWithoutUserInput
     reportComments?: ReportCommentUncheckedCreateNestedManyWithoutUserInput
     reportPosts?: ReportPostUncheckedCreateNestedManyWithoutUserInput
     telegrams?: TelegramUncheckedCreateNestedManyWithoutUserInput
   }
 
-  export type UserCreateOrConnectWithoutreportSubcommentsInput = {
+  export type UserCreateOrConnectWithoutReportSubcommentsInput = {
     where: UserWhereUniqueInput
-    create: XOR<UserUncheckedCreateWithoutReportSubcommentsInput, UserCreateWithoutReportSubcommentsInput>
+    create: XOR<UserCreateWithoutReportSubcommentsInput, UserUncheckedCreateWithoutReportSubcommentsInput>
   }
 
   export type CommunitySubcommentUpsertWithoutReportSubcommentsInput = {
-    update: XOR<CommunitySubcommentUncheckedUpdateWithoutReportSubcommentsInput, CommunitySubcommentUpdateWithoutReportSubcommentsInput>
-    create: XOR<CommunitySubcommentUncheckedCreateWithoutReportSubcommentsInput, CommunitySubcommentCreateWithoutReportSubcommentsInput>
+    update: XOR<CommunitySubcommentUpdateWithoutReportSubcommentsInput, CommunitySubcommentUncheckedUpdateWithoutReportSubcommentsInput>
+    create: XOR<CommunitySubcommentCreateWithoutReportSubcommentsInput, CommunitySubcommentUncheckedCreateWithoutReportSubcommentsInput>
   }
 
   export type CommunitySubcommentUpdateWithoutReportSubcommentsInput = {
@@ -27277,8 +26459,8 @@ export namespace Prisma {
   }
 
   export type UserUpsertWithoutReportSubcommentsInput = {
-    update: XOR<UserUncheckedUpdateWithoutReportSubcommentsInput, UserUpdateWithoutReportSubcommentsInput>
-    create: XOR<UserUncheckedCreateWithoutReportSubcommentsInput, UserCreateWithoutReportSubcommentsInput>
+    update: XOR<UserUpdateWithoutReportSubcommentsInput, UserUncheckedUpdateWithoutReportSubcommentsInput>
+    create: XOR<UserCreateWithoutReportSubcommentsInput, UserUncheckedCreateWithoutReportSubcommentsInput>
   }
 
   export type UserUpdateWithoutReportSubcommentsInput = {
@@ -27301,7 +26483,6 @@ export namespace Prisma {
     communitySubcomments?: CommunitySubcommentUpdateManyWithoutUserInput
     liveChats?: LiveChatUpdateManyWithoutUserInput
     noticeNotificationsSubscriptions?: NoticeNotificationsSubscriptionUpdateManyWithoutUserInput
-    pushes?: PushUpdateManyWithoutUserInput
     reportComments?: ReportCommentUpdateManyWithoutUserInput
     reportPosts?: ReportPostUpdateManyWithoutUserInput
     telegrams?: TelegramUpdateManyWithoutUserInput
@@ -27328,7 +26509,6 @@ export namespace Prisma {
     communitySubcomments?: CommunitySubcommentUncheckedUpdateManyWithoutUserInput
     liveChats?: LiveChatUncheckedUpdateManyWithoutUserInput
     noticeNotificationsSubscriptions?: NoticeNotificationsSubscriptionUncheckedUpdateManyWithoutUserInput
-    pushes?: PushUncheckedUpdateManyWithoutUserInput
     reportComments?: ReportCommentUncheckedUpdateManyWithoutUserInput
     reportPosts?: ReportPostUncheckedUpdateManyWithoutUserInput
     telegrams?: TelegramUncheckedUpdateManyWithoutUserInput
@@ -27354,7 +26534,6 @@ export namespace Prisma {
     communitySubcomments?: CommunitySubcommentCreateNestedManyWithoutUserInput
     liveChats?: LiveChatCreateNestedManyWithoutUserInput
     noticeNotificationsSubscriptions?: NoticeNotificationsSubscriptionCreateNestedManyWithoutUserInput
-    pushes?: PushCreateNestedManyWithoutUserInput
     reportComments?: ReportCommentCreateNestedManyWithoutUserInput
     reportPosts?: ReportPostCreateNestedManyWithoutUserInput
     reportSubcomments?: ReportSubcommentCreateNestedManyWithoutUserInput
@@ -27381,20 +26560,19 @@ export namespace Prisma {
     communitySubcomments?: CommunitySubcommentUncheckedCreateNestedManyWithoutUserInput
     liveChats?: LiveChatUncheckedCreateNestedManyWithoutUserInput
     noticeNotificationsSubscriptions?: NoticeNotificationsSubscriptionUncheckedCreateNestedManyWithoutUserInput
-    pushes?: PushUncheckedCreateNestedManyWithoutUserInput
     reportComments?: ReportCommentUncheckedCreateNestedManyWithoutUserInput
     reportPosts?: ReportPostUncheckedCreateNestedManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUncheckedCreateNestedManyWithoutUserInput
   }
 
-  export type UserCreateOrConnectWithouttelegramsInput = {
+  export type UserCreateOrConnectWithoutTelegramsInput = {
     where: UserWhereUniqueInput
-    create: XOR<UserUncheckedCreateWithoutTelegramsInput, UserCreateWithoutTelegramsInput>
+    create: XOR<UserCreateWithoutTelegramsInput, UserUncheckedCreateWithoutTelegramsInput>
   }
 
   export type UserUpsertWithoutTelegramsInput = {
-    update: XOR<UserUncheckedUpdateWithoutTelegramsInput, UserUpdateWithoutTelegramsInput>
-    create: XOR<UserUncheckedCreateWithoutTelegramsInput, UserCreateWithoutTelegramsInput>
+    update: XOR<UserUpdateWithoutTelegramsInput, UserUncheckedUpdateWithoutTelegramsInput>
+    create: XOR<UserCreateWithoutTelegramsInput, UserUncheckedCreateWithoutTelegramsInput>
   }
 
   export type UserUpdateWithoutTelegramsInput = {
@@ -27417,7 +26595,6 @@ export namespace Prisma {
     communitySubcomments?: CommunitySubcommentUpdateManyWithoutUserInput
     liveChats?: LiveChatUpdateManyWithoutUserInput
     noticeNotificationsSubscriptions?: NoticeNotificationsSubscriptionUpdateManyWithoutUserInput
-    pushes?: PushUpdateManyWithoutUserInput
     reportComments?: ReportCommentUpdateManyWithoutUserInput
     reportPosts?: ReportPostUpdateManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUpdateManyWithoutUserInput
@@ -27444,7 +26621,6 @@ export namespace Prisma {
     communitySubcomments?: CommunitySubcommentUncheckedUpdateManyWithoutUserInput
     liveChats?: LiveChatUncheckedUpdateManyWithoutUserInput
     noticeNotificationsSubscriptions?: NoticeNotificationsSubscriptionUncheckedUpdateManyWithoutUserInput
-    pushes?: PushUncheckedUpdateManyWithoutUserInput
     reportComments?: ReportCommentUncheckedUpdateManyWithoutUserInput
     reportPosts?: ReportPostUncheckedUpdateManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUncheckedUpdateManyWithoutUserInput
@@ -27946,24 +27122,6 @@ export namespace Prisma {
     id?: IntFieldUpdateOperationsInput | number
     noticeKey?: StringFieldUpdateOperationsInput | string
     subscribedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type PushUpdateWithoutUserInput = {
-    expoPushToken?: StringFieldUpdateOperationsInput | string
-    registeredAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    activeAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  }
-
-  export type PushUncheckedUpdateWithoutUserInput = {
-    expoPushToken?: StringFieldUpdateOperationsInput | string
-    registeredAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    activeAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  }
-
-  export type PushUncheckedUpdateManyWithoutPushesInput = {
-    expoPushToken?: StringFieldUpdateOperationsInput | string
-    registeredAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    activeAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type ReportCommentUpdateWithoutUserInput = {
