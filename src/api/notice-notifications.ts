@@ -1,6 +1,6 @@
 import { handleExpressValidation } from '@/middleware/handle-express-validation'
 import { requireAuth } from '@/middleware/require-auth'
-import { availableVendors } from '@/modules/cau-notice-watcher/publishers'
+import { availablePublishers } from '@/modules/cau-notice-watcher/publishers'
 import { makeBodyValidator } from '@/modules/express-validator-utils'
 import { prisma } from '@/modules/prisma'
 import { dbNow } from '@/modules/time'
@@ -9,6 +9,17 @@ import express from 'express'
 const router = express.Router()
 
 router.use(requireAuth)
+
+// Get all publishers
+
+export type ApiNoticeNotificationsGetPublishers = {
+  key: string
+  name: string
+}[]
+
+router.get('/notice-notifications/publishers', async (_, res) => {
+  res.json(availablePublishers)
+})
 
 // Get all subscriptions
 
@@ -51,7 +62,9 @@ router.post<
     const { user } = req
     const { key } = req.body
 
-    const keyIndex = availableVendors.findIndex((vendor) => vendor.key === key)
+    const keyIndex = availablePublishers.findIndex(
+      (vendor) => vendor.key === key
+    )
 
     if (keyIndex === -1) {
       res.status(404).end()

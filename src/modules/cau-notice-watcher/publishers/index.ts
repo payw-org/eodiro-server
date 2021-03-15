@@ -24,7 +24,7 @@ export * from './public-service'
 export * from './sociology'
 export * from './soicalwelfare'
 
-export const availableVendors = [
+export const availablePublishers = [
   cau,
   cmc,
   cse,
