@@ -9,8 +9,9 @@ import express from 'express'
 const router = express.Router()
 
 export type ApiCommunityPostsListReqQuery = {
-  boardId: number
+  boardId?: number
   page?: number
+  my?: 'posts' | 'comments' | 'bookmarks'
 }
 
 export type ApiCommunityPostsListResData = {
@@ -28,32 +29,124 @@ router.get<
   ApiCommunityPostsListReqQuery
 >(
   '/community/posts-list',
-  query('boardId').isNumeric().toInt(),
+  query('boardId').optional().isNumeric().toInt(),
   query('page').optional().isNumeric().toInt(),
+  query('my').optional().isString(),
   handleExpressValidation,
   async (req, res) => {
-    const { boardId, page = 1 } = req.query
+    const { user } = req
+    const userId = user.id
+    const { boardId, page = 1, my } = req.query
 
     const take = eodiroConst.POSTS_TAKE_IN_ONE_PAGE
     const skip = Math.max(page - 1, 0) * take
-    const totalPage = Math.ceil(
-      (await prisma.communityPost.count({
-        where: { isDeleted: false, communityBoard: { id: boardId } },
-      })) / take
-    )
+    let totalPage = 0
 
-    const posts = secureTable(
-      await prisma.communityPost.findMany({
-        where: {
-          isDeleted: false,
-          boardId,
-        },
-        orderBy: { id: 'desc' },
-        skip,
-        take,
-      }),
-      req.user.id
-    )
+    let posts: SafeCommunityPost[] = []
+
+    if (boardId) {
+      totalPage = Math.ceil(
+        (await prisma.communityPost.count({
+          where: { isDeleted: false, communityBoard: { id: boardId } },
+        })) / take
+      )
+
+      posts = secureTable(
+        await prisma.communityPost.findMany({
+          where: {
+            isDeleted: false,
+            boardId,
+          },
+          orderBy: { id: 'desc' },
+          skip,
+          take,
+        }),
+        userId
+      )
+    } else if (my === 'posts') {
+      totalPage = Math.ceil(
+        (await prisma.communityPost.count({
+          where: { userId: user.id, isDeleted: false },
+        })) / take
+      )
+
+      posts = secureTable(
+        await prisma.communityPost.findMany({
+          where: {
+            userId,
+            isDeleted: false,
+          },
+          orderBy: { id: 'desc' },
+          skip,
+          take,
+        }),
+        userId
+      )
+    } else if (my === 'comments') {
+      totalPage = Math.ceil(
+        (
+          await prisma.communityComment.findMany({
+            where: { userId: user.id, isDeleted: false },
+            distinct: ['postId'],
+          })
+        ).length / take
+      )
+
+      posts = secureTable(
+        await prisma.communityPost.findMany({
+          where: {
+            AND: {
+              isDeleted: false,
+            },
+            OR: [
+              {
+                communityComments: {
+                  some: {
+                    userId,
+                    isDeleted: false,
+                  },
+                },
+              },
+              {
+                communitySubcomments: {
+                  some: {
+                    userId,
+                    isDeleted: false,
+                  },
+                },
+              },
+            ],
+          },
+          orderBy: { id: 'desc' },
+          skip,
+          take,
+        }),
+        userId
+      )
+    } else if (my === 'bookmarks') {
+      totalPage = Math.ceil(
+        (await prisma.communityPostBookmark.count({
+          where: { userId: user.id },
+        })) / take
+      )
+
+      posts = secureTable(
+        await prisma.communityPost.findMany({
+          where: {
+            isDeleted: false,
+            communityPostBookmarks: {
+              some: {
+                userId,
+              },
+            },
+          },
+          orderBy: { id: 'desc' },
+          skip,
+          take,
+        }),
+        userId
+      )
+    }
 
     res.json({
       totalPage,
