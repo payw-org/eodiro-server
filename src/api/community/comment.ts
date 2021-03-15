@@ -75,13 +75,11 @@ router.get<
           body: isDeletedButHasSubcomments
             ? '삭제된 댓글입니다.'
             : comment.body,
+          userId: 0,
         }
       })
 
-    const safeComments = secureTable(
-      comments,
-      user.id
-    ) as ApiCommunityGetCommentsResData
+    const safeComments = secureTable(comments, user.id)
 
     res.json(safeComments)
   }
