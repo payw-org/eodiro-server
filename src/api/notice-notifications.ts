@@ -8,8 +8,6 @@ import express from 'express'
 
 const router = express.Router()
 
-router.use(requireAuth)
-
 // Get all publishers
 
 export type ApiNoticeNotificationsGetPublishers = {
@@ -20,6 +18,8 @@ export type ApiNoticeNotificationsGetPublishers = {
 router.get('/notice-notifications/publishers', async (_, res) => {
   res.json(availablePublishers)
 })
+
+router.use(requireAuth)
 
 // Get all subscriptions
 
