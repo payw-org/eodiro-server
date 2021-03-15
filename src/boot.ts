@@ -23,7 +23,9 @@ export async function boot(): Promise<QuitFunction> {
   app.use(
     cors({
       credentials: true,
-      origin: dev ? ['http://localhost:3020'] : ['https://eodiro.com'],
+      origin: dev
+        ? ['http://192.168.1.144:3020', 'http://localhost:3020']
+        : ['https://eodiro.com'],
     })
   )
   app.use(morgan('tiny'))

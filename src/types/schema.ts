@@ -5,7 +5,7 @@ import {
   CommunitySubcomment,
 } from '@/prisma/client'
 
-type Safe<T> = Omit<T, 'userId' | 'isDeleted'> & {
+type SafeContent<T> = Omit<T, 'userId' | 'isDeleted'> & {
   isMine: boolean
 }
 
@@ -22,6 +22,6 @@ export type SafeCommunityBoard = Omit<
   description?: string | null
   createdAt?: Date
 }
-export type SafeCommunityPost = Safe<CommunityPost>
-export type SafeCommunityComment = Safe<CommunityComment>
-export type SafeCommunitySubcomment = Safe<CommunitySubcomment>
+export type SafeCommunityPost = SafeContent<CommunityPost>
+export type SafeCommunityComment = SafeContent<CommunityComment>
+export type SafeCommunitySubcomment = SafeContent<CommunitySubcomment>

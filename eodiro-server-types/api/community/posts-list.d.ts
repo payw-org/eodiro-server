@@ -1,8 +1,9 @@
 import { SafeCommunityPost } from "../../types/schema";
 declare const router: import("express-serve-static-core").Router;
 export declare type ApiCommunityPostsListReqQuery = {
-    boardId: number;
+    boardId?: number;
     page?: number;
+    mine?: boolean;
 };
 export declare type ApiCommunityPostsListResData = {
     totalPage: number;
