@@ -185,8 +185,6 @@ export class CauNoticeWatcher {
       .map((sub) => sub.user.telegrams.map((tel) => tel.chatId))
       .flat()
 
-    console.log(chatIds)
-
     const shouldSendPush = chatIds.length > 0
 
     const lastNoticeIndex = notices.findIndex(
