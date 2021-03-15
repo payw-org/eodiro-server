@@ -10,7 +10,7 @@ export * from './psyche';
 export * from './public-service';
 export * from './sociology';
 export * from './soicalwelfare';
-export declare const availableVendors: {
+export declare const availablePublishers: {
     name: string;
     key: string;
 }[];

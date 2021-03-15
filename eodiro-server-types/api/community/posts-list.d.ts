@@ -3,7 +3,7 @@ declare const router: import("express-serve-static-core").Router;
 export declare type ApiCommunityPostsListReqQuery = {
     boardId?: number;
     page?: number;
-    mine?: boolean;
+    my?: 'posts' | 'comments' | 'bookmarks';
 };
 export declare type ApiCommunityPostsListResData = {
     totalPage: number;
