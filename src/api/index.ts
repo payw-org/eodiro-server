@@ -1,6 +1,7 @@
 import express from 'express'
 import authRouter from './auth'
 import communityRouter from './community'
+import noticeNotifications from './notice-notifications'
 import uploadImageRouter from './upload-image'
 
 const router = express.Router()
@@ -15,8 +16,9 @@ router.get('/', (req, res) => {
 })
 
 router.use(authRouter)
-router.use(uploadImageRouter)
 router.use(communityRouter)
+router.use(noticeNotifications)
+router.use(uploadImageRouter)
 // router.use(lecturesRouter)
 // router.use(myRouter)
 // router.use(vacantRouter)
