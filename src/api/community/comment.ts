@@ -5,7 +5,6 @@ import {
   makeBodyValidator,
   makeQueryValidator,
 } from '@/modules/express-validator-utils'
-import { eodiroClientHost } from '@/modules/host'
 import { prisma } from '@/modules/prisma'
 import { secureTable } from '@/modules/secure-table'
 import { telegramBot } from '@/modules/telegram-bot'
@@ -75,7 +74,9 @@ router.get<
           body: isDeletedButHasSubcomments
             ? '삭제된 댓글입니다.'
             : comment.body,
-          userId: 0,
+          // Set userId to 0 when the comment is deleted,
+          // to make this comment belong to no one
+          userId: isDeletedButHasSubcomments ? 0 : comment.userId,
         }
       })
 
@@ -142,8 +143,6 @@ router.post<any, any, ApiCommunityCreateCommentReqBody>(
         },
       })
 
-      console.log(eodiroClientHost)
-
       if (telegram) {
         telegramBot.sendMessage(
           telegram.chatId,
@@ -188,7 +187,7 @@ router.delete<any, any, ApiCommunityDeleteCommentReqBody>(
     }
 
     if (comment.userId !== user.id) {
-      return res.sendStatus(httpStatus.UNAUTHORIZED)
+      return res.sendStatus(httpStatus.FORBIDDEN)
     }
 
     // Delete comment
