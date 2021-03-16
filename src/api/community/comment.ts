@@ -149,10 +149,9 @@ router.post<any, any, ApiCommunityCreateCommentReqBody>(
           telegram.chatId,
           `
 내 글에 댓글이 달렸습니다.
-
 > ${comment.body}
 
-<a href="https://eodiro.com/community/board/${post.boardId}/post/${post.id}">댓글 보러 가기</a>
+https://eodiro.com/community/board/${post.boardId}/post/${post.id}
         `,
           {
             parse_mode: 'HTML',
@@ -351,7 +350,6 @@ router.post<any, any, ApiCommunityCreateSubcommentReqBody>(
           telegram.chatId,
           `
 내 댓글에 대댓글이 달렸습니다.
-
 > ${subcomment.body}
 
 https://eodiro.com/community/board/${boardId}/post/${postId}
