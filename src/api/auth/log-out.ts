@@ -2,13 +2,11 @@ import { eodiroConst } from '@/constant'
 import { httpStatus } from '@/constant/http-status'
 import { Cookies, setCookie } from '@/modules/cookie'
 import express from 'express'
-import { refreshRouterPath } from './refresh'
-import { revokeRouterPath } from './revoke'
 
 const router = express.Router()
 
 router.post('/log-out', async (req, res) => {
-  const refreshTokenPaths = [refreshRouterPath, revokeRouterPath]
+  const refreshTokenPaths = ['/auth/refresh', '/auth/revoke']
 
   const cookies: Cookies = [
     {

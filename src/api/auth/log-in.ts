@@ -6,8 +6,6 @@ import { AuthData, signAccessToken, signRefreshToken } from '@/modules/jwt'
 import { prisma } from '@/modules/prisma'
 import { sanitizePortalId } from '@/modules/sanitize-portal-id'
 import express from 'express'
-import { refreshRouterPath } from './refresh'
-import { revokeRouterPath } from './revoke'
 
 export type ApiAuthLoginReqBody = LogInInfo
 export type ApiAuthLoginResData = {
@@ -61,7 +59,7 @@ router.post('/log-in', async (req, res) => {
     resData.accessToken = accessToken
 
     const expires = new Date('2038-01-01').toUTCString()
-    const refreshTokenPaths = [refreshRouterPath, revokeRouterPath]
+    const refreshTokenPaths = ['/auth/refresh', '/auth/revoke']
 
     setCookie(req, res, [
       {

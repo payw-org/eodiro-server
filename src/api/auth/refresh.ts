@@ -7,15 +7,14 @@ import express from 'express'
 
 const router = express.Router()
 
-export const refreshRouterPath = '/refresh'
-
 export type ApiAuthRefreshResData = {
   accessToken: string
 }
 
 // Refresh access token
-router.post(refreshRouterPath, async (req, res) => {
+router.post('/refresh', async (req, res) => {
   const refreshToken = extractJwt(req, res, 'refresh')
+  console.log(`refreshToken: ${refreshToken}`)
 
   if (!refreshToken) {
     return res.sendStatus(httpStatus.UNAUTHORIZED)
