@@ -330,7 +330,6 @@ router.post<any, any, ApiCommunityCreateSubcommentReqBody>(
       incrementCount,
     ])
 
-    const postOwnerId = comment.communityPost.userId
     const boardId = comment.communityPost.boardId
     const postId = comment.postId
 
@@ -340,7 +339,7 @@ router.post<any, any, ApiCommunityCreateSubcommentReqBody>(
     if (commentOwnerId !== user.id) {
       const telegram = await prisma.telegram.findFirst({
         where: {
-          userId: postOwnerId,
+          userId: commentOwnerId,
         },
       })
 
