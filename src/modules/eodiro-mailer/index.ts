@@ -57,7 +57,7 @@ export default class EodiroMailer {
       log(
         `[ ${chalk.yellow(
           'email'
-        )} ] connecing to the email server for the first time`
+        )} ] connecting to the email server for the first time`
       )
       await this.verify()
     }
