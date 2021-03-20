@@ -8,6 +8,59 @@ import express from 'express'
 
 const router = express.Router()
 
+async function isBoardNameExists(boardName: string) {
+  const existingBoard = await prisma.communityBoard.findUnique({
+    where: {
+      name: boardName,
+    },
+  })
+  const existingBoardCandidate = await prisma.communityBoardCandidate.findUnique(
+    {
+      where: {
+        name: boardName,
+      },
+    }
+  )
+
+  return existingBoard || existingBoardCandidate
+}
+
+// Check if the board name already exists
+
+export type ApiCommunityCheckBoardNameReqBody = {
+  name: string
+}
+
+export type ApiCommunityCheckBoardNameResData = {
+  isAvailable: boolean
+}
+
+const checkBoardBody = makeBodyValidator<ApiCommunityCheckBoardNameReqBody>()
+
+router.post<
+  any,
+  ApiCommunityCheckBoardNameResData,
+  ApiCommunityCheckBoardNameReqBody
+>(
+  '/board/check',
+  checkBoardBody('name').isString().trim().isLength({
+    min: eodiroConst.MIN_BOARD_NAME_LENGTH,
+    max: eodiroConst.MAX_BOARD_NAME_LENGTH,
+  }),
+  handleExpressValidation,
+  async (req, res) => {
+    const { name } = req.body
+
+    const exist = await isBoardNameExists(name)
+
+    res.json({
+      isAvailable: !exist,
+    })
+  }
+)
+
+// Create a board
+
 export type ApiCommunityCreateNewBoardReqBody = {
   name: string
   description?: string
@@ -18,8 +71,8 @@ const createBoardBody = makeBodyValidator<ApiCommunityCreateNewBoardReqBody>()
 router.post(
   '/board',
   createBoardBody('name').isString().trim().isLength({
-    min: eodiroConst.MIN_BOARD_TITLE_LENGTH,
-    max: eodiroConst.MAX_BOARD_TITLE_LENGTH,
+    min: eodiroConst.MIN_BOARD_NAME_LENGTH,
+    max: eodiroConst.MAX_BOARD_NAME_LENGTH,
   }),
   createBoardBody('description')
     .isString()
@@ -33,6 +86,14 @@ router.post(
   async (req, res) => {
     const { user } = req
     const { name, description } = req.body
+
+    const exist = isBoardNameExists(name)
+
+    if (exist) {
+      return res.status(httpStatus.BAD_REQUEST).json({
+        message: '이미 존재하는 게시판입니다.',
+      })
+    }
 
     try {
       await prisma.communityBoardCandidate.create({

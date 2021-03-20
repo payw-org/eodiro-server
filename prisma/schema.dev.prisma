@@ -35,7 +35,7 @@ model ChangePassword {
 
 model CommunityBoard {
   id                 Int                 @id @default(autoincrement()) @db.UnsignedInt
-  name               String              @default("") @db.VarChar(50)
+  name               String              @unique @default("") @db.VarChar(50)
   description        String?             @db.VarChar(100)
   priority           Int                 @default(0) @db.UnsignedSmallInt
   isDeleted          Boolean             @default(false) @map("is_deleted")
@@ -52,7 +52,7 @@ model CommunityBoard {
 
 model CommunityBoardCandidate {
   id                           Int                           @id @default(autoincrement()) @db.UnsignedInt
-  name                         String                        @default("") @db.VarChar(50)
+  name                         String                        @unique @default("") @db.VarChar(50)
   description                  String?                       @db.VarChar(100)
   createdBy                    Int                           @map("created_by") @db.UnsignedInt
   createdAt                    DateTime                      @map("created_at") @db.DateTime(0)
