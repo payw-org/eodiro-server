@@ -1,4 +1,3 @@
-import { requireAuth } from '@/middleware/require-auth'
 import express from 'express'
 import changePassword from './change-password'
 import forgot from './forgot'
@@ -12,6 +11,7 @@ import verifyJoin from './verify-join'
 
 const router = express.Router()
 
+router.use(changePassword)
 router.use(forgot)
 router.use(join)
 router.use(logIn)
@@ -20,9 +20,5 @@ router.use(refresh)
 router.use(validate)
 router.use(verify)
 router.use(verifyJoin)
-
-router.use(requireAuth)
-
-router.use(changePassword)
 
 export default router
