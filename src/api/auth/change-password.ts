@@ -1,6 +1,10 @@
 import { httpStatus } from '@/constant/http-status'
 import { handleExpressValidation } from '@/middleware/handle-express-validation'
 import Auth from '@/modules/auth'
+import {
+  AuthValidationResult,
+  validatePassword,
+} from '@/modules/auth/validation'
 import { makeBodyValidator } from '@/modules/express-validator-utils'
 import { prisma } from '@/modules/prisma'
 import express from 'express'
@@ -10,6 +14,10 @@ const router = express.Router()
 export type ApiAuthChangePasswordReqBody = {
   token: string
   newPassword: string
+}
+
+export type ApiAuthChangePasswordResData = {
+  result: AuthValidationResult
 }
 
 const changePasswordBody = makeBodyValidator<ApiAuthChangePasswordReqBody>()
@@ -30,6 +38,12 @@ router.post<any, any, ApiAuthChangePasswordReqBody>(
 
     if (!changePasswordInfo) {
       return res.sendStatus(httpStatus.NOT_FOUND)
+    }
+
+    const validation = await validatePassword(newPassword)
+
+    if (!validation.isValid) {
+      return res.status(httpStatus.BAD_REQUEST).json()
     }
 
     const userId = changePasswordInfo.userId
