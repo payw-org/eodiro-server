@@ -43,7 +43,9 @@ router.post<any, any, ApiAuthChangePasswordReqBody>(
     const validation = await validatePassword(newPassword)
 
     if (!validation.isValid) {
-      return res.status(httpStatus.BAD_REQUEST).json()
+      return res.status(httpStatus.BAD_REQUEST).json({
+        message: validation.error?.message,
+      })
     }
 
     const userId = changePasswordInfo.userId
