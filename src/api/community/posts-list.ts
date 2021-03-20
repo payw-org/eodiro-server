@@ -3,6 +3,7 @@ import { handleExpressValidation } from '@/middleware/handle-express-validation'
 import { makeQueryValidator } from '@/modules/express-validator-utils'
 import { prisma } from '@/modules/prisma'
 import { secureTable } from '@/modules/secure-table'
+import { Prisma } from '@/prisma/client'
 import { SafeCommunityPost } from '@/types/schema'
 import express from 'express'
 
@@ -12,6 +13,7 @@ export type ApiCommunityPostsListReqQuery = {
   boardId?: number
   page?: number
   my?: 'posts' | 'comments' | 'bookmarks'
+  contains?: string
 }
 
 export type ApiCommunityPostsListResData = {
@@ -32,11 +34,12 @@ router.get<
   query('boardId').optional().isNumeric().toInt(),
   query('page').optional().isNumeric().toInt(),
   query('my').optional().isString(),
+  query('contains').optional().isString(),
   handleExpressValidation,
   async (req, res) => {
     const { user } = req
     const userId = user.id
-    const { boardId, page = 1, my } = req.query
+    const { boardId, page = 1, my, contains } = req.query
 
     const take = eodiroConst.POSTS_TAKE_IN_ONE_PAGE
     const skip = Math.max(page - 1, 0) * take
@@ -44,19 +47,24 @@ router.get<
 
     let posts: SafeCommunityPost[] = []
 
+    const whereClause: Prisma.CommunityPostWhereInput | undefined = {
+      isDeleted: false,
+      boardId,
+      OR: contains
+        ? [{ title: { contains } }, { body: { contains } }]
+        : undefined,
+    }
+
     if (boardId) {
       totalPage = Math.ceil(
         (await prisma.communityPost.count({
-          where: { isDeleted: false, communityBoard: { id: boardId } },
+          where: whereClause,
         })) / take
       )
 
       posts = secureTable(
         await prisma.communityPost.findMany({
-          where: {
-            isDeleted: false,
-            boardId,
-          },
+          where: whereClause,
           orderBy: { id: 'desc' },
           skip,
           take,
