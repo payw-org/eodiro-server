@@ -11,8 +11,8 @@ export declare const eodiroConst: {
     MIN_COMMENT_BODY_LENGTH: number;
     MAX_COMMENT_BODY_LENGTH: number;
     POST_LIST_SLICE_LENGTH: number;
-    MIN_BOARD_TITLE_LENGTH: number;
-    MAX_BOARD_TITLE_LENGTH: number;
+    MIN_BOARD_NAME_LENGTH: number;
+    MAX_BOARD_NAME_LENGTH: number;
     MIN_BOARD_DESCRIPTION_LENGTH: number;
     MAX_BOARD_DESCRIPTION_LENGTH: number;
     BOARD_CANDIDATE_VOTES_THRESHOLD: number;

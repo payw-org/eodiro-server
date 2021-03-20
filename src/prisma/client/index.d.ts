@@ -18665,6 +18665,7 @@ export namespace Prisma {
 
   export type CommunityBoardWhereUniqueInput = {
     id?: number
+    name?: string
   }
 
   export type CommunityBoardCandidateWhereInput = {
@@ -18691,6 +18692,7 @@ export namespace Prisma {
 
   export type CommunityBoardCandidateWhereUniqueInput = {
     id?: number
+    name?: string
   }
 
   export type CommunityBoardCandidateVoteWhereInput = {

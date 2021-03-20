@@ -4,6 +4,7 @@ export declare type ApiCommunityPostsListReqQuery = {
     boardId?: number;
     page?: number;
     my?: 'posts' | 'comments' | 'bookmarks';
+    contains?: string;
 };
 export declare type ApiCommunityPostsListResData = {
     totalPage: number;
