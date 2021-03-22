@@ -8,7 +8,7 @@ import express from 'express'
 
 const router = express.Router()
 
-async function isBoardNameExists(boardName: string) {
+async function isBoardNameExists(boardName: string): Promise<boolean> {
   const existingBoard = await prisma.communityBoard.findUnique({
     where: {
       name: boardName,
@@ -22,7 +22,7 @@ async function isBoardNameExists(boardName: string) {
     }
   )
 
-  return existingBoard || existingBoardCandidate
+  return existingBoard !== null || existingBoardCandidate !== null
 }
 
 // Check if the board name already exists
@@ -87,7 +87,7 @@ router.post(
     const { user } = req
     const { name, description } = req.body
 
-    const exist = isBoardNameExists(name)
+    const exist = await isBoardNameExists(name)
 
     if (exist) {
       return res.status(httpStatus.BAD_REQUEST).json({
