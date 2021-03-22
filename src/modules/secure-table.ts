@@ -2,10 +2,16 @@ import { DeepOmit } from '@/types/deep-omit'
 import { ReplaceKey } from '@/types/replace-key'
 import { isPrimitive } from './utils/is-primitive'
 
+type secureTableReturnType<T> = ReplaceKey<
+  DeepOmit<T, 'isDeleted'>,
+  'userId',
+  { isMine: boolean }
+>
+
 export function secureTable<T = any>(
   obj: T,
   userId: number
-): ReplaceKey<DeepOmit<T, 'isDeleted'>, 'userId', { isMine: boolean }> {
+): secureTableReturnType<T> {
   for (const key of Object.keys(obj)) {
     const objObj = (obj as unknown) as Record<string, unknown>
     const val = objObj[key]
@@ -19,9 +25,5 @@ export function secureTable<T = any>(
     }
   }
 
-  return obj as ReplaceKey<
-    DeepOmit<T, 'isDeleted'>,
-    'userId',
-    { isMine: boolean }
-  >
+  return obj as secureTableReturnType<T>
 }
