@@ -51,7 +51,6 @@
     "bcrypt": "^5.0.1",
     "cookie-parser": "^1.4.5",
     "cors": "^2.8.5",
-    "cron": "^1.8.2",
     "date-fns": "^2.19.0",
     "dayjs": "^1.10.4",
     "express": "^4.17.1",
@@ -74,8 +73,7 @@
     "socket.io": "^4.0.0",
     "sql-formatter": "^4.0.2",
     "uuid": "^8.3.2",
-    "yargs": "^16.2.0",
-    "zombie": "^6.1.4"
+    "yargs": "^16.2.0"
   },
   "devDependencies": {
     "@types/app-root-path": "^1.2.4",
