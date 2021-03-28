@@ -697,8 +697,8 @@ export namespace Prisma {
   export import Decimal = runtime.Decimal
 
   /**
-   * Prisma Client JS version: 2.18.0
-   * Query Engine version: da6fafb57b24e0b61ca20960c64e2d41f9e8cff1
+   * Prisma Client JS version: 2.19.0
+   * Query Engine version: c1455d0b443d66b0d9db9bcb1bb9ee0d5bbc511d
    */
   export type PrismaVersion = {
     client: string
@@ -18660,7 +18660,6 @@ export namespace Prisma {
     createdBy?: SortOrder
     createdAt?: SortOrder
     activeAt?: SortOrder
-    user?: UserOrderByInput
   }
 
   export type CommunityBoardWhereUniqueInput = {
@@ -18687,7 +18686,6 @@ export namespace Prisma {
     description?: SortOrder
     createdBy?: SortOrder
     createdAt?: SortOrder
-    user?: UserOrderByInput
   }
 
   export type CommunityBoardCandidateWhereUniqueInput = {
@@ -18708,8 +18706,6 @@ export namespace Prisma {
   export type CommunityBoardCandidateVoteOrderByInput = {
     boardCandidateId?: SortOrder
     userId?: SortOrder
-    communityBoardCandidate?: CommunityBoardCandidateOrderByInput
-    user?: UserOrderByInput
   }
 
   export type CommunityBoardCandidateVoteWhereUniqueInput = {
@@ -18729,8 +18725,6 @@ export namespace Prisma {
   export type CommunityBoardPinOrderByInput = {
     userId?: SortOrder
     boardId?: SortOrder
-    communityBoard?: CommunityBoardOrderByInput
-    user?: UserOrderByInput
   }
 
   export type CommunityBoardPinWhereUniqueInput = {
@@ -18762,8 +18756,6 @@ export namespace Prisma {
     body?: SortOrder
     commentedAt?: SortOrder
     isDeleted?: SortOrder
-    communityPost?: CommunityPostOrderByInput
-    user?: UserOrderByInput
   }
 
   export type CommunityCommentWhereUniqueInput = {
@@ -18808,8 +18800,6 @@ export namespace Prisma {
     postedAt?: SortOrder
     editedAt?: SortOrder
     isDeleted?: SortOrder
-    communityBoard?: CommunityBoardOrderByInput
-    user?: UserOrderByInput
   }
 
   export type CommunityPostWhereUniqueInput = {
@@ -18829,8 +18819,6 @@ export namespace Prisma {
   export type CommunityPostBookmarkOrderByInput = {
     userId?: SortOrder
     postId?: SortOrder
-    communityPost?: CommunityPostOrderByInput
-    user?: UserOrderByInput
   }
 
   export type CommunityPostBookmarkWhereUniqueInput = {
@@ -18850,8 +18838,6 @@ export namespace Prisma {
   export type CommunityPostLikeOrderByInput = {
     userId?: SortOrder
     postId?: SortOrder
-    communityPost?: CommunityPostOrderByInput
-    user?: UserOrderByInput
   }
 
   export type CommunityPostLikeWhereUniqueInput = {
@@ -18885,9 +18871,6 @@ export namespace Prisma {
     body?: SortOrder
     subcommentedAt?: SortOrder
     isDeleted?: SortOrder
-    communityComment?: CommunityCommentOrderByInput
-    communityPost?: CommunityPostOrderByInput
-    user?: UserOrderByInput
   }
 
   export type CommunitySubcommentWhereUniqueInput = {
@@ -18927,8 +18910,6 @@ export namespace Prisma {
   export type CoverageMajorLectureOrderByInput = {
     lectureId?: SortOrder
     majorCode?: SortOrder
-    lecture?: LectureOrderByInput
-    coverageMajor?: CoverageMajorOrderByInput
   }
 
   export type CoverageMajorLectureWhereUniqueInput = {
@@ -19002,7 +18983,6 @@ export namespace Prisma {
     createdAt?: SortOrder
     userId?: SortOrder
     randomNickname?: SortOrder
-    user?: UserOrderByInput
   }
 
   export type LiveChatWhereUniqueInput = {
@@ -19025,7 +19005,6 @@ export namespace Prisma {
     userId?: SortOrder
     noticeKey?: SortOrder
     subscribedAt?: SortOrder
-    user?: UserOrderByInput
   }
 
   export type NoticeNotificationsSubscriptionWhereUniqueInput = {
@@ -19082,7 +19061,6 @@ export namespace Prisma {
     startM?: SortOrder
     endH?: SortOrder
     endM?: SortOrder
-    lecture?: LectureOrderByInput
   }
 
   export type PeriodWhereUniqueInput = {
@@ -19127,8 +19105,6 @@ export namespace Prisma {
     randomNickname?: SortOrder
     joinedAt?: SortOrder
     refreshToken?: SortOrder
-    admin?: AdminOrderByInput
-    changePassword?: ChangePasswordOrderByInput
   }
 
   export type UserWhereUniqueInput = {
@@ -19158,8 +19134,6 @@ export namespace Prisma {
     title?: SortOrder
     body?: SortOrder
     reportedAt?: SortOrder
-    communityComment?: CommunityCommentOrderByInput
-    user?: UserOrderByInput
   }
 
   export type ReportCommentWhereUniqueInput = {
@@ -19187,8 +19161,6 @@ export namespace Prisma {
     title?: SortOrder
     body?: SortOrder
     reportedAt?: SortOrder
-    communityPost?: CommunityPostOrderByInput
-    user?: UserOrderByInput
   }
 
   export type ReportPostWhereUniqueInput = {
@@ -19216,8 +19188,6 @@ export namespace Prisma {
     title?: SortOrder
     body?: SortOrder
     reportedAt?: SortOrder
-    communitySubcomment?: CommunitySubcommentOrderByInput
-    user?: UserOrderByInput
   }
 
   export type ReportSubcommentWhereUniqueInput = {
@@ -19236,7 +19206,6 @@ export namespace Prisma {
   export type TelegramOrderByInput = {
     userId?: SortOrder
     chatId?: SortOrder
-    user?: UserOrderByInput
   }
 
   export type TelegramWhereUniqueInput = {
