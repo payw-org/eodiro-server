@@ -254,6 +254,7 @@ export type User = {
   password: string
   nickname: string
   randomNickname: string
+  point: number | null
   joinedAt: Date
   refreshToken: string | null
 }
@@ -14609,10 +14610,12 @@ export namespace Prisma {
 
   export type UserAvgAggregateOutputType = {
     id: number
+    point: number | null
   }
 
   export type UserSumAggregateOutputType = {
     id: number
+    point: number | null
   }
 
   export type UserMinAggregateOutputType = {
@@ -14621,6 +14624,7 @@ export namespace Prisma {
     password: string | null
     nickname: string | null
     randomNickname: string | null
+    point: number | null
     joinedAt: Date | null
     refreshToken: string | null
   }
@@ -14631,6 +14635,7 @@ export namespace Prisma {
     password: string | null
     nickname: string | null
     randomNickname: string | null
+    point: number | null
     joinedAt: Date | null
     refreshToken: string | null
   }
@@ -14641,6 +14646,7 @@ export namespace Prisma {
     password: number | null
     nickname: number | null
     randomNickname: number | null
+    point: number | null
     joinedAt: number | null
     refreshToken: number | null
     _all: number
@@ -14649,10 +14655,12 @@ export namespace Prisma {
 
   export type UserAvgAggregateInputType = {
     id?: true
+    point?: true
   }
 
   export type UserSumAggregateInputType = {
     id?: true
+    point?: true
   }
 
   export type UserMinAggregateInputType = {
@@ -14661,6 +14669,7 @@ export namespace Prisma {
     password?: true
     nickname?: true
     randomNickname?: true
+    point?: true
     joinedAt?: true
     refreshToken?: true
   }
@@ -14671,6 +14680,7 @@ export namespace Prisma {
     password?: true
     nickname?: true
     randomNickname?: true
+    point?: true
     joinedAt?: true
     refreshToken?: true
   }
@@ -14681,6 +14691,7 @@ export namespace Prisma {
     password?: true
     nickname?: true
     randomNickname?: true
+    point?: true
     joinedAt?: true
     refreshToken?: true
     _all?: true
@@ -14763,6 +14774,7 @@ export namespace Prisma {
     password?: boolean
     nickname?: boolean
     randomNickname?: boolean
+    point?: boolean
     joinedAt?: boolean
     refreshToken?: boolean
     admin?: boolean | AdminArgs
@@ -18514,6 +18526,7 @@ export namespace Prisma {
     password: 'password',
     nickname: 'nickname',
     randomNickname: 'randomNickname',
+    point: 'point',
     joinedAt: 'joinedAt',
     refreshToken: 'refreshToken'
   };
@@ -19076,6 +19089,7 @@ export namespace Prisma {
     password?: StringFilter | string
     nickname?: StringFilter | string
     randomNickname?: StringFilter | string
+    point?: IntNullableFilter | number | null
     joinedAt?: DateTimeFilter | Date | string
     refreshToken?: StringNullableFilter | string | null
     admin?: XOR<AdminRelationFilter, AdminWhereInput> | null
@@ -19103,6 +19117,7 @@ export namespace Prisma {
     password?: SortOrder
     nickname?: SortOrder
     randomNickname?: SortOrder
+    point?: SortOrder
     joinedAt?: SortOrder
     refreshToken?: SortOrder
   }
@@ -20170,6 +20185,7 @@ export namespace Prisma {
     password: string
     nickname: string
     randomNickname: string
+    point?: number | null
     joinedAt: Date | string
     refreshToken?: string | null
     admin?: AdminCreateNestedOneWithoutUserInput
@@ -20197,6 +20213,7 @@ export namespace Prisma {
     password: string
     nickname: string
     randomNickname: string
+    point?: number | null
     joinedAt: Date | string
     refreshToken?: string | null
     admin?: AdminUncheckedCreateNestedOneWithoutUserInput
@@ -20223,6 +20240,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     nickname?: StringFieldUpdateOperationsInput | string
     randomNickname?: StringFieldUpdateOperationsInput | string
+    point?: NullableIntFieldUpdateOperationsInput | number | null
     joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     refreshToken?: NullableStringFieldUpdateOperationsInput | string | null
     admin?: AdminUpdateOneWithoutUserInput
@@ -20250,6 +20268,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     nickname?: StringFieldUpdateOperationsInput | string
     randomNickname?: StringFieldUpdateOperationsInput | string
+    point?: NullableIntFieldUpdateOperationsInput | number | null
     joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     refreshToken?: NullableStringFieldUpdateOperationsInput | string | null
     admin?: AdminUncheckedUpdateOneWithoutUserInput
@@ -20276,6 +20295,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     nickname?: StringFieldUpdateOperationsInput | string
     randomNickname?: StringFieldUpdateOperationsInput | string
+    point?: NullableIntFieldUpdateOperationsInput | number | null
     joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     refreshToken?: NullableStringFieldUpdateOperationsInput | string | null
   }
@@ -20286,6 +20306,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     nickname?: StringFieldUpdateOperationsInput | string
     randomNickname?: StringFieldUpdateOperationsInput | string
+    point?: NullableIntFieldUpdateOperationsInput | number | null
     joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     refreshToken?: NullableStringFieldUpdateOperationsInput | string | null
   }
@@ -22465,6 +22486,7 @@ export namespace Prisma {
     password: string
     nickname: string
     randomNickname: string
+    point?: number | null
     joinedAt: Date | string
     refreshToken?: string | null
     changePassword?: ChangePasswordCreateNestedOneWithoutUserInput
@@ -22491,6 +22513,7 @@ export namespace Prisma {
     password: string
     nickname: string
     randomNickname: string
+    point?: number | null
     joinedAt: Date | string
     refreshToken?: string | null
     changePassword?: ChangePasswordUncheckedCreateNestedOneWithoutUserInput
@@ -22526,6 +22549,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     nickname?: StringFieldUpdateOperationsInput | string
     randomNickname?: StringFieldUpdateOperationsInput | string
+    point?: NullableIntFieldUpdateOperationsInput | number | null
     joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     refreshToken?: NullableStringFieldUpdateOperationsInput | string | null
     changePassword?: ChangePasswordUpdateOneWithoutUserInput
@@ -22552,6 +22576,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     nickname?: StringFieldUpdateOperationsInput | string
     randomNickname?: StringFieldUpdateOperationsInput | string
+    point?: NullableIntFieldUpdateOperationsInput | number | null
     joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     refreshToken?: NullableStringFieldUpdateOperationsInput | string | null
     changePassword?: ChangePasswordUncheckedUpdateOneWithoutUserInput
@@ -22577,6 +22602,7 @@ export namespace Prisma {
     password: string
     nickname: string
     randomNickname: string
+    point?: number | null
     joinedAt: Date | string
     refreshToken?: string | null
     admin?: AdminCreateNestedOneWithoutUserInput
@@ -22603,6 +22629,7 @@ export namespace Prisma {
     password: string
     nickname: string
     randomNickname: string
+    point?: number | null
     joinedAt: Date | string
     refreshToken?: string | null
     admin?: AdminUncheckedCreateNestedOneWithoutUserInput
@@ -22638,6 +22665,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     nickname?: StringFieldUpdateOperationsInput | string
     randomNickname?: StringFieldUpdateOperationsInput | string
+    point?: NullableIntFieldUpdateOperationsInput | number | null
     joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     refreshToken?: NullableStringFieldUpdateOperationsInput | string | null
     admin?: AdminUpdateOneWithoutUserInput
@@ -22664,6 +22692,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     nickname?: StringFieldUpdateOperationsInput | string
     randomNickname?: StringFieldUpdateOperationsInput | string
+    point?: NullableIntFieldUpdateOperationsInput | number | null
     joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     refreshToken?: NullableStringFieldUpdateOperationsInput | string | null
     admin?: AdminUncheckedUpdateOneWithoutUserInput
@@ -22689,6 +22718,7 @@ export namespace Prisma {
     password: string
     nickname: string
     randomNickname: string
+    point?: number | null
     joinedAt: Date | string
     refreshToken?: string | null
     admin?: AdminCreateNestedOneWithoutUserInput
@@ -22715,6 +22745,7 @@ export namespace Prisma {
     password: string
     nickname: string
     randomNickname: string
+    point?: number | null
     joinedAt: Date | string
     refreshToken?: string | null
     admin?: AdminUncheckedCreateNestedOneWithoutUserInput
@@ -22805,6 +22836,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     nickname?: StringFieldUpdateOperationsInput | string
     randomNickname?: StringFieldUpdateOperationsInput | string
+    point?: NullableIntFieldUpdateOperationsInput | number | null
     joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     refreshToken?: NullableStringFieldUpdateOperationsInput | string | null
     admin?: AdminUpdateOneWithoutUserInput
@@ -22831,6 +22863,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     nickname?: StringFieldUpdateOperationsInput | string
     randomNickname?: StringFieldUpdateOperationsInput | string
+    point?: NullableIntFieldUpdateOperationsInput | number | null
     joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     refreshToken?: NullableStringFieldUpdateOperationsInput | string | null
     admin?: AdminUncheckedUpdateOneWithoutUserInput
@@ -22914,6 +22947,7 @@ export namespace Prisma {
     password: string
     nickname: string
     randomNickname: string
+    point?: number | null
     joinedAt: Date | string
     refreshToken?: string | null
     admin?: AdminCreateNestedOneWithoutUserInput
@@ -22940,6 +22974,7 @@ export namespace Prisma {
     password: string
     nickname: string
     randomNickname: string
+    point?: number | null
     joinedAt: Date | string
     refreshToken?: string | null
     admin?: AdminUncheckedCreateNestedOneWithoutUserInput
@@ -22988,6 +23023,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     nickname?: StringFieldUpdateOperationsInput | string
     randomNickname?: StringFieldUpdateOperationsInput | string
+    point?: NullableIntFieldUpdateOperationsInput | number | null
     joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     refreshToken?: NullableStringFieldUpdateOperationsInput | string | null
     admin?: AdminUpdateOneWithoutUserInput
@@ -23014,6 +23050,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     nickname?: StringFieldUpdateOperationsInput | string
     randomNickname?: StringFieldUpdateOperationsInput | string
+    point?: NullableIntFieldUpdateOperationsInput | number | null
     joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     refreshToken?: NullableStringFieldUpdateOperationsInput | string | null
     admin?: AdminUncheckedUpdateOneWithoutUserInput
@@ -23083,6 +23120,7 @@ export namespace Prisma {
     password: string
     nickname: string
     randomNickname: string
+    point?: number | null
     joinedAt: Date | string
     refreshToken?: string | null
     admin?: AdminCreateNestedOneWithoutUserInput
@@ -23109,6 +23147,7 @@ export namespace Prisma {
     password: string
     nickname: string
     randomNickname: string
+    point?: number | null
     joinedAt: Date | string
     refreshToken?: string | null
     admin?: AdminUncheckedCreateNestedOneWithoutUserInput
@@ -23164,6 +23203,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     nickname?: StringFieldUpdateOperationsInput | string
     randomNickname?: StringFieldUpdateOperationsInput | string
+    point?: NullableIntFieldUpdateOperationsInput | number | null
     joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     refreshToken?: NullableStringFieldUpdateOperationsInput | string | null
     admin?: AdminUpdateOneWithoutUserInput
@@ -23190,6 +23230,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     nickname?: StringFieldUpdateOperationsInput | string
     randomNickname?: StringFieldUpdateOperationsInput | string
+    point?: NullableIntFieldUpdateOperationsInput | number | null
     joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     refreshToken?: NullableStringFieldUpdateOperationsInput | string | null
     admin?: AdminUncheckedUpdateOneWithoutUserInput
@@ -23243,6 +23284,7 @@ export namespace Prisma {
     password: string
     nickname: string
     randomNickname: string
+    point?: number | null
     joinedAt: Date | string
     refreshToken?: string | null
     admin?: AdminCreateNestedOneWithoutUserInput
@@ -23269,6 +23311,7 @@ export namespace Prisma {
     password: string
     nickname: string
     randomNickname: string
+    point?: number | null
     joinedAt: Date | string
     refreshToken?: string | null
     admin?: AdminUncheckedCreateNestedOneWithoutUserInput
@@ -23332,6 +23375,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     nickname?: StringFieldUpdateOperationsInput | string
     randomNickname?: StringFieldUpdateOperationsInput | string
+    point?: NullableIntFieldUpdateOperationsInput | number | null
     joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     refreshToken?: NullableStringFieldUpdateOperationsInput | string | null
     admin?: AdminUpdateOneWithoutUserInput
@@ -23358,6 +23402,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     nickname?: StringFieldUpdateOperationsInput | string
     randomNickname?: StringFieldUpdateOperationsInput | string
+    point?: NullableIntFieldUpdateOperationsInput | number | null
     joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     refreshToken?: NullableStringFieldUpdateOperationsInput | string | null
     admin?: AdminUncheckedUpdateOneWithoutUserInput
@@ -23425,6 +23470,7 @@ export namespace Prisma {
     password: string
     nickname: string
     randomNickname: string
+    point?: number | null
     joinedAt: Date | string
     refreshToken?: string | null
     admin?: AdminCreateNestedOneWithoutUserInput
@@ -23451,6 +23497,7 @@ export namespace Prisma {
     password: string
     nickname: string
     randomNickname: string
+    point?: number | null
     joinedAt: Date | string
     refreshToken?: string | null
     admin?: AdminUncheckedCreateNestedOneWithoutUserInput
@@ -23574,6 +23621,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     nickname?: StringFieldUpdateOperationsInput | string
     randomNickname?: StringFieldUpdateOperationsInput | string
+    point?: NullableIntFieldUpdateOperationsInput | number | null
     joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     refreshToken?: NullableStringFieldUpdateOperationsInput | string | null
     admin?: AdminUpdateOneWithoutUserInput
@@ -23600,6 +23648,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     nickname?: StringFieldUpdateOperationsInput | string
     randomNickname?: StringFieldUpdateOperationsInput | string
+    point?: NullableIntFieldUpdateOperationsInput | number | null
     joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     refreshToken?: NullableStringFieldUpdateOperationsInput | string | null
     admin?: AdminUncheckedUpdateOneWithoutUserInput
@@ -23711,6 +23760,7 @@ export namespace Prisma {
     password: string
     nickname: string
     randomNickname: string
+    point?: number | null
     joinedAt: Date | string
     refreshToken?: string | null
     admin?: AdminCreateNestedOneWithoutUserInput
@@ -23737,6 +23787,7 @@ export namespace Prisma {
     password: string
     nickname: string
     randomNickname: string
+    point?: number | null
     joinedAt: Date | string
     refreshToken?: string | null
     admin?: AdminUncheckedCreateNestedOneWithoutUserInput
@@ -23898,6 +23949,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     nickname?: StringFieldUpdateOperationsInput | string
     randomNickname?: StringFieldUpdateOperationsInput | string
+    point?: NullableIntFieldUpdateOperationsInput | number | null
     joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     refreshToken?: NullableStringFieldUpdateOperationsInput | string | null
     admin?: AdminUpdateOneWithoutUserInput
@@ -23924,6 +23976,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     nickname?: StringFieldUpdateOperationsInput | string
     randomNickname?: StringFieldUpdateOperationsInput | string
+    point?: NullableIntFieldUpdateOperationsInput | number | null
     joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     refreshToken?: NullableStringFieldUpdateOperationsInput | string | null
     admin?: AdminUncheckedUpdateOneWithoutUserInput
@@ -24112,6 +24165,7 @@ export namespace Prisma {
     password: string
     nickname: string
     randomNickname: string
+    point?: number | null
     joinedAt: Date | string
     refreshToken?: string | null
     admin?: AdminCreateNestedOneWithoutUserInput
@@ -24138,6 +24192,7 @@ export namespace Prisma {
     password: string
     nickname: string
     randomNickname: string
+    point?: number | null
     joinedAt: Date | string
     refreshToken?: string | null
     admin?: AdminUncheckedCreateNestedOneWithoutUserInput
@@ -24215,6 +24270,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     nickname?: StringFieldUpdateOperationsInput | string
     randomNickname?: StringFieldUpdateOperationsInput | string
+    point?: NullableIntFieldUpdateOperationsInput | number | null
     joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     refreshToken?: NullableStringFieldUpdateOperationsInput | string | null
     admin?: AdminUpdateOneWithoutUserInput
@@ -24241,6 +24297,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     nickname?: StringFieldUpdateOperationsInput | string
     randomNickname?: StringFieldUpdateOperationsInput | string
+    point?: NullableIntFieldUpdateOperationsInput | number | null
     joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     refreshToken?: NullableStringFieldUpdateOperationsInput | string | null
     admin?: AdminUncheckedUpdateOneWithoutUserInput
@@ -24308,6 +24365,7 @@ export namespace Prisma {
     password: string
     nickname: string
     randomNickname: string
+    point?: number | null
     joinedAt: Date | string
     refreshToken?: string | null
     admin?: AdminCreateNestedOneWithoutUserInput
@@ -24334,6 +24392,7 @@ export namespace Prisma {
     password: string
     nickname: string
     randomNickname: string
+    point?: number | null
     joinedAt: Date | string
     refreshToken?: string | null
     admin?: AdminUncheckedCreateNestedOneWithoutUserInput
@@ -24411,6 +24470,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     nickname?: StringFieldUpdateOperationsInput | string
     randomNickname?: StringFieldUpdateOperationsInput | string
+    point?: NullableIntFieldUpdateOperationsInput | number | null
     joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     refreshToken?: NullableStringFieldUpdateOperationsInput | string | null
     admin?: AdminUpdateOneWithoutUserInput
@@ -24437,6 +24497,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     nickname?: StringFieldUpdateOperationsInput | string
     randomNickname?: StringFieldUpdateOperationsInput | string
+    point?: NullableIntFieldUpdateOperationsInput | number | null
     joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     refreshToken?: NullableStringFieldUpdateOperationsInput | string | null
     admin?: AdminUncheckedUpdateOneWithoutUserInput
@@ -24530,6 +24591,7 @@ export namespace Prisma {
     password: string
     nickname: string
     randomNickname: string
+    point?: number | null
     joinedAt: Date | string
     refreshToken?: string | null
     admin?: AdminCreateNestedOneWithoutUserInput
@@ -24556,6 +24618,7 @@ export namespace Prisma {
     password: string
     nickname: string
     randomNickname: string
+    point?: number | null
     joinedAt: Date | string
     refreshToken?: string | null
     admin?: AdminUncheckedCreateNestedOneWithoutUserInput
@@ -24679,6 +24742,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     nickname?: StringFieldUpdateOperationsInput | string
     randomNickname?: StringFieldUpdateOperationsInput | string
+    point?: NullableIntFieldUpdateOperationsInput | number | null
     joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     refreshToken?: NullableStringFieldUpdateOperationsInput | string | null
     admin?: AdminUpdateOneWithoutUserInput
@@ -24705,6 +24769,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     nickname?: StringFieldUpdateOperationsInput | string
     randomNickname?: StringFieldUpdateOperationsInput | string
+    point?: NullableIntFieldUpdateOperationsInput | number | null
     joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     refreshToken?: NullableStringFieldUpdateOperationsInput | string | null
     admin?: AdminUncheckedUpdateOneWithoutUserInput
@@ -25001,6 +25066,7 @@ export namespace Prisma {
     password: string
     nickname: string
     randomNickname: string
+    point?: number | null
     joinedAt: Date | string
     refreshToken?: string | null
     admin?: AdminCreateNestedOneWithoutUserInput
@@ -25027,6 +25093,7 @@ export namespace Prisma {
     password: string
     nickname: string
     randomNickname: string
+    point?: number | null
     joinedAt: Date | string
     refreshToken?: string | null
     admin?: AdminUncheckedCreateNestedOneWithoutUserInput
@@ -25062,6 +25129,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     nickname?: StringFieldUpdateOperationsInput | string
     randomNickname?: StringFieldUpdateOperationsInput | string
+    point?: NullableIntFieldUpdateOperationsInput | number | null
     joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     refreshToken?: NullableStringFieldUpdateOperationsInput | string | null
     admin?: AdminUpdateOneWithoutUserInput
@@ -25088,6 +25156,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     nickname?: StringFieldUpdateOperationsInput | string
     randomNickname?: StringFieldUpdateOperationsInput | string
+    point?: NullableIntFieldUpdateOperationsInput | number | null
     joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     refreshToken?: NullableStringFieldUpdateOperationsInput | string | null
     admin?: AdminUncheckedUpdateOneWithoutUserInput
@@ -25113,6 +25182,7 @@ export namespace Prisma {
     password: string
     nickname: string
     randomNickname: string
+    point?: number | null
     joinedAt: Date | string
     refreshToken?: string | null
     admin?: AdminCreateNestedOneWithoutUserInput
@@ -25139,6 +25209,7 @@ export namespace Prisma {
     password: string
     nickname: string
     randomNickname: string
+    point?: number | null
     joinedAt: Date | string
     refreshToken?: string | null
     admin?: AdminUncheckedCreateNestedOneWithoutUserInput
@@ -25174,6 +25245,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     nickname?: StringFieldUpdateOperationsInput | string
     randomNickname?: StringFieldUpdateOperationsInput | string
+    point?: NullableIntFieldUpdateOperationsInput | number | null
     joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     refreshToken?: NullableStringFieldUpdateOperationsInput | string | null
     admin?: AdminUpdateOneWithoutUserInput
@@ -25200,6 +25272,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     nickname?: StringFieldUpdateOperationsInput | string
     randomNickname?: StringFieldUpdateOperationsInput | string
+    point?: NullableIntFieldUpdateOperationsInput | number | null
     joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     refreshToken?: NullableStringFieldUpdateOperationsInput | string | null
     admin?: AdminUncheckedUpdateOneWithoutUserInput
@@ -25992,6 +26065,7 @@ export namespace Prisma {
     password: string
     nickname: string
     randomNickname: string
+    point?: number | null
     joinedAt: Date | string
     refreshToken?: string | null
     admin?: AdminCreateNestedOneWithoutUserInput
@@ -26018,6 +26092,7 @@ export namespace Prisma {
     password: string
     nickname: string
     randomNickname: string
+    point?: number | null
     joinedAt: Date | string
     refreshToken?: string | null
     admin?: AdminUncheckedCreateNestedOneWithoutUserInput
@@ -26079,6 +26154,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     nickname?: StringFieldUpdateOperationsInput | string
     randomNickname?: StringFieldUpdateOperationsInput | string
+    point?: NullableIntFieldUpdateOperationsInput | number | null
     joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     refreshToken?: NullableStringFieldUpdateOperationsInput | string | null
     admin?: AdminUpdateOneWithoutUserInput
@@ -26105,6 +26181,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     nickname?: StringFieldUpdateOperationsInput | string
     randomNickname?: StringFieldUpdateOperationsInput | string
+    point?: NullableIntFieldUpdateOperationsInput | number | null
     joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     refreshToken?: NullableStringFieldUpdateOperationsInput | string | null
     admin?: AdminUncheckedUpdateOneWithoutUserInput
@@ -26172,6 +26249,7 @@ export namespace Prisma {
     password: string
     nickname: string
     randomNickname: string
+    point?: number | null
     joinedAt: Date | string
     refreshToken?: string | null
     admin?: AdminCreateNestedOneWithoutUserInput
@@ -26198,6 +26276,7 @@ export namespace Prisma {
     password: string
     nickname: string
     randomNickname: string
+    point?: number | null
     joinedAt: Date | string
     refreshToken?: string | null
     admin?: AdminUncheckedCreateNestedOneWithoutUserInput
@@ -26275,6 +26354,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     nickname?: StringFieldUpdateOperationsInput | string
     randomNickname?: StringFieldUpdateOperationsInput | string
+    point?: NullableIntFieldUpdateOperationsInput | number | null
     joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     refreshToken?: NullableStringFieldUpdateOperationsInput | string | null
     admin?: AdminUpdateOneWithoutUserInput
@@ -26301,6 +26381,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     nickname?: StringFieldUpdateOperationsInput | string
     randomNickname?: StringFieldUpdateOperationsInput | string
+    point?: NullableIntFieldUpdateOperationsInput | number | null
     joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     refreshToken?: NullableStringFieldUpdateOperationsInput | string | null
     admin?: AdminUncheckedUpdateOneWithoutUserInput
@@ -26352,6 +26433,7 @@ export namespace Prisma {
     password: string
     nickname: string
     randomNickname: string
+    point?: number | null
     joinedAt: Date | string
     refreshToken?: string | null
     admin?: AdminCreateNestedOneWithoutUserInput
@@ -26378,6 +26460,7 @@ export namespace Prisma {
     password: string
     nickname: string
     randomNickname: string
+    point?: number | null
     joinedAt: Date | string
     refreshToken?: string | null
     admin?: AdminUncheckedCreateNestedOneWithoutUserInput
@@ -26439,6 +26522,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     nickname?: StringFieldUpdateOperationsInput | string
     randomNickname?: StringFieldUpdateOperationsInput | string
+    point?: NullableIntFieldUpdateOperationsInput | number | null
     joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     refreshToken?: NullableStringFieldUpdateOperationsInput | string | null
     admin?: AdminUpdateOneWithoutUserInput
@@ -26465,6 +26549,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     nickname?: StringFieldUpdateOperationsInput | string
     randomNickname?: StringFieldUpdateOperationsInput | string
+    point?: NullableIntFieldUpdateOperationsInput | number | null
     joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     refreshToken?: NullableStringFieldUpdateOperationsInput | string | null
     admin?: AdminUncheckedUpdateOneWithoutUserInput
@@ -26490,6 +26575,7 @@ export namespace Prisma {
     password: string
     nickname: string
     randomNickname: string
+    point?: number | null
     joinedAt: Date | string
     refreshToken?: string | null
     admin?: AdminCreateNestedOneWithoutUserInput
@@ -26516,6 +26602,7 @@ export namespace Prisma {
     password: string
     nickname: string
     randomNickname: string
+    point?: number | null
     joinedAt: Date | string
     refreshToken?: string | null
     admin?: AdminUncheckedCreateNestedOneWithoutUserInput
@@ -26551,6 +26638,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     nickname?: StringFieldUpdateOperationsInput | string
     randomNickname?: StringFieldUpdateOperationsInput | string
+    point?: NullableIntFieldUpdateOperationsInput | number | null
     joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     refreshToken?: NullableStringFieldUpdateOperationsInput | string | null
     admin?: AdminUpdateOneWithoutUserInput
@@ -26577,6 +26665,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     nickname?: StringFieldUpdateOperationsInput | string
     randomNickname?: StringFieldUpdateOperationsInput | string
+    point?: NullableIntFieldUpdateOperationsInput | number | null
     joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     refreshToken?: NullableStringFieldUpdateOperationsInput | string | null
     admin?: AdminUncheckedUpdateOneWithoutUserInput
