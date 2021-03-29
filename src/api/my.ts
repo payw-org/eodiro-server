@@ -22,6 +22,7 @@ router.get<any, SafeUser>('/information', async (req, res) => {
       nickname: true,
       randomNickname: true,
       joinedAt: true,
+      point: true,
     },
   })
 
