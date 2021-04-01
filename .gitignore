@@ -26,3 +26,6 @@ src/api/eodiro-one-api/db-schema
 generated
 **/config/index.ts
 **/env/index.ts
+
+# Prisma
+src/prisma
