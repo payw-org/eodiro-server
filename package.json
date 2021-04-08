@@ -20,7 +20,7 @@
     "dev-ts": "cross-env NODE_ENV=development tsnd --no-notify --respawn --transpile-only -r tsconfig-paths/register src/main.ts",
     "typecheck": "tsc --noEmit",
     "typecheck:watch": "tsc --noEmit --watch --preserveWatchOutput",
-    "build": "npm run clear:build && npm run generate && ttsc",
+    "build": "npm run clear:build && npm run generate:prod && ttsc",
     "build:types": "npm run clear:types && ttsc && mkdir -p eodiro-server-types/prisma/client && cp src/prisma/client/index.d.ts eodiro-server-types/prisma/client/index.d.ts",
     "start:dev": "cross-env NODE_ENV=development node --harmony build/src/main.js",
     "pm2:start": "if pm2 show eodiro-server ; then npm run pm2:stop && npm run pm2:delete && npm run pm2:start ; else pm2 start build/main.js --name \"eodiro-server\" ; fi",
