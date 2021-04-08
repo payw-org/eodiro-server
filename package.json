@@ -40,7 +40,7 @@
     "db:push:dev": "prisma db push --schema prisma/schema.dev.prisma --preview-feature",
     "migrate:prod": "prisma migrate dev --preview-feature --schema prisma/schema.prisma",
     "migrate:dev": "prisma migrate dev --preview-feature --schema prisma/schema.dev.prisma",
-    "copy:prisma:types": "cp node_modules/.prisma/client/index.d.ts src/prisma/client/index.d.ts",
+    "copy:prisma:types": "mkdir -p src/prisma/client && cp node_modules/.prisma/client/index.d.ts src/prisma/client/index.d.ts",
     "update:server-types": "zsh ./update-types.sh"
   },
   "dependencies": {
