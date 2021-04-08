@@ -273,6 +273,7 @@ model User {
   password                         String                            @db.Char(60)
   nickname                         String                            @unique @db.VarChar(30)
   randomNickname                   String                            @map("random_nickname") @db.VarChar(30)
+  point                            Int?                              @default(0) @db.UnsignedInt
   joinedAt                         DateTime                          @map("joined_at") @db.DateTime(0)
   refreshToken                     String?                           @map("refresh_token") @db.VarChar(500)
   admin                            Admin?
