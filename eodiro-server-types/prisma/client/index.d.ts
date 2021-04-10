@@ -254,6 +254,7 @@ export type User = {
   password: string
   nickname: string
   randomNickname: string
+  point: number | null
   joinedAt: Date
   refreshToken: string | null
 }
@@ -697,8 +698,8 @@ export namespace Prisma {
   export import Decimal = runtime.Decimal
 
   /**
-   * Prisma Client JS version: 2.18.0
-   * Query Engine version: da6fafb57b24e0b61ca20960c64e2d41f9e8cff1
+   * Prisma Client JS version: 2.20.1
+   * Query Engine version: 60ba6551f29b17d7d6ce479e5733c70d9c00860e
    */
   export type PrismaVersion = {
     client: string
@@ -1177,6 +1178,15 @@ export namespace Prisma {
     url?: string
   }
 
+  /**
+   * Count Types
+   */
+
+
+
+  /**
+   * Models
+   */
 
   /**
    * Model Admin
@@ -1304,6 +1314,38 @@ export namespace Prisma {
   }
 
 
+    
+    
+  export type AdminGroupByArgs = {
+    where?: AdminWhereInput
+    orderBy?: Enumerable<AdminOrderByInput>
+    by: Array<AdminScalarFieldEnum>
+    having?: AdminScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    count?: AdminCountAggregateInputType | true
+    avg?: AdminAvgAggregateInputType
+    sum?: AdminSumAggregateInputType
+    min?: AdminMinAggregateInputType
+    max?: AdminMaxAggregateInputType
+  }
+
+
+  export type AdminGroupByOutputType = {
+    userId: number
+    count: AdminCountAggregateOutputType | null
+    avg: AdminAvgAggregateOutputType | null
+    sum: AdminSumAggregateOutputType | null
+    min: AdminMinAggregateOutputType | null
+    max: AdminMaxAggregateOutputType | null
+  }
+
+  type GetAdminGroupByPayload<T extends AdminGroupByArgs> = Promise<Array<
+    PickArray<AdminGroupByOutputType, T['by']> & {
+      [P in ((keyof T) & (keyof AdminGroupByOutputType))]: GetScalarType<T[P], AdminGroupByOutputType[P]>
+    }
+  >>
+    
 
   export type AdminSelect = {
     userId?: boolean
@@ -1413,6 +1455,22 @@ export namespace Prisma {
     create<T extends AdminCreateArgs>(
       args: SelectSubset<T, AdminCreateArgs>
     ): CheckSelect<T, Prisma__AdminClient<Admin>, Prisma__AdminClient<AdminGetPayload<T>>>
+
+    /**
+     * Create many Admins.
+     *     @param {AdminCreateManyArgs} args - Arguments to create many Admins.
+     *     @example
+     *     // Create many Admins
+     *     const admin = await prisma.admin.createMany({
+     *       data: {
+     *         // ... provide data here
+     *       }
+     *     })
+     *     
+    **/
+    createMany<T extends AdminCreateManyArgs>(
+      args?: SelectSubset<T, AdminCreateManyArgs>
+    ): PrismaPromise<BatchPayload>
 
     /**
      * Delete a Admin.
@@ -1556,7 +1614,82 @@ export namespace Prisma {
     **/
     aggregate<T extends AdminAggregateArgs>(args: Subset<T, AdminAggregateArgs>): PrismaPromise<GetAdminAggregateType<T>>
 
-
+    /**
+     * Group by Admin.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AdminGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends AdminGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: AdminGroupByArgs['orderBy'] }
+        : { orderBy?: AdminGroupByArgs['orderBy'] },
+      OrderFields extends Keys<MaybeTupleToUnion<T['orderBy']>>,
+      ByFields extends TupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, AdminGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetAdminGroupByPayload<T> : Promise<InputErrors>
   }
 
   /**
@@ -1745,6 +1878,15 @@ export namespace Prisma {
      * The data needed to create a Admin.
     **/
     data: XOR<AdminCreateInput, AdminUncheckedCreateInput>
+  }
+
+
+  /**
+   * Admin createMany
+   */
+  export type AdminCreateManyArgs = {
+    data: Enumerable<AdminCreateManyInput>
+    skipDuplicates?: boolean
   }
 
 
@@ -1954,6 +2096,36 @@ export namespace Prisma {
   }
 
 
+    
+    
+  export type CafeteriaMenuGroupByArgs = {
+    where?: CafeteriaMenuWhereInput
+    orderBy?: Enumerable<CafeteriaMenuOrderByInput>
+    by: Array<CafeteriaMenuScalarFieldEnum>
+    having?: CafeteriaMenuScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    count?: CafeteriaMenuCountAggregateInputType | true
+    min?: CafeteriaMenuMinAggregateInputType
+    max?: CafeteriaMenuMaxAggregateInputType
+  }
+
+
+  export type CafeteriaMenuGroupByOutputType = {
+    campus: string
+    servedAt: Date
+    data: JsonValue | null
+    count: CafeteriaMenuCountAggregateOutputType | null
+    min: CafeteriaMenuMinAggregateOutputType | null
+    max: CafeteriaMenuMaxAggregateOutputType | null
+  }
+
+  type GetCafeteriaMenuGroupByPayload<T extends CafeteriaMenuGroupByArgs> = Promise<Array<
+    PickArray<CafeteriaMenuGroupByOutputType, T['by']> & {
+      [P in ((keyof T) & (keyof CafeteriaMenuGroupByOutputType))]: GetScalarType<T[P], CafeteriaMenuGroupByOutputType[P]>
+    }
+  >>
+    
 
   export type CafeteriaMenuSelect = {
     campus?: boolean
@@ -2055,6 +2227,22 @@ export namespace Prisma {
     create<T extends CafeteriaMenuCreateArgs>(
       args: SelectSubset<T, CafeteriaMenuCreateArgs>
     ): CheckSelect<T, Prisma__CafeteriaMenuClient<CafeteriaMenu>, Prisma__CafeteriaMenuClient<CafeteriaMenuGetPayload<T>>>
+
+    /**
+     * Create many CafeteriaMenus.
+     *     @param {CafeteriaMenuCreateManyArgs} args - Arguments to create many CafeteriaMenus.
+     *     @example
+     *     // Create many CafeteriaMenus
+     *     const cafeteriaMenu = await prisma.cafeteriaMenu.createMany({
+     *       data: {
+     *         // ... provide data here
+     *       }
+     *     })
+     *     
+    **/
+    createMany<T extends CafeteriaMenuCreateManyArgs>(
+      args?: SelectSubset<T, CafeteriaMenuCreateManyArgs>
+    ): PrismaPromise<BatchPayload>
 
     /**
      * Delete a CafeteriaMenu.
@@ -2198,7 +2386,82 @@ export namespace Prisma {
     **/
     aggregate<T extends CafeteriaMenuAggregateArgs>(args: Subset<T, CafeteriaMenuAggregateArgs>): PrismaPromise<GetCafeteriaMenuAggregateType<T>>
 
-
+    /**
+     * Group by CafeteriaMenu.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CafeteriaMenuGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends CafeteriaMenuGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: CafeteriaMenuGroupByArgs['orderBy'] }
+        : { orderBy?: CafeteriaMenuGroupByArgs['orderBy'] },
+      OrderFields extends Keys<MaybeTupleToUnion<T['orderBy']>>,
+      ByFields extends TupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, CafeteriaMenuGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetCafeteriaMenuGroupByPayload<T> : Promise<InputErrors>
   }
 
   /**
@@ -2370,6 +2633,15 @@ export namespace Prisma {
      * The data needed to create a CafeteriaMenu.
     **/
     data: XOR<CafeteriaMenuCreateInput, CafeteriaMenuUncheckedCreateInput>
+  }
+
+
+  /**
+   * CafeteriaMenu createMany
+   */
+  export type CafeteriaMenuCreateManyArgs = {
+    data: Enumerable<CafeteriaMenuCreateManyInput>
+    skipDuplicates?: boolean
   }
 
 
@@ -2597,6 +2869,40 @@ export namespace Prisma {
   }
 
 
+    
+    
+  export type ChangePasswordGroupByArgs = {
+    where?: ChangePasswordWhereInput
+    orderBy?: Enumerable<ChangePasswordOrderByInput>
+    by: Array<ChangePasswordScalarFieldEnum>
+    having?: ChangePasswordScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    count?: ChangePasswordCountAggregateInputType | true
+    avg?: ChangePasswordAvgAggregateInputType
+    sum?: ChangePasswordSumAggregateInputType
+    min?: ChangePasswordMinAggregateInputType
+    max?: ChangePasswordMaxAggregateInputType
+  }
+
+
+  export type ChangePasswordGroupByOutputType = {
+    userId: number
+    token: string
+    requestedAt: Date
+    count: ChangePasswordCountAggregateOutputType | null
+    avg: ChangePasswordAvgAggregateOutputType | null
+    sum: ChangePasswordSumAggregateOutputType | null
+    min: ChangePasswordMinAggregateOutputType | null
+    max: ChangePasswordMaxAggregateOutputType | null
+  }
+
+  type GetChangePasswordGroupByPayload<T extends ChangePasswordGroupByArgs> = Promise<Array<
+    PickArray<ChangePasswordGroupByOutputType, T['by']> & {
+      [P in ((keyof T) & (keyof ChangePasswordGroupByOutputType))]: GetScalarType<T[P], ChangePasswordGroupByOutputType[P]>
+    }
+  >>
+    
 
   export type ChangePasswordSelect = {
     userId?: boolean
@@ -2708,6 +3014,22 @@ export namespace Prisma {
     create<T extends ChangePasswordCreateArgs>(
       args: SelectSubset<T, ChangePasswordCreateArgs>
     ): CheckSelect<T, Prisma__ChangePasswordClient<ChangePassword>, Prisma__ChangePasswordClient<ChangePasswordGetPayload<T>>>
+
+    /**
+     * Create many ChangePasswords.
+     *     @param {ChangePasswordCreateManyArgs} args - Arguments to create many ChangePasswords.
+     *     @example
+     *     // Create many ChangePasswords
+     *     const changePassword = await prisma.changePassword.createMany({
+     *       data: {
+     *         // ... provide data here
+     *       }
+     *     })
+     *     
+    **/
+    createMany<T extends ChangePasswordCreateManyArgs>(
+      args?: SelectSubset<T, ChangePasswordCreateManyArgs>
+    ): PrismaPromise<BatchPayload>
 
     /**
      * Delete a ChangePassword.
@@ -2851,7 +3173,82 @@ export namespace Prisma {
     **/
     aggregate<T extends ChangePasswordAggregateArgs>(args: Subset<T, ChangePasswordAggregateArgs>): PrismaPromise<GetChangePasswordAggregateType<T>>
 
-
+    /**
+     * Group by ChangePassword.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ChangePasswordGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends ChangePasswordGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: ChangePasswordGroupByArgs['orderBy'] }
+        : { orderBy?: ChangePasswordGroupByArgs['orderBy'] },
+      OrderFields extends Keys<MaybeTupleToUnion<T['orderBy']>>,
+      ByFields extends TupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, ChangePasswordGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetChangePasswordGroupByPayload<T> : Promise<InputErrors>
   }
 
   /**
@@ -3040,6 +3437,15 @@ export namespace Prisma {
      * The data needed to create a ChangePassword.
     **/
     data: XOR<ChangePasswordCreateInput, ChangePasswordUncheckedCreateInput>
+  }
+
+
+  /**
+   * ChangePassword createMany
+   */
+  export type ChangePasswordCreateManyArgs = {
+    data: Enumerable<ChangePasswordCreateManyInput>
+    skipDuplicates?: boolean
   }
 
 
@@ -3321,6 +3727,45 @@ export namespace Prisma {
   }
 
 
+    
+    
+  export type CommunityBoardGroupByArgs = {
+    where?: CommunityBoardWhereInput
+    orderBy?: Enumerable<CommunityBoardOrderByInput>
+    by: Array<CommunityBoardScalarFieldEnum>
+    having?: CommunityBoardScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    count?: CommunityBoardCountAggregateInputType | true
+    avg?: CommunityBoardAvgAggregateInputType
+    sum?: CommunityBoardSumAggregateInputType
+    min?: CommunityBoardMinAggregateInputType
+    max?: CommunityBoardMaxAggregateInputType
+  }
+
+
+  export type CommunityBoardGroupByOutputType = {
+    id: number
+    name: string
+    description: string | null
+    priority: number
+    isDeleted: boolean
+    createdBy: number
+    createdAt: Date
+    activeAt: Date | null
+    count: CommunityBoardCountAggregateOutputType | null
+    avg: CommunityBoardAvgAggregateOutputType | null
+    sum: CommunityBoardSumAggregateOutputType | null
+    min: CommunityBoardMinAggregateOutputType | null
+    max: CommunityBoardMaxAggregateOutputType | null
+  }
+
+  type GetCommunityBoardGroupByPayload<T extends CommunityBoardGroupByArgs> = Promise<Array<
+    PickArray<CommunityBoardGroupByOutputType, T['by']> & {
+      [P in ((keyof T) & (keyof CommunityBoardGroupByOutputType))]: GetScalarType<T[P], CommunityBoardGroupByOutputType[P]>
+    }
+  >>
+    
 
   export type CommunityBoardSelect = {
     id?: boolean
@@ -3449,6 +3894,22 @@ export namespace Prisma {
     create<T extends CommunityBoardCreateArgs>(
       args: SelectSubset<T, CommunityBoardCreateArgs>
     ): CheckSelect<T, Prisma__CommunityBoardClient<CommunityBoard>, Prisma__CommunityBoardClient<CommunityBoardGetPayload<T>>>
+
+    /**
+     * Create many CommunityBoards.
+     *     @param {CommunityBoardCreateManyArgs} args - Arguments to create many CommunityBoards.
+     *     @example
+     *     // Create many CommunityBoards
+     *     const communityBoard = await prisma.communityBoard.createMany({
+     *       data: {
+     *         // ... provide data here
+     *       }
+     *     })
+     *     
+    **/
+    createMany<T extends CommunityBoardCreateManyArgs>(
+      args?: SelectSubset<T, CommunityBoardCreateManyArgs>
+    ): PrismaPromise<BatchPayload>
 
     /**
      * Delete a CommunityBoard.
@@ -3592,7 +4053,82 @@ export namespace Prisma {
     **/
     aggregate<T extends CommunityBoardAggregateArgs>(args: Subset<T, CommunityBoardAggregateArgs>): PrismaPromise<GetCommunityBoardAggregateType<T>>
 
-
+    /**
+     * Group by CommunityBoard.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CommunityBoardGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends CommunityBoardGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: CommunityBoardGroupByArgs['orderBy'] }
+        : { orderBy?: CommunityBoardGroupByArgs['orderBy'] },
+      OrderFields extends Keys<MaybeTupleToUnion<T['orderBy']>>,
+      ByFields extends TupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, CommunityBoardGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetCommunityBoardGroupByPayload<T> : Promise<InputErrors>
   }
 
   /**
@@ -3785,6 +4321,15 @@ export namespace Prisma {
      * The data needed to create a CommunityBoard.
     **/
     data: XOR<CommunityBoardCreateInput, CommunityBoardUncheckedCreateInput>
+  }
+
+
+  /**
+   * CommunityBoard createMany
+   */
+  export type CommunityBoardCreateManyArgs = {
+    data: Enumerable<CommunityBoardCreateManyInput>
+    skipDuplicates?: boolean
   }
 
 
@@ -4044,6 +4589,42 @@ export namespace Prisma {
   }
 
 
+    
+    
+  export type CommunityBoardCandidateGroupByArgs = {
+    where?: CommunityBoardCandidateWhereInput
+    orderBy?: Enumerable<CommunityBoardCandidateOrderByInput>
+    by: Array<CommunityBoardCandidateScalarFieldEnum>
+    having?: CommunityBoardCandidateScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    count?: CommunityBoardCandidateCountAggregateInputType | true
+    avg?: CommunityBoardCandidateAvgAggregateInputType
+    sum?: CommunityBoardCandidateSumAggregateInputType
+    min?: CommunityBoardCandidateMinAggregateInputType
+    max?: CommunityBoardCandidateMaxAggregateInputType
+  }
+
+
+  export type CommunityBoardCandidateGroupByOutputType = {
+    id: number
+    name: string
+    description: string | null
+    createdBy: number
+    createdAt: Date
+    count: CommunityBoardCandidateCountAggregateOutputType | null
+    avg: CommunityBoardCandidateAvgAggregateOutputType | null
+    sum: CommunityBoardCandidateSumAggregateOutputType | null
+    min: CommunityBoardCandidateMinAggregateOutputType | null
+    max: CommunityBoardCandidateMaxAggregateOutputType | null
+  }
+
+  type GetCommunityBoardCandidateGroupByPayload<T extends CommunityBoardCandidateGroupByArgs> = Promise<Array<
+    PickArray<CommunityBoardCandidateGroupByOutputType, T['by']> & {
+      [P in ((keyof T) & (keyof CommunityBoardCandidateGroupByOutputType))]: GetScalarType<T[P], CommunityBoardCandidateGroupByOutputType[P]>
+    }
+  >>
+    
 
   export type CommunityBoardCandidateSelect = {
     id?: boolean
@@ -4163,6 +4744,22 @@ export namespace Prisma {
     create<T extends CommunityBoardCandidateCreateArgs>(
       args: SelectSubset<T, CommunityBoardCandidateCreateArgs>
     ): CheckSelect<T, Prisma__CommunityBoardCandidateClient<CommunityBoardCandidate>, Prisma__CommunityBoardCandidateClient<CommunityBoardCandidateGetPayload<T>>>
+
+    /**
+     * Create many CommunityBoardCandidates.
+     *     @param {CommunityBoardCandidateCreateManyArgs} args - Arguments to create many CommunityBoardCandidates.
+     *     @example
+     *     // Create many CommunityBoardCandidates
+     *     const communityBoardCandidate = await prisma.communityBoardCandidate.createMany({
+     *       data: {
+     *         // ... provide data here
+     *       }
+     *     })
+     *     
+    **/
+    createMany<T extends CommunityBoardCandidateCreateManyArgs>(
+      args?: SelectSubset<T, CommunityBoardCandidateCreateManyArgs>
+    ): PrismaPromise<BatchPayload>
 
     /**
      * Delete a CommunityBoardCandidate.
@@ -4306,7 +4903,82 @@ export namespace Prisma {
     **/
     aggregate<T extends CommunityBoardCandidateAggregateArgs>(args: Subset<T, CommunityBoardCandidateAggregateArgs>): PrismaPromise<GetCommunityBoardCandidateAggregateType<T>>
 
-
+    /**
+     * Group by CommunityBoardCandidate.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CommunityBoardCandidateGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends CommunityBoardCandidateGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: CommunityBoardCandidateGroupByArgs['orderBy'] }
+        : { orderBy?: CommunityBoardCandidateGroupByArgs['orderBy'] },
+      OrderFields extends Keys<MaybeTupleToUnion<T['orderBy']>>,
+      ByFields extends TupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, CommunityBoardCandidateGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetCommunityBoardCandidateGroupByPayload<T> : Promise<InputErrors>
   }
 
   /**
@@ -4497,6 +5169,15 @@ export namespace Prisma {
      * The data needed to create a CommunityBoardCandidate.
     **/
     data: XOR<CommunityBoardCandidateCreateInput, CommunityBoardCandidateUncheckedCreateInput>
+  }
+
+
+  /**
+   * CommunityBoardCandidate createMany
+   */
+  export type CommunityBoardCandidateCreateManyArgs = {
+    data: Enumerable<CommunityBoardCandidateCreateManyInput>
+    skipDuplicates?: boolean
   }
 
 
@@ -4738,6 +5419,39 @@ export namespace Prisma {
   }
 
 
+    
+    
+  export type CommunityBoardCandidateVoteGroupByArgs = {
+    where?: CommunityBoardCandidateVoteWhereInput
+    orderBy?: Enumerable<CommunityBoardCandidateVoteOrderByInput>
+    by: Array<CommunityBoardCandidateVoteScalarFieldEnum>
+    having?: CommunityBoardCandidateVoteScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    count?: CommunityBoardCandidateVoteCountAggregateInputType | true
+    avg?: CommunityBoardCandidateVoteAvgAggregateInputType
+    sum?: CommunityBoardCandidateVoteSumAggregateInputType
+    min?: CommunityBoardCandidateVoteMinAggregateInputType
+    max?: CommunityBoardCandidateVoteMaxAggregateInputType
+  }
+
+
+  export type CommunityBoardCandidateVoteGroupByOutputType = {
+    boardCandidateId: number
+    userId: number
+    count: CommunityBoardCandidateVoteCountAggregateOutputType | null
+    avg: CommunityBoardCandidateVoteAvgAggregateOutputType | null
+    sum: CommunityBoardCandidateVoteSumAggregateOutputType | null
+    min: CommunityBoardCandidateVoteMinAggregateOutputType | null
+    max: CommunityBoardCandidateVoteMaxAggregateOutputType | null
+  }
+
+  type GetCommunityBoardCandidateVoteGroupByPayload<T extends CommunityBoardCandidateVoteGroupByArgs> = Promise<Array<
+    PickArray<CommunityBoardCandidateVoteGroupByOutputType, T['by']> & {
+      [P in ((keyof T) & (keyof CommunityBoardCandidateVoteGroupByOutputType))]: GetScalarType<T[P], CommunityBoardCandidateVoteGroupByOutputType[P]>
+    }
+  >>
+    
 
   export type CommunityBoardCandidateVoteSelect = {
     boardCandidateId?: boolean
@@ -4854,6 +5568,22 @@ export namespace Prisma {
     create<T extends CommunityBoardCandidateVoteCreateArgs>(
       args: SelectSubset<T, CommunityBoardCandidateVoteCreateArgs>
     ): CheckSelect<T, Prisma__CommunityBoardCandidateVoteClient<CommunityBoardCandidateVote>, Prisma__CommunityBoardCandidateVoteClient<CommunityBoardCandidateVoteGetPayload<T>>>
+
+    /**
+     * Create many CommunityBoardCandidateVotes.
+     *     @param {CommunityBoardCandidateVoteCreateManyArgs} args - Arguments to create many CommunityBoardCandidateVotes.
+     *     @example
+     *     // Create many CommunityBoardCandidateVotes
+     *     const communityBoardCandidateVote = await prisma.communityBoardCandidateVote.createMany({
+     *       data: {
+     *         // ... provide data here
+     *       }
+     *     })
+     *     
+    **/
+    createMany<T extends CommunityBoardCandidateVoteCreateManyArgs>(
+      args?: SelectSubset<T, CommunityBoardCandidateVoteCreateManyArgs>
+    ): PrismaPromise<BatchPayload>
 
     /**
      * Delete a CommunityBoardCandidateVote.
@@ -4997,7 +5727,82 @@ export namespace Prisma {
     **/
     aggregate<T extends CommunityBoardCandidateVoteAggregateArgs>(args: Subset<T, CommunityBoardCandidateVoteAggregateArgs>): PrismaPromise<GetCommunityBoardCandidateVoteAggregateType<T>>
 
-
+    /**
+     * Group by CommunityBoardCandidateVote.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CommunityBoardCandidateVoteGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends CommunityBoardCandidateVoteGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: CommunityBoardCandidateVoteGroupByArgs['orderBy'] }
+        : { orderBy?: CommunityBoardCandidateVoteGroupByArgs['orderBy'] },
+      OrderFields extends Keys<MaybeTupleToUnion<T['orderBy']>>,
+      ByFields extends TupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, CommunityBoardCandidateVoteGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetCommunityBoardCandidateVoteGroupByPayload<T> : Promise<InputErrors>
   }
 
   /**
@@ -5188,6 +5993,15 @@ export namespace Prisma {
      * The data needed to create a CommunityBoardCandidateVote.
     **/
     data: XOR<CommunityBoardCandidateVoteCreateInput, CommunityBoardCandidateVoteUncheckedCreateInput>
+  }
+
+
+  /**
+   * CommunityBoardCandidateVote createMany
+   */
+  export type CommunityBoardCandidateVoteCreateManyArgs = {
+    data: Enumerable<CommunityBoardCandidateVoteCreateManyInput>
+    skipDuplicates?: boolean
   }
 
 
@@ -5429,6 +6243,39 @@ export namespace Prisma {
   }
 
 
+    
+    
+  export type CommunityBoardPinGroupByArgs = {
+    where?: CommunityBoardPinWhereInput
+    orderBy?: Enumerable<CommunityBoardPinOrderByInput>
+    by: Array<CommunityBoardPinScalarFieldEnum>
+    having?: CommunityBoardPinScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    count?: CommunityBoardPinCountAggregateInputType | true
+    avg?: CommunityBoardPinAvgAggregateInputType
+    sum?: CommunityBoardPinSumAggregateInputType
+    min?: CommunityBoardPinMinAggregateInputType
+    max?: CommunityBoardPinMaxAggregateInputType
+  }
+
+
+  export type CommunityBoardPinGroupByOutputType = {
+    userId: number
+    boardId: number
+    count: CommunityBoardPinCountAggregateOutputType | null
+    avg: CommunityBoardPinAvgAggregateOutputType | null
+    sum: CommunityBoardPinSumAggregateOutputType | null
+    min: CommunityBoardPinMinAggregateOutputType | null
+    max: CommunityBoardPinMaxAggregateOutputType | null
+  }
+
+  type GetCommunityBoardPinGroupByPayload<T extends CommunityBoardPinGroupByArgs> = Promise<Array<
+    PickArray<CommunityBoardPinGroupByOutputType, T['by']> & {
+      [P in ((keyof T) & (keyof CommunityBoardPinGroupByOutputType))]: GetScalarType<T[P], CommunityBoardPinGroupByOutputType[P]>
+    }
+  >>
+    
 
   export type CommunityBoardPinSelect = {
     userId?: boolean
@@ -5545,6 +6392,22 @@ export namespace Prisma {
     create<T extends CommunityBoardPinCreateArgs>(
       args: SelectSubset<T, CommunityBoardPinCreateArgs>
     ): CheckSelect<T, Prisma__CommunityBoardPinClient<CommunityBoardPin>, Prisma__CommunityBoardPinClient<CommunityBoardPinGetPayload<T>>>
+
+    /**
+     * Create many CommunityBoardPins.
+     *     @param {CommunityBoardPinCreateManyArgs} args - Arguments to create many CommunityBoardPins.
+     *     @example
+     *     // Create many CommunityBoardPins
+     *     const communityBoardPin = await prisma.communityBoardPin.createMany({
+     *       data: {
+     *         // ... provide data here
+     *       }
+     *     })
+     *     
+    **/
+    createMany<T extends CommunityBoardPinCreateManyArgs>(
+      args?: SelectSubset<T, CommunityBoardPinCreateManyArgs>
+    ): PrismaPromise<BatchPayload>
 
     /**
      * Delete a CommunityBoardPin.
@@ -5688,7 +6551,82 @@ export namespace Prisma {
     **/
     aggregate<T extends CommunityBoardPinAggregateArgs>(args: Subset<T, CommunityBoardPinAggregateArgs>): PrismaPromise<GetCommunityBoardPinAggregateType<T>>
 
-
+    /**
+     * Group by CommunityBoardPin.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CommunityBoardPinGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends CommunityBoardPinGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: CommunityBoardPinGroupByArgs['orderBy'] }
+        : { orderBy?: CommunityBoardPinGroupByArgs['orderBy'] },
+      OrderFields extends Keys<MaybeTupleToUnion<T['orderBy']>>,
+      ByFields extends TupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, CommunityBoardPinGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetCommunityBoardPinGroupByPayload<T> : Promise<InputErrors>
   }
 
   /**
@@ -5879,6 +6817,15 @@ export namespace Prisma {
      * The data needed to create a CommunityBoardPin.
     **/
     data: XOR<CommunityBoardPinCreateInput, CommunityBoardPinUncheckedCreateInput>
+  }
+
+
+  /**
+   * CommunityBoardPin createMany
+   */
+  export type CommunityBoardPinCreateManyArgs = {
+    data: Enumerable<CommunityBoardPinCreateManyInput>
+    skipDuplicates?: boolean
   }
 
 
@@ -6154,6 +7101,44 @@ export namespace Prisma {
   }
 
 
+    
+    
+  export type CommunityCommentGroupByArgs = {
+    where?: CommunityCommentWhereInput
+    orderBy?: Enumerable<CommunityCommentOrderByInput>
+    by: Array<CommunityCommentScalarFieldEnum>
+    having?: CommunityCommentScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    count?: CommunityCommentCountAggregateInputType | true
+    avg?: CommunityCommentAvgAggregateInputType
+    sum?: CommunityCommentSumAggregateInputType
+    min?: CommunityCommentMinAggregateInputType
+    max?: CommunityCommentMaxAggregateInputType
+  }
+
+
+  export type CommunityCommentGroupByOutputType = {
+    id: number
+    postId: number
+    userId: number
+    randomNickname: string
+    body: string
+    commentedAt: Date
+    isDeleted: boolean
+    count: CommunityCommentCountAggregateOutputType | null
+    avg: CommunityCommentAvgAggregateOutputType | null
+    sum: CommunityCommentSumAggregateOutputType | null
+    min: CommunityCommentMinAggregateOutputType | null
+    max: CommunityCommentMaxAggregateOutputType | null
+  }
+
+  type GetCommunityCommentGroupByPayload<T extends CommunityCommentGroupByArgs> = Promise<Array<
+    PickArray<CommunityCommentGroupByOutputType, T['by']> & {
+      [P in ((keyof T) & (keyof CommunityCommentGroupByOutputType))]: GetScalarType<T[P], CommunityCommentGroupByOutputType[P]>
+    }
+  >>
+    
 
   export type CommunityCommentSelect = {
     id?: boolean
@@ -6287,6 +7272,22 @@ export namespace Prisma {
     create<T extends CommunityCommentCreateArgs>(
       args: SelectSubset<T, CommunityCommentCreateArgs>
     ): CheckSelect<T, Prisma__CommunityCommentClient<CommunityComment>, Prisma__CommunityCommentClient<CommunityCommentGetPayload<T>>>
+
+    /**
+     * Create many CommunityComments.
+     *     @param {CommunityCommentCreateManyArgs} args - Arguments to create many CommunityComments.
+     *     @example
+     *     // Create many CommunityComments
+     *     const communityComment = await prisma.communityComment.createMany({
+     *       data: {
+     *         // ... provide data here
+     *       }
+     *     })
+     *     
+    **/
+    createMany<T extends CommunityCommentCreateManyArgs>(
+      args?: SelectSubset<T, CommunityCommentCreateManyArgs>
+    ): PrismaPromise<BatchPayload>
 
     /**
      * Delete a CommunityComment.
@@ -6430,7 +7431,82 @@ export namespace Prisma {
     **/
     aggregate<T extends CommunityCommentAggregateArgs>(args: Subset<T, CommunityCommentAggregateArgs>): PrismaPromise<GetCommunityCommentAggregateType<T>>
 
-
+    /**
+     * Group by CommunityComment.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CommunityCommentGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends CommunityCommentGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: CommunityCommentGroupByArgs['orderBy'] }
+        : { orderBy?: CommunityCommentGroupByArgs['orderBy'] },
+      OrderFields extends Keys<MaybeTupleToUnion<T['orderBy']>>,
+      ByFields extends TupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, CommunityCommentGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetCommunityCommentGroupByPayload<T> : Promise<InputErrors>
   }
 
   /**
@@ -6625,6 +7701,15 @@ export namespace Prisma {
      * The data needed to create a CommunityComment.
     **/
     data: XOR<CommunityCommentCreateInput, CommunityCommentUncheckedCreateInput>
+  }
+
+
+  /**
+   * CommunityComment createMany
+   */
+  export type CommunityCommentCreateManyArgs = {
+    data: Enumerable<CommunityCommentCreateManyInput>
+    skipDuplicates?: boolean
   }
 
 
@@ -6942,6 +8027,49 @@ export namespace Prisma {
   }
 
 
+    
+    
+  export type CommunityPostGroupByArgs = {
+    where?: CommunityPostWhereInput
+    orderBy?: Enumerable<CommunityPostOrderByInput>
+    by: Array<CommunityPostScalarFieldEnum>
+    having?: CommunityPostScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    count?: CommunityPostCountAggregateInputType | true
+    avg?: CommunityPostAvgAggregateInputType
+    sum?: CommunityPostSumAggregateInputType
+    min?: CommunityPostMinAggregateInputType
+    max?: CommunityPostMaxAggregateInputType
+  }
+
+
+  export type CommunityPostGroupByOutputType = {
+    id: number
+    boardId: number
+    userId: number
+    title: string
+    body: string
+    randomNickname: string
+    likesCount: number
+    commentsCount: number
+    bookmarksCount: number
+    postedAt: Date
+    editedAt: Date | null
+    isDeleted: boolean
+    count: CommunityPostCountAggregateOutputType | null
+    avg: CommunityPostAvgAggregateOutputType | null
+    sum: CommunityPostSumAggregateOutputType | null
+    min: CommunityPostMinAggregateOutputType | null
+    max: CommunityPostMaxAggregateOutputType | null
+  }
+
+  type GetCommunityPostGroupByPayload<T extends CommunityPostGroupByArgs> = Promise<Array<
+    PickArray<CommunityPostGroupByOutputType, T['by']> & {
+      [P in ((keyof T) & (keyof CommunityPostGroupByOutputType))]: GetScalarType<T[P], CommunityPostGroupByOutputType[P]>
+    }
+  >>
+    
 
   export type CommunityPostSelect = {
     id?: boolean
@@ -7100,6 +8228,22 @@ export namespace Prisma {
     ): CheckSelect<T, Prisma__CommunityPostClient<CommunityPost>, Prisma__CommunityPostClient<CommunityPostGetPayload<T>>>
 
     /**
+     * Create many CommunityPosts.
+     *     @param {CommunityPostCreateManyArgs} args - Arguments to create many CommunityPosts.
+     *     @example
+     *     // Create many CommunityPosts
+     *     const communityPost = await prisma.communityPost.createMany({
+     *       data: {
+     *         // ... provide data here
+     *       }
+     *     })
+     *     
+    **/
+    createMany<T extends CommunityPostCreateManyArgs>(
+      args?: SelectSubset<T, CommunityPostCreateManyArgs>
+    ): PrismaPromise<BatchPayload>
+
+    /**
      * Delete a CommunityPost.
      * @param {CommunityPostDeleteArgs} args - Arguments to delete one CommunityPost.
      * @example
@@ -7241,7 +8385,82 @@ export namespace Prisma {
     **/
     aggregate<T extends CommunityPostAggregateArgs>(args: Subset<T, CommunityPostAggregateArgs>): PrismaPromise<GetCommunityPostAggregateType<T>>
 
-
+    /**
+     * Group by CommunityPost.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CommunityPostGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends CommunityPostGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: CommunityPostGroupByArgs['orderBy'] }
+        : { orderBy?: CommunityPostGroupByArgs['orderBy'] },
+      OrderFields extends Keys<MaybeTupleToUnion<T['orderBy']>>,
+      ByFields extends TupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, CommunityPostGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetCommunityPostGroupByPayload<T> : Promise<InputErrors>
   }
 
   /**
@@ -7442,6 +8661,15 @@ export namespace Prisma {
      * The data needed to create a CommunityPost.
     **/
     data: XOR<CommunityPostCreateInput, CommunityPostUncheckedCreateInput>
+  }
+
+
+  /**
+   * CommunityPost createMany
+   */
+  export type CommunityPostCreateManyArgs = {
+    data: Enumerable<CommunityPostCreateManyInput>
+    skipDuplicates?: boolean
   }
 
 
@@ -7683,6 +8911,39 @@ export namespace Prisma {
   }
 
 
+    
+    
+  export type CommunityPostBookmarkGroupByArgs = {
+    where?: CommunityPostBookmarkWhereInput
+    orderBy?: Enumerable<CommunityPostBookmarkOrderByInput>
+    by: Array<CommunityPostBookmarkScalarFieldEnum>
+    having?: CommunityPostBookmarkScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    count?: CommunityPostBookmarkCountAggregateInputType | true
+    avg?: CommunityPostBookmarkAvgAggregateInputType
+    sum?: CommunityPostBookmarkSumAggregateInputType
+    min?: CommunityPostBookmarkMinAggregateInputType
+    max?: CommunityPostBookmarkMaxAggregateInputType
+  }
+
+
+  export type CommunityPostBookmarkGroupByOutputType = {
+    userId: number
+    postId: number
+    count: CommunityPostBookmarkCountAggregateOutputType | null
+    avg: CommunityPostBookmarkAvgAggregateOutputType | null
+    sum: CommunityPostBookmarkSumAggregateOutputType | null
+    min: CommunityPostBookmarkMinAggregateOutputType | null
+    max: CommunityPostBookmarkMaxAggregateOutputType | null
+  }
+
+  type GetCommunityPostBookmarkGroupByPayload<T extends CommunityPostBookmarkGroupByArgs> = Promise<Array<
+    PickArray<CommunityPostBookmarkGroupByOutputType, T['by']> & {
+      [P in ((keyof T) & (keyof CommunityPostBookmarkGroupByOutputType))]: GetScalarType<T[P], CommunityPostBookmarkGroupByOutputType[P]>
+    }
+  >>
+    
 
   export type CommunityPostBookmarkSelect = {
     userId?: boolean
@@ -7799,6 +9060,22 @@ export namespace Prisma {
     create<T extends CommunityPostBookmarkCreateArgs>(
       args: SelectSubset<T, CommunityPostBookmarkCreateArgs>
     ): CheckSelect<T, Prisma__CommunityPostBookmarkClient<CommunityPostBookmark>, Prisma__CommunityPostBookmarkClient<CommunityPostBookmarkGetPayload<T>>>
+
+    /**
+     * Create many CommunityPostBookmarks.
+     *     @param {CommunityPostBookmarkCreateManyArgs} args - Arguments to create many CommunityPostBookmarks.
+     *     @example
+     *     // Create many CommunityPostBookmarks
+     *     const communityPostBookmark = await prisma.communityPostBookmark.createMany({
+     *       data: {
+     *         // ... provide data here
+     *       }
+     *     })
+     *     
+    **/
+    createMany<T extends CommunityPostBookmarkCreateManyArgs>(
+      args?: SelectSubset<T, CommunityPostBookmarkCreateManyArgs>
+    ): PrismaPromise<BatchPayload>
 
     /**
      * Delete a CommunityPostBookmark.
@@ -7942,7 +9219,82 @@ export namespace Prisma {
     **/
     aggregate<T extends CommunityPostBookmarkAggregateArgs>(args: Subset<T, CommunityPostBookmarkAggregateArgs>): PrismaPromise<GetCommunityPostBookmarkAggregateType<T>>
 
-
+    /**
+     * Group by CommunityPostBookmark.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CommunityPostBookmarkGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends CommunityPostBookmarkGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: CommunityPostBookmarkGroupByArgs['orderBy'] }
+        : { orderBy?: CommunityPostBookmarkGroupByArgs['orderBy'] },
+      OrderFields extends Keys<MaybeTupleToUnion<T['orderBy']>>,
+      ByFields extends TupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, CommunityPostBookmarkGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetCommunityPostBookmarkGroupByPayload<T> : Promise<InputErrors>
   }
 
   /**
@@ -8133,6 +9485,15 @@ export namespace Prisma {
      * The data needed to create a CommunityPostBookmark.
     **/
     data: XOR<CommunityPostBookmarkCreateInput, CommunityPostBookmarkUncheckedCreateInput>
+  }
+
+
+  /**
+   * CommunityPostBookmark createMany
+   */
+  export type CommunityPostBookmarkCreateManyArgs = {
+    data: Enumerable<CommunityPostBookmarkCreateManyInput>
+    skipDuplicates?: boolean
   }
 
 
@@ -8374,6 +9735,39 @@ export namespace Prisma {
   }
 
 
+    
+    
+  export type CommunityPostLikeGroupByArgs = {
+    where?: CommunityPostLikeWhereInput
+    orderBy?: Enumerable<CommunityPostLikeOrderByInput>
+    by: Array<CommunityPostLikeScalarFieldEnum>
+    having?: CommunityPostLikeScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    count?: CommunityPostLikeCountAggregateInputType | true
+    avg?: CommunityPostLikeAvgAggregateInputType
+    sum?: CommunityPostLikeSumAggregateInputType
+    min?: CommunityPostLikeMinAggregateInputType
+    max?: CommunityPostLikeMaxAggregateInputType
+  }
+
+
+  export type CommunityPostLikeGroupByOutputType = {
+    userId: number
+    postId: number
+    count: CommunityPostLikeCountAggregateOutputType | null
+    avg: CommunityPostLikeAvgAggregateOutputType | null
+    sum: CommunityPostLikeSumAggregateOutputType | null
+    min: CommunityPostLikeMinAggregateOutputType | null
+    max: CommunityPostLikeMaxAggregateOutputType | null
+  }
+
+  type GetCommunityPostLikeGroupByPayload<T extends CommunityPostLikeGroupByArgs> = Promise<Array<
+    PickArray<CommunityPostLikeGroupByOutputType, T['by']> & {
+      [P in ((keyof T) & (keyof CommunityPostLikeGroupByOutputType))]: GetScalarType<T[P], CommunityPostLikeGroupByOutputType[P]>
+    }
+  >>
+    
 
   export type CommunityPostLikeSelect = {
     userId?: boolean
@@ -8490,6 +9884,22 @@ export namespace Prisma {
     create<T extends CommunityPostLikeCreateArgs>(
       args: SelectSubset<T, CommunityPostLikeCreateArgs>
     ): CheckSelect<T, Prisma__CommunityPostLikeClient<CommunityPostLike>, Prisma__CommunityPostLikeClient<CommunityPostLikeGetPayload<T>>>
+
+    /**
+     * Create many CommunityPostLikes.
+     *     @param {CommunityPostLikeCreateManyArgs} args - Arguments to create many CommunityPostLikes.
+     *     @example
+     *     // Create many CommunityPostLikes
+     *     const communityPostLike = await prisma.communityPostLike.createMany({
+     *       data: {
+     *         // ... provide data here
+     *       }
+     *     })
+     *     
+    **/
+    createMany<T extends CommunityPostLikeCreateManyArgs>(
+      args?: SelectSubset<T, CommunityPostLikeCreateManyArgs>
+    ): PrismaPromise<BatchPayload>
 
     /**
      * Delete a CommunityPostLike.
@@ -8633,7 +10043,82 @@ export namespace Prisma {
     **/
     aggregate<T extends CommunityPostLikeAggregateArgs>(args: Subset<T, CommunityPostLikeAggregateArgs>): PrismaPromise<GetCommunityPostLikeAggregateType<T>>
 
-
+    /**
+     * Group by CommunityPostLike.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CommunityPostLikeGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends CommunityPostLikeGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: CommunityPostLikeGroupByArgs['orderBy'] }
+        : { orderBy?: CommunityPostLikeGroupByArgs['orderBy'] },
+      OrderFields extends Keys<MaybeTupleToUnion<T['orderBy']>>,
+      ByFields extends TupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, CommunityPostLikeGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetCommunityPostLikeGroupByPayload<T> : Promise<InputErrors>
   }
 
   /**
@@ -8824,6 +10309,15 @@ export namespace Prisma {
      * The data needed to create a CommunityPostLike.
     **/
     data: XOR<CommunityPostLikeCreateInput, CommunityPostLikeUncheckedCreateInput>
+  }
+
+
+  /**
+   * CommunityPostLike createMany
+   */
+  export type CommunityPostLikeCreateManyArgs = {
+    data: Enumerable<CommunityPostLikeCreateManyInput>
+    skipDuplicates?: boolean
   }
 
 
@@ -9109,6 +10603,45 @@ export namespace Prisma {
   }
 
 
+    
+    
+  export type CommunitySubcommentGroupByArgs = {
+    where?: CommunitySubcommentWhereInput
+    orderBy?: Enumerable<CommunitySubcommentOrderByInput>
+    by: Array<CommunitySubcommentScalarFieldEnum>
+    having?: CommunitySubcommentScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    count?: CommunitySubcommentCountAggregateInputType | true
+    avg?: CommunitySubcommentAvgAggregateInputType
+    sum?: CommunitySubcommentSumAggregateInputType
+    min?: CommunitySubcommentMinAggregateInputType
+    max?: CommunitySubcommentMaxAggregateInputType
+  }
+
+
+  export type CommunitySubcommentGroupByOutputType = {
+    id: number
+    userId: number
+    postId: number
+    commentId: number
+    randomNickname: string
+    body: string
+    subcommentedAt: Date
+    isDeleted: boolean
+    count: CommunitySubcommentCountAggregateOutputType | null
+    avg: CommunitySubcommentAvgAggregateOutputType | null
+    sum: CommunitySubcommentSumAggregateOutputType | null
+    min: CommunitySubcommentMinAggregateOutputType | null
+    max: CommunitySubcommentMaxAggregateOutputType | null
+  }
+
+  type GetCommunitySubcommentGroupByPayload<T extends CommunitySubcommentGroupByArgs> = Promise<Array<
+    PickArray<CommunitySubcommentGroupByOutputType, T['by']> & {
+      [P in ((keyof T) & (keyof CommunitySubcommentGroupByOutputType))]: GetScalarType<T[P], CommunitySubcommentGroupByOutputType[P]>
+    }
+  >>
+    
 
   export type CommunitySubcommentSelect = {
     id?: boolean
@@ -9243,6 +10776,22 @@ export namespace Prisma {
     create<T extends CommunitySubcommentCreateArgs>(
       args: SelectSubset<T, CommunitySubcommentCreateArgs>
     ): CheckSelect<T, Prisma__CommunitySubcommentClient<CommunitySubcomment>, Prisma__CommunitySubcommentClient<CommunitySubcommentGetPayload<T>>>
+
+    /**
+     * Create many CommunitySubcomments.
+     *     @param {CommunitySubcommentCreateManyArgs} args - Arguments to create many CommunitySubcomments.
+     *     @example
+     *     // Create many CommunitySubcomments
+     *     const communitySubcomment = await prisma.communitySubcomment.createMany({
+     *       data: {
+     *         // ... provide data here
+     *       }
+     *     })
+     *     
+    **/
+    createMany<T extends CommunitySubcommentCreateManyArgs>(
+      args?: SelectSubset<T, CommunitySubcommentCreateManyArgs>
+    ): PrismaPromise<BatchPayload>
 
     /**
      * Delete a CommunitySubcomment.
@@ -9386,7 +10935,82 @@ export namespace Prisma {
     **/
     aggregate<T extends CommunitySubcommentAggregateArgs>(args: Subset<T, CommunitySubcommentAggregateArgs>): PrismaPromise<GetCommunitySubcommentAggregateType<T>>
 
-
+    /**
+     * Group by CommunitySubcomment.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CommunitySubcommentGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends CommunitySubcommentGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: CommunitySubcommentGroupByArgs['orderBy'] }
+        : { orderBy?: CommunitySubcommentGroupByArgs['orderBy'] },
+      OrderFields extends Keys<MaybeTupleToUnion<T['orderBy']>>,
+      ByFields extends TupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, CommunitySubcommentGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetCommunitySubcommentGroupByPayload<T> : Promise<InputErrors>
   }
 
   /**
@@ -9581,6 +11205,15 @@ export namespace Prisma {
      * The data needed to create a CommunitySubcomment.
     **/
     data: XOR<CommunitySubcommentCreateInput, CommunitySubcommentUncheckedCreateInput>
+  }
+
+
+  /**
+   * CommunitySubcomment createMany
+   */
+  export type CommunitySubcommentCreateManyArgs = {
+    data: Enumerable<CommunitySubcommentCreateManyInput>
+    skipDuplicates?: boolean
   }
 
 
@@ -9794,6 +11427,36 @@ export namespace Prisma {
   }
 
 
+    
+    
+  export type CoverageMajorGroupByArgs = {
+    where?: CoverageMajorWhereInput
+    orderBy?: Enumerable<CoverageMajorOrderByInput>
+    by: Array<CoverageMajorScalarFieldEnum>
+    having?: CoverageMajorScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    count?: CoverageMajorCountAggregateInputType | true
+    min?: CoverageMajorMinAggregateInputType
+    max?: CoverageMajorMaxAggregateInputType
+  }
+
+
+  export type CoverageMajorGroupByOutputType = {
+    coverageCollege: string | null
+    name: string
+    code: string
+    count: CoverageMajorCountAggregateOutputType | null
+    min: CoverageMajorMinAggregateOutputType | null
+    max: CoverageMajorMaxAggregateOutputType | null
+  }
+
+  type GetCoverageMajorGroupByPayload<T extends CoverageMajorGroupByArgs> = Promise<Array<
+    PickArray<CoverageMajorGroupByOutputType, T['by']> & {
+      [P in ((keyof T) & (keyof CoverageMajorGroupByOutputType))]: GetScalarType<T[P], CoverageMajorGroupByOutputType[P]>
+    }
+  >>
+    
 
   export type CoverageMajorSelect = {
     coverageCollege?: boolean
@@ -9905,6 +11568,22 @@ export namespace Prisma {
     create<T extends CoverageMajorCreateArgs>(
       args: SelectSubset<T, CoverageMajorCreateArgs>
     ): CheckSelect<T, Prisma__CoverageMajorClient<CoverageMajor>, Prisma__CoverageMajorClient<CoverageMajorGetPayload<T>>>
+
+    /**
+     * Create many CoverageMajors.
+     *     @param {CoverageMajorCreateManyArgs} args - Arguments to create many CoverageMajors.
+     *     @example
+     *     // Create many CoverageMajors
+     *     const coverageMajor = await prisma.coverageMajor.createMany({
+     *       data: {
+     *         // ... provide data here
+     *       }
+     *     })
+     *     
+    **/
+    createMany<T extends CoverageMajorCreateManyArgs>(
+      args?: SelectSubset<T, CoverageMajorCreateManyArgs>
+    ): PrismaPromise<BatchPayload>
 
     /**
      * Delete a CoverageMajor.
@@ -10048,7 +11727,82 @@ export namespace Prisma {
     **/
     aggregate<T extends CoverageMajorAggregateArgs>(args: Subset<T, CoverageMajorAggregateArgs>): PrismaPromise<GetCoverageMajorAggregateType<T>>
 
-
+    /**
+     * Group by CoverageMajor.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CoverageMajorGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends CoverageMajorGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: CoverageMajorGroupByArgs['orderBy'] }
+        : { orderBy?: CoverageMajorGroupByArgs['orderBy'] },
+      OrderFields extends Keys<MaybeTupleToUnion<T['orderBy']>>,
+      ByFields extends TupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, CoverageMajorGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetCoverageMajorGroupByPayload<T> : Promise<InputErrors>
   }
 
   /**
@@ -10237,6 +11991,15 @@ export namespace Prisma {
      * The data needed to create a CoverageMajor.
     **/
     data: XOR<CoverageMajorCreateInput, CoverageMajorUncheckedCreateInput>
+  }
+
+
+  /**
+   * CoverageMajor createMany
+   */
+  export type CoverageMajorCreateManyArgs = {
+    data: Enumerable<CoverageMajorCreateManyInput>
+    skipDuplicates?: boolean
   }
 
 
@@ -10444,6 +12207,35 @@ export namespace Prisma {
   }
 
 
+    
+    
+  export type CoverageMajorLectureGroupByArgs = {
+    where?: CoverageMajorLectureWhereInput
+    orderBy?: Enumerable<CoverageMajorLectureOrderByInput>
+    by: Array<CoverageMajorLectureScalarFieldEnum>
+    having?: CoverageMajorLectureScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    count?: CoverageMajorLectureCountAggregateInputType | true
+    min?: CoverageMajorLectureMinAggregateInputType
+    max?: CoverageMajorLectureMaxAggregateInputType
+  }
+
+
+  export type CoverageMajorLectureGroupByOutputType = {
+    lectureId: string
+    majorCode: string
+    count: CoverageMajorLectureCountAggregateOutputType | null
+    min: CoverageMajorLectureMinAggregateOutputType | null
+    max: CoverageMajorLectureMaxAggregateOutputType | null
+  }
+
+  type GetCoverageMajorLectureGroupByPayload<T extends CoverageMajorLectureGroupByArgs> = Promise<Array<
+    PickArray<CoverageMajorLectureGroupByOutputType, T['by']> & {
+      [P in ((keyof T) & (keyof CoverageMajorLectureGroupByOutputType))]: GetScalarType<T[P], CoverageMajorLectureGroupByOutputType[P]>
+    }
+  >>
+    
 
   export type CoverageMajorLectureSelect = {
     lectureId?: boolean
@@ -10560,6 +12352,22 @@ export namespace Prisma {
     create<T extends CoverageMajorLectureCreateArgs>(
       args: SelectSubset<T, CoverageMajorLectureCreateArgs>
     ): CheckSelect<T, Prisma__CoverageMajorLectureClient<CoverageMajorLecture>, Prisma__CoverageMajorLectureClient<CoverageMajorLectureGetPayload<T>>>
+
+    /**
+     * Create many CoverageMajorLectures.
+     *     @param {CoverageMajorLectureCreateManyArgs} args - Arguments to create many CoverageMajorLectures.
+     *     @example
+     *     // Create many CoverageMajorLectures
+     *     const coverageMajorLecture = await prisma.coverageMajorLecture.createMany({
+     *       data: {
+     *         // ... provide data here
+     *       }
+     *     })
+     *     
+    **/
+    createMany<T extends CoverageMajorLectureCreateManyArgs>(
+      args?: SelectSubset<T, CoverageMajorLectureCreateManyArgs>
+    ): PrismaPromise<BatchPayload>
 
     /**
      * Delete a CoverageMajorLecture.
@@ -10703,7 +12511,82 @@ export namespace Prisma {
     **/
     aggregate<T extends CoverageMajorLectureAggregateArgs>(args: Subset<T, CoverageMajorLectureAggregateArgs>): PrismaPromise<GetCoverageMajorLectureAggregateType<T>>
 
-
+    /**
+     * Group by CoverageMajorLecture.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CoverageMajorLectureGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends CoverageMajorLectureGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: CoverageMajorLectureGroupByArgs['orderBy'] }
+        : { orderBy?: CoverageMajorLectureGroupByArgs['orderBy'] },
+      OrderFields extends Keys<MaybeTupleToUnion<T['orderBy']>>,
+      ByFields extends TupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, CoverageMajorLectureGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetCoverageMajorLectureGroupByPayload<T> : Promise<InputErrors>
   }
 
   /**
@@ -10894,6 +12777,15 @@ export namespace Prisma {
      * The data needed to create a CoverageMajorLecture.
     **/
     data: XOR<CoverageMajorLectureCreateInput, CoverageMajorLectureUncheckedCreateInput>
+  }
+
+
+  /**
+   * CoverageMajorLecture createMany
+   */
+  export type CoverageMajorLectureCreateManyArgs = {
+    data: Enumerable<CoverageMajorLectureCreateManyInput>
+    skipDuplicates?: boolean
   }
 
 
@@ -11233,6 +13125,54 @@ export namespace Prisma {
   }
 
 
+    
+    
+  export type LectureGroupByArgs = {
+    where?: LectureWhereInput
+    orderBy?: Enumerable<LectureOrderByInput>
+    by: Array<LectureScalarFieldEnum>
+    having?: LectureScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    count?: LectureCountAggregateInputType | true
+    avg?: LectureAvgAggregateInputType
+    sum?: LectureSumAggregateInputType
+    min?: LectureMinAggregateInputType
+    max?: LectureMaxAggregateInputType
+  }
+
+
+  export type LectureGroupByOutputType = {
+    id: string
+    year: number | null
+    semester: string | null
+    campus: string | null
+    college: string | null
+    major: string | null
+    grade: number | null
+    credit: number | null
+    course: string | null
+    section: string | null
+    code: string | null
+    name: string | null
+    professor: string | null
+    schedule: string | null
+    building: number | null
+    room: string | null
+    note: string | null
+    count: LectureCountAggregateOutputType | null
+    avg: LectureAvgAggregateOutputType | null
+    sum: LectureSumAggregateOutputType | null
+    min: LectureMinAggregateOutputType | null
+    max: LectureMaxAggregateOutputType | null
+  }
+
+  type GetLectureGroupByPayload<T extends LectureGroupByArgs> = Promise<Array<
+    PickArray<LectureGroupByOutputType, T['by']> & {
+      [P in ((keyof T) & (keyof LectureGroupByOutputType))]: GetScalarType<T[P], LectureGroupByOutputType[P]>
+    }
+  >>
+    
 
   export type LectureSelect = {
     id?: boolean
@@ -11364,6 +13304,22 @@ export namespace Prisma {
     create<T extends LectureCreateArgs>(
       args: SelectSubset<T, LectureCreateArgs>
     ): CheckSelect<T, Prisma__LectureClient<Lecture>, Prisma__LectureClient<LectureGetPayload<T>>>
+
+    /**
+     * Create many Lectures.
+     *     @param {LectureCreateManyArgs} args - Arguments to create many Lectures.
+     *     @example
+     *     // Create many Lectures
+     *     const lecture = await prisma.lecture.createMany({
+     *       data: {
+     *         // ... provide data here
+     *       }
+     *     })
+     *     
+    **/
+    createMany<T extends LectureCreateManyArgs>(
+      args?: SelectSubset<T, LectureCreateManyArgs>
+    ): PrismaPromise<BatchPayload>
 
     /**
      * Delete a Lecture.
@@ -11507,7 +13463,82 @@ export namespace Prisma {
     **/
     aggregate<T extends LectureAggregateArgs>(args: Subset<T, LectureAggregateArgs>): PrismaPromise<GetLectureAggregateType<T>>
 
-
+    /**
+     * Group by Lecture.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {LectureGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends LectureGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: LectureGroupByArgs['orderBy'] }
+        : { orderBy?: LectureGroupByArgs['orderBy'] },
+      OrderFields extends Keys<MaybeTupleToUnion<T['orderBy']>>,
+      ByFields extends TupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, LectureGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetLectureGroupByPayload<T> : Promise<InputErrors>
   }
 
   /**
@@ -11698,6 +13729,15 @@ export namespace Prisma {
      * The data needed to create a Lecture.
     **/
     data: XOR<LectureCreateInput, LectureUncheckedCreateInput>
+  }
+
+
+  /**
+   * Lecture createMany
+   */
+  export type LectureCreateManyArgs = {
+    data: Enumerable<LectureCreateManyInput>
+    skipDuplicates?: boolean
   }
 
 
@@ -11957,6 +13997,42 @@ export namespace Prisma {
   }
 
 
+    
+    
+  export type LiveChatGroupByArgs = {
+    where?: LiveChatWhereInput
+    orderBy?: Enumerable<LiveChatOrderByInput>
+    by: Array<LiveChatScalarFieldEnum>
+    having?: LiveChatScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    count?: LiveChatCountAggregateInputType | true
+    avg?: LiveChatAvgAggregateInputType
+    sum?: LiveChatSumAggregateInputType
+    min?: LiveChatMinAggregateInputType
+    max?: LiveChatMaxAggregateInputType
+  }
+
+
+  export type LiveChatGroupByOutputType = {
+    id: number
+    message: string
+    createdAt: Date
+    userId: number
+    randomNickname: string
+    count: LiveChatCountAggregateOutputType | null
+    avg: LiveChatAvgAggregateOutputType | null
+    sum: LiveChatSumAggregateOutputType | null
+    min: LiveChatMinAggregateOutputType | null
+    max: LiveChatMaxAggregateOutputType | null
+  }
+
+  type GetLiveChatGroupByPayload<T extends LiveChatGroupByArgs> = Promise<Array<
+    PickArray<LiveChatGroupByOutputType, T['by']> & {
+      [P in ((keyof T) & (keyof LiveChatGroupByOutputType))]: GetScalarType<T[P], LiveChatGroupByOutputType[P]>
+    }
+  >>
+    
 
   export type LiveChatSelect = {
     id?: boolean
@@ -12070,6 +14146,22 @@ export namespace Prisma {
     create<T extends LiveChatCreateArgs>(
       args: SelectSubset<T, LiveChatCreateArgs>
     ): CheckSelect<T, Prisma__LiveChatClient<LiveChat>, Prisma__LiveChatClient<LiveChatGetPayload<T>>>
+
+    /**
+     * Create many LiveChats.
+     *     @param {LiveChatCreateManyArgs} args - Arguments to create many LiveChats.
+     *     @example
+     *     // Create many LiveChats
+     *     const liveChat = await prisma.liveChat.createMany({
+     *       data: {
+     *         // ... provide data here
+     *       }
+     *     })
+     *     
+    **/
+    createMany<T extends LiveChatCreateManyArgs>(
+      args?: SelectSubset<T, LiveChatCreateManyArgs>
+    ): PrismaPromise<BatchPayload>
 
     /**
      * Delete a LiveChat.
@@ -12213,7 +14305,82 @@ export namespace Prisma {
     **/
     aggregate<T extends LiveChatAggregateArgs>(args: Subset<T, LiveChatAggregateArgs>): PrismaPromise<GetLiveChatAggregateType<T>>
 
-
+    /**
+     * Group by LiveChat.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {LiveChatGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends LiveChatGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: LiveChatGroupByArgs['orderBy'] }
+        : { orderBy?: LiveChatGroupByArgs['orderBy'] },
+      OrderFields extends Keys<MaybeTupleToUnion<T['orderBy']>>,
+      ByFields extends TupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, LiveChatGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetLiveChatGroupByPayload<T> : Promise<InputErrors>
   }
 
   /**
@@ -12402,6 +14569,15 @@ export namespace Prisma {
      * The data needed to create a LiveChat.
     **/
     data: XOR<LiveChatCreateInput, LiveChatUncheckedCreateInput>
+  }
+
+
+  /**
+   * LiveChat createMany
+   */
+  export type LiveChatCreateManyArgs = {
+    data: Enumerable<LiveChatCreateManyInput>
+    skipDuplicates?: boolean
   }
 
 
@@ -12655,6 +14831,41 @@ export namespace Prisma {
   }
 
 
+    
+    
+  export type NoticeNotificationsSubscriptionGroupByArgs = {
+    where?: NoticeNotificationsSubscriptionWhereInput
+    orderBy?: Enumerable<NoticeNotificationsSubscriptionOrderByInput>
+    by: Array<NoticeNotificationsSubscriptionScalarFieldEnum>
+    having?: NoticeNotificationsSubscriptionScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    count?: NoticeNotificationsSubscriptionCountAggregateInputType | true
+    avg?: NoticeNotificationsSubscriptionAvgAggregateInputType
+    sum?: NoticeNotificationsSubscriptionSumAggregateInputType
+    min?: NoticeNotificationsSubscriptionMinAggregateInputType
+    max?: NoticeNotificationsSubscriptionMaxAggregateInputType
+  }
+
+
+  export type NoticeNotificationsSubscriptionGroupByOutputType = {
+    id: number
+    userId: number
+    noticeKey: string
+    subscribedAt: Date
+    count: NoticeNotificationsSubscriptionCountAggregateOutputType | null
+    avg: NoticeNotificationsSubscriptionAvgAggregateOutputType | null
+    sum: NoticeNotificationsSubscriptionSumAggregateOutputType | null
+    min: NoticeNotificationsSubscriptionMinAggregateOutputType | null
+    max: NoticeNotificationsSubscriptionMaxAggregateOutputType | null
+  }
+
+  type GetNoticeNotificationsSubscriptionGroupByPayload<T extends NoticeNotificationsSubscriptionGroupByArgs> = Promise<Array<
+    PickArray<NoticeNotificationsSubscriptionGroupByOutputType, T['by']> & {
+      [P in ((keyof T) & (keyof NoticeNotificationsSubscriptionGroupByOutputType))]: GetScalarType<T[P], NoticeNotificationsSubscriptionGroupByOutputType[P]>
+    }
+  >>
+    
 
   export type NoticeNotificationsSubscriptionSelect = {
     id?: boolean
@@ -12767,6 +14978,22 @@ export namespace Prisma {
     create<T extends NoticeNotificationsSubscriptionCreateArgs>(
       args: SelectSubset<T, NoticeNotificationsSubscriptionCreateArgs>
     ): CheckSelect<T, Prisma__NoticeNotificationsSubscriptionClient<NoticeNotificationsSubscription>, Prisma__NoticeNotificationsSubscriptionClient<NoticeNotificationsSubscriptionGetPayload<T>>>
+
+    /**
+     * Create many NoticeNotificationsSubscriptions.
+     *     @param {NoticeNotificationsSubscriptionCreateManyArgs} args - Arguments to create many NoticeNotificationsSubscriptions.
+     *     @example
+     *     // Create many NoticeNotificationsSubscriptions
+     *     const noticeNotificationsSubscription = await prisma.noticeNotificationsSubscription.createMany({
+     *       data: {
+     *         // ... provide data here
+     *       }
+     *     })
+     *     
+    **/
+    createMany<T extends NoticeNotificationsSubscriptionCreateManyArgs>(
+      args?: SelectSubset<T, NoticeNotificationsSubscriptionCreateManyArgs>
+    ): PrismaPromise<BatchPayload>
 
     /**
      * Delete a NoticeNotificationsSubscription.
@@ -12910,7 +15137,82 @@ export namespace Prisma {
     **/
     aggregate<T extends NoticeNotificationsSubscriptionAggregateArgs>(args: Subset<T, NoticeNotificationsSubscriptionAggregateArgs>): PrismaPromise<GetNoticeNotificationsSubscriptionAggregateType<T>>
 
-
+    /**
+     * Group by NoticeNotificationsSubscription.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {NoticeNotificationsSubscriptionGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends NoticeNotificationsSubscriptionGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: NoticeNotificationsSubscriptionGroupByArgs['orderBy'] }
+        : { orderBy?: NoticeNotificationsSubscriptionGroupByArgs['orderBy'] },
+      OrderFields extends Keys<MaybeTupleToUnion<T['orderBy']>>,
+      ByFields extends TupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, NoticeNotificationsSubscriptionGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetNoticeNotificationsSubscriptionGroupByPayload<T> : Promise<InputErrors>
   }
 
   /**
@@ -13099,6 +15401,15 @@ export namespace Prisma {
      * The data needed to create a NoticeNotificationsSubscription.
     **/
     data: XOR<NoticeNotificationsSubscriptionCreateInput, NoticeNotificationsSubscriptionUncheckedCreateInput>
+  }
+
+
+  /**
+   * NoticeNotificationsSubscription createMany
+   */
+  export type NoticeNotificationsSubscriptionCreateManyArgs = {
+    data: Enumerable<NoticeNotificationsSubscriptionCreateManyInput>
+    skipDuplicates?: boolean
   }
 
 
@@ -13366,6 +15677,44 @@ export namespace Prisma {
   }
 
 
+    
+    
+  export type PendingUserGroupByArgs = {
+    where?: PendingUserWhereInput
+    orderBy?: Enumerable<PendingUserOrderByInput>
+    by: Array<PendingUserScalarFieldEnum>
+    having?: PendingUserScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    count?: PendingUserCountAggregateInputType | true
+    avg?: PendingUserAvgAggregateInputType
+    sum?: PendingUserSumAggregateInputType
+    min?: PendingUserMinAggregateInputType
+    max?: PendingUserMaxAggregateInputType
+  }
+
+
+  export type PendingUserGroupByOutputType = {
+    id: number
+    portalId: string
+    password: string
+    nickname: string
+    randomNickname: string
+    joinedAt: Date
+    token: string
+    count: PendingUserCountAggregateOutputType | null
+    avg: PendingUserAvgAggregateOutputType | null
+    sum: PendingUserSumAggregateOutputType | null
+    min: PendingUserMinAggregateOutputType | null
+    max: PendingUserMaxAggregateOutputType | null
+  }
+
+  type GetPendingUserGroupByPayload<T extends PendingUserGroupByArgs> = Promise<Array<
+    PickArray<PendingUserGroupByOutputType, T['by']> & {
+      [P in ((keyof T) & (keyof PendingUserGroupByOutputType))]: GetScalarType<T[P], PendingUserGroupByOutputType[P]>
+    }
+  >>
+    
 
   export type PendingUserSelect = {
     id?: boolean
@@ -13471,6 +15820,22 @@ export namespace Prisma {
     create<T extends PendingUserCreateArgs>(
       args: SelectSubset<T, PendingUserCreateArgs>
     ): CheckSelect<T, Prisma__PendingUserClient<PendingUser>, Prisma__PendingUserClient<PendingUserGetPayload<T>>>
+
+    /**
+     * Create many PendingUsers.
+     *     @param {PendingUserCreateManyArgs} args - Arguments to create many PendingUsers.
+     *     @example
+     *     // Create many PendingUsers
+     *     const pendingUser = await prisma.pendingUser.createMany({
+     *       data: {
+     *         // ... provide data here
+     *       }
+     *     })
+     *     
+    **/
+    createMany<T extends PendingUserCreateManyArgs>(
+      args?: SelectSubset<T, PendingUserCreateManyArgs>
+    ): PrismaPromise<BatchPayload>
 
     /**
      * Delete a PendingUser.
@@ -13614,7 +15979,82 @@ export namespace Prisma {
     **/
     aggregate<T extends PendingUserAggregateArgs>(args: Subset<T, PendingUserAggregateArgs>): PrismaPromise<GetPendingUserAggregateType<T>>
 
-
+    /**
+     * Group by PendingUser.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PendingUserGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends PendingUserGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: PendingUserGroupByArgs['orderBy'] }
+        : { orderBy?: PendingUserGroupByArgs['orderBy'] },
+      OrderFields extends Keys<MaybeTupleToUnion<T['orderBy']>>,
+      ByFields extends TupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, PendingUserGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetPendingUserGroupByPayload<T> : Promise<InputErrors>
   }
 
   /**
@@ -13786,6 +16226,15 @@ export namespace Prisma {
      * The data needed to create a PendingUser.
     **/
     data: XOR<PendingUserCreateInput, PendingUserUncheckedCreateInput>
+  }
+
+
+  /**
+   * PendingUser createMany
+   */
+  export type PendingUserCreateManyArgs = {
+    data: Enumerable<PendingUserCreateManyInput>
+    skipDuplicates?: boolean
   }
 
 
@@ -14043,6 +16492,43 @@ export namespace Prisma {
   }
 
 
+    
+    
+  export type PeriodGroupByArgs = {
+    where?: PeriodWhereInput
+    orderBy?: Enumerable<PeriodOrderByInput>
+    by: Array<PeriodScalarFieldEnum>
+    having?: PeriodScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    count?: PeriodCountAggregateInputType | true
+    avg?: PeriodAvgAggregateInputType
+    sum?: PeriodSumAggregateInputType
+    min?: PeriodMinAggregateInputType
+    max?: PeriodMaxAggregateInputType
+  }
+
+
+  export type PeriodGroupByOutputType = {
+    lectureId: string
+    day: string
+    startH: number
+    startM: number
+    endH: number
+    endM: number
+    count: PeriodCountAggregateOutputType | null
+    avg: PeriodAvgAggregateOutputType | null
+    sum: PeriodSumAggregateOutputType | null
+    min: PeriodMinAggregateOutputType | null
+    max: PeriodMaxAggregateOutputType | null
+  }
+
+  type GetPeriodGroupByPayload<T extends PeriodGroupByArgs> = Promise<Array<
+    PickArray<PeriodGroupByOutputType, T['by']> & {
+      [P in ((keyof T) & (keyof PeriodGroupByOutputType))]: GetScalarType<T[P], PeriodGroupByOutputType[P]>
+    }
+  >>
+    
 
   export type PeriodSelect = {
     lectureId?: boolean
@@ -14157,6 +16643,22 @@ export namespace Prisma {
     create<T extends PeriodCreateArgs>(
       args: SelectSubset<T, PeriodCreateArgs>
     ): CheckSelect<T, Prisma__PeriodClient<Period>, Prisma__PeriodClient<PeriodGetPayload<T>>>
+
+    /**
+     * Create many Periods.
+     *     @param {PeriodCreateManyArgs} args - Arguments to create many Periods.
+     *     @example
+     *     // Create many Periods
+     *     const period = await prisma.period.createMany({
+     *       data: {
+     *         // ... provide data here
+     *       }
+     *     })
+     *     
+    **/
+    createMany<T extends PeriodCreateManyArgs>(
+      args?: SelectSubset<T, PeriodCreateManyArgs>
+    ): PrismaPromise<BatchPayload>
 
     /**
      * Delete a Period.
@@ -14300,7 +16802,82 @@ export namespace Prisma {
     **/
     aggregate<T extends PeriodAggregateArgs>(args: Subset<T, PeriodAggregateArgs>): PrismaPromise<GetPeriodAggregateType<T>>
 
-
+    /**
+     * Group by Period.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PeriodGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends PeriodGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: PeriodGroupByArgs['orderBy'] }
+        : { orderBy?: PeriodGroupByArgs['orderBy'] },
+      OrderFields extends Keys<MaybeTupleToUnion<T['orderBy']>>,
+      ByFields extends TupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, PeriodGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetPeriodGroupByPayload<T> : Promise<InputErrors>
   }
 
   /**
@@ -14493,6 +17070,15 @@ export namespace Prisma {
 
 
   /**
+   * Period createMany
+   */
+  export type PeriodCreateManyArgs = {
+    data: Enumerable<PeriodCreateManyInput>
+    skipDuplicates?: boolean
+  }
+
+
+  /**
    * Period update
    */
   export type PeriodUpdateArgs = {
@@ -14609,10 +17195,12 @@ export namespace Prisma {
 
   export type UserAvgAggregateOutputType = {
     id: number
+    point: number | null
   }
 
   export type UserSumAggregateOutputType = {
     id: number
+    point: number | null
   }
 
   export type UserMinAggregateOutputType = {
@@ -14621,6 +17209,7 @@ export namespace Prisma {
     password: string | null
     nickname: string | null
     randomNickname: string | null
+    point: number | null
     joinedAt: Date | null
     refreshToken: string | null
   }
@@ -14631,6 +17220,7 @@ export namespace Prisma {
     password: string | null
     nickname: string | null
     randomNickname: string | null
+    point: number | null
     joinedAt: Date | null
     refreshToken: string | null
   }
@@ -14641,6 +17231,7 @@ export namespace Prisma {
     password: number | null
     nickname: number | null
     randomNickname: number | null
+    point: number | null
     joinedAt: number | null
     refreshToken: number | null
     _all: number
@@ -14649,10 +17240,12 @@ export namespace Prisma {
 
   export type UserAvgAggregateInputType = {
     id?: true
+    point?: true
   }
 
   export type UserSumAggregateInputType = {
     id?: true
+    point?: true
   }
 
   export type UserMinAggregateInputType = {
@@ -14661,6 +17254,7 @@ export namespace Prisma {
     password?: true
     nickname?: true
     randomNickname?: true
+    point?: true
     joinedAt?: true
     refreshToken?: true
   }
@@ -14671,6 +17265,7 @@ export namespace Prisma {
     password?: true
     nickname?: true
     randomNickname?: true
+    point?: true
     joinedAt?: true
     refreshToken?: true
   }
@@ -14681,6 +17276,7 @@ export namespace Prisma {
     password?: true
     nickname?: true
     randomNickname?: true
+    point?: true
     joinedAt?: true
     refreshToken?: true
     _all?: true
@@ -14756,6 +17352,45 @@ export namespace Prisma {
   }
 
 
+    
+    
+  export type UserGroupByArgs = {
+    where?: UserWhereInput
+    orderBy?: Enumerable<UserOrderByInput>
+    by: Array<UserScalarFieldEnum>
+    having?: UserScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    count?: UserCountAggregateInputType | true
+    avg?: UserAvgAggregateInputType
+    sum?: UserSumAggregateInputType
+    min?: UserMinAggregateInputType
+    max?: UserMaxAggregateInputType
+  }
+
+
+  export type UserGroupByOutputType = {
+    id: number
+    portalId: string
+    password: string
+    nickname: string
+    randomNickname: string
+    point: number | null
+    joinedAt: Date
+    refreshToken: string | null
+    count: UserCountAggregateOutputType | null
+    avg: UserAvgAggregateOutputType | null
+    sum: UserSumAggregateOutputType | null
+    min: UserMinAggregateOutputType | null
+    max: UserMaxAggregateOutputType | null
+  }
+
+  type GetUserGroupByPayload<T extends UserGroupByArgs> = Promise<Array<
+    PickArray<UserGroupByOutputType, T['by']> & {
+      [P in ((keyof T) & (keyof UserGroupByOutputType))]: GetScalarType<T[P], UserGroupByOutputType[P]>
+    }
+  >>
+    
 
   export type UserSelect = {
     id?: boolean
@@ -14763,6 +17398,7 @@ export namespace Prisma {
     password?: boolean
     nickname?: boolean
     randomNickname?: boolean
+    point?: boolean
     joinedAt?: boolean
     refreshToken?: boolean
     admin?: boolean | AdminArgs
@@ -14969,6 +17605,22 @@ export namespace Prisma {
     ): CheckSelect<T, Prisma__UserClient<User>, Prisma__UserClient<UserGetPayload<T>>>
 
     /**
+     * Create many Users.
+     *     @param {UserCreateManyArgs} args - Arguments to create many Users.
+     *     @example
+     *     // Create many Users
+     *     const user = await prisma.user.createMany({
+     *       data: {
+     *         // ... provide data here
+     *       }
+     *     })
+     *     
+    **/
+    createMany<T extends UserCreateManyArgs>(
+      args?: SelectSubset<T, UserCreateManyArgs>
+    ): PrismaPromise<BatchPayload>
+
+    /**
      * Delete a User.
      * @param {UserDeleteArgs} args - Arguments to delete one User.
      * @example
@@ -15110,7 +17762,82 @@ export namespace Prisma {
     **/
     aggregate<T extends UserAggregateArgs>(args: Subset<T, UserAggregateArgs>): PrismaPromise<GetUserAggregateType<T>>
 
-
+    /**
+     * Group by User.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {UserGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends UserGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: UserGroupByArgs['orderBy'] }
+        : { orderBy?: UserGroupByArgs['orderBy'] },
+      OrderFields extends Keys<MaybeTupleToUnion<T['orderBy']>>,
+      ByFields extends TupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, UserGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetUserGroupByPayload<T> : Promise<InputErrors>
   }
 
   /**
@@ -15331,6 +18058,15 @@ export namespace Prisma {
      * The data needed to create a User.
     **/
     data: XOR<UserCreateInput, UserUncheckedCreateInput>
+  }
+
+
+  /**
+   * User createMany
+   */
+  export type UserCreateManyArgs = {
+    data: Enumerable<UserCreateManyInput>
+    skipDuplicates?: boolean
   }
 
 
@@ -15600,6 +18336,43 @@ export namespace Prisma {
   }
 
 
+    
+    
+  export type ReportCommentGroupByArgs = {
+    where?: ReportCommentWhereInput
+    orderBy?: Enumerable<ReportCommentOrderByInput>
+    by: Array<ReportCommentScalarFieldEnum>
+    having?: ReportCommentScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    count?: ReportCommentCountAggregateInputType | true
+    avg?: ReportCommentAvgAggregateInputType
+    sum?: ReportCommentSumAggregateInputType
+    min?: ReportCommentMinAggregateInputType
+    max?: ReportCommentMaxAggregateInputType
+  }
+
+
+  export type ReportCommentGroupByOutputType = {
+    id: number
+    commentId: number
+    userId: number
+    title: string
+    body: string | null
+    reportedAt: Date
+    count: ReportCommentCountAggregateOutputType | null
+    avg: ReportCommentAvgAggregateOutputType | null
+    sum: ReportCommentSumAggregateOutputType | null
+    min: ReportCommentMinAggregateOutputType | null
+    max: ReportCommentMaxAggregateOutputType | null
+  }
+
+  type GetReportCommentGroupByPayload<T extends ReportCommentGroupByArgs> = Promise<Array<
+    PickArray<ReportCommentGroupByOutputType, T['by']> & {
+      [P in ((keyof T) & (keyof ReportCommentGroupByOutputType))]: GetScalarType<T[P], ReportCommentGroupByOutputType[P]>
+    }
+  >>
+    
 
   export type ReportCommentSelect = {
     id?: boolean
@@ -15720,6 +18493,22 @@ export namespace Prisma {
     create<T extends ReportCommentCreateArgs>(
       args: SelectSubset<T, ReportCommentCreateArgs>
     ): CheckSelect<T, Prisma__ReportCommentClient<ReportComment>, Prisma__ReportCommentClient<ReportCommentGetPayload<T>>>
+
+    /**
+     * Create many ReportComments.
+     *     @param {ReportCommentCreateManyArgs} args - Arguments to create many ReportComments.
+     *     @example
+     *     // Create many ReportComments
+     *     const reportComment = await prisma.reportComment.createMany({
+     *       data: {
+     *         // ... provide data here
+     *       }
+     *     })
+     *     
+    **/
+    createMany<T extends ReportCommentCreateManyArgs>(
+      args?: SelectSubset<T, ReportCommentCreateManyArgs>
+    ): PrismaPromise<BatchPayload>
 
     /**
      * Delete a ReportComment.
@@ -15863,7 +18652,82 @@ export namespace Prisma {
     **/
     aggregate<T extends ReportCommentAggregateArgs>(args: Subset<T, ReportCommentAggregateArgs>): PrismaPromise<GetReportCommentAggregateType<T>>
 
-
+    /**
+     * Group by ReportComment.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ReportCommentGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends ReportCommentGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: ReportCommentGroupByArgs['orderBy'] }
+        : { orderBy?: ReportCommentGroupByArgs['orderBy'] },
+      OrderFields extends Keys<MaybeTupleToUnion<T['orderBy']>>,
+      ByFields extends TupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, ReportCommentGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetReportCommentGroupByPayload<T> : Promise<InputErrors>
   }
 
   /**
@@ -16054,6 +18918,15 @@ export namespace Prisma {
      * The data needed to create a ReportComment.
     **/
     data: XOR<ReportCommentCreateInput, ReportCommentUncheckedCreateInput>
+  }
+
+
+  /**
+   * ReportComment createMany
+   */
+  export type ReportCommentCreateManyArgs = {
+    data: Enumerable<ReportCommentCreateManyInput>
+    skipDuplicates?: boolean
   }
 
 
@@ -16323,6 +19196,43 @@ export namespace Prisma {
   }
 
 
+    
+    
+  export type ReportPostGroupByArgs = {
+    where?: ReportPostWhereInput
+    orderBy?: Enumerable<ReportPostOrderByInput>
+    by: Array<ReportPostScalarFieldEnum>
+    having?: ReportPostScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    count?: ReportPostCountAggregateInputType | true
+    avg?: ReportPostAvgAggregateInputType
+    sum?: ReportPostSumAggregateInputType
+    min?: ReportPostMinAggregateInputType
+    max?: ReportPostMaxAggregateInputType
+  }
+
+
+  export type ReportPostGroupByOutputType = {
+    id: number
+    postId: number
+    userId: number
+    title: string
+    body: string | null
+    reportedAt: Date
+    count: ReportPostCountAggregateOutputType | null
+    avg: ReportPostAvgAggregateOutputType | null
+    sum: ReportPostSumAggregateOutputType | null
+    min: ReportPostMinAggregateOutputType | null
+    max: ReportPostMaxAggregateOutputType | null
+  }
+
+  type GetReportPostGroupByPayload<T extends ReportPostGroupByArgs> = Promise<Array<
+    PickArray<ReportPostGroupByOutputType, T['by']> & {
+      [P in ((keyof T) & (keyof ReportPostGroupByOutputType))]: GetScalarType<T[P], ReportPostGroupByOutputType[P]>
+    }
+  >>
+    
 
   export type ReportPostSelect = {
     id?: boolean
@@ -16443,6 +19353,22 @@ export namespace Prisma {
     create<T extends ReportPostCreateArgs>(
       args: SelectSubset<T, ReportPostCreateArgs>
     ): CheckSelect<T, Prisma__ReportPostClient<ReportPost>, Prisma__ReportPostClient<ReportPostGetPayload<T>>>
+
+    /**
+     * Create many ReportPosts.
+     *     @param {ReportPostCreateManyArgs} args - Arguments to create many ReportPosts.
+     *     @example
+     *     // Create many ReportPosts
+     *     const reportPost = await prisma.reportPost.createMany({
+     *       data: {
+     *         // ... provide data here
+     *       }
+     *     })
+     *     
+    **/
+    createMany<T extends ReportPostCreateManyArgs>(
+      args?: SelectSubset<T, ReportPostCreateManyArgs>
+    ): PrismaPromise<BatchPayload>
 
     /**
      * Delete a ReportPost.
@@ -16586,7 +19512,82 @@ export namespace Prisma {
     **/
     aggregate<T extends ReportPostAggregateArgs>(args: Subset<T, ReportPostAggregateArgs>): PrismaPromise<GetReportPostAggregateType<T>>
 
-
+    /**
+     * Group by ReportPost.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ReportPostGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends ReportPostGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: ReportPostGroupByArgs['orderBy'] }
+        : { orderBy?: ReportPostGroupByArgs['orderBy'] },
+      OrderFields extends Keys<MaybeTupleToUnion<T['orderBy']>>,
+      ByFields extends TupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, ReportPostGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetReportPostGroupByPayload<T> : Promise<InputErrors>
   }
 
   /**
@@ -16777,6 +19778,15 @@ export namespace Prisma {
      * The data needed to create a ReportPost.
     **/
     data: XOR<ReportPostCreateInput, ReportPostUncheckedCreateInput>
+  }
+
+
+  /**
+   * ReportPost createMany
+   */
+  export type ReportPostCreateManyArgs = {
+    data: Enumerable<ReportPostCreateManyInput>
+    skipDuplicates?: boolean
   }
 
 
@@ -17046,6 +20056,43 @@ export namespace Prisma {
   }
 
 
+    
+    
+  export type ReportSubcommentGroupByArgs = {
+    where?: ReportSubcommentWhereInput
+    orderBy?: Enumerable<ReportSubcommentOrderByInput>
+    by: Array<ReportSubcommentScalarFieldEnum>
+    having?: ReportSubcommentScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    count?: ReportSubcommentCountAggregateInputType | true
+    avg?: ReportSubcommentAvgAggregateInputType
+    sum?: ReportSubcommentSumAggregateInputType
+    min?: ReportSubcommentMinAggregateInputType
+    max?: ReportSubcommentMaxAggregateInputType
+  }
+
+
+  export type ReportSubcommentGroupByOutputType = {
+    id: number
+    subcommentId: number
+    userId: number
+    title: string
+    body: string | null
+    reportedAt: Date
+    count: ReportSubcommentCountAggregateOutputType | null
+    avg: ReportSubcommentAvgAggregateOutputType | null
+    sum: ReportSubcommentSumAggregateOutputType | null
+    min: ReportSubcommentMinAggregateOutputType | null
+    max: ReportSubcommentMaxAggregateOutputType | null
+  }
+
+  type GetReportSubcommentGroupByPayload<T extends ReportSubcommentGroupByArgs> = Promise<Array<
+    PickArray<ReportSubcommentGroupByOutputType, T['by']> & {
+      [P in ((keyof T) & (keyof ReportSubcommentGroupByOutputType))]: GetScalarType<T[P], ReportSubcommentGroupByOutputType[P]>
+    }
+  >>
+    
 
   export type ReportSubcommentSelect = {
     id?: boolean
@@ -17166,6 +20213,22 @@ export namespace Prisma {
     create<T extends ReportSubcommentCreateArgs>(
       args: SelectSubset<T, ReportSubcommentCreateArgs>
     ): CheckSelect<T, Prisma__ReportSubcommentClient<ReportSubcomment>, Prisma__ReportSubcommentClient<ReportSubcommentGetPayload<T>>>
+
+    /**
+     * Create many ReportSubcomments.
+     *     @param {ReportSubcommentCreateManyArgs} args - Arguments to create many ReportSubcomments.
+     *     @example
+     *     // Create many ReportSubcomments
+     *     const reportSubcomment = await prisma.reportSubcomment.createMany({
+     *       data: {
+     *         // ... provide data here
+     *       }
+     *     })
+     *     
+    **/
+    createMany<T extends ReportSubcommentCreateManyArgs>(
+      args?: SelectSubset<T, ReportSubcommentCreateManyArgs>
+    ): PrismaPromise<BatchPayload>
 
     /**
      * Delete a ReportSubcomment.
@@ -17309,7 +20372,82 @@ export namespace Prisma {
     **/
     aggregate<T extends ReportSubcommentAggregateArgs>(args: Subset<T, ReportSubcommentAggregateArgs>): PrismaPromise<GetReportSubcommentAggregateType<T>>
 
-
+    /**
+     * Group by ReportSubcomment.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ReportSubcommentGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends ReportSubcommentGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: ReportSubcommentGroupByArgs['orderBy'] }
+        : { orderBy?: ReportSubcommentGroupByArgs['orderBy'] },
+      OrderFields extends Keys<MaybeTupleToUnion<T['orderBy']>>,
+      ByFields extends TupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, ReportSubcommentGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetReportSubcommentGroupByPayload<T> : Promise<InputErrors>
   }
 
   /**
@@ -17500,6 +20638,15 @@ export namespace Prisma {
      * The data needed to create a ReportSubcomment.
     **/
     data: XOR<ReportSubcommentCreateInput, ReportSubcommentUncheckedCreateInput>
+  }
+
+
+  /**
+   * ReportSubcomment createMany
+   */
+  export type ReportSubcommentCreateManyArgs = {
+    data: Enumerable<ReportSubcommentCreateManyInput>
+    skipDuplicates?: boolean
   }
 
 
@@ -17741,6 +20888,39 @@ export namespace Prisma {
   }
 
 
+    
+    
+  export type TelegramGroupByArgs = {
+    where?: TelegramWhereInput
+    orderBy?: Enumerable<TelegramOrderByInput>
+    by: Array<TelegramScalarFieldEnum>
+    having?: TelegramScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    count?: TelegramCountAggregateInputType | true
+    avg?: TelegramAvgAggregateInputType
+    sum?: TelegramSumAggregateInputType
+    min?: TelegramMinAggregateInputType
+    max?: TelegramMaxAggregateInputType
+  }
+
+
+  export type TelegramGroupByOutputType = {
+    userId: number
+    chatId: number
+    count: TelegramCountAggregateOutputType | null
+    avg: TelegramAvgAggregateOutputType | null
+    sum: TelegramSumAggregateOutputType | null
+    min: TelegramMinAggregateOutputType | null
+    max: TelegramMaxAggregateOutputType | null
+  }
+
+  type GetTelegramGroupByPayload<T extends TelegramGroupByArgs> = Promise<Array<
+    PickArray<TelegramGroupByOutputType, T['by']> & {
+      [P in ((keyof T) & (keyof TelegramGroupByOutputType))]: GetScalarType<T[P], TelegramGroupByOutputType[P]>
+    }
+  >>
+    
 
   export type TelegramSelect = {
     userId?: boolean
@@ -17851,6 +21031,22 @@ export namespace Prisma {
     create<T extends TelegramCreateArgs>(
       args: SelectSubset<T, TelegramCreateArgs>
     ): CheckSelect<T, Prisma__TelegramClient<Telegram>, Prisma__TelegramClient<TelegramGetPayload<T>>>
+
+    /**
+     * Create many Telegrams.
+     *     @param {TelegramCreateManyArgs} args - Arguments to create many Telegrams.
+     *     @example
+     *     // Create many Telegrams
+     *     const telegram = await prisma.telegram.createMany({
+     *       data: {
+     *         // ... provide data here
+     *       }
+     *     })
+     *     
+    **/
+    createMany<T extends TelegramCreateManyArgs>(
+      args?: SelectSubset<T, TelegramCreateManyArgs>
+    ): PrismaPromise<BatchPayload>
 
     /**
      * Delete a Telegram.
@@ -17994,7 +21190,82 @@ export namespace Prisma {
     **/
     aggregate<T extends TelegramAggregateArgs>(args: Subset<T, TelegramAggregateArgs>): PrismaPromise<GetTelegramAggregateType<T>>
 
-
+    /**
+     * Group by Telegram.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TelegramGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends TelegramGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: TelegramGroupByArgs['orderBy'] }
+        : { orderBy?: TelegramGroupByArgs['orderBy'] },
+      OrderFields extends Keys<MaybeTupleToUnion<T['orderBy']>>,
+      ByFields extends TupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, TelegramGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetTelegramGroupByPayload<T> : Promise<InputErrors>
   }
 
   /**
@@ -18183,6 +21454,15 @@ export namespace Prisma {
      * The data needed to create a Telegram.
     **/
     data: XOR<TelegramCreateInput, TelegramUncheckedCreateInput>
+  }
+
+
+  /**
+   * Telegram createMany
+   */
+  export type TelegramCreateManyArgs = {
+    data: Enumerable<TelegramCreateManyInput>
+    skipDuplicates?: boolean
   }
 
 
@@ -18514,6 +21794,7 @@ export namespace Prisma {
     password: 'password',
     nickname: 'nickname',
     randomNickname: 'randomNickname',
+    point: 'point',
     joinedAt: 'joinedAt',
     refreshToken: 'refreshToken'
   };
@@ -18594,6 +21875,13 @@ export namespace Prisma {
     userId?: number
   }
 
+  export type AdminScalarWhereWithAggregatesInput = {
+    AND?: Enumerable<AdminScalarWhereWithAggregatesInput>
+    OR?: Enumerable<AdminScalarWhereWithAggregatesInput>
+    NOT?: Enumerable<AdminScalarWhereWithAggregatesInput>
+    userId?: IntWithAggregatesFilter | number
+  }
+
   export type CafeteriaMenuWhereInput = {
     AND?: Enumerable<CafeteriaMenuWhereInput>
     OR?: Enumerable<CafeteriaMenuWhereInput>
@@ -18611,6 +21899,15 @@ export namespace Prisma {
 
   export type CafeteriaMenuWhereUniqueInput = {
     campus_servedAt?: CafeteriaMenuCampusServedAtCompoundUniqueInput
+  }
+
+  export type CafeteriaMenuScalarWhereWithAggregatesInput = {
+    AND?: Enumerable<CafeteriaMenuScalarWhereWithAggregatesInput>
+    OR?: Enumerable<CafeteriaMenuScalarWhereWithAggregatesInput>
+    NOT?: Enumerable<CafeteriaMenuScalarWhereWithAggregatesInput>
+    campus?: StringWithAggregatesFilter | string
+    servedAt?: DateTimeWithAggregatesFilter | Date | string
+    data?: JsonNullableWithAggregatesFilter
   }
 
   export type ChangePasswordWhereInput = {
@@ -18632,6 +21929,15 @@ export namespace Prisma {
   export type ChangePasswordWhereUniqueInput = {
     userId?: number
     token?: string
+  }
+
+  export type ChangePasswordScalarWhereWithAggregatesInput = {
+    AND?: Enumerable<ChangePasswordScalarWhereWithAggregatesInput>
+    OR?: Enumerable<ChangePasswordScalarWhereWithAggregatesInput>
+    NOT?: Enumerable<ChangePasswordScalarWhereWithAggregatesInput>
+    userId?: IntWithAggregatesFilter | number
+    token?: StringWithAggregatesFilter | string
+    requestedAt?: DateTimeWithAggregatesFilter | Date | string
   }
 
   export type CommunityBoardWhereInput = {
@@ -18660,12 +21966,25 @@ export namespace Prisma {
     createdBy?: SortOrder
     createdAt?: SortOrder
     activeAt?: SortOrder
-    user?: UserOrderByInput
   }
 
   export type CommunityBoardWhereUniqueInput = {
     id?: number
     name?: string
+  }
+
+  export type CommunityBoardScalarWhereWithAggregatesInput = {
+    AND?: Enumerable<CommunityBoardScalarWhereWithAggregatesInput>
+    OR?: Enumerable<CommunityBoardScalarWhereWithAggregatesInput>
+    NOT?: Enumerable<CommunityBoardScalarWhereWithAggregatesInput>
+    id?: IntWithAggregatesFilter | number
+    name?: StringWithAggregatesFilter | string
+    description?: StringNullableWithAggregatesFilter | string | null
+    priority?: IntWithAggregatesFilter | number
+    isDeleted?: BoolWithAggregatesFilter | boolean
+    createdBy?: IntWithAggregatesFilter | number
+    createdAt?: DateTimeWithAggregatesFilter | Date | string
+    activeAt?: DateTimeNullableWithAggregatesFilter | Date | string | null
   }
 
   export type CommunityBoardCandidateWhereInput = {
@@ -18687,12 +22006,22 @@ export namespace Prisma {
     description?: SortOrder
     createdBy?: SortOrder
     createdAt?: SortOrder
-    user?: UserOrderByInput
   }
 
   export type CommunityBoardCandidateWhereUniqueInput = {
     id?: number
     name?: string
+  }
+
+  export type CommunityBoardCandidateScalarWhereWithAggregatesInput = {
+    AND?: Enumerable<CommunityBoardCandidateScalarWhereWithAggregatesInput>
+    OR?: Enumerable<CommunityBoardCandidateScalarWhereWithAggregatesInput>
+    NOT?: Enumerable<CommunityBoardCandidateScalarWhereWithAggregatesInput>
+    id?: IntWithAggregatesFilter | number
+    name?: StringWithAggregatesFilter | string
+    description?: StringNullableWithAggregatesFilter | string | null
+    createdBy?: IntWithAggregatesFilter | number
+    createdAt?: DateTimeWithAggregatesFilter | Date | string
   }
 
   export type CommunityBoardCandidateVoteWhereInput = {
@@ -18708,12 +22037,18 @@ export namespace Prisma {
   export type CommunityBoardCandidateVoteOrderByInput = {
     boardCandidateId?: SortOrder
     userId?: SortOrder
-    communityBoardCandidate?: CommunityBoardCandidateOrderByInput
-    user?: UserOrderByInput
   }
 
   export type CommunityBoardCandidateVoteWhereUniqueInput = {
     boardCandidateId_userId?: CommunityBoardCandidateVoteBoardCandidateIdUserIdCompoundUniqueInput
+  }
+
+  export type CommunityBoardCandidateVoteScalarWhereWithAggregatesInput = {
+    AND?: Enumerable<CommunityBoardCandidateVoteScalarWhereWithAggregatesInput>
+    OR?: Enumerable<CommunityBoardCandidateVoteScalarWhereWithAggregatesInput>
+    NOT?: Enumerable<CommunityBoardCandidateVoteScalarWhereWithAggregatesInput>
+    boardCandidateId?: IntWithAggregatesFilter | number
+    userId?: IntWithAggregatesFilter | number
   }
 
   export type CommunityBoardPinWhereInput = {
@@ -18729,12 +22064,18 @@ export namespace Prisma {
   export type CommunityBoardPinOrderByInput = {
     userId?: SortOrder
     boardId?: SortOrder
-    communityBoard?: CommunityBoardOrderByInput
-    user?: UserOrderByInput
   }
 
   export type CommunityBoardPinWhereUniqueInput = {
     userId_boardId?: CommunityBoardPinUserIdBoardIdCompoundUniqueInput
+  }
+
+  export type CommunityBoardPinScalarWhereWithAggregatesInput = {
+    AND?: Enumerable<CommunityBoardPinScalarWhereWithAggregatesInput>
+    OR?: Enumerable<CommunityBoardPinScalarWhereWithAggregatesInput>
+    NOT?: Enumerable<CommunityBoardPinScalarWhereWithAggregatesInput>
+    userId?: IntWithAggregatesFilter | number
+    boardId?: IntWithAggregatesFilter | number
   }
 
   export type CommunityCommentWhereInput = {
@@ -18762,12 +22103,23 @@ export namespace Prisma {
     body?: SortOrder
     commentedAt?: SortOrder
     isDeleted?: SortOrder
-    communityPost?: CommunityPostOrderByInput
-    user?: UserOrderByInput
   }
 
   export type CommunityCommentWhereUniqueInput = {
     id?: number
+  }
+
+  export type CommunityCommentScalarWhereWithAggregatesInput = {
+    AND?: Enumerable<CommunityCommentScalarWhereWithAggregatesInput>
+    OR?: Enumerable<CommunityCommentScalarWhereWithAggregatesInput>
+    NOT?: Enumerable<CommunityCommentScalarWhereWithAggregatesInput>
+    id?: IntWithAggregatesFilter | number
+    postId?: IntWithAggregatesFilter | number
+    userId?: IntWithAggregatesFilter | number
+    randomNickname?: StringWithAggregatesFilter | string
+    body?: StringWithAggregatesFilter | string
+    commentedAt?: DateTimeWithAggregatesFilter | Date | string
+    isDeleted?: BoolWithAggregatesFilter | boolean
   }
 
   export type CommunityPostWhereInput = {
@@ -18808,12 +22160,28 @@ export namespace Prisma {
     postedAt?: SortOrder
     editedAt?: SortOrder
     isDeleted?: SortOrder
-    communityBoard?: CommunityBoardOrderByInput
-    user?: UserOrderByInput
   }
 
   export type CommunityPostWhereUniqueInput = {
     id?: number
+  }
+
+  export type CommunityPostScalarWhereWithAggregatesInput = {
+    AND?: Enumerable<CommunityPostScalarWhereWithAggregatesInput>
+    OR?: Enumerable<CommunityPostScalarWhereWithAggregatesInput>
+    NOT?: Enumerable<CommunityPostScalarWhereWithAggregatesInput>
+    id?: IntWithAggregatesFilter | number
+    boardId?: IntWithAggregatesFilter | number
+    userId?: IntWithAggregatesFilter | number
+    title?: StringWithAggregatesFilter | string
+    body?: StringWithAggregatesFilter | string
+    randomNickname?: StringWithAggregatesFilter | string
+    likesCount?: IntWithAggregatesFilter | number
+    commentsCount?: IntWithAggregatesFilter | number
+    bookmarksCount?: IntWithAggregatesFilter | number
+    postedAt?: DateTimeWithAggregatesFilter | Date | string
+    editedAt?: DateTimeNullableWithAggregatesFilter | Date | string | null
+    isDeleted?: BoolWithAggregatesFilter | boolean
   }
 
   export type CommunityPostBookmarkWhereInput = {
@@ -18829,12 +22197,18 @@ export namespace Prisma {
   export type CommunityPostBookmarkOrderByInput = {
     userId?: SortOrder
     postId?: SortOrder
-    communityPost?: CommunityPostOrderByInput
-    user?: UserOrderByInput
   }
 
   export type CommunityPostBookmarkWhereUniqueInput = {
     userId_postId?: CommunityPostBookmarkUserIdPostIdCompoundUniqueInput
+  }
+
+  export type CommunityPostBookmarkScalarWhereWithAggregatesInput = {
+    AND?: Enumerable<CommunityPostBookmarkScalarWhereWithAggregatesInput>
+    OR?: Enumerable<CommunityPostBookmarkScalarWhereWithAggregatesInput>
+    NOT?: Enumerable<CommunityPostBookmarkScalarWhereWithAggregatesInput>
+    userId?: IntWithAggregatesFilter | number
+    postId?: IntWithAggregatesFilter | number
   }
 
   export type CommunityPostLikeWhereInput = {
@@ -18850,12 +22224,18 @@ export namespace Prisma {
   export type CommunityPostLikeOrderByInput = {
     userId?: SortOrder
     postId?: SortOrder
-    communityPost?: CommunityPostOrderByInput
-    user?: UserOrderByInput
   }
 
   export type CommunityPostLikeWhereUniqueInput = {
     userId_postId?: CommunityPostLikeUserIdPostIdCompoundUniqueInput
+  }
+
+  export type CommunityPostLikeScalarWhereWithAggregatesInput = {
+    AND?: Enumerable<CommunityPostLikeScalarWhereWithAggregatesInput>
+    OR?: Enumerable<CommunityPostLikeScalarWhereWithAggregatesInput>
+    NOT?: Enumerable<CommunityPostLikeScalarWhereWithAggregatesInput>
+    userId?: IntWithAggregatesFilter | number
+    postId?: IntWithAggregatesFilter | number
   }
 
   export type CommunitySubcommentWhereInput = {
@@ -18885,13 +22265,24 @@ export namespace Prisma {
     body?: SortOrder
     subcommentedAt?: SortOrder
     isDeleted?: SortOrder
-    communityComment?: CommunityCommentOrderByInput
-    communityPost?: CommunityPostOrderByInput
-    user?: UserOrderByInput
   }
 
   export type CommunitySubcommentWhereUniqueInput = {
     id?: number
+  }
+
+  export type CommunitySubcommentScalarWhereWithAggregatesInput = {
+    AND?: Enumerable<CommunitySubcommentScalarWhereWithAggregatesInput>
+    OR?: Enumerable<CommunitySubcommentScalarWhereWithAggregatesInput>
+    NOT?: Enumerable<CommunitySubcommentScalarWhereWithAggregatesInput>
+    id?: IntWithAggregatesFilter | number
+    userId?: IntWithAggregatesFilter | number
+    postId?: IntWithAggregatesFilter | number
+    commentId?: IntWithAggregatesFilter | number
+    randomNickname?: StringWithAggregatesFilter | string
+    body?: StringWithAggregatesFilter | string
+    subcommentedAt?: DateTimeWithAggregatesFilter | Date | string
+    isDeleted?: BoolWithAggregatesFilter | boolean
   }
 
   export type CoverageMajorWhereInput = {
@@ -18914,6 +22305,15 @@ export namespace Prisma {
     code?: string
   }
 
+  export type CoverageMajorScalarWhereWithAggregatesInput = {
+    AND?: Enumerable<CoverageMajorScalarWhereWithAggregatesInput>
+    OR?: Enumerable<CoverageMajorScalarWhereWithAggregatesInput>
+    NOT?: Enumerable<CoverageMajorScalarWhereWithAggregatesInput>
+    coverageCollege?: StringNullableWithAggregatesFilter | string | null
+    name?: StringWithAggregatesFilter | string
+    code?: StringWithAggregatesFilter | string
+  }
+
   export type CoverageMajorLectureWhereInput = {
     AND?: Enumerable<CoverageMajorLectureWhereInput>
     OR?: Enumerable<CoverageMajorLectureWhereInput>
@@ -18927,12 +22327,18 @@ export namespace Prisma {
   export type CoverageMajorLectureOrderByInput = {
     lectureId?: SortOrder
     majorCode?: SortOrder
-    lecture?: LectureOrderByInput
-    coverageMajor?: CoverageMajorOrderByInput
   }
 
   export type CoverageMajorLectureWhereUniqueInput = {
     lectureId_majorCode?: CoverageMajorLectureLectureIdMajorCodeCompoundUniqueInput
+  }
+
+  export type CoverageMajorLectureScalarWhereWithAggregatesInput = {
+    AND?: Enumerable<CoverageMajorLectureScalarWhereWithAggregatesInput>
+    OR?: Enumerable<CoverageMajorLectureScalarWhereWithAggregatesInput>
+    NOT?: Enumerable<CoverageMajorLectureScalarWhereWithAggregatesInput>
+    lectureId?: StringWithAggregatesFilter | string
+    majorCode?: StringWithAggregatesFilter | string
   }
 
   export type LectureWhereInput = {
@@ -18984,6 +22390,29 @@ export namespace Prisma {
     id?: string
   }
 
+  export type LectureScalarWhereWithAggregatesInput = {
+    AND?: Enumerable<LectureScalarWhereWithAggregatesInput>
+    OR?: Enumerable<LectureScalarWhereWithAggregatesInput>
+    NOT?: Enumerable<LectureScalarWhereWithAggregatesInput>
+    id?: StringWithAggregatesFilter | string
+    year?: IntNullableWithAggregatesFilter | number | null
+    semester?: StringNullableWithAggregatesFilter | string | null
+    campus?: StringNullableWithAggregatesFilter | string | null
+    college?: StringNullableWithAggregatesFilter | string | null
+    major?: StringNullableWithAggregatesFilter | string | null
+    grade?: IntNullableWithAggregatesFilter | number | null
+    credit?: IntNullableWithAggregatesFilter | number | null
+    course?: StringNullableWithAggregatesFilter | string | null
+    section?: StringNullableWithAggregatesFilter | string | null
+    code?: StringNullableWithAggregatesFilter | string | null
+    name?: StringNullableWithAggregatesFilter | string | null
+    professor?: StringNullableWithAggregatesFilter | string | null
+    schedule?: StringNullableWithAggregatesFilter | string | null
+    building?: IntNullableWithAggregatesFilter | number | null
+    room?: StringNullableWithAggregatesFilter | string | null
+    note?: StringNullableWithAggregatesFilter | string | null
+  }
+
   export type LiveChatWhereInput = {
     AND?: Enumerable<LiveChatWhereInput>
     OR?: Enumerable<LiveChatWhereInput>
@@ -19002,11 +22431,21 @@ export namespace Prisma {
     createdAt?: SortOrder
     userId?: SortOrder
     randomNickname?: SortOrder
-    user?: UserOrderByInput
   }
 
   export type LiveChatWhereUniqueInput = {
     id_userId?: LiveChatIdUserIdCompoundUniqueInput
+  }
+
+  export type LiveChatScalarWhereWithAggregatesInput = {
+    AND?: Enumerable<LiveChatScalarWhereWithAggregatesInput>
+    OR?: Enumerable<LiveChatScalarWhereWithAggregatesInput>
+    NOT?: Enumerable<LiveChatScalarWhereWithAggregatesInput>
+    id?: IntWithAggregatesFilter | number
+    message?: StringWithAggregatesFilter | string
+    createdAt?: DateTimeWithAggregatesFilter | Date | string
+    userId?: IntWithAggregatesFilter | number
+    randomNickname?: StringWithAggregatesFilter | string
   }
 
   export type NoticeNotificationsSubscriptionWhereInput = {
@@ -19025,11 +22464,20 @@ export namespace Prisma {
     userId?: SortOrder
     noticeKey?: SortOrder
     subscribedAt?: SortOrder
-    user?: UserOrderByInput
   }
 
   export type NoticeNotificationsSubscriptionWhereUniqueInput = {
     id?: number
+  }
+
+  export type NoticeNotificationsSubscriptionScalarWhereWithAggregatesInput = {
+    AND?: Enumerable<NoticeNotificationsSubscriptionScalarWhereWithAggregatesInput>
+    OR?: Enumerable<NoticeNotificationsSubscriptionScalarWhereWithAggregatesInput>
+    NOT?: Enumerable<NoticeNotificationsSubscriptionScalarWhereWithAggregatesInput>
+    id?: IntWithAggregatesFilter | number
+    userId?: IntWithAggregatesFilter | number
+    noticeKey?: StringWithAggregatesFilter | string
+    subscribedAt?: DateTimeWithAggregatesFilter | Date | string
   }
 
   export type PendingUserWhereInput = {
@@ -19062,6 +22510,19 @@ export namespace Prisma {
     token?: string
   }
 
+  export type PendingUserScalarWhereWithAggregatesInput = {
+    AND?: Enumerable<PendingUserScalarWhereWithAggregatesInput>
+    OR?: Enumerable<PendingUserScalarWhereWithAggregatesInput>
+    NOT?: Enumerable<PendingUserScalarWhereWithAggregatesInput>
+    id?: IntWithAggregatesFilter | number
+    portalId?: StringWithAggregatesFilter | string
+    password?: StringWithAggregatesFilter | string
+    nickname?: StringWithAggregatesFilter | string
+    randomNickname?: StringWithAggregatesFilter | string
+    joinedAt?: DateTimeWithAggregatesFilter | Date | string
+    token?: StringWithAggregatesFilter | string
+  }
+
   export type PeriodWhereInput = {
     AND?: Enumerable<PeriodWhereInput>
     OR?: Enumerable<PeriodWhereInput>
@@ -19082,11 +22543,22 @@ export namespace Prisma {
     startM?: SortOrder
     endH?: SortOrder
     endM?: SortOrder
-    lecture?: LectureOrderByInput
   }
 
   export type PeriodWhereUniqueInput = {
     lectureId_day_startH_startM_endH_endM?: PeriodLectureIdDayStartHStartMEndHEndMCompoundUniqueInput
+  }
+
+  export type PeriodScalarWhereWithAggregatesInput = {
+    AND?: Enumerable<PeriodScalarWhereWithAggregatesInput>
+    OR?: Enumerable<PeriodScalarWhereWithAggregatesInput>
+    NOT?: Enumerable<PeriodScalarWhereWithAggregatesInput>
+    lectureId?: StringWithAggregatesFilter | string
+    day?: StringWithAggregatesFilter | string
+    startH?: IntWithAggregatesFilter | number
+    startM?: IntWithAggregatesFilter | number
+    endH?: IntWithAggregatesFilter | number
+    endM?: IntWithAggregatesFilter | number
   }
 
   export type UserWhereInput = {
@@ -19098,6 +22570,7 @@ export namespace Prisma {
     password?: StringFilter | string
     nickname?: StringFilter | string
     randomNickname?: StringFilter | string
+    point?: IntNullableFilter | number | null
     joinedAt?: DateTimeFilter | Date | string
     refreshToken?: StringNullableFilter | string | null
     admin?: XOR<AdminRelationFilter, AdminWhereInput> | null
@@ -19125,16 +22598,29 @@ export namespace Prisma {
     password?: SortOrder
     nickname?: SortOrder
     randomNickname?: SortOrder
+    point?: SortOrder
     joinedAt?: SortOrder
     refreshToken?: SortOrder
-    admin?: AdminOrderByInput
-    changePassword?: ChangePasswordOrderByInput
   }
 
   export type UserWhereUniqueInput = {
     id?: number
     portalId?: string
     nickname?: string
+  }
+
+  export type UserScalarWhereWithAggregatesInput = {
+    AND?: Enumerable<UserScalarWhereWithAggregatesInput>
+    OR?: Enumerable<UserScalarWhereWithAggregatesInput>
+    NOT?: Enumerable<UserScalarWhereWithAggregatesInput>
+    id?: IntWithAggregatesFilter | number
+    portalId?: StringWithAggregatesFilter | string
+    password?: StringWithAggregatesFilter | string
+    nickname?: StringWithAggregatesFilter | string
+    randomNickname?: StringWithAggregatesFilter | string
+    point?: IntNullableWithAggregatesFilter | number | null
+    joinedAt?: DateTimeWithAggregatesFilter | Date | string
+    refreshToken?: StringNullableWithAggregatesFilter | string | null
   }
 
   export type ReportCommentWhereInput = {
@@ -19158,12 +22644,22 @@ export namespace Prisma {
     title?: SortOrder
     body?: SortOrder
     reportedAt?: SortOrder
-    communityComment?: CommunityCommentOrderByInput
-    user?: UserOrderByInput
   }
 
   export type ReportCommentWhereUniqueInput = {
     id?: number
+  }
+
+  export type ReportCommentScalarWhereWithAggregatesInput = {
+    AND?: Enumerable<ReportCommentScalarWhereWithAggregatesInput>
+    OR?: Enumerable<ReportCommentScalarWhereWithAggregatesInput>
+    NOT?: Enumerable<ReportCommentScalarWhereWithAggregatesInput>
+    id?: IntWithAggregatesFilter | number
+    commentId?: IntWithAggregatesFilter | number
+    userId?: IntWithAggregatesFilter | number
+    title?: StringWithAggregatesFilter | string
+    body?: StringNullableWithAggregatesFilter | string | null
+    reportedAt?: DateTimeWithAggregatesFilter | Date | string
   }
 
   export type ReportPostWhereInput = {
@@ -19187,12 +22683,22 @@ export namespace Prisma {
     title?: SortOrder
     body?: SortOrder
     reportedAt?: SortOrder
-    communityPost?: CommunityPostOrderByInput
-    user?: UserOrderByInput
   }
 
   export type ReportPostWhereUniqueInput = {
     id?: number
+  }
+
+  export type ReportPostScalarWhereWithAggregatesInput = {
+    AND?: Enumerable<ReportPostScalarWhereWithAggregatesInput>
+    OR?: Enumerable<ReportPostScalarWhereWithAggregatesInput>
+    NOT?: Enumerable<ReportPostScalarWhereWithAggregatesInput>
+    id?: IntWithAggregatesFilter | number
+    postId?: IntWithAggregatesFilter | number
+    userId?: IntWithAggregatesFilter | number
+    title?: StringWithAggregatesFilter | string
+    body?: StringNullableWithAggregatesFilter | string | null
+    reportedAt?: DateTimeWithAggregatesFilter | Date | string
   }
 
   export type ReportSubcommentWhereInput = {
@@ -19216,12 +22722,22 @@ export namespace Prisma {
     title?: SortOrder
     body?: SortOrder
     reportedAt?: SortOrder
-    communitySubcomment?: CommunitySubcommentOrderByInput
-    user?: UserOrderByInput
   }
 
   export type ReportSubcommentWhereUniqueInput = {
     id?: number
+  }
+
+  export type ReportSubcommentScalarWhereWithAggregatesInput = {
+    AND?: Enumerable<ReportSubcommentScalarWhereWithAggregatesInput>
+    OR?: Enumerable<ReportSubcommentScalarWhereWithAggregatesInput>
+    NOT?: Enumerable<ReportSubcommentScalarWhereWithAggregatesInput>
+    id?: IntWithAggregatesFilter | number
+    subcommentId?: IntWithAggregatesFilter | number
+    userId?: IntWithAggregatesFilter | number
+    title?: StringWithAggregatesFilter | string
+    body?: StringNullableWithAggregatesFilter | string | null
+    reportedAt?: DateTimeWithAggregatesFilter | Date | string
   }
 
   export type TelegramWhereInput = {
@@ -19236,11 +22752,18 @@ export namespace Prisma {
   export type TelegramOrderByInput = {
     userId?: SortOrder
     chatId?: SortOrder
-    user?: UserOrderByInput
   }
 
   export type TelegramWhereUniqueInput = {
     userId_chatId?: TelegramUserIdChatIdCompoundUniqueInput
+  }
+
+  export type TelegramScalarWhereWithAggregatesInput = {
+    AND?: Enumerable<TelegramScalarWhereWithAggregatesInput>
+    OR?: Enumerable<TelegramScalarWhereWithAggregatesInput>
+    NOT?: Enumerable<TelegramScalarWhereWithAggregatesInput>
+    userId?: IntWithAggregatesFilter | number
+    chatId?: IntWithAggregatesFilter | number
   }
 
   export type AdminCreateInput = {
@@ -19257,6 +22780,10 @@ export namespace Prisma {
 
   export type AdminUncheckedUpdateInput = {
     userId?: IntFieldUpdateOperationsInput | number
+  }
+
+  export type AdminCreateManyInput = {
+    userId: number
   }
 
   export type AdminUpdateManyMutationInput = {
@@ -19288,6 +22815,12 @@ export namespace Prisma {
   export type CafeteriaMenuUncheckedUpdateInput = {
     campus?: StringFieldUpdateOperationsInput | string
     servedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    data?: InputJsonValue | null
+  }
+
+  export type CafeteriaMenuCreateManyInput = {
+    campus: string
+    servedAt: Date | string
     data?: InputJsonValue | null
   }
 
@@ -19325,6 +22858,12 @@ export namespace Prisma {
     userId?: IntFieldUpdateOperationsInput | number
     token?: StringFieldUpdateOperationsInput | string
     requestedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ChangePasswordCreateManyInput = {
+    userId: number
+    token: string
+    requestedAt: Date | string
   }
 
   export type ChangePasswordUpdateManyMutationInput = {
@@ -19388,6 +22927,17 @@ export namespace Prisma {
     communityPosts?: CommunityPostUncheckedUpdateManyWithoutCommunityBoardInput
   }
 
+  export type CommunityBoardCreateManyInput = {
+    id?: number
+    name?: string
+    description?: string | null
+    priority?: number
+    isDeleted?: boolean
+    createdBy: number
+    createdAt: Date | string
+    activeAt?: Date | string | null
+  }
+
   export type CommunityBoardUpdateManyMutationInput = {
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
@@ -19442,6 +22992,14 @@ export namespace Prisma {
     communityBoardCandidateVotes?: CommunityBoardCandidateVoteUncheckedUpdateManyWithoutCommunityBoardCandidateInput
   }
 
+  export type CommunityBoardCandidateCreateManyInput = {
+    id?: number
+    name?: string
+    description?: string | null
+    createdBy: number
+    createdAt: Date | string
+  }
+
   export type CommunityBoardCandidateUpdateManyMutationInput = {
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
@@ -19476,6 +23034,11 @@ export namespace Prisma {
     userId?: IntFieldUpdateOperationsInput | number
   }
 
+  export type CommunityBoardCandidateVoteCreateManyInput = {
+    boardCandidateId: number
+    userId: number
+  }
+
   export type CommunityBoardCandidateVoteUpdateManyMutationInput = {
 
   }
@@ -19503,6 +23066,11 @@ export namespace Prisma {
   export type CommunityBoardPinUncheckedUpdateInput = {
     userId?: IntFieldUpdateOperationsInput | number
     boardId?: IntFieldUpdateOperationsInput | number
+  }
+
+  export type CommunityBoardPinCreateManyInput = {
+    userId: number
+    boardId: number
   }
 
   export type CommunityBoardPinUpdateManyMutationInput = {
@@ -19558,6 +23126,16 @@ export namespace Prisma {
     isDeleted?: BoolFieldUpdateOperationsInput | boolean
     communitySubcomments?: CommunitySubcommentUncheckedUpdateManyWithoutCommunityCommentInput
     reportComments?: ReportCommentUncheckedUpdateManyWithoutCommunityCommentInput
+  }
+
+  export type CommunityCommentCreateManyInput = {
+    id?: number
+    postId: number
+    userId: number
+    randomNickname?: string
+    body: string
+    commentedAt: Date | string
+    isDeleted?: boolean
   }
 
   export type CommunityCommentUpdateManyMutationInput = {
@@ -19655,6 +23233,21 @@ export namespace Prisma {
     reportPosts?: ReportPostUncheckedUpdateManyWithoutCommunityPostInput
   }
 
+  export type CommunityPostCreateManyInput = {
+    id?: number
+    boardId: number
+    userId: number
+    title: string
+    body: string
+    randomNickname: string
+    likesCount?: number
+    commentsCount?: number
+    bookmarksCount?: number
+    postedAt: Date | string
+    editedAt?: Date | string | null
+    isDeleted?: boolean
+  }
+
   export type CommunityPostUpdateManyMutationInput = {
     title?: StringFieldUpdateOperationsInput | string
     body?: StringFieldUpdateOperationsInput | string
@@ -19702,6 +23295,11 @@ export namespace Prisma {
     postId?: IntFieldUpdateOperationsInput | number
   }
 
+  export type CommunityPostBookmarkCreateManyInput = {
+    userId: number
+    postId: number
+  }
+
   export type CommunityPostBookmarkUpdateManyMutationInput = {
 
   }
@@ -19729,6 +23327,11 @@ export namespace Prisma {
   export type CommunityPostLikeUncheckedUpdateInput = {
     userId?: IntFieldUpdateOperationsInput | number
     postId?: IntFieldUpdateOperationsInput | number
+  }
+
+  export type CommunityPostLikeCreateManyInput = {
+    userId: number
+    postId: number
   }
 
   export type CommunityPostLikeUpdateManyMutationInput = {
@@ -19786,6 +23389,17 @@ export namespace Prisma {
     reportSubcomments?: ReportSubcommentUncheckedUpdateManyWithoutCommunitySubcommentInput
   }
 
+  export type CommunitySubcommentCreateManyInput = {
+    id?: number
+    userId: number
+    postId: number
+    commentId: number
+    randomNickname?: string
+    body: string
+    subcommentedAt: Date | string
+    isDeleted?: boolean
+  }
+
   export type CommunitySubcommentUpdateManyMutationInput = {
     randomNickname?: StringFieldUpdateOperationsInput | string
     body?: StringFieldUpdateOperationsInput | string
@@ -19832,6 +23446,12 @@ export namespace Prisma {
     coverageMajorLectures?: CoverageMajorLectureUncheckedUpdateManyWithoutCoverageMajorInput
   }
 
+  export type CoverageMajorCreateManyInput = {
+    coverageCollege?: string | null
+    name: string
+    code: string
+  }
+
   export type CoverageMajorUpdateManyMutationInput = {
     coverageCollege?: NullableStringFieldUpdateOperationsInput | string | null
     name?: StringFieldUpdateOperationsInput | string
@@ -19862,6 +23482,11 @@ export namespace Prisma {
   export type CoverageMajorLectureUncheckedUpdateInput = {
     lectureId?: StringFieldUpdateOperationsInput | string
     majorCode?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type CoverageMajorLectureCreateManyInput = {
+    lectureId: string
+    majorCode: string
   }
 
   export type CoverageMajorLectureUpdateManyMutationInput = {
@@ -19961,6 +23586,26 @@ export namespace Prisma {
     periods?: PeriodUncheckedUpdateManyWithoutLectureInput
   }
 
+  export type LectureCreateManyInput = {
+    id: string
+    year?: number | null
+    semester?: string | null
+    campus?: string | null
+    college?: string | null
+    major?: string | null
+    grade?: number | null
+    credit?: number | null
+    course?: string | null
+    section?: string | null
+    code?: string | null
+    name?: string | null
+    professor?: string | null
+    schedule?: string | null
+    building?: number | null
+    room?: string | null
+    note?: string | null
+  }
+
   export type LectureUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
     year?: NullableIntFieldUpdateOperationsInput | number | null
@@ -20033,6 +23678,14 @@ export namespace Prisma {
     randomNickname?: StringFieldUpdateOperationsInput | string
   }
 
+  export type LiveChatCreateManyInput = {
+    id?: number
+    message: string
+    createdAt: Date | string
+    userId: number
+    randomNickname: string
+  }
+
   export type LiveChatUpdateManyMutationInput = {
     id?: IntFieldUpdateOperationsInput | number
     message?: StringFieldUpdateOperationsInput | string
@@ -20072,6 +23725,13 @@ export namespace Prisma {
     userId?: IntFieldUpdateOperationsInput | number
     noticeKey?: StringFieldUpdateOperationsInput | string
     subscribedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type NoticeNotificationsSubscriptionCreateManyInput = {
+    id?: number
+    userId: number
+    noticeKey: string
+    subscribedAt: Date | string
   }
 
   export type NoticeNotificationsSubscriptionUpdateManyMutationInput = {
@@ -20122,6 +23782,16 @@ export namespace Prisma {
     randomNickname?: StringFieldUpdateOperationsInput | string
     joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     token?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type PendingUserCreateManyInput = {
+    id?: number
+    portalId: string
+    password: string
+    nickname: string
+    randomNickname: string
+    joinedAt: Date | string
+    token: string
   }
 
   export type PendingUserUpdateManyMutationInput = {
@@ -20179,6 +23849,15 @@ export namespace Prisma {
     endM?: IntFieldUpdateOperationsInput | number
   }
 
+  export type PeriodCreateManyInput = {
+    lectureId: string
+    day: string
+    startH: number
+    startM: number
+    endH: number
+    endM: number
+  }
+
   export type PeriodUpdateManyMutationInput = {
     day?: StringFieldUpdateOperationsInput | string
     startH?: IntFieldUpdateOperationsInput | number
@@ -20201,6 +23880,7 @@ export namespace Prisma {
     password: string
     nickname: string
     randomNickname: string
+    point?: number | null
     joinedAt: Date | string
     refreshToken?: string | null
     admin?: AdminCreateNestedOneWithoutUserInput
@@ -20228,6 +23908,7 @@ export namespace Prisma {
     password: string
     nickname: string
     randomNickname: string
+    point?: number | null
     joinedAt: Date | string
     refreshToken?: string | null
     admin?: AdminUncheckedCreateNestedOneWithoutUserInput
@@ -20254,6 +23935,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     nickname?: StringFieldUpdateOperationsInput | string
     randomNickname?: StringFieldUpdateOperationsInput | string
+    point?: NullableIntFieldUpdateOperationsInput | number | null
     joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     refreshToken?: NullableStringFieldUpdateOperationsInput | string | null
     admin?: AdminUpdateOneWithoutUserInput
@@ -20281,6 +23963,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     nickname?: StringFieldUpdateOperationsInput | string
     randomNickname?: StringFieldUpdateOperationsInput | string
+    point?: NullableIntFieldUpdateOperationsInput | number | null
     joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     refreshToken?: NullableStringFieldUpdateOperationsInput | string | null
     admin?: AdminUncheckedUpdateOneWithoutUserInput
@@ -20302,11 +23985,23 @@ export namespace Prisma {
     telegrams?: TelegramUncheckedUpdateManyWithoutUserInput
   }
 
+  export type UserCreateManyInput = {
+    id?: number
+    portalId: string
+    password: string
+    nickname: string
+    randomNickname: string
+    point?: number | null
+    joinedAt: Date | string
+    refreshToken?: string | null
+  }
+
   export type UserUpdateManyMutationInput = {
     portalId?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
     nickname?: StringFieldUpdateOperationsInput | string
     randomNickname?: StringFieldUpdateOperationsInput | string
+    point?: NullableIntFieldUpdateOperationsInput | number | null
     joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     refreshToken?: NullableStringFieldUpdateOperationsInput | string | null
   }
@@ -20317,6 +24012,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     nickname?: StringFieldUpdateOperationsInput | string
     randomNickname?: StringFieldUpdateOperationsInput | string
+    point?: NullableIntFieldUpdateOperationsInput | number | null
     joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     refreshToken?: NullableStringFieldUpdateOperationsInput | string | null
   }
@@ -20353,6 +24049,15 @@ export namespace Prisma {
     title?: StringFieldUpdateOperationsInput | string
     body?: NullableStringFieldUpdateOperationsInput | string | null
     reportedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ReportCommentCreateManyInput = {
+    id?: number
+    commentId: number
+    userId: number
+    title?: string
+    body?: string | null
+    reportedAt: Date | string
   }
 
   export type ReportCommentUpdateManyMutationInput = {
@@ -20404,6 +24109,15 @@ export namespace Prisma {
     reportedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type ReportPostCreateManyInput = {
+    id?: number
+    postId: number
+    userId: number
+    title?: string
+    body?: string | null
+    reportedAt: Date | string
+  }
+
   export type ReportPostUpdateManyMutationInput = {
     title?: StringFieldUpdateOperationsInput | string
     body?: NullableStringFieldUpdateOperationsInput | string | null
@@ -20453,6 +24167,15 @@ export namespace Prisma {
     reportedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type ReportSubcommentCreateManyInput = {
+    id?: number
+    subcommentId: number
+    userId: number
+    title?: string
+    body?: string | null
+    reportedAt: Date | string
+  }
+
   export type ReportSubcommentUpdateManyMutationInput = {
     title?: StringFieldUpdateOperationsInput | string
     body?: NullableStringFieldUpdateOperationsInput | string | null
@@ -20488,6 +24211,11 @@ export namespace Prisma {
     chatId?: IntFieldUpdateOperationsInput | number
   }
 
+  export type TelegramCreateManyInput = {
+    userId: number
+    chatId: number
+  }
+
   export type TelegramUpdateManyMutationInput = {
     chatId?: IntFieldUpdateOperationsInput | number
   }
@@ -20511,6 +24239,22 @@ export namespace Prisma {
   export type UserRelationFilter = {
     is?: UserWhereInput
     isNot?: UserWhereInput
+  }
+
+  export type IntWithAggregatesFilter = {
+    equals?: number
+    in?: Enumerable<number>
+    notIn?: Enumerable<number>
+    lt?: number
+    lte?: number
+    gt?: number
+    gte?: number
+    not?: NestedIntWithAggregatesFilter | number
+    count?: NestedIntFilter
+    avg?: NestedFloatFilter
+    sum?: NestedIntFilter
+    min?: NestedIntFilter
+    max?: NestedIntFilter
   }
 
   export type StringFilter = {
@@ -20546,6 +24290,45 @@ export namespace Prisma {
   export type CafeteriaMenuCampusServedAtCompoundUniqueInput = {
     campus: string
     servedAt: Date | string
+  }
+
+  export type StringWithAggregatesFilter = {
+    equals?: string
+    in?: Enumerable<string>
+    notIn?: Enumerable<string>
+    lt?: string
+    lte?: string
+    gt?: string
+    gte?: string
+    contains?: string
+    startsWith?: string
+    endsWith?: string
+    not?: NestedStringWithAggregatesFilter | string
+    count?: NestedIntFilter
+    min?: NestedStringFilter
+    max?: NestedStringFilter
+  }
+
+  export type DateTimeWithAggregatesFilter = {
+    equals?: Date | string
+    in?: Enumerable<Date> | Enumerable<string>
+    notIn?: Enumerable<Date> | Enumerable<string>
+    lt?: Date | string
+    lte?: Date | string
+    gt?: Date | string
+    gte?: Date | string
+    not?: NestedDateTimeWithAggregatesFilter | Date | string
+    count?: NestedIntFilter
+    min?: NestedDateTimeFilter
+    max?: NestedDateTimeFilter
+  }
+
+  export type JsonNullableWithAggregatesFilter = {
+    equals?: InputJsonValue | null
+    not?: InputJsonValue | null
+    count?: NestedIntNullableFilter
+    min?: NestedJsonNullableFilter
+    max?: NestedJsonNullableFilter
   }
 
   export type StringNullableFilter = {
@@ -20588,6 +24371,45 @@ export namespace Prisma {
     every?: CommunityPostWhereInput
     some?: CommunityPostWhereInput
     none?: CommunityPostWhereInput
+  }
+
+  export type StringNullableWithAggregatesFilter = {
+    equals?: string | null
+    in?: Enumerable<string> | null
+    notIn?: Enumerable<string> | null
+    lt?: string
+    lte?: string
+    gt?: string
+    gte?: string
+    contains?: string
+    startsWith?: string
+    endsWith?: string
+    not?: NestedStringNullableWithAggregatesFilter | string | null
+    count?: NestedIntNullableFilter
+    min?: NestedStringNullableFilter
+    max?: NestedStringNullableFilter
+  }
+
+  export type BoolWithAggregatesFilter = {
+    equals?: boolean
+    not?: NestedBoolWithAggregatesFilter | boolean
+    count?: NestedIntFilter
+    min?: NestedBoolFilter
+    max?: NestedBoolFilter
+  }
+
+  export type DateTimeNullableWithAggregatesFilter = {
+    equals?: Date | string | null
+    in?: Enumerable<Date> | Enumerable<string> | null
+    notIn?: Enumerable<Date> | Enumerable<string> | null
+    lt?: Date | string
+    lte?: Date | string
+    gt?: Date | string
+    gte?: Date | string
+    not?: NestedDateTimeNullableWithAggregatesFilter | Date | string | null
+    count?: NestedIntNullableFilter
+    min?: NestedDateTimeNullableFilter
+    max?: NestedDateTimeNullableFilter
   }
 
   export type CommunityBoardCandidateVoteListRelationFilter = {
@@ -20716,6 +24538,22 @@ export namespace Prisma {
     none?: PeriodWhereInput
   }
 
+  export type IntNullableWithAggregatesFilter = {
+    equals?: number | null
+    in?: Enumerable<number> | null
+    notIn?: Enumerable<number> | null
+    lt?: number
+    lte?: number
+    gt?: number
+    gte?: number
+    not?: NestedIntNullableWithAggregatesFilter | number | null
+    count?: NestedIntNullableFilter
+    avg?: NestedFloatNullableFilter
+    sum?: NestedIntNullableFilter
+    min?: NestedIntNullableFilter
+    max?: NestedIntNullableFilter
+  }
+
   export type LiveChatIdUserIdCompoundUniqueInput = {
     id: number
     userId: number
@@ -20833,24 +24671,28 @@ export namespace Prisma {
   export type CommunityBoardPinCreateNestedManyWithoutCommunityBoardInput = {
     create?: XOR<Enumerable<CommunityBoardPinCreateWithoutCommunityBoardInput>, Enumerable<CommunityBoardPinUncheckedCreateWithoutCommunityBoardInput>>
     connectOrCreate?: Enumerable<CommunityBoardPinCreateOrConnectWithoutCommunityBoardInput>
+    createMany?: CommunityBoardPinCreateManyCommunityBoardInputEnvelope
     connect?: Enumerable<CommunityBoardPinWhereUniqueInput>
   }
 
   export type CommunityPostCreateNestedManyWithoutCommunityBoardInput = {
     create?: XOR<Enumerable<CommunityPostCreateWithoutCommunityBoardInput>, Enumerable<CommunityPostUncheckedCreateWithoutCommunityBoardInput>>
     connectOrCreate?: Enumerable<CommunityPostCreateOrConnectWithoutCommunityBoardInput>
+    createMany?: CommunityPostCreateManyCommunityBoardInputEnvelope
     connect?: Enumerable<CommunityPostWhereUniqueInput>
   }
 
   export type CommunityBoardPinUncheckedCreateNestedManyWithoutCommunityBoardInput = {
     create?: XOR<Enumerable<CommunityBoardPinCreateWithoutCommunityBoardInput>, Enumerable<CommunityBoardPinUncheckedCreateWithoutCommunityBoardInput>>
     connectOrCreate?: Enumerable<CommunityBoardPinCreateOrConnectWithoutCommunityBoardInput>
+    createMany?: CommunityBoardPinCreateManyCommunityBoardInputEnvelope
     connect?: Enumerable<CommunityBoardPinWhereUniqueInput>
   }
 
   export type CommunityPostUncheckedCreateNestedManyWithoutCommunityBoardInput = {
     create?: XOR<Enumerable<CommunityPostCreateWithoutCommunityBoardInput>, Enumerable<CommunityPostUncheckedCreateWithoutCommunityBoardInput>>
     connectOrCreate?: Enumerable<CommunityPostCreateOrConnectWithoutCommunityBoardInput>
+    createMany?: CommunityPostCreateManyCommunityBoardInputEnvelope
     connect?: Enumerable<CommunityPostWhereUniqueInput>
   }
 
@@ -20878,6 +24720,7 @@ export namespace Prisma {
     create?: XOR<Enumerable<CommunityBoardPinCreateWithoutCommunityBoardInput>, Enumerable<CommunityBoardPinUncheckedCreateWithoutCommunityBoardInput>>
     connectOrCreate?: Enumerable<CommunityBoardPinCreateOrConnectWithoutCommunityBoardInput>
     upsert?: Enumerable<CommunityBoardPinUpsertWithWhereUniqueWithoutCommunityBoardInput>
+    createMany?: CommunityBoardPinCreateManyCommunityBoardInputEnvelope
     connect?: Enumerable<CommunityBoardPinWhereUniqueInput>
     set?: Enumerable<CommunityBoardPinWhereUniqueInput>
     disconnect?: Enumerable<CommunityBoardPinWhereUniqueInput>
@@ -20891,6 +24734,7 @@ export namespace Prisma {
     create?: XOR<Enumerable<CommunityPostCreateWithoutCommunityBoardInput>, Enumerable<CommunityPostUncheckedCreateWithoutCommunityBoardInput>>
     connectOrCreate?: Enumerable<CommunityPostCreateOrConnectWithoutCommunityBoardInput>
     upsert?: Enumerable<CommunityPostUpsertWithWhereUniqueWithoutCommunityBoardInput>
+    createMany?: CommunityPostCreateManyCommunityBoardInputEnvelope
     connect?: Enumerable<CommunityPostWhereUniqueInput>
     set?: Enumerable<CommunityPostWhereUniqueInput>
     disconnect?: Enumerable<CommunityPostWhereUniqueInput>
@@ -20904,6 +24748,7 @@ export namespace Prisma {
     create?: XOR<Enumerable<CommunityBoardPinCreateWithoutCommunityBoardInput>, Enumerable<CommunityBoardPinUncheckedCreateWithoutCommunityBoardInput>>
     connectOrCreate?: Enumerable<CommunityBoardPinCreateOrConnectWithoutCommunityBoardInput>
     upsert?: Enumerable<CommunityBoardPinUpsertWithWhereUniqueWithoutCommunityBoardInput>
+    createMany?: CommunityBoardPinCreateManyCommunityBoardInputEnvelope
     connect?: Enumerable<CommunityBoardPinWhereUniqueInput>
     set?: Enumerable<CommunityBoardPinWhereUniqueInput>
     disconnect?: Enumerable<CommunityBoardPinWhereUniqueInput>
@@ -20917,6 +24762,7 @@ export namespace Prisma {
     create?: XOR<Enumerable<CommunityPostCreateWithoutCommunityBoardInput>, Enumerable<CommunityPostUncheckedCreateWithoutCommunityBoardInput>>
     connectOrCreate?: Enumerable<CommunityPostCreateOrConnectWithoutCommunityBoardInput>
     upsert?: Enumerable<CommunityPostUpsertWithWhereUniqueWithoutCommunityBoardInput>
+    createMany?: CommunityPostCreateManyCommunityBoardInputEnvelope
     connect?: Enumerable<CommunityPostWhereUniqueInput>
     set?: Enumerable<CommunityPostWhereUniqueInput>
     disconnect?: Enumerable<CommunityPostWhereUniqueInput>
@@ -20935,12 +24781,14 @@ export namespace Prisma {
   export type CommunityBoardCandidateVoteCreateNestedManyWithoutCommunityBoardCandidateInput = {
     create?: XOR<Enumerable<CommunityBoardCandidateVoteCreateWithoutCommunityBoardCandidateInput>, Enumerable<CommunityBoardCandidateVoteUncheckedCreateWithoutCommunityBoardCandidateInput>>
     connectOrCreate?: Enumerable<CommunityBoardCandidateVoteCreateOrConnectWithoutCommunityBoardCandidateInput>
+    createMany?: CommunityBoardCandidateVoteCreateManyCommunityBoardCandidateInputEnvelope
     connect?: Enumerable<CommunityBoardCandidateVoteWhereUniqueInput>
   }
 
   export type CommunityBoardCandidateVoteUncheckedCreateNestedManyWithoutCommunityBoardCandidateInput = {
     create?: XOR<Enumerable<CommunityBoardCandidateVoteCreateWithoutCommunityBoardCandidateInput>, Enumerable<CommunityBoardCandidateVoteUncheckedCreateWithoutCommunityBoardCandidateInput>>
     connectOrCreate?: Enumerable<CommunityBoardCandidateVoteCreateOrConnectWithoutCommunityBoardCandidateInput>
+    createMany?: CommunityBoardCandidateVoteCreateManyCommunityBoardCandidateInputEnvelope
     connect?: Enumerable<CommunityBoardCandidateVoteWhereUniqueInput>
   }
 
@@ -20956,6 +24804,7 @@ export namespace Prisma {
     create?: XOR<Enumerable<CommunityBoardCandidateVoteCreateWithoutCommunityBoardCandidateInput>, Enumerable<CommunityBoardCandidateVoteUncheckedCreateWithoutCommunityBoardCandidateInput>>
     connectOrCreate?: Enumerable<CommunityBoardCandidateVoteCreateOrConnectWithoutCommunityBoardCandidateInput>
     upsert?: Enumerable<CommunityBoardCandidateVoteUpsertWithWhereUniqueWithoutCommunityBoardCandidateInput>
+    createMany?: CommunityBoardCandidateVoteCreateManyCommunityBoardCandidateInputEnvelope
     connect?: Enumerable<CommunityBoardCandidateVoteWhereUniqueInput>
     set?: Enumerable<CommunityBoardCandidateVoteWhereUniqueInput>
     disconnect?: Enumerable<CommunityBoardCandidateVoteWhereUniqueInput>
@@ -20969,6 +24818,7 @@ export namespace Prisma {
     create?: XOR<Enumerable<CommunityBoardCandidateVoteCreateWithoutCommunityBoardCandidateInput>, Enumerable<CommunityBoardCandidateVoteUncheckedCreateWithoutCommunityBoardCandidateInput>>
     connectOrCreate?: Enumerable<CommunityBoardCandidateVoteCreateOrConnectWithoutCommunityBoardCandidateInput>
     upsert?: Enumerable<CommunityBoardCandidateVoteUpsertWithWhereUniqueWithoutCommunityBoardCandidateInput>
+    createMany?: CommunityBoardCandidateVoteCreateManyCommunityBoardCandidateInputEnvelope
     connect?: Enumerable<CommunityBoardCandidateVoteWhereUniqueInput>
     set?: Enumerable<CommunityBoardCandidateVoteWhereUniqueInput>
     disconnect?: Enumerable<CommunityBoardCandidateVoteWhereUniqueInput>
@@ -21049,24 +24899,28 @@ export namespace Prisma {
   export type CommunitySubcommentCreateNestedManyWithoutCommunityCommentInput = {
     create?: XOR<Enumerable<CommunitySubcommentCreateWithoutCommunityCommentInput>, Enumerable<CommunitySubcommentUncheckedCreateWithoutCommunityCommentInput>>
     connectOrCreate?: Enumerable<CommunitySubcommentCreateOrConnectWithoutCommunityCommentInput>
+    createMany?: CommunitySubcommentCreateManyCommunityCommentInputEnvelope
     connect?: Enumerable<CommunitySubcommentWhereUniqueInput>
   }
 
   export type ReportCommentCreateNestedManyWithoutCommunityCommentInput = {
     create?: XOR<Enumerable<ReportCommentCreateWithoutCommunityCommentInput>, Enumerable<ReportCommentUncheckedCreateWithoutCommunityCommentInput>>
     connectOrCreate?: Enumerable<ReportCommentCreateOrConnectWithoutCommunityCommentInput>
+    createMany?: ReportCommentCreateManyCommunityCommentInputEnvelope
     connect?: Enumerable<ReportCommentWhereUniqueInput>
   }
 
   export type CommunitySubcommentUncheckedCreateNestedManyWithoutCommunityCommentInput = {
     create?: XOR<Enumerable<CommunitySubcommentCreateWithoutCommunityCommentInput>, Enumerable<CommunitySubcommentUncheckedCreateWithoutCommunityCommentInput>>
     connectOrCreate?: Enumerable<CommunitySubcommentCreateOrConnectWithoutCommunityCommentInput>
+    createMany?: CommunitySubcommentCreateManyCommunityCommentInputEnvelope
     connect?: Enumerable<CommunitySubcommentWhereUniqueInput>
   }
 
   export type ReportCommentUncheckedCreateNestedManyWithoutCommunityCommentInput = {
     create?: XOR<Enumerable<ReportCommentCreateWithoutCommunityCommentInput>, Enumerable<ReportCommentUncheckedCreateWithoutCommunityCommentInput>>
     connectOrCreate?: Enumerable<ReportCommentCreateOrConnectWithoutCommunityCommentInput>
+    createMany?: ReportCommentCreateManyCommunityCommentInputEnvelope
     connect?: Enumerable<ReportCommentWhereUniqueInput>
   }
 
@@ -21090,6 +24944,7 @@ export namespace Prisma {
     create?: XOR<Enumerable<CommunitySubcommentCreateWithoutCommunityCommentInput>, Enumerable<CommunitySubcommentUncheckedCreateWithoutCommunityCommentInput>>
     connectOrCreate?: Enumerable<CommunitySubcommentCreateOrConnectWithoutCommunityCommentInput>
     upsert?: Enumerable<CommunitySubcommentUpsertWithWhereUniqueWithoutCommunityCommentInput>
+    createMany?: CommunitySubcommentCreateManyCommunityCommentInputEnvelope
     connect?: Enumerable<CommunitySubcommentWhereUniqueInput>
     set?: Enumerable<CommunitySubcommentWhereUniqueInput>
     disconnect?: Enumerable<CommunitySubcommentWhereUniqueInput>
@@ -21103,6 +24958,7 @@ export namespace Prisma {
     create?: XOR<Enumerable<ReportCommentCreateWithoutCommunityCommentInput>, Enumerable<ReportCommentUncheckedCreateWithoutCommunityCommentInput>>
     connectOrCreate?: Enumerable<ReportCommentCreateOrConnectWithoutCommunityCommentInput>
     upsert?: Enumerable<ReportCommentUpsertWithWhereUniqueWithoutCommunityCommentInput>
+    createMany?: ReportCommentCreateManyCommunityCommentInputEnvelope
     connect?: Enumerable<ReportCommentWhereUniqueInput>
     set?: Enumerable<ReportCommentWhereUniqueInput>
     disconnect?: Enumerable<ReportCommentWhereUniqueInput>
@@ -21116,6 +24972,7 @@ export namespace Prisma {
     create?: XOR<Enumerable<CommunitySubcommentCreateWithoutCommunityCommentInput>, Enumerable<CommunitySubcommentUncheckedCreateWithoutCommunityCommentInput>>
     connectOrCreate?: Enumerable<CommunitySubcommentCreateOrConnectWithoutCommunityCommentInput>
     upsert?: Enumerable<CommunitySubcommentUpsertWithWhereUniqueWithoutCommunityCommentInput>
+    createMany?: CommunitySubcommentCreateManyCommunityCommentInputEnvelope
     connect?: Enumerable<CommunitySubcommentWhereUniqueInput>
     set?: Enumerable<CommunitySubcommentWhereUniqueInput>
     disconnect?: Enumerable<CommunitySubcommentWhereUniqueInput>
@@ -21129,6 +24986,7 @@ export namespace Prisma {
     create?: XOR<Enumerable<ReportCommentCreateWithoutCommunityCommentInput>, Enumerable<ReportCommentUncheckedCreateWithoutCommunityCommentInput>>
     connectOrCreate?: Enumerable<ReportCommentCreateOrConnectWithoutCommunityCommentInput>
     upsert?: Enumerable<ReportCommentUpsertWithWhereUniqueWithoutCommunityCommentInput>
+    createMany?: ReportCommentCreateManyCommunityCommentInputEnvelope
     connect?: Enumerable<ReportCommentWhereUniqueInput>
     set?: Enumerable<ReportCommentWhereUniqueInput>
     disconnect?: Enumerable<ReportCommentWhereUniqueInput>
@@ -21153,60 +25011,70 @@ export namespace Prisma {
   export type CommunityCommentCreateNestedManyWithoutCommunityPostInput = {
     create?: XOR<Enumerable<CommunityCommentCreateWithoutCommunityPostInput>, Enumerable<CommunityCommentUncheckedCreateWithoutCommunityPostInput>>
     connectOrCreate?: Enumerable<CommunityCommentCreateOrConnectWithoutCommunityPostInput>
+    createMany?: CommunityCommentCreateManyCommunityPostInputEnvelope
     connect?: Enumerable<CommunityCommentWhereUniqueInput>
   }
 
   export type CommunityPostBookmarkCreateNestedManyWithoutCommunityPostInput = {
     create?: XOR<Enumerable<CommunityPostBookmarkCreateWithoutCommunityPostInput>, Enumerable<CommunityPostBookmarkUncheckedCreateWithoutCommunityPostInput>>
     connectOrCreate?: Enumerable<CommunityPostBookmarkCreateOrConnectWithoutCommunityPostInput>
+    createMany?: CommunityPostBookmarkCreateManyCommunityPostInputEnvelope
     connect?: Enumerable<CommunityPostBookmarkWhereUniqueInput>
   }
 
   export type CommunityPostLikeCreateNestedManyWithoutCommunityPostInput = {
     create?: XOR<Enumerable<CommunityPostLikeCreateWithoutCommunityPostInput>, Enumerable<CommunityPostLikeUncheckedCreateWithoutCommunityPostInput>>
     connectOrCreate?: Enumerable<CommunityPostLikeCreateOrConnectWithoutCommunityPostInput>
+    createMany?: CommunityPostLikeCreateManyCommunityPostInputEnvelope
     connect?: Enumerable<CommunityPostLikeWhereUniqueInput>
   }
 
   export type CommunitySubcommentCreateNestedManyWithoutCommunityPostInput = {
     create?: XOR<Enumerable<CommunitySubcommentCreateWithoutCommunityPostInput>, Enumerable<CommunitySubcommentUncheckedCreateWithoutCommunityPostInput>>
     connectOrCreate?: Enumerable<CommunitySubcommentCreateOrConnectWithoutCommunityPostInput>
+    createMany?: CommunitySubcommentCreateManyCommunityPostInputEnvelope
     connect?: Enumerable<CommunitySubcommentWhereUniqueInput>
   }
 
   export type ReportPostCreateNestedManyWithoutCommunityPostInput = {
     create?: XOR<Enumerable<ReportPostCreateWithoutCommunityPostInput>, Enumerable<ReportPostUncheckedCreateWithoutCommunityPostInput>>
     connectOrCreate?: Enumerable<ReportPostCreateOrConnectWithoutCommunityPostInput>
+    createMany?: ReportPostCreateManyCommunityPostInputEnvelope
     connect?: Enumerable<ReportPostWhereUniqueInput>
   }
 
   export type CommunityCommentUncheckedCreateNestedManyWithoutCommunityPostInput = {
     create?: XOR<Enumerable<CommunityCommentCreateWithoutCommunityPostInput>, Enumerable<CommunityCommentUncheckedCreateWithoutCommunityPostInput>>
     connectOrCreate?: Enumerable<CommunityCommentCreateOrConnectWithoutCommunityPostInput>
+    createMany?: CommunityCommentCreateManyCommunityPostInputEnvelope
     connect?: Enumerable<CommunityCommentWhereUniqueInput>
   }
 
   export type CommunityPostBookmarkUncheckedCreateNestedManyWithoutCommunityPostInput = {
     create?: XOR<Enumerable<CommunityPostBookmarkCreateWithoutCommunityPostInput>, Enumerable<CommunityPostBookmarkUncheckedCreateWithoutCommunityPostInput>>
     connectOrCreate?: Enumerable<CommunityPostBookmarkCreateOrConnectWithoutCommunityPostInput>
+    createMany?: CommunityPostBookmarkCreateManyCommunityPostInputEnvelope
     connect?: Enumerable<CommunityPostBookmarkWhereUniqueInput>
   }
 
   export type CommunityPostLikeUncheckedCreateNestedManyWithoutCommunityPostInput = {
     create?: XOR<Enumerable<CommunityPostLikeCreateWithoutCommunityPostInput>, Enumerable<CommunityPostLikeUncheckedCreateWithoutCommunityPostInput>>
     connectOrCreate?: Enumerable<CommunityPostLikeCreateOrConnectWithoutCommunityPostInput>
+    createMany?: CommunityPostLikeCreateManyCommunityPostInputEnvelope
     connect?: Enumerable<CommunityPostLikeWhereUniqueInput>
   }
 
   export type CommunitySubcommentUncheckedCreateNestedManyWithoutCommunityPostInput = {
     create?: XOR<Enumerable<CommunitySubcommentCreateWithoutCommunityPostInput>, Enumerable<CommunitySubcommentUncheckedCreateWithoutCommunityPostInput>>
     connectOrCreate?: Enumerable<CommunitySubcommentCreateOrConnectWithoutCommunityPostInput>
+    createMany?: CommunitySubcommentCreateManyCommunityPostInputEnvelope
     connect?: Enumerable<CommunitySubcommentWhereUniqueInput>
   }
 
   export type ReportPostUncheckedCreateNestedManyWithoutCommunityPostInput = {
     create?: XOR<Enumerable<ReportPostCreateWithoutCommunityPostInput>, Enumerable<ReportPostUncheckedCreateWithoutCommunityPostInput>>
     connectOrCreate?: Enumerable<ReportPostCreateOrConnectWithoutCommunityPostInput>
+    createMany?: ReportPostCreateManyCommunityPostInputEnvelope
     connect?: Enumerable<ReportPostWhereUniqueInput>
   }
 
@@ -21230,6 +25098,7 @@ export namespace Prisma {
     create?: XOR<Enumerable<CommunityCommentCreateWithoutCommunityPostInput>, Enumerable<CommunityCommentUncheckedCreateWithoutCommunityPostInput>>
     connectOrCreate?: Enumerable<CommunityCommentCreateOrConnectWithoutCommunityPostInput>
     upsert?: Enumerable<CommunityCommentUpsertWithWhereUniqueWithoutCommunityPostInput>
+    createMany?: CommunityCommentCreateManyCommunityPostInputEnvelope
     connect?: Enumerable<CommunityCommentWhereUniqueInput>
     set?: Enumerable<CommunityCommentWhereUniqueInput>
     disconnect?: Enumerable<CommunityCommentWhereUniqueInput>
@@ -21243,6 +25112,7 @@ export namespace Prisma {
     create?: XOR<Enumerable<CommunityPostBookmarkCreateWithoutCommunityPostInput>, Enumerable<CommunityPostBookmarkUncheckedCreateWithoutCommunityPostInput>>
     connectOrCreate?: Enumerable<CommunityPostBookmarkCreateOrConnectWithoutCommunityPostInput>
     upsert?: Enumerable<CommunityPostBookmarkUpsertWithWhereUniqueWithoutCommunityPostInput>
+    createMany?: CommunityPostBookmarkCreateManyCommunityPostInputEnvelope
     connect?: Enumerable<CommunityPostBookmarkWhereUniqueInput>
     set?: Enumerable<CommunityPostBookmarkWhereUniqueInput>
     disconnect?: Enumerable<CommunityPostBookmarkWhereUniqueInput>
@@ -21256,6 +25126,7 @@ export namespace Prisma {
     create?: XOR<Enumerable<CommunityPostLikeCreateWithoutCommunityPostInput>, Enumerable<CommunityPostLikeUncheckedCreateWithoutCommunityPostInput>>
     connectOrCreate?: Enumerable<CommunityPostLikeCreateOrConnectWithoutCommunityPostInput>
     upsert?: Enumerable<CommunityPostLikeUpsertWithWhereUniqueWithoutCommunityPostInput>
+    createMany?: CommunityPostLikeCreateManyCommunityPostInputEnvelope
     connect?: Enumerable<CommunityPostLikeWhereUniqueInput>
     set?: Enumerable<CommunityPostLikeWhereUniqueInput>
     disconnect?: Enumerable<CommunityPostLikeWhereUniqueInput>
@@ -21269,6 +25140,7 @@ export namespace Prisma {
     create?: XOR<Enumerable<CommunitySubcommentCreateWithoutCommunityPostInput>, Enumerable<CommunitySubcommentUncheckedCreateWithoutCommunityPostInput>>
     connectOrCreate?: Enumerable<CommunitySubcommentCreateOrConnectWithoutCommunityPostInput>
     upsert?: Enumerable<CommunitySubcommentUpsertWithWhereUniqueWithoutCommunityPostInput>
+    createMany?: CommunitySubcommentCreateManyCommunityPostInputEnvelope
     connect?: Enumerable<CommunitySubcommentWhereUniqueInput>
     set?: Enumerable<CommunitySubcommentWhereUniqueInput>
     disconnect?: Enumerable<CommunitySubcommentWhereUniqueInput>
@@ -21282,6 +25154,7 @@ export namespace Prisma {
     create?: XOR<Enumerable<ReportPostCreateWithoutCommunityPostInput>, Enumerable<ReportPostUncheckedCreateWithoutCommunityPostInput>>
     connectOrCreate?: Enumerable<ReportPostCreateOrConnectWithoutCommunityPostInput>
     upsert?: Enumerable<ReportPostUpsertWithWhereUniqueWithoutCommunityPostInput>
+    createMany?: ReportPostCreateManyCommunityPostInputEnvelope
     connect?: Enumerable<ReportPostWhereUniqueInput>
     set?: Enumerable<ReportPostWhereUniqueInput>
     disconnect?: Enumerable<ReportPostWhereUniqueInput>
@@ -21295,6 +25168,7 @@ export namespace Prisma {
     create?: XOR<Enumerable<CommunityCommentCreateWithoutCommunityPostInput>, Enumerable<CommunityCommentUncheckedCreateWithoutCommunityPostInput>>
     connectOrCreate?: Enumerable<CommunityCommentCreateOrConnectWithoutCommunityPostInput>
     upsert?: Enumerable<CommunityCommentUpsertWithWhereUniqueWithoutCommunityPostInput>
+    createMany?: CommunityCommentCreateManyCommunityPostInputEnvelope
     connect?: Enumerable<CommunityCommentWhereUniqueInput>
     set?: Enumerable<CommunityCommentWhereUniqueInput>
     disconnect?: Enumerable<CommunityCommentWhereUniqueInput>
@@ -21308,6 +25182,7 @@ export namespace Prisma {
     create?: XOR<Enumerable<CommunityPostBookmarkCreateWithoutCommunityPostInput>, Enumerable<CommunityPostBookmarkUncheckedCreateWithoutCommunityPostInput>>
     connectOrCreate?: Enumerable<CommunityPostBookmarkCreateOrConnectWithoutCommunityPostInput>
     upsert?: Enumerable<CommunityPostBookmarkUpsertWithWhereUniqueWithoutCommunityPostInput>
+    createMany?: CommunityPostBookmarkCreateManyCommunityPostInputEnvelope
     connect?: Enumerable<CommunityPostBookmarkWhereUniqueInput>
     set?: Enumerable<CommunityPostBookmarkWhereUniqueInput>
     disconnect?: Enumerable<CommunityPostBookmarkWhereUniqueInput>
@@ -21321,6 +25196,7 @@ export namespace Prisma {
     create?: XOR<Enumerable<CommunityPostLikeCreateWithoutCommunityPostInput>, Enumerable<CommunityPostLikeUncheckedCreateWithoutCommunityPostInput>>
     connectOrCreate?: Enumerable<CommunityPostLikeCreateOrConnectWithoutCommunityPostInput>
     upsert?: Enumerable<CommunityPostLikeUpsertWithWhereUniqueWithoutCommunityPostInput>
+    createMany?: CommunityPostLikeCreateManyCommunityPostInputEnvelope
     connect?: Enumerable<CommunityPostLikeWhereUniqueInput>
     set?: Enumerable<CommunityPostLikeWhereUniqueInput>
     disconnect?: Enumerable<CommunityPostLikeWhereUniqueInput>
@@ -21334,6 +25210,7 @@ export namespace Prisma {
     create?: XOR<Enumerable<CommunitySubcommentCreateWithoutCommunityPostInput>, Enumerable<CommunitySubcommentUncheckedCreateWithoutCommunityPostInput>>
     connectOrCreate?: Enumerable<CommunitySubcommentCreateOrConnectWithoutCommunityPostInput>
     upsert?: Enumerable<CommunitySubcommentUpsertWithWhereUniqueWithoutCommunityPostInput>
+    createMany?: CommunitySubcommentCreateManyCommunityPostInputEnvelope
     connect?: Enumerable<CommunitySubcommentWhereUniqueInput>
     set?: Enumerable<CommunitySubcommentWhereUniqueInput>
     disconnect?: Enumerable<CommunitySubcommentWhereUniqueInput>
@@ -21347,6 +25224,7 @@ export namespace Prisma {
     create?: XOR<Enumerable<ReportPostCreateWithoutCommunityPostInput>, Enumerable<ReportPostUncheckedCreateWithoutCommunityPostInput>>
     connectOrCreate?: Enumerable<ReportPostCreateOrConnectWithoutCommunityPostInput>
     upsert?: Enumerable<ReportPostUpsertWithWhereUniqueWithoutCommunityPostInput>
+    createMany?: ReportPostCreateManyCommunityPostInputEnvelope
     connect?: Enumerable<ReportPostWhereUniqueInput>
     set?: Enumerable<ReportPostWhereUniqueInput>
     disconnect?: Enumerable<ReportPostWhereUniqueInput>
@@ -21433,12 +25311,14 @@ export namespace Prisma {
   export type ReportSubcommentCreateNestedManyWithoutCommunitySubcommentInput = {
     create?: XOR<Enumerable<ReportSubcommentCreateWithoutCommunitySubcommentInput>, Enumerable<ReportSubcommentUncheckedCreateWithoutCommunitySubcommentInput>>
     connectOrCreate?: Enumerable<ReportSubcommentCreateOrConnectWithoutCommunitySubcommentInput>
+    createMany?: ReportSubcommentCreateManyCommunitySubcommentInputEnvelope
     connect?: Enumerable<ReportSubcommentWhereUniqueInput>
   }
 
   export type ReportSubcommentUncheckedCreateNestedManyWithoutCommunitySubcommentInput = {
     create?: XOR<Enumerable<ReportSubcommentCreateWithoutCommunitySubcommentInput>, Enumerable<ReportSubcommentUncheckedCreateWithoutCommunitySubcommentInput>>
     connectOrCreate?: Enumerable<ReportSubcommentCreateOrConnectWithoutCommunitySubcommentInput>
+    createMany?: ReportSubcommentCreateManyCommunitySubcommentInputEnvelope
     connect?: Enumerable<ReportSubcommentWhereUniqueInput>
   }
 
@@ -21470,6 +25350,7 @@ export namespace Prisma {
     create?: XOR<Enumerable<ReportSubcommentCreateWithoutCommunitySubcommentInput>, Enumerable<ReportSubcommentUncheckedCreateWithoutCommunitySubcommentInput>>
     connectOrCreate?: Enumerable<ReportSubcommentCreateOrConnectWithoutCommunitySubcommentInput>
     upsert?: Enumerable<ReportSubcommentUpsertWithWhereUniqueWithoutCommunitySubcommentInput>
+    createMany?: ReportSubcommentCreateManyCommunitySubcommentInputEnvelope
     connect?: Enumerable<ReportSubcommentWhereUniqueInput>
     set?: Enumerable<ReportSubcommentWhereUniqueInput>
     disconnect?: Enumerable<ReportSubcommentWhereUniqueInput>
@@ -21483,6 +25364,7 @@ export namespace Prisma {
     create?: XOR<Enumerable<ReportSubcommentCreateWithoutCommunitySubcommentInput>, Enumerable<ReportSubcommentUncheckedCreateWithoutCommunitySubcommentInput>>
     connectOrCreate?: Enumerable<ReportSubcommentCreateOrConnectWithoutCommunitySubcommentInput>
     upsert?: Enumerable<ReportSubcommentUpsertWithWhereUniqueWithoutCommunitySubcommentInput>
+    createMany?: ReportSubcommentCreateManyCommunitySubcommentInputEnvelope
     connect?: Enumerable<ReportSubcommentWhereUniqueInput>
     set?: Enumerable<ReportSubcommentWhereUniqueInput>
     disconnect?: Enumerable<ReportSubcommentWhereUniqueInput>
@@ -21495,12 +25377,14 @@ export namespace Prisma {
   export type CoverageMajorLectureCreateNestedManyWithoutCoverageMajorInput = {
     create?: XOR<Enumerable<CoverageMajorLectureCreateWithoutCoverageMajorInput>, Enumerable<CoverageMajorLectureUncheckedCreateWithoutCoverageMajorInput>>
     connectOrCreate?: Enumerable<CoverageMajorLectureCreateOrConnectWithoutCoverageMajorInput>
+    createMany?: CoverageMajorLectureCreateManyCoverageMajorInputEnvelope
     connect?: Enumerable<CoverageMajorLectureWhereUniqueInput>
   }
 
   export type CoverageMajorLectureUncheckedCreateNestedManyWithoutCoverageMajorInput = {
     create?: XOR<Enumerable<CoverageMajorLectureCreateWithoutCoverageMajorInput>, Enumerable<CoverageMajorLectureUncheckedCreateWithoutCoverageMajorInput>>
     connectOrCreate?: Enumerable<CoverageMajorLectureCreateOrConnectWithoutCoverageMajorInput>
+    createMany?: CoverageMajorLectureCreateManyCoverageMajorInputEnvelope
     connect?: Enumerable<CoverageMajorLectureWhereUniqueInput>
   }
 
@@ -21508,6 +25392,7 @@ export namespace Prisma {
     create?: XOR<Enumerable<CoverageMajorLectureCreateWithoutCoverageMajorInput>, Enumerable<CoverageMajorLectureUncheckedCreateWithoutCoverageMajorInput>>
     connectOrCreate?: Enumerable<CoverageMajorLectureCreateOrConnectWithoutCoverageMajorInput>
     upsert?: Enumerable<CoverageMajorLectureUpsertWithWhereUniqueWithoutCoverageMajorInput>
+    createMany?: CoverageMajorLectureCreateManyCoverageMajorInputEnvelope
     connect?: Enumerable<CoverageMajorLectureWhereUniqueInput>
     set?: Enumerable<CoverageMajorLectureWhereUniqueInput>
     disconnect?: Enumerable<CoverageMajorLectureWhereUniqueInput>
@@ -21521,6 +25406,7 @@ export namespace Prisma {
     create?: XOR<Enumerable<CoverageMajorLectureCreateWithoutCoverageMajorInput>, Enumerable<CoverageMajorLectureUncheckedCreateWithoutCoverageMajorInput>>
     connectOrCreate?: Enumerable<CoverageMajorLectureCreateOrConnectWithoutCoverageMajorInput>
     upsert?: Enumerable<CoverageMajorLectureUpsertWithWhereUniqueWithoutCoverageMajorInput>
+    createMany?: CoverageMajorLectureCreateManyCoverageMajorInputEnvelope
     connect?: Enumerable<CoverageMajorLectureWhereUniqueInput>
     set?: Enumerable<CoverageMajorLectureWhereUniqueInput>
     disconnect?: Enumerable<CoverageMajorLectureWhereUniqueInput>
@@ -21561,24 +25447,28 @@ export namespace Prisma {
   export type CoverageMajorLectureCreateNestedManyWithoutLectureInput = {
     create?: XOR<Enumerable<CoverageMajorLectureCreateWithoutLectureInput>, Enumerable<CoverageMajorLectureUncheckedCreateWithoutLectureInput>>
     connectOrCreate?: Enumerable<CoverageMajorLectureCreateOrConnectWithoutLectureInput>
+    createMany?: CoverageMajorLectureCreateManyLectureInputEnvelope
     connect?: Enumerable<CoverageMajorLectureWhereUniqueInput>
   }
 
   export type PeriodCreateNestedManyWithoutLectureInput = {
     create?: XOR<Enumerable<PeriodCreateWithoutLectureInput>, Enumerable<PeriodUncheckedCreateWithoutLectureInput>>
     connectOrCreate?: Enumerable<PeriodCreateOrConnectWithoutLectureInput>
+    createMany?: PeriodCreateManyLectureInputEnvelope
     connect?: Enumerable<PeriodWhereUniqueInput>
   }
 
   export type CoverageMajorLectureUncheckedCreateNestedManyWithoutLectureInput = {
     create?: XOR<Enumerable<CoverageMajorLectureCreateWithoutLectureInput>, Enumerable<CoverageMajorLectureUncheckedCreateWithoutLectureInput>>
     connectOrCreate?: Enumerable<CoverageMajorLectureCreateOrConnectWithoutLectureInput>
+    createMany?: CoverageMajorLectureCreateManyLectureInputEnvelope
     connect?: Enumerable<CoverageMajorLectureWhereUniqueInput>
   }
 
   export type PeriodUncheckedCreateNestedManyWithoutLectureInput = {
     create?: XOR<Enumerable<PeriodCreateWithoutLectureInput>, Enumerable<PeriodUncheckedCreateWithoutLectureInput>>
     connectOrCreate?: Enumerable<PeriodCreateOrConnectWithoutLectureInput>
+    createMany?: PeriodCreateManyLectureInputEnvelope
     connect?: Enumerable<PeriodWhereUniqueInput>
   }
 
@@ -21594,6 +25484,7 @@ export namespace Prisma {
     create?: XOR<Enumerable<CoverageMajorLectureCreateWithoutLectureInput>, Enumerable<CoverageMajorLectureUncheckedCreateWithoutLectureInput>>
     connectOrCreate?: Enumerable<CoverageMajorLectureCreateOrConnectWithoutLectureInput>
     upsert?: Enumerable<CoverageMajorLectureUpsertWithWhereUniqueWithoutLectureInput>
+    createMany?: CoverageMajorLectureCreateManyLectureInputEnvelope
     connect?: Enumerable<CoverageMajorLectureWhereUniqueInput>
     set?: Enumerable<CoverageMajorLectureWhereUniqueInput>
     disconnect?: Enumerable<CoverageMajorLectureWhereUniqueInput>
@@ -21607,6 +25498,7 @@ export namespace Prisma {
     create?: XOR<Enumerable<PeriodCreateWithoutLectureInput>, Enumerable<PeriodUncheckedCreateWithoutLectureInput>>
     connectOrCreate?: Enumerable<PeriodCreateOrConnectWithoutLectureInput>
     upsert?: Enumerable<PeriodUpsertWithWhereUniqueWithoutLectureInput>
+    createMany?: PeriodCreateManyLectureInputEnvelope
     connect?: Enumerable<PeriodWhereUniqueInput>
     set?: Enumerable<PeriodWhereUniqueInput>
     disconnect?: Enumerable<PeriodWhereUniqueInput>
@@ -21620,6 +25512,7 @@ export namespace Prisma {
     create?: XOR<Enumerable<CoverageMajorLectureCreateWithoutLectureInput>, Enumerable<CoverageMajorLectureUncheckedCreateWithoutLectureInput>>
     connectOrCreate?: Enumerable<CoverageMajorLectureCreateOrConnectWithoutLectureInput>
     upsert?: Enumerable<CoverageMajorLectureUpsertWithWhereUniqueWithoutLectureInput>
+    createMany?: CoverageMajorLectureCreateManyLectureInputEnvelope
     connect?: Enumerable<CoverageMajorLectureWhereUniqueInput>
     set?: Enumerable<CoverageMajorLectureWhereUniqueInput>
     disconnect?: Enumerable<CoverageMajorLectureWhereUniqueInput>
@@ -21633,6 +25526,7 @@ export namespace Prisma {
     create?: XOR<Enumerable<PeriodCreateWithoutLectureInput>, Enumerable<PeriodUncheckedCreateWithoutLectureInput>>
     connectOrCreate?: Enumerable<PeriodCreateOrConnectWithoutLectureInput>
     upsert?: Enumerable<PeriodUpsertWithWhereUniqueWithoutLectureInput>
+    createMany?: PeriodCreateManyLectureInputEnvelope
     connect?: Enumerable<PeriodWhereUniqueInput>
     set?: Enumerable<PeriodWhereUniqueInput>
     disconnect?: Enumerable<PeriodWhereUniqueInput>
@@ -21699,90 +25593,105 @@ export namespace Prisma {
   export type CommunityBoardCreateNestedManyWithoutUserInput = {
     create?: XOR<Enumerable<CommunityBoardCreateWithoutUserInput>, Enumerable<CommunityBoardUncheckedCreateWithoutUserInput>>
     connectOrCreate?: Enumerable<CommunityBoardCreateOrConnectWithoutUserInput>
+    createMany?: CommunityBoardCreateManyUserInputEnvelope
     connect?: Enumerable<CommunityBoardWhereUniqueInput>
   }
 
   export type CommunityBoardCandidateCreateNestedManyWithoutUserInput = {
     create?: XOR<Enumerable<CommunityBoardCandidateCreateWithoutUserInput>, Enumerable<CommunityBoardCandidateUncheckedCreateWithoutUserInput>>
     connectOrCreate?: Enumerable<CommunityBoardCandidateCreateOrConnectWithoutUserInput>
+    createMany?: CommunityBoardCandidateCreateManyUserInputEnvelope
     connect?: Enumerable<CommunityBoardCandidateWhereUniqueInput>
   }
 
   export type CommunityBoardCandidateVoteCreateNestedManyWithoutUserInput = {
     create?: XOR<Enumerable<CommunityBoardCandidateVoteCreateWithoutUserInput>, Enumerable<CommunityBoardCandidateVoteUncheckedCreateWithoutUserInput>>
     connectOrCreate?: Enumerable<CommunityBoardCandidateVoteCreateOrConnectWithoutUserInput>
+    createMany?: CommunityBoardCandidateVoteCreateManyUserInputEnvelope
     connect?: Enumerable<CommunityBoardCandidateVoteWhereUniqueInput>
   }
 
   export type CommunityBoardPinCreateNestedManyWithoutUserInput = {
     create?: XOR<Enumerable<CommunityBoardPinCreateWithoutUserInput>, Enumerable<CommunityBoardPinUncheckedCreateWithoutUserInput>>
     connectOrCreate?: Enumerable<CommunityBoardPinCreateOrConnectWithoutUserInput>
+    createMany?: CommunityBoardPinCreateManyUserInputEnvelope
     connect?: Enumerable<CommunityBoardPinWhereUniqueInput>
   }
 
   export type CommunityCommentCreateNestedManyWithoutUserInput = {
     create?: XOR<Enumerable<CommunityCommentCreateWithoutUserInput>, Enumerable<CommunityCommentUncheckedCreateWithoutUserInput>>
     connectOrCreate?: Enumerable<CommunityCommentCreateOrConnectWithoutUserInput>
+    createMany?: CommunityCommentCreateManyUserInputEnvelope
     connect?: Enumerable<CommunityCommentWhereUniqueInput>
   }
 
   export type CommunityPostCreateNestedManyWithoutUserInput = {
     create?: XOR<Enumerable<CommunityPostCreateWithoutUserInput>, Enumerable<CommunityPostUncheckedCreateWithoutUserInput>>
     connectOrCreate?: Enumerable<CommunityPostCreateOrConnectWithoutUserInput>
+    createMany?: CommunityPostCreateManyUserInputEnvelope
     connect?: Enumerable<CommunityPostWhereUniqueInput>
   }
 
   export type CommunityPostBookmarkCreateNestedManyWithoutUserInput = {
     create?: XOR<Enumerable<CommunityPostBookmarkCreateWithoutUserInput>, Enumerable<CommunityPostBookmarkUncheckedCreateWithoutUserInput>>
     connectOrCreate?: Enumerable<CommunityPostBookmarkCreateOrConnectWithoutUserInput>
+    createMany?: CommunityPostBookmarkCreateManyUserInputEnvelope
     connect?: Enumerable<CommunityPostBookmarkWhereUniqueInput>
   }
 
   export type CommunityPostLikeCreateNestedManyWithoutUserInput = {
     create?: XOR<Enumerable<CommunityPostLikeCreateWithoutUserInput>, Enumerable<CommunityPostLikeUncheckedCreateWithoutUserInput>>
     connectOrCreate?: Enumerable<CommunityPostLikeCreateOrConnectWithoutUserInput>
+    createMany?: CommunityPostLikeCreateManyUserInputEnvelope
     connect?: Enumerable<CommunityPostLikeWhereUniqueInput>
   }
 
   export type CommunitySubcommentCreateNestedManyWithoutUserInput = {
     create?: XOR<Enumerable<CommunitySubcommentCreateWithoutUserInput>, Enumerable<CommunitySubcommentUncheckedCreateWithoutUserInput>>
     connectOrCreate?: Enumerable<CommunitySubcommentCreateOrConnectWithoutUserInput>
+    createMany?: CommunitySubcommentCreateManyUserInputEnvelope
     connect?: Enumerable<CommunitySubcommentWhereUniqueInput>
   }
 
   export type LiveChatCreateNestedManyWithoutUserInput = {
     create?: XOR<Enumerable<LiveChatCreateWithoutUserInput>, Enumerable<LiveChatUncheckedCreateWithoutUserInput>>
     connectOrCreate?: Enumerable<LiveChatCreateOrConnectWithoutUserInput>
+    createMany?: LiveChatCreateManyUserInputEnvelope
     connect?: Enumerable<LiveChatWhereUniqueInput>
   }
 
   export type NoticeNotificationsSubscriptionCreateNestedManyWithoutUserInput = {
     create?: XOR<Enumerable<NoticeNotificationsSubscriptionCreateWithoutUserInput>, Enumerable<NoticeNotificationsSubscriptionUncheckedCreateWithoutUserInput>>
     connectOrCreate?: Enumerable<NoticeNotificationsSubscriptionCreateOrConnectWithoutUserInput>
+    createMany?: NoticeNotificationsSubscriptionCreateManyUserInputEnvelope
     connect?: Enumerable<NoticeNotificationsSubscriptionWhereUniqueInput>
   }
 
   export type ReportCommentCreateNestedManyWithoutUserInput = {
     create?: XOR<Enumerable<ReportCommentCreateWithoutUserInput>, Enumerable<ReportCommentUncheckedCreateWithoutUserInput>>
     connectOrCreate?: Enumerable<ReportCommentCreateOrConnectWithoutUserInput>
+    createMany?: ReportCommentCreateManyUserInputEnvelope
     connect?: Enumerable<ReportCommentWhereUniqueInput>
   }
 
   export type ReportPostCreateNestedManyWithoutUserInput = {
     create?: XOR<Enumerable<ReportPostCreateWithoutUserInput>, Enumerable<ReportPostUncheckedCreateWithoutUserInput>>
     connectOrCreate?: Enumerable<ReportPostCreateOrConnectWithoutUserInput>
+    createMany?: ReportPostCreateManyUserInputEnvelope
     connect?: Enumerable<ReportPostWhereUniqueInput>
   }
 
   export type ReportSubcommentCreateNestedManyWithoutUserInput = {
     create?: XOR<Enumerable<ReportSubcommentCreateWithoutUserInput>, Enumerable<ReportSubcommentUncheckedCreateWithoutUserInput>>
     connectOrCreate?: Enumerable<ReportSubcommentCreateOrConnectWithoutUserInput>
+    createMany?: ReportSubcommentCreateManyUserInputEnvelope
     connect?: Enumerable<ReportSubcommentWhereUniqueInput>
   }
 
   export type TelegramCreateNestedManyWithoutUserInput = {
     create?: XOR<Enumerable<TelegramCreateWithoutUserInput>, Enumerable<TelegramUncheckedCreateWithoutUserInput>>
     connectOrCreate?: Enumerable<TelegramCreateOrConnectWithoutUserInput>
+    createMany?: TelegramCreateManyUserInputEnvelope
     connect?: Enumerable<TelegramWhereUniqueInput>
   }
 
@@ -21801,90 +25710,105 @@ export namespace Prisma {
   export type CommunityBoardUncheckedCreateNestedManyWithoutUserInput = {
     create?: XOR<Enumerable<CommunityBoardCreateWithoutUserInput>, Enumerable<CommunityBoardUncheckedCreateWithoutUserInput>>
     connectOrCreate?: Enumerable<CommunityBoardCreateOrConnectWithoutUserInput>
+    createMany?: CommunityBoardCreateManyUserInputEnvelope
     connect?: Enumerable<CommunityBoardWhereUniqueInput>
   }
 
   export type CommunityBoardCandidateUncheckedCreateNestedManyWithoutUserInput = {
     create?: XOR<Enumerable<CommunityBoardCandidateCreateWithoutUserInput>, Enumerable<CommunityBoardCandidateUncheckedCreateWithoutUserInput>>
     connectOrCreate?: Enumerable<CommunityBoardCandidateCreateOrConnectWithoutUserInput>
+    createMany?: CommunityBoardCandidateCreateManyUserInputEnvelope
     connect?: Enumerable<CommunityBoardCandidateWhereUniqueInput>
   }
 
   export type CommunityBoardCandidateVoteUncheckedCreateNestedManyWithoutUserInput = {
     create?: XOR<Enumerable<CommunityBoardCandidateVoteCreateWithoutUserInput>, Enumerable<CommunityBoardCandidateVoteUncheckedCreateWithoutUserInput>>
     connectOrCreate?: Enumerable<CommunityBoardCandidateVoteCreateOrConnectWithoutUserInput>
+    createMany?: CommunityBoardCandidateVoteCreateManyUserInputEnvelope
     connect?: Enumerable<CommunityBoardCandidateVoteWhereUniqueInput>
   }
 
   export type CommunityBoardPinUncheckedCreateNestedManyWithoutUserInput = {
     create?: XOR<Enumerable<CommunityBoardPinCreateWithoutUserInput>, Enumerable<CommunityBoardPinUncheckedCreateWithoutUserInput>>
     connectOrCreate?: Enumerable<CommunityBoardPinCreateOrConnectWithoutUserInput>
+    createMany?: CommunityBoardPinCreateManyUserInputEnvelope
     connect?: Enumerable<CommunityBoardPinWhereUniqueInput>
   }
 
   export type CommunityCommentUncheckedCreateNestedManyWithoutUserInput = {
     create?: XOR<Enumerable<CommunityCommentCreateWithoutUserInput>, Enumerable<CommunityCommentUncheckedCreateWithoutUserInput>>
     connectOrCreate?: Enumerable<CommunityCommentCreateOrConnectWithoutUserInput>
+    createMany?: CommunityCommentCreateManyUserInputEnvelope
     connect?: Enumerable<CommunityCommentWhereUniqueInput>
   }
 
   export type CommunityPostUncheckedCreateNestedManyWithoutUserInput = {
     create?: XOR<Enumerable<CommunityPostCreateWithoutUserInput>, Enumerable<CommunityPostUncheckedCreateWithoutUserInput>>
     connectOrCreate?: Enumerable<CommunityPostCreateOrConnectWithoutUserInput>
+    createMany?: CommunityPostCreateManyUserInputEnvelope
     connect?: Enumerable<CommunityPostWhereUniqueInput>
   }
 
   export type CommunityPostBookmarkUncheckedCreateNestedManyWithoutUserInput = {
     create?: XOR<Enumerable<CommunityPostBookmarkCreateWithoutUserInput>, Enumerable<CommunityPostBookmarkUncheckedCreateWithoutUserInput>>
     connectOrCreate?: Enumerable<CommunityPostBookmarkCreateOrConnectWithoutUserInput>
+    createMany?: CommunityPostBookmarkCreateManyUserInputEnvelope
     connect?: Enumerable<CommunityPostBookmarkWhereUniqueInput>
   }
 
   export type CommunityPostLikeUncheckedCreateNestedManyWithoutUserInput = {
     create?: XOR<Enumerable<CommunityPostLikeCreateWithoutUserInput>, Enumerable<CommunityPostLikeUncheckedCreateWithoutUserInput>>
     connectOrCreate?: Enumerable<CommunityPostLikeCreateOrConnectWithoutUserInput>
+    createMany?: CommunityPostLikeCreateManyUserInputEnvelope
     connect?: Enumerable<CommunityPostLikeWhereUniqueInput>
   }
 
   export type CommunitySubcommentUncheckedCreateNestedManyWithoutUserInput = {
     create?: XOR<Enumerable<CommunitySubcommentCreateWithoutUserInput>, Enumerable<CommunitySubcommentUncheckedCreateWithoutUserInput>>
     connectOrCreate?: Enumerable<CommunitySubcommentCreateOrConnectWithoutUserInput>
+    createMany?: CommunitySubcommentCreateManyUserInputEnvelope
     connect?: Enumerable<CommunitySubcommentWhereUniqueInput>
   }
 
   export type LiveChatUncheckedCreateNestedManyWithoutUserInput = {
     create?: XOR<Enumerable<LiveChatCreateWithoutUserInput>, Enumerable<LiveChatUncheckedCreateWithoutUserInput>>
     connectOrCreate?: Enumerable<LiveChatCreateOrConnectWithoutUserInput>
+    createMany?: LiveChatCreateManyUserInputEnvelope
     connect?: Enumerable<LiveChatWhereUniqueInput>
   }
 
   export type NoticeNotificationsSubscriptionUncheckedCreateNestedManyWithoutUserInput = {
     create?: XOR<Enumerable<NoticeNotificationsSubscriptionCreateWithoutUserInput>, Enumerable<NoticeNotificationsSubscriptionUncheckedCreateWithoutUserInput>>
     connectOrCreate?: Enumerable<NoticeNotificationsSubscriptionCreateOrConnectWithoutUserInput>
+    createMany?: NoticeNotificationsSubscriptionCreateManyUserInputEnvelope
     connect?: Enumerable<NoticeNotificationsSubscriptionWhereUniqueInput>
   }
 
   export type ReportCommentUncheckedCreateNestedManyWithoutUserInput = {
     create?: XOR<Enumerable<ReportCommentCreateWithoutUserInput>, Enumerable<ReportCommentUncheckedCreateWithoutUserInput>>
     connectOrCreate?: Enumerable<ReportCommentCreateOrConnectWithoutUserInput>
+    createMany?: ReportCommentCreateManyUserInputEnvelope
     connect?: Enumerable<ReportCommentWhereUniqueInput>
   }
 
   export type ReportPostUncheckedCreateNestedManyWithoutUserInput = {
     create?: XOR<Enumerable<ReportPostCreateWithoutUserInput>, Enumerable<ReportPostUncheckedCreateWithoutUserInput>>
     connectOrCreate?: Enumerable<ReportPostCreateOrConnectWithoutUserInput>
+    createMany?: ReportPostCreateManyUserInputEnvelope
     connect?: Enumerable<ReportPostWhereUniqueInput>
   }
 
   export type ReportSubcommentUncheckedCreateNestedManyWithoutUserInput = {
     create?: XOR<Enumerable<ReportSubcommentCreateWithoutUserInput>, Enumerable<ReportSubcommentUncheckedCreateWithoutUserInput>>
     connectOrCreate?: Enumerable<ReportSubcommentCreateOrConnectWithoutUserInput>
+    createMany?: ReportSubcommentCreateManyUserInputEnvelope
     connect?: Enumerable<ReportSubcommentWhereUniqueInput>
   }
 
   export type TelegramUncheckedCreateNestedManyWithoutUserInput = {
     create?: XOR<Enumerable<TelegramCreateWithoutUserInput>, Enumerable<TelegramUncheckedCreateWithoutUserInput>>
     connectOrCreate?: Enumerable<TelegramCreateOrConnectWithoutUserInput>
+    createMany?: TelegramCreateManyUserInputEnvelope
     connect?: Enumerable<TelegramWhereUniqueInput>
   }
 
@@ -21911,6 +25835,7 @@ export namespace Prisma {
     create?: XOR<Enumerable<CommunityBoardCreateWithoutUserInput>, Enumerable<CommunityBoardUncheckedCreateWithoutUserInput>>
     connectOrCreate?: Enumerable<CommunityBoardCreateOrConnectWithoutUserInput>
     upsert?: Enumerable<CommunityBoardUpsertWithWhereUniqueWithoutUserInput>
+    createMany?: CommunityBoardCreateManyUserInputEnvelope
     connect?: Enumerable<CommunityBoardWhereUniqueInput>
     set?: Enumerable<CommunityBoardWhereUniqueInput>
     disconnect?: Enumerable<CommunityBoardWhereUniqueInput>
@@ -21924,6 +25849,7 @@ export namespace Prisma {
     create?: XOR<Enumerable<CommunityBoardCandidateCreateWithoutUserInput>, Enumerable<CommunityBoardCandidateUncheckedCreateWithoutUserInput>>
     connectOrCreate?: Enumerable<CommunityBoardCandidateCreateOrConnectWithoutUserInput>
     upsert?: Enumerable<CommunityBoardCandidateUpsertWithWhereUniqueWithoutUserInput>
+    createMany?: CommunityBoardCandidateCreateManyUserInputEnvelope
     connect?: Enumerable<CommunityBoardCandidateWhereUniqueInput>
     set?: Enumerable<CommunityBoardCandidateWhereUniqueInput>
     disconnect?: Enumerable<CommunityBoardCandidateWhereUniqueInput>
@@ -21937,6 +25863,7 @@ export namespace Prisma {
     create?: XOR<Enumerable<CommunityBoardCandidateVoteCreateWithoutUserInput>, Enumerable<CommunityBoardCandidateVoteUncheckedCreateWithoutUserInput>>
     connectOrCreate?: Enumerable<CommunityBoardCandidateVoteCreateOrConnectWithoutUserInput>
     upsert?: Enumerable<CommunityBoardCandidateVoteUpsertWithWhereUniqueWithoutUserInput>
+    createMany?: CommunityBoardCandidateVoteCreateManyUserInputEnvelope
     connect?: Enumerable<CommunityBoardCandidateVoteWhereUniqueInput>
     set?: Enumerable<CommunityBoardCandidateVoteWhereUniqueInput>
     disconnect?: Enumerable<CommunityBoardCandidateVoteWhereUniqueInput>
@@ -21950,6 +25877,7 @@ export namespace Prisma {
     create?: XOR<Enumerable<CommunityBoardPinCreateWithoutUserInput>, Enumerable<CommunityBoardPinUncheckedCreateWithoutUserInput>>
     connectOrCreate?: Enumerable<CommunityBoardPinCreateOrConnectWithoutUserInput>
     upsert?: Enumerable<CommunityBoardPinUpsertWithWhereUniqueWithoutUserInput>
+    createMany?: CommunityBoardPinCreateManyUserInputEnvelope
     connect?: Enumerable<CommunityBoardPinWhereUniqueInput>
     set?: Enumerable<CommunityBoardPinWhereUniqueInput>
     disconnect?: Enumerable<CommunityBoardPinWhereUniqueInput>
@@ -21963,6 +25891,7 @@ export namespace Prisma {
     create?: XOR<Enumerable<CommunityCommentCreateWithoutUserInput>, Enumerable<CommunityCommentUncheckedCreateWithoutUserInput>>
     connectOrCreate?: Enumerable<CommunityCommentCreateOrConnectWithoutUserInput>
     upsert?: Enumerable<CommunityCommentUpsertWithWhereUniqueWithoutUserInput>
+    createMany?: CommunityCommentCreateManyUserInputEnvelope
     connect?: Enumerable<CommunityCommentWhereUniqueInput>
     set?: Enumerable<CommunityCommentWhereUniqueInput>
     disconnect?: Enumerable<CommunityCommentWhereUniqueInput>
@@ -21976,6 +25905,7 @@ export namespace Prisma {
     create?: XOR<Enumerable<CommunityPostCreateWithoutUserInput>, Enumerable<CommunityPostUncheckedCreateWithoutUserInput>>
     connectOrCreate?: Enumerable<CommunityPostCreateOrConnectWithoutUserInput>
     upsert?: Enumerable<CommunityPostUpsertWithWhereUniqueWithoutUserInput>
+    createMany?: CommunityPostCreateManyUserInputEnvelope
     connect?: Enumerable<CommunityPostWhereUniqueInput>
     set?: Enumerable<CommunityPostWhereUniqueInput>
     disconnect?: Enumerable<CommunityPostWhereUniqueInput>
@@ -21989,6 +25919,7 @@ export namespace Prisma {
     create?: XOR<Enumerable<CommunityPostBookmarkCreateWithoutUserInput>, Enumerable<CommunityPostBookmarkUncheckedCreateWithoutUserInput>>
     connectOrCreate?: Enumerable<CommunityPostBookmarkCreateOrConnectWithoutUserInput>
     upsert?: Enumerable<CommunityPostBookmarkUpsertWithWhereUniqueWithoutUserInput>
+    createMany?: CommunityPostBookmarkCreateManyUserInputEnvelope
     connect?: Enumerable<CommunityPostBookmarkWhereUniqueInput>
     set?: Enumerable<CommunityPostBookmarkWhereUniqueInput>
     disconnect?: Enumerable<CommunityPostBookmarkWhereUniqueInput>
@@ -22002,6 +25933,7 @@ export namespace Prisma {
     create?: XOR<Enumerable<CommunityPostLikeCreateWithoutUserInput>, Enumerable<CommunityPostLikeUncheckedCreateWithoutUserInput>>
     connectOrCreate?: Enumerable<CommunityPostLikeCreateOrConnectWithoutUserInput>
     upsert?: Enumerable<CommunityPostLikeUpsertWithWhereUniqueWithoutUserInput>
+    createMany?: CommunityPostLikeCreateManyUserInputEnvelope
     connect?: Enumerable<CommunityPostLikeWhereUniqueInput>
     set?: Enumerable<CommunityPostLikeWhereUniqueInput>
     disconnect?: Enumerable<CommunityPostLikeWhereUniqueInput>
@@ -22015,6 +25947,7 @@ export namespace Prisma {
     create?: XOR<Enumerable<CommunitySubcommentCreateWithoutUserInput>, Enumerable<CommunitySubcommentUncheckedCreateWithoutUserInput>>
     connectOrCreate?: Enumerable<CommunitySubcommentCreateOrConnectWithoutUserInput>
     upsert?: Enumerable<CommunitySubcommentUpsertWithWhereUniqueWithoutUserInput>
+    createMany?: CommunitySubcommentCreateManyUserInputEnvelope
     connect?: Enumerable<CommunitySubcommentWhereUniqueInput>
     set?: Enumerable<CommunitySubcommentWhereUniqueInput>
     disconnect?: Enumerable<CommunitySubcommentWhereUniqueInput>
@@ -22028,6 +25961,7 @@ export namespace Prisma {
     create?: XOR<Enumerable<LiveChatCreateWithoutUserInput>, Enumerable<LiveChatUncheckedCreateWithoutUserInput>>
     connectOrCreate?: Enumerable<LiveChatCreateOrConnectWithoutUserInput>
     upsert?: Enumerable<LiveChatUpsertWithWhereUniqueWithoutUserInput>
+    createMany?: LiveChatCreateManyUserInputEnvelope
     connect?: Enumerable<LiveChatWhereUniqueInput>
     set?: Enumerable<LiveChatWhereUniqueInput>
     disconnect?: Enumerable<LiveChatWhereUniqueInput>
@@ -22041,6 +25975,7 @@ export namespace Prisma {
     create?: XOR<Enumerable<NoticeNotificationsSubscriptionCreateWithoutUserInput>, Enumerable<NoticeNotificationsSubscriptionUncheckedCreateWithoutUserInput>>
     connectOrCreate?: Enumerable<NoticeNotificationsSubscriptionCreateOrConnectWithoutUserInput>
     upsert?: Enumerable<NoticeNotificationsSubscriptionUpsertWithWhereUniqueWithoutUserInput>
+    createMany?: NoticeNotificationsSubscriptionCreateManyUserInputEnvelope
     connect?: Enumerable<NoticeNotificationsSubscriptionWhereUniqueInput>
     set?: Enumerable<NoticeNotificationsSubscriptionWhereUniqueInput>
     disconnect?: Enumerable<NoticeNotificationsSubscriptionWhereUniqueInput>
@@ -22054,6 +25989,7 @@ export namespace Prisma {
     create?: XOR<Enumerable<ReportCommentCreateWithoutUserInput>, Enumerable<ReportCommentUncheckedCreateWithoutUserInput>>
     connectOrCreate?: Enumerable<ReportCommentCreateOrConnectWithoutUserInput>
     upsert?: Enumerable<ReportCommentUpsertWithWhereUniqueWithoutUserInput>
+    createMany?: ReportCommentCreateManyUserInputEnvelope
     connect?: Enumerable<ReportCommentWhereUniqueInput>
     set?: Enumerable<ReportCommentWhereUniqueInput>
     disconnect?: Enumerable<ReportCommentWhereUniqueInput>
@@ -22067,6 +26003,7 @@ export namespace Prisma {
     create?: XOR<Enumerable<ReportPostCreateWithoutUserInput>, Enumerable<ReportPostUncheckedCreateWithoutUserInput>>
     connectOrCreate?: Enumerable<ReportPostCreateOrConnectWithoutUserInput>
     upsert?: Enumerable<ReportPostUpsertWithWhereUniqueWithoutUserInput>
+    createMany?: ReportPostCreateManyUserInputEnvelope
     connect?: Enumerable<ReportPostWhereUniqueInput>
     set?: Enumerable<ReportPostWhereUniqueInput>
     disconnect?: Enumerable<ReportPostWhereUniqueInput>
@@ -22080,6 +26017,7 @@ export namespace Prisma {
     create?: XOR<Enumerable<ReportSubcommentCreateWithoutUserInput>, Enumerable<ReportSubcommentUncheckedCreateWithoutUserInput>>
     connectOrCreate?: Enumerable<ReportSubcommentCreateOrConnectWithoutUserInput>
     upsert?: Enumerable<ReportSubcommentUpsertWithWhereUniqueWithoutUserInput>
+    createMany?: ReportSubcommentCreateManyUserInputEnvelope
     connect?: Enumerable<ReportSubcommentWhereUniqueInput>
     set?: Enumerable<ReportSubcommentWhereUniqueInput>
     disconnect?: Enumerable<ReportSubcommentWhereUniqueInput>
@@ -22093,6 +26031,7 @@ export namespace Prisma {
     create?: XOR<Enumerable<TelegramCreateWithoutUserInput>, Enumerable<TelegramUncheckedCreateWithoutUserInput>>
     connectOrCreate?: Enumerable<TelegramCreateOrConnectWithoutUserInput>
     upsert?: Enumerable<TelegramUpsertWithWhereUniqueWithoutUserInput>
+    createMany?: TelegramCreateManyUserInputEnvelope
     connect?: Enumerable<TelegramWhereUniqueInput>
     set?: Enumerable<TelegramWhereUniqueInput>
     disconnect?: Enumerable<TelegramWhereUniqueInput>
@@ -22125,6 +26064,7 @@ export namespace Prisma {
     create?: XOR<Enumerable<CommunityBoardCreateWithoutUserInput>, Enumerable<CommunityBoardUncheckedCreateWithoutUserInput>>
     connectOrCreate?: Enumerable<CommunityBoardCreateOrConnectWithoutUserInput>
     upsert?: Enumerable<CommunityBoardUpsertWithWhereUniqueWithoutUserInput>
+    createMany?: CommunityBoardCreateManyUserInputEnvelope
     connect?: Enumerable<CommunityBoardWhereUniqueInput>
     set?: Enumerable<CommunityBoardWhereUniqueInput>
     disconnect?: Enumerable<CommunityBoardWhereUniqueInput>
@@ -22138,6 +26078,7 @@ export namespace Prisma {
     create?: XOR<Enumerable<CommunityBoardCandidateCreateWithoutUserInput>, Enumerable<CommunityBoardCandidateUncheckedCreateWithoutUserInput>>
     connectOrCreate?: Enumerable<CommunityBoardCandidateCreateOrConnectWithoutUserInput>
     upsert?: Enumerable<CommunityBoardCandidateUpsertWithWhereUniqueWithoutUserInput>
+    createMany?: CommunityBoardCandidateCreateManyUserInputEnvelope
     connect?: Enumerable<CommunityBoardCandidateWhereUniqueInput>
     set?: Enumerable<CommunityBoardCandidateWhereUniqueInput>
     disconnect?: Enumerable<CommunityBoardCandidateWhereUniqueInput>
@@ -22151,6 +26092,7 @@ export namespace Prisma {
     create?: XOR<Enumerable<CommunityBoardCandidateVoteCreateWithoutUserInput>, Enumerable<CommunityBoardCandidateVoteUncheckedCreateWithoutUserInput>>
     connectOrCreate?: Enumerable<CommunityBoardCandidateVoteCreateOrConnectWithoutUserInput>
     upsert?: Enumerable<CommunityBoardCandidateVoteUpsertWithWhereUniqueWithoutUserInput>
+    createMany?: CommunityBoardCandidateVoteCreateManyUserInputEnvelope
     connect?: Enumerable<CommunityBoardCandidateVoteWhereUniqueInput>
     set?: Enumerable<CommunityBoardCandidateVoteWhereUniqueInput>
     disconnect?: Enumerable<CommunityBoardCandidateVoteWhereUniqueInput>
@@ -22164,6 +26106,7 @@ export namespace Prisma {
     create?: XOR<Enumerable<CommunityBoardPinCreateWithoutUserInput>, Enumerable<CommunityBoardPinUncheckedCreateWithoutUserInput>>
     connectOrCreate?: Enumerable<CommunityBoardPinCreateOrConnectWithoutUserInput>
     upsert?: Enumerable<CommunityBoardPinUpsertWithWhereUniqueWithoutUserInput>
+    createMany?: CommunityBoardPinCreateManyUserInputEnvelope
     connect?: Enumerable<CommunityBoardPinWhereUniqueInput>
     set?: Enumerable<CommunityBoardPinWhereUniqueInput>
     disconnect?: Enumerable<CommunityBoardPinWhereUniqueInput>
@@ -22177,6 +26120,7 @@ export namespace Prisma {
     create?: XOR<Enumerable<CommunityCommentCreateWithoutUserInput>, Enumerable<CommunityCommentUncheckedCreateWithoutUserInput>>
     connectOrCreate?: Enumerable<CommunityCommentCreateOrConnectWithoutUserInput>
     upsert?: Enumerable<CommunityCommentUpsertWithWhereUniqueWithoutUserInput>
+    createMany?: CommunityCommentCreateManyUserInputEnvelope
     connect?: Enumerable<CommunityCommentWhereUniqueInput>
     set?: Enumerable<CommunityCommentWhereUniqueInput>
     disconnect?: Enumerable<CommunityCommentWhereUniqueInput>
@@ -22190,6 +26134,7 @@ export namespace Prisma {
     create?: XOR<Enumerable<CommunityPostCreateWithoutUserInput>, Enumerable<CommunityPostUncheckedCreateWithoutUserInput>>
     connectOrCreate?: Enumerable<CommunityPostCreateOrConnectWithoutUserInput>
     upsert?: Enumerable<CommunityPostUpsertWithWhereUniqueWithoutUserInput>
+    createMany?: CommunityPostCreateManyUserInputEnvelope
     connect?: Enumerable<CommunityPostWhereUniqueInput>
     set?: Enumerable<CommunityPostWhereUniqueInput>
     disconnect?: Enumerable<CommunityPostWhereUniqueInput>
@@ -22203,6 +26148,7 @@ export namespace Prisma {
     create?: XOR<Enumerable<CommunityPostBookmarkCreateWithoutUserInput>, Enumerable<CommunityPostBookmarkUncheckedCreateWithoutUserInput>>
     connectOrCreate?: Enumerable<CommunityPostBookmarkCreateOrConnectWithoutUserInput>
     upsert?: Enumerable<CommunityPostBookmarkUpsertWithWhereUniqueWithoutUserInput>
+    createMany?: CommunityPostBookmarkCreateManyUserInputEnvelope
     connect?: Enumerable<CommunityPostBookmarkWhereUniqueInput>
     set?: Enumerable<CommunityPostBookmarkWhereUniqueInput>
     disconnect?: Enumerable<CommunityPostBookmarkWhereUniqueInput>
@@ -22216,6 +26162,7 @@ export namespace Prisma {
     create?: XOR<Enumerable<CommunityPostLikeCreateWithoutUserInput>, Enumerable<CommunityPostLikeUncheckedCreateWithoutUserInput>>
     connectOrCreate?: Enumerable<CommunityPostLikeCreateOrConnectWithoutUserInput>
     upsert?: Enumerable<CommunityPostLikeUpsertWithWhereUniqueWithoutUserInput>
+    createMany?: CommunityPostLikeCreateManyUserInputEnvelope
     connect?: Enumerable<CommunityPostLikeWhereUniqueInput>
     set?: Enumerable<CommunityPostLikeWhereUniqueInput>
     disconnect?: Enumerable<CommunityPostLikeWhereUniqueInput>
@@ -22229,6 +26176,7 @@ export namespace Prisma {
     create?: XOR<Enumerable<CommunitySubcommentCreateWithoutUserInput>, Enumerable<CommunitySubcommentUncheckedCreateWithoutUserInput>>
     connectOrCreate?: Enumerable<CommunitySubcommentCreateOrConnectWithoutUserInput>
     upsert?: Enumerable<CommunitySubcommentUpsertWithWhereUniqueWithoutUserInput>
+    createMany?: CommunitySubcommentCreateManyUserInputEnvelope
     connect?: Enumerable<CommunitySubcommentWhereUniqueInput>
     set?: Enumerable<CommunitySubcommentWhereUniqueInput>
     disconnect?: Enumerable<CommunitySubcommentWhereUniqueInput>
@@ -22242,6 +26190,7 @@ export namespace Prisma {
     create?: XOR<Enumerable<LiveChatCreateWithoutUserInput>, Enumerable<LiveChatUncheckedCreateWithoutUserInput>>
     connectOrCreate?: Enumerable<LiveChatCreateOrConnectWithoutUserInput>
     upsert?: Enumerable<LiveChatUpsertWithWhereUniqueWithoutUserInput>
+    createMany?: LiveChatCreateManyUserInputEnvelope
     connect?: Enumerable<LiveChatWhereUniqueInput>
     set?: Enumerable<LiveChatWhereUniqueInput>
     disconnect?: Enumerable<LiveChatWhereUniqueInput>
@@ -22255,6 +26204,7 @@ export namespace Prisma {
     create?: XOR<Enumerable<NoticeNotificationsSubscriptionCreateWithoutUserInput>, Enumerable<NoticeNotificationsSubscriptionUncheckedCreateWithoutUserInput>>
     connectOrCreate?: Enumerable<NoticeNotificationsSubscriptionCreateOrConnectWithoutUserInput>
     upsert?: Enumerable<NoticeNotificationsSubscriptionUpsertWithWhereUniqueWithoutUserInput>
+    createMany?: NoticeNotificationsSubscriptionCreateManyUserInputEnvelope
     connect?: Enumerable<NoticeNotificationsSubscriptionWhereUniqueInput>
     set?: Enumerable<NoticeNotificationsSubscriptionWhereUniqueInput>
     disconnect?: Enumerable<NoticeNotificationsSubscriptionWhereUniqueInput>
@@ -22268,6 +26218,7 @@ export namespace Prisma {
     create?: XOR<Enumerable<ReportCommentCreateWithoutUserInput>, Enumerable<ReportCommentUncheckedCreateWithoutUserInput>>
     connectOrCreate?: Enumerable<ReportCommentCreateOrConnectWithoutUserInput>
     upsert?: Enumerable<ReportCommentUpsertWithWhereUniqueWithoutUserInput>
+    createMany?: ReportCommentCreateManyUserInputEnvelope
     connect?: Enumerable<ReportCommentWhereUniqueInput>
     set?: Enumerable<ReportCommentWhereUniqueInput>
     disconnect?: Enumerable<ReportCommentWhereUniqueInput>
@@ -22281,6 +26232,7 @@ export namespace Prisma {
     create?: XOR<Enumerable<ReportPostCreateWithoutUserInput>, Enumerable<ReportPostUncheckedCreateWithoutUserInput>>
     connectOrCreate?: Enumerable<ReportPostCreateOrConnectWithoutUserInput>
     upsert?: Enumerable<ReportPostUpsertWithWhereUniqueWithoutUserInput>
+    createMany?: ReportPostCreateManyUserInputEnvelope
     connect?: Enumerable<ReportPostWhereUniqueInput>
     set?: Enumerable<ReportPostWhereUniqueInput>
     disconnect?: Enumerable<ReportPostWhereUniqueInput>
@@ -22294,6 +26246,7 @@ export namespace Prisma {
     create?: XOR<Enumerable<ReportSubcommentCreateWithoutUserInput>, Enumerable<ReportSubcommentUncheckedCreateWithoutUserInput>>
     connectOrCreate?: Enumerable<ReportSubcommentCreateOrConnectWithoutUserInput>
     upsert?: Enumerable<ReportSubcommentUpsertWithWhereUniqueWithoutUserInput>
+    createMany?: ReportSubcommentCreateManyUserInputEnvelope
     connect?: Enumerable<ReportSubcommentWhereUniqueInput>
     set?: Enumerable<ReportSubcommentWhereUniqueInput>
     disconnect?: Enumerable<ReportSubcommentWhereUniqueInput>
@@ -22307,6 +26260,7 @@ export namespace Prisma {
     create?: XOR<Enumerable<TelegramCreateWithoutUserInput>, Enumerable<TelegramUncheckedCreateWithoutUserInput>>
     connectOrCreate?: Enumerable<TelegramCreateOrConnectWithoutUserInput>
     upsert?: Enumerable<TelegramUpsertWithWhereUniqueWithoutUserInput>
+    createMany?: TelegramCreateManyUserInputEnvelope
     connect?: Enumerable<TelegramWhereUniqueInput>
     set?: Enumerable<TelegramWhereUniqueInput>
     disconnect?: Enumerable<TelegramWhereUniqueInput>
@@ -22425,6 +26379,33 @@ export namespace Prisma {
     not?: NestedIntFilter | number
   }
 
+  export type NestedIntWithAggregatesFilter = {
+    equals?: number
+    in?: Enumerable<number>
+    notIn?: Enumerable<number>
+    lt?: number
+    lte?: number
+    gt?: number
+    gte?: number
+    not?: NestedIntWithAggregatesFilter | number
+    count?: NestedIntFilter
+    avg?: NestedFloatFilter
+    sum?: NestedIntFilter
+    min?: NestedIntFilter
+    max?: NestedIntFilter
+  }
+
+  export type NestedFloatFilter = {
+    equals?: number
+    in?: Enumerable<number>
+    notIn?: Enumerable<number>
+    lt?: number
+    lte?: number
+    gt?: number
+    gte?: number
+    not?: NestedFloatFilter | number
+  }
+
   export type NestedStringFilter = {
     equals?: string
     in?: Enumerable<string>
@@ -22448,6 +26429,53 @@ export namespace Prisma {
     gt?: Date | string
     gte?: Date | string
     not?: NestedDateTimeFilter | Date | string
+  }
+
+  export type NestedStringWithAggregatesFilter = {
+    equals?: string
+    in?: Enumerable<string>
+    notIn?: Enumerable<string>
+    lt?: string
+    lte?: string
+    gt?: string
+    gte?: string
+    contains?: string
+    startsWith?: string
+    endsWith?: string
+    not?: NestedStringWithAggregatesFilter | string
+    count?: NestedIntFilter
+    min?: NestedStringFilter
+    max?: NestedStringFilter
+  }
+
+  export type NestedDateTimeWithAggregatesFilter = {
+    equals?: Date | string
+    in?: Enumerable<Date> | Enumerable<string>
+    notIn?: Enumerable<Date> | Enumerable<string>
+    lt?: Date | string
+    lte?: Date | string
+    gt?: Date | string
+    gte?: Date | string
+    not?: NestedDateTimeWithAggregatesFilter | Date | string
+    count?: NestedIntFilter
+    min?: NestedDateTimeFilter
+    max?: NestedDateTimeFilter
+  }
+
+  export type NestedIntNullableFilter = {
+    equals?: number | null
+    in?: Enumerable<number> | null
+    notIn?: Enumerable<number> | null
+    lt?: number
+    lte?: number
+    gt?: number
+    gte?: number
+    not?: NestedIntNullableFilter | number | null
+  }
+
+  export type NestedJsonNullableFilter = {
+    equals?: InputJsonValue | null
+    not?: InputJsonValue | null
   }
 
   export type NestedStringNullableFilter = {
@@ -22480,7 +26508,46 @@ export namespace Prisma {
     not?: NestedDateTimeNullableFilter | Date | string | null
   }
 
-  export type NestedIntNullableFilter = {
+  export type NestedStringNullableWithAggregatesFilter = {
+    equals?: string | null
+    in?: Enumerable<string> | null
+    notIn?: Enumerable<string> | null
+    lt?: string
+    lte?: string
+    gt?: string
+    gte?: string
+    contains?: string
+    startsWith?: string
+    endsWith?: string
+    not?: NestedStringNullableWithAggregatesFilter | string | null
+    count?: NestedIntNullableFilter
+    min?: NestedStringNullableFilter
+    max?: NestedStringNullableFilter
+  }
+
+  export type NestedBoolWithAggregatesFilter = {
+    equals?: boolean
+    not?: NestedBoolWithAggregatesFilter | boolean
+    count?: NestedIntFilter
+    min?: NestedBoolFilter
+    max?: NestedBoolFilter
+  }
+
+  export type NestedDateTimeNullableWithAggregatesFilter = {
+    equals?: Date | string | null
+    in?: Enumerable<Date> | Enumerable<string> | null
+    notIn?: Enumerable<Date> | Enumerable<string> | null
+    lt?: Date | string
+    lte?: Date | string
+    gt?: Date | string
+    gte?: Date | string
+    not?: NestedDateTimeNullableWithAggregatesFilter | Date | string | null
+    count?: NestedIntNullableFilter
+    min?: NestedDateTimeNullableFilter
+    max?: NestedDateTimeNullableFilter
+  }
+
+  export type NestedIntNullableWithAggregatesFilter = {
     equals?: number | null
     in?: Enumerable<number> | null
     notIn?: Enumerable<number> | null
@@ -22488,7 +26555,23 @@ export namespace Prisma {
     lte?: number
     gt?: number
     gte?: number
-    not?: NestedIntNullableFilter | number | null
+    not?: NestedIntNullableWithAggregatesFilter | number | null
+    count?: NestedIntNullableFilter
+    avg?: NestedFloatNullableFilter
+    sum?: NestedIntNullableFilter
+    min?: NestedIntNullableFilter
+    max?: NestedIntNullableFilter
+  }
+
+  export type NestedFloatNullableFilter = {
+    equals?: number | null
+    in?: Enumerable<number> | null
+    notIn?: Enumerable<number> | null
+    lt?: number
+    lte?: number
+    gt?: number
+    gte?: number
+    not?: NestedFloatNullableFilter | number | null
   }
 
   export type UserCreateWithoutAdminInput = {
@@ -22496,6 +26579,7 @@ export namespace Prisma {
     password: string
     nickname: string
     randomNickname: string
+    point?: number | null
     joinedAt: Date | string
     refreshToken?: string | null
     changePassword?: ChangePasswordCreateNestedOneWithoutUserInput
@@ -22522,6 +26606,7 @@ export namespace Prisma {
     password: string
     nickname: string
     randomNickname: string
+    point?: number | null
     joinedAt: Date | string
     refreshToken?: string | null
     changePassword?: ChangePasswordUncheckedCreateNestedOneWithoutUserInput
@@ -22557,6 +26642,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     nickname?: StringFieldUpdateOperationsInput | string
     randomNickname?: StringFieldUpdateOperationsInput | string
+    point?: NullableIntFieldUpdateOperationsInput | number | null
     joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     refreshToken?: NullableStringFieldUpdateOperationsInput | string | null
     changePassword?: ChangePasswordUpdateOneWithoutUserInput
@@ -22583,6 +26669,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     nickname?: StringFieldUpdateOperationsInput | string
     randomNickname?: StringFieldUpdateOperationsInput | string
+    point?: NullableIntFieldUpdateOperationsInput | number | null
     joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     refreshToken?: NullableStringFieldUpdateOperationsInput | string | null
     changePassword?: ChangePasswordUncheckedUpdateOneWithoutUserInput
@@ -22608,6 +26695,7 @@ export namespace Prisma {
     password: string
     nickname: string
     randomNickname: string
+    point?: number | null
     joinedAt: Date | string
     refreshToken?: string | null
     admin?: AdminCreateNestedOneWithoutUserInput
@@ -22634,6 +26722,7 @@ export namespace Prisma {
     password: string
     nickname: string
     randomNickname: string
+    point?: number | null
     joinedAt: Date | string
     refreshToken?: string | null
     admin?: AdminUncheckedCreateNestedOneWithoutUserInput
@@ -22669,6 +26758,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     nickname?: StringFieldUpdateOperationsInput | string
     randomNickname?: StringFieldUpdateOperationsInput | string
+    point?: NullableIntFieldUpdateOperationsInput | number | null
     joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     refreshToken?: NullableStringFieldUpdateOperationsInput | string | null
     admin?: AdminUpdateOneWithoutUserInput
@@ -22695,6 +26785,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     nickname?: StringFieldUpdateOperationsInput | string
     randomNickname?: StringFieldUpdateOperationsInput | string
+    point?: NullableIntFieldUpdateOperationsInput | number | null
     joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     refreshToken?: NullableStringFieldUpdateOperationsInput | string | null
     admin?: AdminUncheckedUpdateOneWithoutUserInput
@@ -22720,6 +26811,7 @@ export namespace Prisma {
     password: string
     nickname: string
     randomNickname: string
+    point?: number | null
     joinedAt: Date | string
     refreshToken?: string | null
     admin?: AdminCreateNestedOneWithoutUserInput
@@ -22746,6 +26838,7 @@ export namespace Prisma {
     password: string
     nickname: string
     randomNickname: string
+    point?: number | null
     joinedAt: Date | string
     refreshToken?: string | null
     admin?: AdminUncheckedCreateNestedOneWithoutUserInput
@@ -22782,6 +26875,11 @@ export namespace Prisma {
   export type CommunityBoardPinCreateOrConnectWithoutCommunityBoardInput = {
     where: CommunityBoardPinWhereUniqueInput
     create: XOR<CommunityBoardPinCreateWithoutCommunityBoardInput, CommunityBoardPinUncheckedCreateWithoutCommunityBoardInput>
+  }
+
+  export type CommunityBoardPinCreateManyCommunityBoardInputEnvelope = {
+    data: Enumerable<CommunityBoardPinCreateManyCommunityBoardInput>
+    skipDuplicates?: boolean
   }
 
   export type CommunityPostCreateWithoutCommunityBoardInput = {
@@ -22826,6 +26924,11 @@ export namespace Prisma {
     create: XOR<CommunityPostCreateWithoutCommunityBoardInput, CommunityPostUncheckedCreateWithoutCommunityBoardInput>
   }
 
+  export type CommunityPostCreateManyCommunityBoardInputEnvelope = {
+    data: Enumerable<CommunityPostCreateManyCommunityBoardInput>
+    skipDuplicates?: boolean
+  }
+
   export type UserUpsertWithoutCommunityBoardsInput = {
     update: XOR<UserUpdateWithoutCommunityBoardsInput, UserUncheckedUpdateWithoutCommunityBoardsInput>
     create: XOR<UserCreateWithoutCommunityBoardsInput, UserUncheckedCreateWithoutCommunityBoardsInput>
@@ -22836,6 +26939,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     nickname?: StringFieldUpdateOperationsInput | string
     randomNickname?: StringFieldUpdateOperationsInput | string
+    point?: NullableIntFieldUpdateOperationsInput | number | null
     joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     refreshToken?: NullableStringFieldUpdateOperationsInput | string | null
     admin?: AdminUpdateOneWithoutUserInput
@@ -22862,6 +26966,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     nickname?: StringFieldUpdateOperationsInput | string
     randomNickname?: StringFieldUpdateOperationsInput | string
+    point?: NullableIntFieldUpdateOperationsInput | number | null
     joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     refreshToken?: NullableStringFieldUpdateOperationsInput | string | null
     admin?: AdminUncheckedUpdateOneWithoutUserInput
@@ -22945,6 +27050,7 @@ export namespace Prisma {
     password: string
     nickname: string
     randomNickname: string
+    point?: number | null
     joinedAt: Date | string
     refreshToken?: string | null
     admin?: AdminCreateNestedOneWithoutUserInput
@@ -22971,6 +27077,7 @@ export namespace Prisma {
     password: string
     nickname: string
     randomNickname: string
+    point?: number | null
     joinedAt: Date | string
     refreshToken?: string | null
     admin?: AdminUncheckedCreateNestedOneWithoutUserInput
@@ -23009,6 +27116,11 @@ export namespace Prisma {
     create: XOR<CommunityBoardCandidateVoteCreateWithoutCommunityBoardCandidateInput, CommunityBoardCandidateVoteUncheckedCreateWithoutCommunityBoardCandidateInput>
   }
 
+  export type CommunityBoardCandidateVoteCreateManyCommunityBoardCandidateInputEnvelope = {
+    data: Enumerable<CommunityBoardCandidateVoteCreateManyCommunityBoardCandidateInput>
+    skipDuplicates?: boolean
+  }
+
   export type UserUpsertWithoutCommunityBoardCandidatesInput = {
     update: XOR<UserUpdateWithoutCommunityBoardCandidatesInput, UserUncheckedUpdateWithoutCommunityBoardCandidatesInput>
     create: XOR<UserCreateWithoutCommunityBoardCandidatesInput, UserUncheckedCreateWithoutCommunityBoardCandidatesInput>
@@ -23019,6 +27131,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     nickname?: StringFieldUpdateOperationsInput | string
     randomNickname?: StringFieldUpdateOperationsInput | string
+    point?: NullableIntFieldUpdateOperationsInput | number | null
     joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     refreshToken?: NullableStringFieldUpdateOperationsInput | string | null
     admin?: AdminUpdateOneWithoutUserInput
@@ -23045,6 +27158,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     nickname?: StringFieldUpdateOperationsInput | string
     randomNickname?: StringFieldUpdateOperationsInput | string
+    point?: NullableIntFieldUpdateOperationsInput | number | null
     joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     refreshToken?: NullableStringFieldUpdateOperationsInput | string | null
     admin?: AdminUncheckedUpdateOneWithoutUserInput
@@ -23114,6 +27228,7 @@ export namespace Prisma {
     password: string
     nickname: string
     randomNickname: string
+    point?: number | null
     joinedAt: Date | string
     refreshToken?: string | null
     admin?: AdminCreateNestedOneWithoutUserInput
@@ -23140,6 +27255,7 @@ export namespace Prisma {
     password: string
     nickname: string
     randomNickname: string
+    point?: number | null
     joinedAt: Date | string
     refreshToken?: string | null
     admin?: AdminUncheckedCreateNestedOneWithoutUserInput
@@ -23195,6 +27311,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     nickname?: StringFieldUpdateOperationsInput | string
     randomNickname?: StringFieldUpdateOperationsInput | string
+    point?: NullableIntFieldUpdateOperationsInput | number | null
     joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     refreshToken?: NullableStringFieldUpdateOperationsInput | string | null
     admin?: AdminUpdateOneWithoutUserInput
@@ -23221,6 +27338,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     nickname?: StringFieldUpdateOperationsInput | string
     randomNickname?: StringFieldUpdateOperationsInput | string
+    point?: NullableIntFieldUpdateOperationsInput | number | null
     joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     refreshToken?: NullableStringFieldUpdateOperationsInput | string | null
     admin?: AdminUncheckedUpdateOneWithoutUserInput
@@ -23274,6 +27392,7 @@ export namespace Prisma {
     password: string
     nickname: string
     randomNickname: string
+    point?: number | null
     joinedAt: Date | string
     refreshToken?: string | null
     admin?: AdminCreateNestedOneWithoutUserInput
@@ -23300,6 +27419,7 @@ export namespace Prisma {
     password: string
     nickname: string
     randomNickname: string
+    point?: number | null
     joinedAt: Date | string
     refreshToken?: string | null
     admin?: AdminUncheckedCreateNestedOneWithoutUserInput
@@ -23363,6 +27483,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     nickname?: StringFieldUpdateOperationsInput | string
     randomNickname?: StringFieldUpdateOperationsInput | string
+    point?: NullableIntFieldUpdateOperationsInput | number | null
     joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     refreshToken?: NullableStringFieldUpdateOperationsInput | string | null
     admin?: AdminUpdateOneWithoutUserInput
@@ -23389,6 +27510,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     nickname?: StringFieldUpdateOperationsInput | string
     randomNickname?: StringFieldUpdateOperationsInput | string
+    point?: NullableIntFieldUpdateOperationsInput | number | null
     joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     refreshToken?: NullableStringFieldUpdateOperationsInput | string | null
     admin?: AdminUncheckedUpdateOneWithoutUserInput
@@ -23456,6 +27578,7 @@ export namespace Prisma {
     password: string
     nickname: string
     randomNickname: string
+    point?: number | null
     joinedAt: Date | string
     refreshToken?: string | null
     admin?: AdminCreateNestedOneWithoutUserInput
@@ -23482,6 +27605,7 @@ export namespace Prisma {
     password: string
     nickname: string
     randomNickname: string
+    point?: number | null
     joinedAt: Date | string
     refreshToken?: string | null
     admin?: AdminUncheckedCreateNestedOneWithoutUserInput
@@ -23533,6 +27657,11 @@ export namespace Prisma {
     create: XOR<CommunitySubcommentCreateWithoutCommunityCommentInput, CommunitySubcommentUncheckedCreateWithoutCommunityCommentInput>
   }
 
+  export type CommunitySubcommentCreateManyCommunityCommentInputEnvelope = {
+    data: Enumerable<CommunitySubcommentCreateManyCommunityCommentInput>
+    skipDuplicates?: boolean
+  }
+
   export type ReportCommentCreateWithoutCommunityCommentInput = {
     title?: string
     body?: string | null
@@ -23551,6 +27680,11 @@ export namespace Prisma {
   export type ReportCommentCreateOrConnectWithoutCommunityCommentInput = {
     where: ReportCommentWhereUniqueInput
     create: XOR<ReportCommentCreateWithoutCommunityCommentInput, ReportCommentUncheckedCreateWithoutCommunityCommentInput>
+  }
+
+  export type ReportCommentCreateManyCommunityCommentInputEnvelope = {
+    data: Enumerable<ReportCommentCreateManyCommunityCommentInput>
+    skipDuplicates?: boolean
   }
 
   export type CommunityPostUpsertWithoutCommunityCommentsInput = {
@@ -23605,6 +27739,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     nickname?: StringFieldUpdateOperationsInput | string
     randomNickname?: StringFieldUpdateOperationsInput | string
+    point?: NullableIntFieldUpdateOperationsInput | number | null
     joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     refreshToken?: NullableStringFieldUpdateOperationsInput | string | null
     admin?: AdminUpdateOneWithoutUserInput
@@ -23631,6 +27766,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     nickname?: StringFieldUpdateOperationsInput | string
     randomNickname?: StringFieldUpdateOperationsInput | string
+    point?: NullableIntFieldUpdateOperationsInput | number | null
     joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     refreshToken?: NullableStringFieldUpdateOperationsInput | string | null
     admin?: AdminUncheckedUpdateOneWithoutUserInput
@@ -23742,6 +27878,7 @@ export namespace Prisma {
     password: string
     nickname: string
     randomNickname: string
+    point?: number | null
     joinedAt: Date | string
     refreshToken?: string | null
     admin?: AdminCreateNestedOneWithoutUserInput
@@ -23768,6 +27905,7 @@ export namespace Prisma {
     password: string
     nickname: string
     randomNickname: string
+    point?: number | null
     joinedAt: Date | string
     refreshToken?: string | null
     admin?: AdminUncheckedCreateNestedOneWithoutUserInput
@@ -23819,6 +27957,11 @@ export namespace Prisma {
     create: XOR<CommunityCommentCreateWithoutCommunityPostInput, CommunityCommentUncheckedCreateWithoutCommunityPostInput>
   }
 
+  export type CommunityCommentCreateManyCommunityPostInputEnvelope = {
+    data: Enumerable<CommunityCommentCreateManyCommunityPostInput>
+    skipDuplicates?: boolean
+  }
+
   export type CommunityPostBookmarkCreateWithoutCommunityPostInput = {
     user: UserCreateNestedOneWithoutCommunityPostBookmarksInput
   }
@@ -23832,6 +27975,11 @@ export namespace Prisma {
     create: XOR<CommunityPostBookmarkCreateWithoutCommunityPostInput, CommunityPostBookmarkUncheckedCreateWithoutCommunityPostInput>
   }
 
+  export type CommunityPostBookmarkCreateManyCommunityPostInputEnvelope = {
+    data: Enumerable<CommunityPostBookmarkCreateManyCommunityPostInput>
+    skipDuplicates?: boolean
+  }
+
   export type CommunityPostLikeCreateWithoutCommunityPostInput = {
     user: UserCreateNestedOneWithoutCommunityPostLikesInput
   }
@@ -23843,6 +27991,11 @@ export namespace Prisma {
   export type CommunityPostLikeCreateOrConnectWithoutCommunityPostInput = {
     where: CommunityPostLikeWhereUniqueInput
     create: XOR<CommunityPostLikeCreateWithoutCommunityPostInput, CommunityPostLikeUncheckedCreateWithoutCommunityPostInput>
+  }
+
+  export type CommunityPostLikeCreateManyCommunityPostInputEnvelope = {
+    data: Enumerable<CommunityPostLikeCreateManyCommunityPostInput>
+    skipDuplicates?: boolean
   }
 
   export type CommunitySubcommentCreateWithoutCommunityPostInput = {
@@ -23871,6 +28024,11 @@ export namespace Prisma {
     create: XOR<CommunitySubcommentCreateWithoutCommunityPostInput, CommunitySubcommentUncheckedCreateWithoutCommunityPostInput>
   }
 
+  export type CommunitySubcommentCreateManyCommunityPostInputEnvelope = {
+    data: Enumerable<CommunitySubcommentCreateManyCommunityPostInput>
+    skipDuplicates?: boolean
+  }
+
   export type ReportPostCreateWithoutCommunityPostInput = {
     title?: string
     body?: string | null
@@ -23889,6 +28047,11 @@ export namespace Prisma {
   export type ReportPostCreateOrConnectWithoutCommunityPostInput = {
     where: ReportPostWhereUniqueInput
     create: XOR<ReportPostCreateWithoutCommunityPostInput, ReportPostUncheckedCreateWithoutCommunityPostInput>
+  }
+
+  export type ReportPostCreateManyCommunityPostInputEnvelope = {
+    data: Enumerable<ReportPostCreateManyCommunityPostInput>
+    skipDuplicates?: boolean
   }
 
   export type CommunityBoardUpsertWithoutCommunityPostsInput = {
@@ -23929,6 +28092,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     nickname?: StringFieldUpdateOperationsInput | string
     randomNickname?: StringFieldUpdateOperationsInput | string
+    point?: NullableIntFieldUpdateOperationsInput | number | null
     joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     refreshToken?: NullableStringFieldUpdateOperationsInput | string | null
     admin?: AdminUpdateOneWithoutUserInput
@@ -23955,6 +28119,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     nickname?: StringFieldUpdateOperationsInput | string
     randomNickname?: StringFieldUpdateOperationsInput | string
+    point?: NullableIntFieldUpdateOperationsInput | number | null
     joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     refreshToken?: NullableStringFieldUpdateOperationsInput | string | null
     admin?: AdminUncheckedUpdateOneWithoutUserInput
@@ -24143,6 +28308,7 @@ export namespace Prisma {
     password: string
     nickname: string
     randomNickname: string
+    point?: number | null
     joinedAt: Date | string
     refreshToken?: string | null
     admin?: AdminCreateNestedOneWithoutUserInput
@@ -24169,6 +28335,7 @@ export namespace Prisma {
     password: string
     nickname: string
     randomNickname: string
+    point?: number | null
     joinedAt: Date | string
     refreshToken?: string | null
     admin?: AdminUncheckedCreateNestedOneWithoutUserInput
@@ -24246,6 +28413,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     nickname?: StringFieldUpdateOperationsInput | string
     randomNickname?: StringFieldUpdateOperationsInput | string
+    point?: NullableIntFieldUpdateOperationsInput | number | null
     joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     refreshToken?: NullableStringFieldUpdateOperationsInput | string | null
     admin?: AdminUpdateOneWithoutUserInput
@@ -24272,6 +28440,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     nickname?: StringFieldUpdateOperationsInput | string
     randomNickname?: StringFieldUpdateOperationsInput | string
+    point?: NullableIntFieldUpdateOperationsInput | number | null
     joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     refreshToken?: NullableStringFieldUpdateOperationsInput | string | null
     admin?: AdminUncheckedUpdateOneWithoutUserInput
@@ -24339,6 +28508,7 @@ export namespace Prisma {
     password: string
     nickname: string
     randomNickname: string
+    point?: number | null
     joinedAt: Date | string
     refreshToken?: string | null
     admin?: AdminCreateNestedOneWithoutUserInput
@@ -24365,6 +28535,7 @@ export namespace Prisma {
     password: string
     nickname: string
     randomNickname: string
+    point?: number | null
     joinedAt: Date | string
     refreshToken?: string | null
     admin?: AdminUncheckedCreateNestedOneWithoutUserInput
@@ -24442,6 +28613,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     nickname?: StringFieldUpdateOperationsInput | string
     randomNickname?: StringFieldUpdateOperationsInput | string
+    point?: NullableIntFieldUpdateOperationsInput | number | null
     joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     refreshToken?: NullableStringFieldUpdateOperationsInput | string | null
     admin?: AdminUpdateOneWithoutUserInput
@@ -24468,6 +28640,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     nickname?: StringFieldUpdateOperationsInput | string
     randomNickname?: StringFieldUpdateOperationsInput | string
+    point?: NullableIntFieldUpdateOperationsInput | number | null
     joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     refreshToken?: NullableStringFieldUpdateOperationsInput | string | null
     admin?: AdminUncheckedUpdateOneWithoutUserInput
@@ -24561,6 +28734,7 @@ export namespace Prisma {
     password: string
     nickname: string
     randomNickname: string
+    point?: number | null
     joinedAt: Date | string
     refreshToken?: string | null
     admin?: AdminCreateNestedOneWithoutUserInput
@@ -24587,6 +28761,7 @@ export namespace Prisma {
     password: string
     nickname: string
     randomNickname: string
+    point?: number | null
     joinedAt: Date | string
     refreshToken?: string | null
     admin?: AdminUncheckedCreateNestedOneWithoutUserInput
@@ -24630,6 +28805,11 @@ export namespace Prisma {
   export type ReportSubcommentCreateOrConnectWithoutCommunitySubcommentInput = {
     where: ReportSubcommentWhereUniqueInput
     create: XOR<ReportSubcommentCreateWithoutCommunitySubcommentInput, ReportSubcommentUncheckedCreateWithoutCommunitySubcommentInput>
+  }
+
+  export type ReportSubcommentCreateManyCommunitySubcommentInputEnvelope = {
+    data: Enumerable<ReportSubcommentCreateManyCommunitySubcommentInput>
+    skipDuplicates?: boolean
   }
 
   export type CommunityCommentUpsertWithoutCommunitySubcommentsInput = {
@@ -24710,6 +28890,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     nickname?: StringFieldUpdateOperationsInput | string
     randomNickname?: StringFieldUpdateOperationsInput | string
+    point?: NullableIntFieldUpdateOperationsInput | number | null
     joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     refreshToken?: NullableStringFieldUpdateOperationsInput | string | null
     admin?: AdminUpdateOneWithoutUserInput
@@ -24736,6 +28917,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     nickname?: StringFieldUpdateOperationsInput | string
     randomNickname?: StringFieldUpdateOperationsInput | string
+    point?: NullableIntFieldUpdateOperationsInput | number | null
     joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     refreshToken?: NullableStringFieldUpdateOperationsInput | string | null
     admin?: AdminUncheckedUpdateOneWithoutUserInput
@@ -24795,6 +28977,11 @@ export namespace Prisma {
   export type CoverageMajorLectureCreateOrConnectWithoutCoverageMajorInput = {
     where: CoverageMajorLectureWhereUniqueInput
     create: XOR<CoverageMajorLectureCreateWithoutCoverageMajorInput, CoverageMajorLectureUncheckedCreateWithoutCoverageMajorInput>
+  }
+
+  export type CoverageMajorLectureCreateManyCoverageMajorInputEnvelope = {
+    data: Enumerable<CoverageMajorLectureCreateManyCoverageMajorInput>
+    skipDuplicates?: boolean
   }
 
   export type CoverageMajorLectureUpsertWithWhereUniqueWithoutCoverageMajorInput = {
@@ -24962,6 +29149,11 @@ export namespace Prisma {
     create: XOR<CoverageMajorLectureCreateWithoutLectureInput, CoverageMajorLectureUncheckedCreateWithoutLectureInput>
   }
 
+  export type CoverageMajorLectureCreateManyLectureInputEnvelope = {
+    data: Enumerable<CoverageMajorLectureCreateManyLectureInput>
+    skipDuplicates?: boolean
+  }
+
   export type PeriodCreateWithoutLectureInput = {
     day: string
     startH: number
@@ -24981,6 +29173,11 @@ export namespace Prisma {
   export type PeriodCreateOrConnectWithoutLectureInput = {
     where: PeriodWhereUniqueInput
     create: XOR<PeriodCreateWithoutLectureInput, PeriodUncheckedCreateWithoutLectureInput>
+  }
+
+  export type PeriodCreateManyLectureInputEnvelope = {
+    data: Enumerable<PeriodCreateManyLectureInput>
+    skipDuplicates?: boolean
   }
 
   export type CoverageMajorLectureUpsertWithWhereUniqueWithoutLectureInput = {
@@ -25032,6 +29229,7 @@ export namespace Prisma {
     password: string
     nickname: string
     randomNickname: string
+    point?: number | null
     joinedAt: Date | string
     refreshToken?: string | null
     admin?: AdminCreateNestedOneWithoutUserInput
@@ -25058,6 +29256,7 @@ export namespace Prisma {
     password: string
     nickname: string
     randomNickname: string
+    point?: number | null
     joinedAt: Date | string
     refreshToken?: string | null
     admin?: AdminUncheckedCreateNestedOneWithoutUserInput
@@ -25093,6 +29292,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     nickname?: StringFieldUpdateOperationsInput | string
     randomNickname?: StringFieldUpdateOperationsInput | string
+    point?: NullableIntFieldUpdateOperationsInput | number | null
     joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     refreshToken?: NullableStringFieldUpdateOperationsInput | string | null
     admin?: AdminUpdateOneWithoutUserInput
@@ -25119,6 +29319,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     nickname?: StringFieldUpdateOperationsInput | string
     randomNickname?: StringFieldUpdateOperationsInput | string
+    point?: NullableIntFieldUpdateOperationsInput | number | null
     joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     refreshToken?: NullableStringFieldUpdateOperationsInput | string | null
     admin?: AdminUncheckedUpdateOneWithoutUserInput
@@ -25144,6 +29345,7 @@ export namespace Prisma {
     password: string
     nickname: string
     randomNickname: string
+    point?: number | null
     joinedAt: Date | string
     refreshToken?: string | null
     admin?: AdminCreateNestedOneWithoutUserInput
@@ -25170,6 +29372,7 @@ export namespace Prisma {
     password: string
     nickname: string
     randomNickname: string
+    point?: number | null
     joinedAt: Date | string
     refreshToken?: string | null
     admin?: AdminUncheckedCreateNestedOneWithoutUserInput
@@ -25205,6 +29408,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     nickname?: StringFieldUpdateOperationsInput | string
     randomNickname?: StringFieldUpdateOperationsInput | string
+    point?: NullableIntFieldUpdateOperationsInput | number | null
     joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     refreshToken?: NullableStringFieldUpdateOperationsInput | string | null
     admin?: AdminUpdateOneWithoutUserInput
@@ -25231,6 +29435,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     nickname?: StringFieldUpdateOperationsInput | string
     randomNickname?: StringFieldUpdateOperationsInput | string
+    point?: NullableIntFieldUpdateOperationsInput | number | null
     joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     refreshToken?: NullableStringFieldUpdateOperationsInput | string | null
     admin?: AdminUncheckedUpdateOneWithoutUserInput
@@ -25401,6 +29606,11 @@ export namespace Prisma {
     create: XOR<CommunityBoardCreateWithoutUserInput, CommunityBoardUncheckedCreateWithoutUserInput>
   }
 
+  export type CommunityBoardCreateManyUserInputEnvelope = {
+    data: Enumerable<CommunityBoardCreateManyUserInput>
+    skipDuplicates?: boolean
+  }
+
   export type CommunityBoardCandidateCreateWithoutUserInput = {
     name?: string
     description?: string | null
@@ -25421,6 +29631,11 @@ export namespace Prisma {
     create: XOR<CommunityBoardCandidateCreateWithoutUserInput, CommunityBoardCandidateUncheckedCreateWithoutUserInput>
   }
 
+  export type CommunityBoardCandidateCreateManyUserInputEnvelope = {
+    data: Enumerable<CommunityBoardCandidateCreateManyUserInput>
+    skipDuplicates?: boolean
+  }
+
   export type CommunityBoardCandidateVoteCreateWithoutUserInput = {
     communityBoardCandidate: CommunityBoardCandidateCreateNestedOneWithoutCommunityBoardCandidateVotesInput
   }
@@ -25434,6 +29649,11 @@ export namespace Prisma {
     create: XOR<CommunityBoardCandidateVoteCreateWithoutUserInput, CommunityBoardCandidateVoteUncheckedCreateWithoutUserInput>
   }
 
+  export type CommunityBoardCandidateVoteCreateManyUserInputEnvelope = {
+    data: Enumerable<CommunityBoardCandidateVoteCreateManyUserInput>
+    skipDuplicates?: boolean
+  }
+
   export type CommunityBoardPinCreateWithoutUserInput = {
     communityBoard: CommunityBoardCreateNestedOneWithoutCommunityBoardPinsInput
   }
@@ -25445,6 +29665,11 @@ export namespace Prisma {
   export type CommunityBoardPinCreateOrConnectWithoutUserInput = {
     where: CommunityBoardPinWhereUniqueInput
     create: XOR<CommunityBoardPinCreateWithoutUserInput, CommunityBoardPinUncheckedCreateWithoutUserInput>
+  }
+
+  export type CommunityBoardPinCreateManyUserInputEnvelope = {
+    data: Enumerable<CommunityBoardPinCreateManyUserInput>
+    skipDuplicates?: boolean
   }
 
   export type CommunityCommentCreateWithoutUserInput = {
@@ -25471,6 +29696,11 @@ export namespace Prisma {
   export type CommunityCommentCreateOrConnectWithoutUserInput = {
     where: CommunityCommentWhereUniqueInput
     create: XOR<CommunityCommentCreateWithoutUserInput, CommunityCommentUncheckedCreateWithoutUserInput>
+  }
+
+  export type CommunityCommentCreateManyUserInputEnvelope = {
+    data: Enumerable<CommunityCommentCreateManyUserInput>
+    skipDuplicates?: boolean
   }
 
   export type CommunityPostCreateWithoutUserInput = {
@@ -25515,6 +29745,11 @@ export namespace Prisma {
     create: XOR<CommunityPostCreateWithoutUserInput, CommunityPostUncheckedCreateWithoutUserInput>
   }
 
+  export type CommunityPostCreateManyUserInputEnvelope = {
+    data: Enumerable<CommunityPostCreateManyUserInput>
+    skipDuplicates?: boolean
+  }
+
   export type CommunityPostBookmarkCreateWithoutUserInput = {
     communityPost: CommunityPostCreateNestedOneWithoutCommunityPostBookmarksInput
   }
@@ -25528,6 +29763,11 @@ export namespace Prisma {
     create: XOR<CommunityPostBookmarkCreateWithoutUserInput, CommunityPostBookmarkUncheckedCreateWithoutUserInput>
   }
 
+  export type CommunityPostBookmarkCreateManyUserInputEnvelope = {
+    data: Enumerable<CommunityPostBookmarkCreateManyUserInput>
+    skipDuplicates?: boolean
+  }
+
   export type CommunityPostLikeCreateWithoutUserInput = {
     communityPost: CommunityPostCreateNestedOneWithoutCommunityPostLikesInput
   }
@@ -25539,6 +29779,11 @@ export namespace Prisma {
   export type CommunityPostLikeCreateOrConnectWithoutUserInput = {
     where: CommunityPostLikeWhereUniqueInput
     create: XOR<CommunityPostLikeCreateWithoutUserInput, CommunityPostLikeUncheckedCreateWithoutUserInput>
+  }
+
+  export type CommunityPostLikeCreateManyUserInputEnvelope = {
+    data: Enumerable<CommunityPostLikeCreateManyUserInput>
+    skipDuplicates?: boolean
   }
 
   export type CommunitySubcommentCreateWithoutUserInput = {
@@ -25567,6 +29812,11 @@ export namespace Prisma {
     create: XOR<CommunitySubcommentCreateWithoutUserInput, CommunitySubcommentUncheckedCreateWithoutUserInput>
   }
 
+  export type CommunitySubcommentCreateManyUserInputEnvelope = {
+    data: Enumerable<CommunitySubcommentCreateManyUserInput>
+    skipDuplicates?: boolean
+  }
+
   export type LiveChatCreateWithoutUserInput = {
     id?: number
     message: string
@@ -25586,6 +29836,11 @@ export namespace Prisma {
     create: XOR<LiveChatCreateWithoutUserInput, LiveChatUncheckedCreateWithoutUserInput>
   }
 
+  export type LiveChatCreateManyUserInputEnvelope = {
+    data: Enumerable<LiveChatCreateManyUserInput>
+    skipDuplicates?: boolean
+  }
+
   export type NoticeNotificationsSubscriptionCreateWithoutUserInput = {
     noticeKey: string
     subscribedAt: Date | string
@@ -25600,6 +29855,11 @@ export namespace Prisma {
   export type NoticeNotificationsSubscriptionCreateOrConnectWithoutUserInput = {
     where: NoticeNotificationsSubscriptionWhereUniqueInput
     create: XOR<NoticeNotificationsSubscriptionCreateWithoutUserInput, NoticeNotificationsSubscriptionUncheckedCreateWithoutUserInput>
+  }
+
+  export type NoticeNotificationsSubscriptionCreateManyUserInputEnvelope = {
+    data: Enumerable<NoticeNotificationsSubscriptionCreateManyUserInput>
+    skipDuplicates?: boolean
   }
 
   export type ReportCommentCreateWithoutUserInput = {
@@ -25622,6 +29882,11 @@ export namespace Prisma {
     create: XOR<ReportCommentCreateWithoutUserInput, ReportCommentUncheckedCreateWithoutUserInput>
   }
 
+  export type ReportCommentCreateManyUserInputEnvelope = {
+    data: Enumerable<ReportCommentCreateManyUserInput>
+    skipDuplicates?: boolean
+  }
+
   export type ReportPostCreateWithoutUserInput = {
     title?: string
     body?: string | null
@@ -25640,6 +29905,11 @@ export namespace Prisma {
   export type ReportPostCreateOrConnectWithoutUserInput = {
     where: ReportPostWhereUniqueInput
     create: XOR<ReportPostCreateWithoutUserInput, ReportPostUncheckedCreateWithoutUserInput>
+  }
+
+  export type ReportPostCreateManyUserInputEnvelope = {
+    data: Enumerable<ReportPostCreateManyUserInput>
+    skipDuplicates?: boolean
   }
 
   export type ReportSubcommentCreateWithoutUserInput = {
@@ -25662,6 +29932,11 @@ export namespace Prisma {
     create: XOR<ReportSubcommentCreateWithoutUserInput, ReportSubcommentUncheckedCreateWithoutUserInput>
   }
 
+  export type ReportSubcommentCreateManyUserInputEnvelope = {
+    data: Enumerable<ReportSubcommentCreateManyUserInput>
+    skipDuplicates?: boolean
+  }
+
   export type TelegramCreateWithoutUserInput = {
     chatId: number
   }
@@ -25673,6 +29948,11 @@ export namespace Prisma {
   export type TelegramCreateOrConnectWithoutUserInput = {
     where: TelegramWhereUniqueInput
     create: XOR<TelegramCreateWithoutUserInput, TelegramUncheckedCreateWithoutUserInput>
+  }
+
+  export type TelegramCreateManyUserInputEnvelope = {
+    data: Enumerable<TelegramCreateManyUserInput>
+    skipDuplicates?: boolean
   }
 
   export type AdminUpdateWithoutUserInput = {
@@ -26023,6 +30303,7 @@ export namespace Prisma {
     password: string
     nickname: string
     randomNickname: string
+    point?: number | null
     joinedAt: Date | string
     refreshToken?: string | null
     admin?: AdminCreateNestedOneWithoutUserInput
@@ -26049,6 +30330,7 @@ export namespace Prisma {
     password: string
     nickname: string
     randomNickname: string
+    point?: number | null
     joinedAt: Date | string
     refreshToken?: string | null
     admin?: AdminUncheckedCreateNestedOneWithoutUserInput
@@ -26110,6 +30392,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     nickname?: StringFieldUpdateOperationsInput | string
     randomNickname?: StringFieldUpdateOperationsInput | string
+    point?: NullableIntFieldUpdateOperationsInput | number | null
     joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     refreshToken?: NullableStringFieldUpdateOperationsInput | string | null
     admin?: AdminUpdateOneWithoutUserInput
@@ -26136,6 +30419,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     nickname?: StringFieldUpdateOperationsInput | string
     randomNickname?: StringFieldUpdateOperationsInput | string
+    point?: NullableIntFieldUpdateOperationsInput | number | null
     joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     refreshToken?: NullableStringFieldUpdateOperationsInput | string | null
     admin?: AdminUncheckedUpdateOneWithoutUserInput
@@ -26203,6 +30487,7 @@ export namespace Prisma {
     password: string
     nickname: string
     randomNickname: string
+    point?: number | null
     joinedAt: Date | string
     refreshToken?: string | null
     admin?: AdminCreateNestedOneWithoutUserInput
@@ -26229,6 +30514,7 @@ export namespace Prisma {
     password: string
     nickname: string
     randomNickname: string
+    point?: number | null
     joinedAt: Date | string
     refreshToken?: string | null
     admin?: AdminUncheckedCreateNestedOneWithoutUserInput
@@ -26306,6 +30592,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     nickname?: StringFieldUpdateOperationsInput | string
     randomNickname?: StringFieldUpdateOperationsInput | string
+    point?: NullableIntFieldUpdateOperationsInput | number | null
     joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     refreshToken?: NullableStringFieldUpdateOperationsInput | string | null
     admin?: AdminUpdateOneWithoutUserInput
@@ -26332,6 +30619,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     nickname?: StringFieldUpdateOperationsInput | string
     randomNickname?: StringFieldUpdateOperationsInput | string
+    point?: NullableIntFieldUpdateOperationsInput | number | null
     joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     refreshToken?: NullableStringFieldUpdateOperationsInput | string | null
     admin?: AdminUncheckedUpdateOneWithoutUserInput
@@ -26383,6 +30671,7 @@ export namespace Prisma {
     password: string
     nickname: string
     randomNickname: string
+    point?: number | null
     joinedAt: Date | string
     refreshToken?: string | null
     admin?: AdminCreateNestedOneWithoutUserInput
@@ -26409,6 +30698,7 @@ export namespace Prisma {
     password: string
     nickname: string
     randomNickname: string
+    point?: number | null
     joinedAt: Date | string
     refreshToken?: string | null
     admin?: AdminUncheckedCreateNestedOneWithoutUserInput
@@ -26470,6 +30760,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     nickname?: StringFieldUpdateOperationsInput | string
     randomNickname?: StringFieldUpdateOperationsInput | string
+    point?: NullableIntFieldUpdateOperationsInput | number | null
     joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     refreshToken?: NullableStringFieldUpdateOperationsInput | string | null
     admin?: AdminUpdateOneWithoutUserInput
@@ -26496,6 +30787,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     nickname?: StringFieldUpdateOperationsInput | string
     randomNickname?: StringFieldUpdateOperationsInput | string
+    point?: NullableIntFieldUpdateOperationsInput | number | null
     joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     refreshToken?: NullableStringFieldUpdateOperationsInput | string | null
     admin?: AdminUncheckedUpdateOneWithoutUserInput
@@ -26521,6 +30813,7 @@ export namespace Prisma {
     password: string
     nickname: string
     randomNickname: string
+    point?: number | null
     joinedAt: Date | string
     refreshToken?: string | null
     admin?: AdminCreateNestedOneWithoutUserInput
@@ -26547,6 +30840,7 @@ export namespace Prisma {
     password: string
     nickname: string
     randomNickname: string
+    point?: number | null
     joinedAt: Date | string
     refreshToken?: string | null
     admin?: AdminUncheckedCreateNestedOneWithoutUserInput
@@ -26582,6 +30876,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     nickname?: StringFieldUpdateOperationsInput | string
     randomNickname?: StringFieldUpdateOperationsInput | string
+    point?: NullableIntFieldUpdateOperationsInput | number | null
     joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     refreshToken?: NullableStringFieldUpdateOperationsInput | string | null
     admin?: AdminUpdateOneWithoutUserInput
@@ -26608,6 +30903,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     nickname?: StringFieldUpdateOperationsInput | string
     randomNickname?: StringFieldUpdateOperationsInput | string
+    point?: NullableIntFieldUpdateOperationsInput | number | null
     joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     refreshToken?: NullableStringFieldUpdateOperationsInput | string | null
     admin?: AdminUncheckedUpdateOneWithoutUserInput
@@ -26626,6 +30922,24 @@ export namespace Prisma {
     reportComments?: ReportCommentUncheckedUpdateManyWithoutUserInput
     reportPosts?: ReportPostUncheckedUpdateManyWithoutUserInput
     reportSubcomments?: ReportSubcommentUncheckedUpdateManyWithoutUserInput
+  }
+
+  export type CommunityBoardPinCreateManyCommunityBoardInput = {
+    userId: number
+  }
+
+  export type CommunityPostCreateManyCommunityBoardInput = {
+    id?: number
+    userId: number
+    title: string
+    body: string
+    randomNickname: string
+    likesCount?: number
+    commentsCount?: number
+    bookmarksCount?: number
+    postedAt: Date | string
+    editedAt?: Date | string | null
+    isDeleted?: boolean
   }
 
   export type CommunityBoardPinUpdateWithoutCommunityBoardInput = {
@@ -26691,6 +31005,10 @@ export namespace Prisma {
     isDeleted?: BoolFieldUpdateOperationsInput | boolean
   }
 
+  export type CommunityBoardCandidateVoteCreateManyCommunityBoardCandidateInput = {
+    userId: number
+  }
+
   export type CommunityBoardCandidateVoteUpdateWithoutCommunityBoardCandidateInput = {
     user?: UserUpdateOneRequiredWithoutCommunityBoardCandidateVotesInput
   }
@@ -26701,6 +31019,24 @@ export namespace Prisma {
 
   export type CommunityBoardCandidateVoteUncheckedUpdateManyWithoutCommunityBoardCandidateVotesInput = {
     userId?: IntFieldUpdateOperationsInput | number
+  }
+
+  export type CommunitySubcommentCreateManyCommunityCommentInput = {
+    id?: number
+    userId: number
+    postId: number
+    randomNickname?: string
+    body: string
+    subcommentedAt: Date | string
+    isDeleted?: boolean
+  }
+
+  export type ReportCommentCreateManyCommunityCommentInput = {
+    id?: number
+    userId: number
+    title?: string
+    body?: string | null
+    reportedAt: Date | string
   }
 
   export type CommunitySubcommentUpdateWithoutCommunityCommentInput = {
@@ -26755,6 +31091,41 @@ export namespace Prisma {
     title?: StringFieldUpdateOperationsInput | string
     body?: NullableStringFieldUpdateOperationsInput | string | null
     reportedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type CommunityCommentCreateManyCommunityPostInput = {
+    id?: number
+    userId: number
+    randomNickname?: string
+    body: string
+    commentedAt: Date | string
+    isDeleted?: boolean
+  }
+
+  export type CommunityPostBookmarkCreateManyCommunityPostInput = {
+    userId: number
+  }
+
+  export type CommunityPostLikeCreateManyCommunityPostInput = {
+    userId: number
+  }
+
+  export type CommunitySubcommentCreateManyCommunityPostInput = {
+    id?: number
+    userId: number
+    commentId: number
+    randomNickname?: string
+    body: string
+    subcommentedAt: Date | string
+    isDeleted?: boolean
+  }
+
+  export type ReportPostCreateManyCommunityPostInput = {
+    id?: number
+    userId: number
+    title?: string
+    body?: string | null
+    reportedAt: Date | string
   }
 
   export type CommunityCommentUpdateWithoutCommunityPostInput = {
@@ -26855,6 +31226,14 @@ export namespace Prisma {
     reportedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type ReportSubcommentCreateManyCommunitySubcommentInput = {
+    id?: number
+    userId: number
+    title?: string
+    body?: string | null
+    reportedAt: Date | string
+  }
+
   export type ReportSubcommentUpdateWithoutCommunitySubcommentInput = {
     title?: StringFieldUpdateOperationsInput | string
     body?: NullableStringFieldUpdateOperationsInput | string | null
@@ -26878,6 +31257,10 @@ export namespace Prisma {
     reportedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type CoverageMajorLectureCreateManyCoverageMajorInput = {
+    lectureId: string
+  }
+
   export type CoverageMajorLectureUpdateWithoutCoverageMajorInput = {
     lecture?: LectureUpdateOneRequiredWithoutCoverageMajorLecturesInput
   }
@@ -26888,6 +31271,18 @@ export namespace Prisma {
 
   export type CoverageMajorLectureUncheckedUpdateManyWithoutCoverageMajorLecturesInput = {
     lectureId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type CoverageMajorLectureCreateManyLectureInput = {
+    majorCode: string
+  }
+
+  export type PeriodCreateManyLectureInput = {
+    day: string
+    startH: number
+    startM: number
+    endH: number
+    endM: number
   }
 
   export type CoverageMajorLectureUpdateWithoutLectureInput = {
@@ -26920,6 +31315,113 @@ export namespace Prisma {
     startM?: IntFieldUpdateOperationsInput | number
     endH?: IntFieldUpdateOperationsInput | number
     endM?: IntFieldUpdateOperationsInput | number
+  }
+
+  export type CommunityBoardCreateManyUserInput = {
+    id?: number
+    name?: string
+    description?: string | null
+    priority?: number
+    isDeleted?: boolean
+    createdAt: Date | string
+    activeAt?: Date | string | null
+  }
+
+  export type CommunityBoardCandidateCreateManyUserInput = {
+    id?: number
+    name?: string
+    description?: string | null
+    createdAt: Date | string
+  }
+
+  export type CommunityBoardCandidateVoteCreateManyUserInput = {
+    boardCandidateId: number
+  }
+
+  export type CommunityBoardPinCreateManyUserInput = {
+    boardId: number
+  }
+
+  export type CommunityCommentCreateManyUserInput = {
+    id?: number
+    postId: number
+    randomNickname?: string
+    body: string
+    commentedAt: Date | string
+    isDeleted?: boolean
+  }
+
+  export type CommunityPostCreateManyUserInput = {
+    id?: number
+    boardId: number
+    title: string
+    body: string
+    randomNickname: string
+    likesCount?: number
+    commentsCount?: number
+    bookmarksCount?: number
+    postedAt: Date | string
+    editedAt?: Date | string | null
+    isDeleted?: boolean
+  }
+
+  export type CommunityPostBookmarkCreateManyUserInput = {
+    postId: number
+  }
+
+  export type CommunityPostLikeCreateManyUserInput = {
+    postId: number
+  }
+
+  export type CommunitySubcommentCreateManyUserInput = {
+    id?: number
+    postId: number
+    commentId: number
+    randomNickname?: string
+    body: string
+    subcommentedAt: Date | string
+    isDeleted?: boolean
+  }
+
+  export type LiveChatCreateManyUserInput = {
+    id?: number
+    message: string
+    createdAt: Date | string
+    randomNickname: string
+  }
+
+  export type NoticeNotificationsSubscriptionCreateManyUserInput = {
+    id?: number
+    noticeKey: string
+    subscribedAt: Date | string
+  }
+
+  export type ReportCommentCreateManyUserInput = {
+    id?: number
+    commentId: number
+    title?: string
+    body?: string | null
+    reportedAt: Date | string
+  }
+
+  export type ReportPostCreateManyUserInput = {
+    id?: number
+    postId: number
+    title?: string
+    body?: string | null
+    reportedAt: Date | string
+  }
+
+  export type ReportSubcommentCreateManyUserInput = {
+    id?: number
+    subcommentId: number
+    title?: string
+    body?: string | null
+    reportedAt: Date | string
+  }
+
+  export type TelegramCreateManyUserInput = {
+    chatId: number
   }
 
   export type CommunityBoardUpdateWithoutUserInput = {
