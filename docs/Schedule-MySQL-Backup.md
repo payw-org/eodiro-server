@@ -22,16 +22,6 @@
 % mysql -u [username] -p [database] < backup.sql
 ```
 
-## Crontab
-
-```zsh
-crontab -e
-```
-
-```
-00 23 * * * mysqldump -u [username] -p [database] | gzip > /home/utente/backup.sql.gz
-```
-
 ### Password
 
 Create `.my.cnf` in the home directory.
