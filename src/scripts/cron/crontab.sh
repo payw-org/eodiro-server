@@ -20,5 +20,8 @@
 # clear pending users every 30 minutes
 */30 * * * * [path-to-node] [path-to-cron]/clear-pending-users
 
+# backup db everyday at 00:00
+0 0 * * * [path-to-node] [path-to-cron]/backup-db
+
 # seed cafeteria menus at 03:00 everyday
 # 0 3 * * * NODE_ENV=production [path-to-node] [path-to-cron]/seed-cafeteria-menus
