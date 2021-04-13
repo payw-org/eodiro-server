@@ -6,7 +6,7 @@
 # > sudo service cron start
 
 # [path-to-node]: ex) /home/~/node/v13/bin/node
-# [path-to-cron]: ex) /home/~/cron
+# [path-to-cron]: ex) /home/~/build/scripts/cron
 
 # update random nicknames at 00:00
 0 0 * * * [path-to-node] [path-to-cron]/update-random-nicknames
