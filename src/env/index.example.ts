@@ -5,6 +5,11 @@ export default {
   CLIENT_PORT: 0,
   CLIENT_DEV_PORT: 0,
 
+  // DB
+  DB_PROD_NAME: '',
+  DB_DEV_NAME: '',
+  DB_USERNAME: '',
+
   // GitHub
   GITHUB_OAUTH_TOKEN: '',
 
@@ -30,6 +35,10 @@ export default {
 
   // Cron
   TIME_ZONE: '',
+
+  // Path
+  PATH_MYSQL_CONF: '',
+  PATH_MYSQL_BACKUP: '',
 
   // Imgur
   IMGUR_HOST: '',
