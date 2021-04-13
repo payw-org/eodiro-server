@@ -51,4 +51,9 @@ To keep the password safe, the file should not be accessible to anyone but yours
 % chmod 600 .my.cnf
 ```
 
+To name from the command line a specific option file containing the password, use the `--defaults-extra-file=file_name` option, where `file_name` is the full path name to the file.
+
+- `--defaults-extra-file=file_name` should be the first argument.
+- Once you add the `--defaults-extra-file=file_name` you must drop the `-p` flag from your command.
+
 [Reference (Stack Overflow)](https://stackoverflow.com/questions/6861355/mysqldump-launched-by-cron-and-password-security/6861458#6861458)
