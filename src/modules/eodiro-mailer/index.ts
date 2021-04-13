@@ -1,6 +1,7 @@
 import env from '@/env'
 import chalk from 'chalk'
 import NodeMailer from 'nodemailer'
+import type Mail from 'nodemailer/lib/mailer'
 
 const { log } = console
 
@@ -15,6 +16,7 @@ interface MailOption {
   subject: string
   to: string
   html?: string
+  attachments?: Mail.Attachment[]
 }
 
 export default class EodiroMailer {
