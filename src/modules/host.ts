@@ -1,4 +1,4 @@
-import { env } from '@/env'
+import env from '@/env'
 import { isDev } from './utils/is-dev'
 
 export const eodiroClientHost = isDev()

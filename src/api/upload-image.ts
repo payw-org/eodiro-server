@@ -1,5 +1,5 @@
 import { httpStatus } from '@/constant/http-status'
-import { env } from '@/env'
+import env from '@/env'
 import axios from 'axios'
 import express from 'express'
 import FormData from 'form-data'

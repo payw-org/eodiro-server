@@ -6,7 +6,7 @@ import express from 'express'
 import http from 'http'
 import morgan from 'morgan'
 import api from './api'
-import { env } from './env'
+import env from './env'
 import { prisma } from './modules/prisma'
 import { isDev } from './modules/utils/is-dev'
 

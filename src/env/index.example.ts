@@ -1,4 +1,4 @@
-export const env = {
+export default {
   // Ports
   PORT: 0,
   DEV_PORT: 0,
