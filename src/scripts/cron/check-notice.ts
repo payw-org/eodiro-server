@@ -1,6 +1,7 @@
 import { CauNoticeWatcher } from '@/modules/cau-notice-watcher'
 import * as Publishers from '@/modules/cau-notice-watcher/publishers'
 import { prisma } from '@/modules/prisma'
+import kill from '@/modules/utils/kill'
 
 async function run() {
   const watcher = new CauNoticeWatcher()
@@ -25,6 +26,10 @@ async function run() {
   }
 
   await prisma.$disconnect()
+
+  const queries = ['prisma', 'chromium', 'check-notice']
+  queries.forEach((query) => kill(query))
+
   process.exit()
 }
 
