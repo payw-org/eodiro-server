@@ -78,6 +78,4 @@ export async function checkBoardCandidateVotes() {
   })
 
   await Promise.all(transactions)
-
-  process.exit()
 }

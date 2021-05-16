@@ -149,12 +149,7 @@ export class CauNoticeWatcher {
 
     // page.setMaxListeners(Infinity)
 
-    const noticesSet = await CauNoticeWatcher.visit(page, publisher).catch(
-      (err) => {
-        console.error(err)
-        process.exit()
-      }
-    )
+    const noticesSet = await CauNoticeWatcher.visit(page, publisher)
     const notices = Array.from(noticesSet)
 
     if (notices.length === 0) {
