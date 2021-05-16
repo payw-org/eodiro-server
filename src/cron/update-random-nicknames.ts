@@ -1,7 +1,7 @@
 import { prisma } from '@/modules/prisma'
 import { rng } from '@/modules/random-name-generator'
 
-async function updateRandomNicknames() {
+export async function updateRandomNicknames() {
   const users = await prisma.user.findMany()
 
   const updateQueries = users.map((user) => {
@@ -15,5 +15,3 @@ async function updateRandomNicknames() {
   await prisma.$disconnect()
   process.exit()
 }
-
-updateRandomNicknames()

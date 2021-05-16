@@ -2,7 +2,7 @@ import { eodiroConst } from '@/constant'
 import { prisma } from '@/modules/prisma'
 import dayjs from 'dayjs'
 
-async function run() {
+export async function checkBoardCandidateVotes() {
   const boardCandidates = await prisma.communityBoardCandidate.findMany({
     include: {
       communityBoardCandidateVotes: true,
@@ -81,5 +81,3 @@ async function run() {
 
   process.exit()
 }
-
-run()

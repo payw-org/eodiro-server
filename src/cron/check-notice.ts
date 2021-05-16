@@ -3,7 +3,7 @@ import * as Publishers from '@/modules/cau-notice-watcher/publishers'
 import { prisma } from '@/modules/prisma'
 import kill from '@/modules/utils/kill'
 
-async function run() {
+export async function checkNotice() {
   const watcher = new CauNoticeWatcher()
 
   watcher.register(Publishers.cau)
@@ -32,5 +32,3 @@ async function run() {
 
   process.exit()
 }
-
-run()

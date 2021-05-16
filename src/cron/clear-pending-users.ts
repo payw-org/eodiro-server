@@ -1,7 +1,7 @@
 import { prisma } from '@/modules/prisma'
 import dayjs from 'dayjs'
 
-async function clearPendingUsers() {
+export async function clearPendingUsers() {
   const pendingUsers = await prisma.pendingUser.findMany()
 
   const deletions: Promise<any>[] = []
@@ -23,5 +23,3 @@ async function clearPendingUsers() {
   await prisma.$disconnect()
   process.exit()
 }
-
-clearPendingUsers()

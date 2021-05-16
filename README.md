@@ -47,12 +47,6 @@ It uses MySQL internally as its database.
 
 [Installation](https://gist.github.com/jhaemin/651e335525f002011bd90d75f0e49c8e)
 
-### Cron
-
-We have multiple periodic jobs. Those are including clearing pending users, garbage collecting dangling user-uploaded files, scraping data from websites and much more. Previously these jobs were running inside the main process through so called **node-cron**. Unfortunately we faced the issue([#41](https://github.com/payw-org/eodiro-server/issues/41)) where the headless browsers(Zombie.js and Puppeteer) leak memories on every browser instance creation. So, from `v2.1.0`, they are separated from the main process and moved to **cron**. This approach additionally provides few improvements as well as resolving the memory leak problem which is critical. They are now isolated and run in background even when the main server process got blocked or updating. It means that periodic jobs never halt and always achieve what they have to.
-
-[Configuration](https://github.com/payw-org/eodiro-server/blob/master/src/scripts/crontab.sh)
-
 ---
 
 ## 📚 API References
