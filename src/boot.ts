@@ -11,7 +11,7 @@ import env from './env'
 import { prisma } from './modules/prisma'
 import { isDev } from './modules/utils/is-dev'
 
-const dev = isDev()
+const dev = isDev
 const log = console.log
 
 type QuitFunction = () => void
