@@ -1,5 +1,3 @@
-import { isDev } from '@/modules/utils/is-dev'
-import kill from '@/modules/utils/kill'
 import schedule from 'node-schedule'
 import { backupDb } from './backup-db'
 import { checkBoardCandidateVotes } from './check-board-candidate-votes'
@@ -19,9 +17,9 @@ schedule.scheduleJob('0 0 * * *', checkBoardCandidateVotes)
 schedule.scheduleJob('0 0 * * *', updateRandomNicknames)
 
 // Kill processes every 15 minutes in production
-if (isDev) {
-  schedule.scheduleJob('*/15 * * * *', () => {
-    const queries = ['prisma', 'chromium']
-    queries.forEach((query) => kill(query))
-  })
-}
+// if (isDev) {
+//   schedule.scheduleJob('*/15 * * * *', () => {
+//     const queries = ['prisma', 'chromium']
+//     queries.forEach((query) => kill(query))
+//   })
+// }
