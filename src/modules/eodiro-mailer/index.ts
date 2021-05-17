@@ -21,10 +21,10 @@ interface MailOption {
 
 export default class EodiroMailer {
   private static transporter = NodeMailer?.createTransport({
-    service: env.MAIL_SERVICE,
     host: env.MAIL_HOST,
     port: env.MAIL_PORT,
-    secure: true,
+    secure: false,
+    requireTLS: true,
     auth: {
       user: env.MAIL_USERNAME,
       pass: env.MAIL_PASSWORD,
@@ -37,11 +37,11 @@ export default class EodiroMailer {
     return new Promise((resolve) => {
       this.transporter.verify((err) => {
         if (err) {
-          log(`[ ${chalk.red('error')} ] failed to connect to zoho mail server`)
+          log(`[ ${chalk.red('error')} ] failed to connect to Gmail server`)
           console.error(err.message)
           resolve(false)
         } else {
-          log(`[ ${chalk.yellow('email')} ] connected to zoho mail server`)
+          log(`[ ${chalk.yellow('email')} ] connected to Gmail server`)
           this.isReady = true
           resolve(true)
         }

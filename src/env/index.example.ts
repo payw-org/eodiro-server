@@ -23,7 +23,6 @@ export default {
   TEST_EXPO_PUSH_TOKEN: '',
 
   // Email
-  MAIL_SERVICE: '',
   MAIL_HOST: '',
   MAIL_PORT: 0,
   MAIL_USERNAME: '',
