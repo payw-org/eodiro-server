@@ -12,9 +12,9 @@ schedule.scheduleJob('*/15 * * * *', checkNotice)
 schedule.scheduleJob('*/30 * * * *', clearPendingUsers)
 
 // every 00:00
-schedule.scheduleJob('0 0 * * *', backupDb)
-schedule.scheduleJob('0 0 * * *', checkBoardCandidateVotes)
-schedule.scheduleJob('0 0 * * *', updateRandomNicknames)
+schedule.scheduleJob('0 0 0 * * *', backupDb)
+schedule.scheduleJob('0 0 0 * * *', checkBoardCandidateVotes)
+schedule.scheduleJob('0 0 0 * * *', updateRandomNicknames)
 
 // Kill processes every 15 minutes in production
 // if (isDev) {
