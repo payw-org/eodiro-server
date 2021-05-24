@@ -12,9 +12,9 @@ new CronJob('*/15 * * * *', checkNotice, null, true, 'Asia/Seoul')
 new CronJob('*/30 * * * *', clearPendingUsers, null, true, 'Asia/Seoul')
 
 // every 00:00
-new CronJob('0 0 * * *', backupDb, null, true, 'Asia/Seoul')
-new CronJob('0 0 * * *', checkBoardCandidateVotes, null, true, 'Asia/Seoul')
-new CronJob('0 0 * * *', updateRandomNicknames, null, true, 'Asia/Seoul')
+new CronJob('0 0 0 * * *', backupDb, null, true, 'Asia/Seoul')
+new CronJob('0 0 0 * * *', checkBoardCandidateVotes, null, true, 'Asia/Seoul')
+new CronJob('0 0 0 * * *', updateRandomNicknames, null, true, 'Asia/Seoul')
 
 // Kill processes every 15 minutes in production
 // if (isDev) {
