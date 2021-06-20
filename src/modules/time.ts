@@ -121,6 +121,7 @@ export function yyyymmddhhmm(date: string | Date, pretty?: boolean): string {
   return dayjs(date).format('YYYY-MM-DD HH:mm')
 }
 
+// Subtract 9 hours from all the Date objects recursively
 function subtract9Hours(obj: Record<string, unknown>) {
   if (!obj) return
 
@@ -135,7 +136,6 @@ function subtract9Hours(obj: Record<string, unknown>) {
   }
 }
 
-// Subtract 9 hours from all the Date objects
 export function prismaTimeMod<T>(value: T): T {
   if (value instanceof Date) {
     return dayjs(value).subtract(9, 'hour').toDate() as any
