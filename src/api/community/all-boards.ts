@@ -1,4 +1,4 @@
-import { prisma } from '@/modules/prisma'
+import prisma from '@/modules/prisma'
 import express from 'express'
 
 const router = express.Router()
@@ -71,11 +71,8 @@ router.get<any, ApiCommunityAllBoardCandidatesResData>(
       })
     )
       .map((candidate) => {
-        const {
-          createdBy,
-          communityBoardCandidateVotes,
-          ...safeCandidate
-        } = candidate
+        const { createdBy, communityBoardCandidateVotes, ...safeCandidate } =
+          candidate
 
         return {
           isMine: createdBy === req.user.id,

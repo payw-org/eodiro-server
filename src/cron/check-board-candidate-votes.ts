@@ -1,5 +1,5 @@
 import { eodiroConst } from '@/constant'
-import { prisma } from '@/modules/prisma'
+import prisma from '@/modules/prisma'
 import dayjs from 'dayjs'
 
 export async function checkBoardCandidateVotes() {

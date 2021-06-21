@@ -1,4 +1,4 @@
-import { prisma } from '@/modules/prisma'
+import prisma from '@/modules/prisma'
 import { SafeCommunityBoard } from '@/types/schema'
 import express from 'express'
 

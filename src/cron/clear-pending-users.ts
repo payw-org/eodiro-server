@@ -1,4 +1,4 @@
-import { prisma } from '@/modules/prisma'
+import prisma from '@/modules/prisma'
 import dayjs from 'dayjs'
 
 export async function clearPendingUsers() {

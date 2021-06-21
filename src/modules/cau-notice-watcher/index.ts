@@ -1,4 +1,4 @@
-import { prisma } from '@/modules/prisma'
+import prisma from '@/modules/prisma'
 import appRoot from 'app-root-path'
 import chalk from 'chalk'
 import fs from 'fs'

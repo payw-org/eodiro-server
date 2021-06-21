@@ -2,7 +2,7 @@ import { eodiroConst } from '@/constant'
 import { httpStatus } from '@/constant/http-status'
 import { handleExpressValidation } from '@/middleware/handle-express-validation'
 import { makeBodyValidator } from '@/modules/express-validator-utils'
-import { prisma } from '@/modules/prisma'
+import prisma from '@/modules/prisma'
 import { dbNow } from '@/modules/time'
 import express from 'express'
 
@@ -14,13 +14,12 @@ async function isBoardNameExists(boardName: string): Promise<boolean> {
       name: boardName,
     },
   })
-  const existingBoardCandidate = await prisma.communityBoardCandidate.findUnique(
-    {
+  const existingBoardCandidate =
+    await prisma.communityBoardCandidate.findUnique({
       where: {
         name: boardName,
       },
-    }
-  )
+    })
 
   return existingBoard !== null || existingBoardCandidate !== null
 }

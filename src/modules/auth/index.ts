@@ -4,7 +4,7 @@ import changePasswordEmailTemplate from '@/modules/eodiro-mailer/templates/chang
 import joinEmailTemplate from '@/modules/eodiro-mailer/templates/join'
 import crypto from 'crypto'
 import Mustache from 'mustache'
-import { prisma } from '../prisma'
+import prisma from '../prisma'
 import { rng } from '../random-name-generator'
 import { sanitizePortalId } from '../sanitize-portal-id'
 import { dbNow } from '../time'

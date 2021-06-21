@@ -1,7 +1,7 @@
 import { httpStatus } from '@/constant/http-status'
 import { extractJwt } from '@/modules/auth/extract-token'
 import { signRefreshToken, verifyJwt } from '@/modules/jwt'
-import { prisma } from '@/modules/prisma'
+import prisma from '@/modules/prisma'
 import express from 'express'
 
 const router = express.Router()

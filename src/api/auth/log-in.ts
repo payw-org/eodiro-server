@@ -3,7 +3,7 @@ import { LogInInfo } from '@/modules/auth'
 import { setCookie } from '@/modules/cookie'
 import EodiroEncrypt from '@/modules/eodiro-encrypt'
 import { AuthData, signAccessToken, signRefreshToken } from '@/modules/jwt'
-import { prisma } from '@/modules/prisma'
+import prisma from '@/modules/prisma'
 import { sanitizePortalId } from '@/modules/sanitize-portal-id'
 import express from 'express'
 

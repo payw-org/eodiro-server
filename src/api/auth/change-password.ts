@@ -6,7 +6,7 @@ import {
   validatePassword,
 } from '@/modules/auth/validation'
 import { makeBodyValidator } from '@/modules/express-validator-utils'
-import { prisma } from '@/modules/prisma'
+import prisma from '@/modules/prisma'
 import express from 'express'
 
 const router = express.Router()

@@ -1,5 +1,5 @@
 import EodiroEncrypt from '@/modules/eodiro-encrypt'
-import { prisma } from '@/modules/prisma'
+import prisma from '@/modules/prisma'
 import { sanitizePortalId } from '@/modules/sanitize-portal-id'
 import { telegramBot as bot } from '@/modules/telegram-bot'
 

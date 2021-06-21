@@ -13,4 +13,4 @@ function timeMod(prismaInstance: PrismaClient) {
 const prisma = new PrismaClient()
 timeMod(prisma)
 
-export { prisma }
+export default prisma

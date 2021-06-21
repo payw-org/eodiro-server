@@ -5,7 +5,7 @@ import {
   makeBodyValidator,
   makeQueryValidator,
 } from '@/modules/express-validator-utils'
-import { prisma } from '@/modules/prisma'
+import prisma from '@/modules/prisma'
 import { secureTable } from '@/modules/secure-table'
 import { telegramBot } from '@/modules/telegram-bot'
 import { dbNow } from '@/modules/time'
@@ -222,7 +222,8 @@ export type ApiCommunityGetSubcommentsReqQuery = {
 
 export type ApiCommunitySubcommentsResData = SafeCommunitySubcomment[]
 
-const getSubcommentsQuery = makeQueryValidator<ApiCommunityGetSubcommentsReqQuery>()
+const getSubcommentsQuery =
+  makeQueryValidator<ApiCommunityGetSubcommentsReqQuery>()
 
 router.get<
   any,
@@ -268,7 +269,8 @@ export type ApiCommunityCreateSubcommentReqBody = {
   commentId: number
 }
 
-const createSubcommentBody = makeBodyValidator<ApiCommunityCreateSubcommentReqBody>()
+const createSubcommentBody =
+  makeBodyValidator<ApiCommunityCreateSubcommentReqBody>()
 
 router.post<any, any, ApiCommunityCreateSubcommentReqBody>(
   '/subcomment',
@@ -371,7 +373,8 @@ export type ApiCommunityDeleteSubcommentReqBody = {
   subcommentId: number
 }
 
-const deleteSubcommentBody = makeBodyValidator<ApiCommunityDeleteSubcommentReqBody>()
+const deleteSubcommentBody =
+  makeBodyValidator<ApiCommunityDeleteSubcommentReqBody>()
 
 router.delete<any, any, ApiCommunityDeleteSubcommentReqBody>(
   '/subcomment',

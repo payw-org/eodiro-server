@@ -1,6 +1,6 @@
 import env from '@/env'
 import jwt from 'jsonwebtoken'
-import { prisma } from './prisma'
+import prisma from './prisma'
 
 export type AuthData = {
   userId: number

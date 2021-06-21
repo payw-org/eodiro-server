@@ -1,5 +1,5 @@
 import { httpStatus } from '@/constants/http-status'
-import { prisma } from '@/modules/prisma'
+import prisma from '@/modules/prisma'
 import { Campus } from '@/types'
 import dayjs from 'dayjs'
 import express from 'express'

@@ -5,7 +5,7 @@ import {
   makeBodyValidator,
   makeQueryValidator,
 } from '@/modules/express-validator-utils'
-import { prisma } from '@/modules/prisma'
+import prisma from '@/modules/prisma'
 import { secureTable } from '@/modules/secure-table'
 import { dbNow } from '@/modules/time'
 import { SafeCommunityPost } from '@/types/schema'

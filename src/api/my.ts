@@ -1,6 +1,6 @@
 import { httpStatus } from '@/constant/http-status'
 import { requireAuth } from '@/middleware/require-auth'
-import { prisma } from '@/modules/prisma'
+import prisma from '@/modules/prisma'
 import { User } from '@/prisma/client'
 import express from 'express'
 

@@ -1,4 +1,4 @@
-import { prisma } from '@/modules/prisma'
+import prisma from '@/modules/prisma'
 import express from 'express'
 
 const router = express.Router()

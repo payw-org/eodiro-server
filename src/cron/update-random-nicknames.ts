@@ -1,4 +1,4 @@
-import { prisma } from '@/modules/prisma'
+import prisma from '@/modules/prisma'
 import { rng } from '@/modules/random-name-generator'
 
 export async function updateRandomNicknames() {

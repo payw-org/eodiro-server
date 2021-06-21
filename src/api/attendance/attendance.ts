@@ -1,5 +1,5 @@
 import { requireAuth } from '@/middleware/require-auth'
-import { prisma } from '@/modules/prisma'
+import prisma from '@/modules/prisma'
 import { dbNow } from '@/modules/time'
 import dayjs from 'dayjs'
 import express from 'express'

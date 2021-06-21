@@ -1,4 +1,4 @@
-import { prisma } from '@/modules/prisma'
+import prisma from '@/modules/prisma'
 import { dbTime } from '@/modules/time'
 import { SafeCommunityBoard } from '@/types/schema'
 import dayjs from 'dayjs'

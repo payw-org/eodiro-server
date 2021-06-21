@@ -1,6 +1,6 @@
 import { httpStatus } from '@/constant/http-status'
 import { handleExpressValidation } from '@/middleware/handle-express-validation'
-import { prisma } from '@/modules/prisma'
+import prisma from '@/modules/prisma'
 import express from 'express'
 import { body } from 'express-validator'
 
@@ -28,13 +28,8 @@ router.post<any, any, ApiAuthVerifyJoinReqBody>(
     const clearPendingUser = prisma.pendingUser.delete({
       where: { token },
     })
-    const {
-      portalId,
-      nickname,
-      password,
-      randomNickname,
-      joinedAt,
-    } = pendingUser
+    const { portalId, nickname, password, randomNickname, joinedAt } =
+      pendingUser
     const createUser = prisma.user.create({
       data: { portalId, nickname, password, randomNickname, joinedAt },
     })

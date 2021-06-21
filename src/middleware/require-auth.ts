@@ -1,7 +1,7 @@
 import { httpStatus } from '@/constant/http-status'
 import { extractJwt } from '@/modules/auth/extract-token'
 import { JwtError, verifyJwt } from '@/modules/jwt'
-import { prisma } from '@/modules/prisma'
+import prisma from '@/modules/prisma'
 import { NextFunction, Request, Response } from 'express'
 
 export type MiddlewareRequireAuthResData = {

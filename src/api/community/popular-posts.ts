@@ -1,7 +1,7 @@
 import { eodiroConst } from '@/constant'
 import { handleExpressValidation } from '@/middleware/handle-express-validation'
 import { makeQueryValidator } from '@/modules/express-validator-utils'
-import { prisma } from '@/modules/prisma'
+import prisma from '@/modules/prisma'
 import { secureTable } from '@/modules/secure-table'
 import { SafeCommunityPost } from '@/types/schema'
 import express from 'express'
@@ -18,7 +18,8 @@ export type ApiCommunityGetPopularPostsResData = {
   popularPosts: SafeCommunityPost[]
 }
 
-const getPopularPostsQuery = makeQueryValidator<ApiCommunityGetPopularPostsReqQuery>()
+const getPopularPostsQuery =
+  makeQueryValidator<ApiCommunityGetPopularPostsReqQuery>()
 
 router.get<
   any,

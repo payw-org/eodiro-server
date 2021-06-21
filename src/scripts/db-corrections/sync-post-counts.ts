@@ -1,6 +1,6 @@
 // Sync community post's likes, comments, subcomments, bookmarks count.
 
-import { prisma } from '@/modules/prisma'
+import prisma from '@/modules/prisma'
 
 async function sync() {
   const posts = await prisma.communityPost.findMany()

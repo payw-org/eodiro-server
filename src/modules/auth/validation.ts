@@ -1,5 +1,5 @@
 import { eodiroConst } from '@/constant'
-import { prisma } from '@/modules/prisma'
+import prisma from '@/modules/prisma'
 import { sanitizePortalId } from '@/modules/sanitize-portal-id'
 
 export type AuthValidationResult = {

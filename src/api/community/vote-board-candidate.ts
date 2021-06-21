@@ -1,7 +1,7 @@
 import { httpStatus } from '@/constant/http-status'
 import { handleExpressValidation } from '@/middleware/handle-express-validation'
 import { makeBodyValidator } from '@/modules/express-validator-utils'
-import { prisma } from '@/modules/prisma'
+import prisma from '@/modules/prisma'
 import express from 'express'
 
 const router = express.Router()

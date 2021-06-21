@@ -1,4 +1,4 @@
-import { prisma } from '@/modules/prisma'
+import prisma from '@/modules/prisma'
 
 async function updateSubcommentPostId() {
   const subcomments = await prisma.communitySubcomment.findMany({

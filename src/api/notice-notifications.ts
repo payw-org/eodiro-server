@@ -2,7 +2,7 @@ import { handleExpressValidation } from '@/middleware/handle-express-validation'
 import { requireAuth } from '@/middleware/require-auth'
 import { availablePublishers } from '@/modules/cau-notice-watcher/publishers'
 import { makeBodyValidator } from '@/modules/express-validator-utils'
-import { prisma } from '@/modules/prisma'
+import prisma from '@/modules/prisma'
 import { dbNow } from '@/modules/time'
 import express from 'express'
 
@@ -48,7 +48,8 @@ export type ApiNoticeNotificationsSubscribeResData = {
   subscribed: boolean
 }
 
-const subscribeBody = makeBodyValidator<ApiNoticeNotificationsSubscribeReqBody>()
+const subscribeBody =
+  makeBodyValidator<ApiNoticeNotificationsSubscribeReqBody>()
 
 router.post<
   any,
@@ -72,14 +73,13 @@ router.post<
     }
 
     // Find the existing subscription
-    const existingSubscription = await prisma.noticeNotificationsSubscription.findFirst(
-      {
+    const existingSubscription =
+      await prisma.noticeNotificationsSubscription.findFirst({
         where: {
           userId: user.id,
           noticeKey: key,
         },
-      }
-    )
+      })
 
     if (existingSubscription) {
       await prisma.noticeNotificationsSubscription.delete({
