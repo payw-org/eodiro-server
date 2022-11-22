@@ -69,7 +69,7 @@
     "pluralize": "^8.0.0",
     "reflect-metadata": "^0.1.13",
     "serve-handler": "^6.1.3",
-    "socket.io": "^4.1.3",
+    "socket.io": "^4.5.3",
     "sql-formatter": "^4.0.2",
     "uuid": "^8.3.2",
     "yargs": "^16.2.0"
